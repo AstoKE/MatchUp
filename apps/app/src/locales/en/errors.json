@@ -1,0 +1,21 @@
+{
+  "NOT_AUTHENTICATED": "You need to sign in to do that.",
+  "NOT_ALLOWED": "You're not allowed to do that.",
+  "ACCOUNT_RESTRICTED": "Your account is restricted. Please contact support.",
+  "EMAIL_NOT_VERIFIED": "Please verify your email address first.",
+  "NOT_FOUND": "We couldn't find what you were looking for.",
+  "VALIDATION_FAILED": "Please check the information you entered and try again.",
+  "INVALID_TRANSITION": "That can't be done right now.",
+  "EVENT_FULL": "This event is full.",
+  "REGISTRATION_CLOSED": "Registration for this event is closed.",
+  "ALREADY_REQUESTED": "You've already sent a request for this event.",
+  "REQUEST_LIMIT_REACHED": "You've reached the request limit for this event.",
+  "BLOCKED": "That action isn't available.",
+  "RATE_LIMITED": "You're doing that too often. Please try again in a little while.",
+  "REVIEW_NOT_ELIGIBLE": "You can't review this player.",
+  "ALREADY_REVIEWED": "You've already reviewed this player.",
+  "WINDOW_CLOSED": "The review window has closed.",
+  "NETWORK": "Couldn't connect. Check your internet connection and try again.",
+  "TIMEOUT": "That took too long. Please try again.",
+  "UNKNOWN": "Something went wrong. Please try again."
+}
