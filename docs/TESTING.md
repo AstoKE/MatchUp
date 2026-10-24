@@ -88,3 +88,18 @@ Automated: axe in Playwright; RNTL queries by role/label; token contrast test. *
 ## 7. Release criteria
 
 All CI gates green on the release commit; manual a11y checklist complete; load results meet budgets or have signed-off waivers; security advisor clean; no open critical/high defects; known limitations list updated in release notes.
+
+## 8. Phase 1 status (what actually exists and passes — 2026-10-24)
+
+| Layer | Count | Notes |
+|---|---|---|
+| Unit — `packages/domain` / `packages/config` (Vitest) | 24 / 4 | coverage gates 90/85/90 enforced; domain ≈ 93.5 % stmts, 100 % lines |
+| Component/unit — app (Jest 30 + RNTL 14) | 189 | tokens contrast (38 pairs), UI components, i18n parity, auth screens, storage, observability, guards |
+| Repo scripts (node:test) | 6 | secret scanner |
+| pgTAP | 48 | structure (10) + behaviour (38); mutation-verified |
+| Integration (real stack) | 43 | Data API exposure 22, auth flows 10, health function 4, **concurrency harness 7** |
+| Web E2E (Playwright + axe) | 28 | Chromium only |
+
+Not yet present: Maestro/mobile E2E, domain/event test builders (no entities yet), the capacity/concurrency tests of §2 (the **harness** and its proof exist: `packages/db-tests/src/concurrency*.ts`), manual accessibility pass (§6), load tests. The two-runner decision (ADR-0008) is in effect, with Jest 30 rather than 29.
+
+Lessons that changed the test design: RNTL role queries only match *accessible* elements; `getByLabel` needs `exact` when a button label contains the field label; Playwright + axe needs a fresh browser context; always gate scripts on real exit codes, never on piped output.

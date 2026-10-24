@@ -142,3 +142,14 @@ See DATABASE §11. Security points: deletion requires recent re-authentication; 
 | S-20 | XSS payloads in titles/descriptions/names | rendered as inert text |
 
 Additional release activities: dependency audit, Supabase security advisor, manual authorization review of every RPC, external penetration test or structured review before the pilot (recommended), and a documented incident-response checklist.
+
+## 12. Phase 1 implementation status
+
+Implemented and tested (details and evidence: [PHASE1_REPORT §4](PHASE1_REPORT.md), ADR-0014):
+- Deny-by-default database grants; RLS on every table (CI-enforced); no client write path on any table; `SECURITY DEFINER` hygiene enforced by a catalogue-wide pgTAP check (empty `search_path`, no PUBLIC/anon execute).
+- Email verification required before sign-in; server-side minimum password length 10; PKCE with single-use, verifier-bound codes; refresh rotation; JWT 1 h.
+- Public client holds only the anon key; the env validator rejects `service_role`/`sb_secret_` keys; CI scans the built bundle and git history for privileged credentials.
+- Allow-listed email-link destinations and open-redirect-safe `returnTo`; redaction of PII/secrets in logs and error reports before they leave the device.
+- Guest (`anon`) surface is exactly: read `app_config`; **no RPC is executable by anon** (the guest event RPC whitelist begins in Phase 3, ADR-0013).
+
+**Residual / open (see PHASE1_REPORT §4–5):** sign-up enumeration signal (`user_already_exists`); hosted-only protections untested locally (CAPTCHA, leaked-password protection, custom SMTP, production rate limits); web session in `localStorage` requires CSP before launch; consent/18+ capture arrives with onboarding (Phase 2); native secure-storage behavior unverified on a device; no admin RPCs or MFA enforcement exist yet (Phase 6).

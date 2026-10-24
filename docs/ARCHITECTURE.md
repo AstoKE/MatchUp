@@ -1,6 +1,6 @@
 # Architecture
 
-Status: Phase 0 blueprint · Style: **modular monolith** on Supabase · Decisions recorded in [ADR/](ADR/)
+Status: Phase 0 blueprint, **updated with the as-built Phase 1 foundation** (§3 layout and §6.7 installed versions are authoritative where they differ from earlier text) · Style: **modular monolith** on Supabase · Decisions recorded in [ADR/](ADR/)
 
 Related: [DATABASE](DATABASE.md) · [SECURITY](SECURITY.md) · [TESTING](TESTING.md) · [DEPLOYMENT](DEPLOYMENT.md)
 
@@ -275,3 +275,29 @@ MVP implements only the in-app "channel" (the row itself). Dispatchers for other
 - **ODbL:** OpenStreetMap-derived data requires attribution ("© OpenStreetMap contributors") visible on maps, and database-level share-alike may apply to derived databases. Imported OSM venues stay in rows tagged `provenance = OSM_IMPORT` and are separable; a legal check precedes any bulk import.
 - **Google Maps/Places:** no scraping or bulk storage; not used in MVP.
 - **User privacy:** device location is optional, used only for a query, never persisted; precise user coordinates are never exposed to other users.
+
+## 14. As built at the end of Phase 1 (authoritative)
+
+**Layout actually created** (differences from §3: `packages/db-tests` added; `packages/ui` and `apps/web` still deliberately absent):
+
+```
+apps/app/{app/, src/{features/auth, lib/{env,i18n,observability,query,supabase}, ui/{tokens,theme,components}, locales/{tr,en}, navigation, types, test}, e2e/}
+packages/{domain, config, db-tests}
+supabase/{config.toml, migrations/, seed/, functions/health, tests/database}
+scripts/   .github/workflows/ci.yml   docs/
+```
+
+### 6.7 Installed versions (exact, 2026-10-24; supersede the ranges in §6.1–6.4)
+
+| Area | Versions |
+|---|---|
+| Runtime / tooling | Node 24.11.1 · pnpm 10.33.0 · TypeScript 6.0.3 (strict, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`, **`types` must be listed explicitly** in TS 6) · ESLint 9.39.5 + eslint-config-expo 58.0.4 + typescript-eslint 8.72.0 · Prettier 3.9.10 · husky 9.1.7 · lint-staged 17.6.0 |
+| Expo SDK 58 | expo 58.0.19 · react / react-dom 19.3.0 · react-native 0.88.0 · react-native-web 0.21.4 · expo-router 58.0.26 · reanimated 4.7.1 / worklets 0.13.0 · screens 4.30.0 · expo-secure-store 58.0.2 · expo-image 58.0.17 · expo-localization 58.0.5 |
+| Data / forms / i18n | @supabase/supabase-js 2.118.0 · @tanstack/react-query 5.104.5 · zod 4.6.7 · react-hook-form 7.91.0 + @hookform/resolvers 6.0.0 · i18next 26.5.10 + react-i18next 17.1.8 |
+| Observability | @sentry/react-native 8.28.0 (Expo-pinned; lazily imported, active only with a DSN) |
+| Tests | Vitest 5.0.5 (+ coverage-v8) · **Jest 30.5.2** + jest-expo 58.0.12 + @react-native/jest-preset 0.88.0 + RNTL 14.1.0 + test-renderer 1.3.1 · Playwright 1.64.1 + @axe-core/playwright 4.14.0 · pg 8.23.1 · pgTAP (Supabase `pg_prove` 3.36) |
+| Backend (local) | Supabase CLI 2.122.0 · PostgreSQL **17.11** (Supabase image) · PostGIS **not installed yet** (Phase 3/4) · Edge runtime: Deno 2 |
+
+Pinned build-script policy: `pnpm-workspace.yaml` denies dependency build scripts except the reviewed `supabase` CLI download. `@expo/cli>zod` is overridden to ≥ 4.6.7; one scoped audit ignore exists (node-forge, dev tooling) — see PHASE1_REPORT §4.
+
+Measured web bundle (not optimized): first load ≈ 895 kB gzip JS against the 350 kB target in §8; guarded by a ratchet (`scripts/check-bundle-size.mjs`).

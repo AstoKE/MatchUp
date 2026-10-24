@@ -43,6 +43,9 @@ Durable rules only. Details live in `docs/` (read the relevant doc before changi
 
 - Privacy by default; location optional and transient; hide exact event location until approval when chosen; minimal data collection. Reporting, blocking, deletion and export are core features. Legal/KVKK items in `docs/SECURITY.md §8` need counsel — never claim compliance.
 
-## Commands (available after Phase 1 M1)
+## Commands (see docs/DEVELOPMENT.md)
 
-`pnpm check` (typecheck+lint+format+unit) · `pnpm test:db` · `pnpm test:app` · `pnpm test:e2e` · `supabase start|stop|db reset|test db`
+`pnpm check` (typecheck + lint + format + brand + script tests + unit/component) · `pnpm db:start|stop|reset|test|types` (Docker required) · `pnpm test:integration` · `pnpm test:e2e` (`REQUIRE_STACK=1` to fail instead of skip) · `pnpm env:local` · `pnpm check:bundle` / `check:bundle-size` after `export:web`.
+
+- Gate on **real exit codes**, not on piped/grepped output. Write source files with the editor tools, not shell heredocs/`node -e` (quoting bugs cost real time). Never run formatters over the repo-root `settings.json` (the owner's local hook; it is in `.prettierignore`).
+- State of the repo: Phases 0–1 complete; Phase 2 starts only on explicit instruction (see docs/PHASE1_REPORT.md §7–8).

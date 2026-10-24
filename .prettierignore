@@ -8,7 +8,6 @@ playwright-report
 test-results
 supabase/.temp
 supabase/.branches
-apps/app/src/types/supabase.generated.ts
 docs/
 *.png
 settings.json

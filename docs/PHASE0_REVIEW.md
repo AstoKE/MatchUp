@@ -2,6 +2,8 @@
 
 Date: 2026-10-24 · Status: **Phase 0 complete and approved; Phase 1 authorized** with the confirmed decisions in §4a. (Original Phase 0 text below is retained as written; where §4a differs, §4a wins.)
 
+> Phase 1 followed: see [PHASE1_REPORT](PHASE1_REPORT.md).
+
 ## 1. What Phase 0 produced
 
 `README`, `CLAUDE.md`, `.gitignore`, and under `docs/`: PRODUCT_VISION, PRD, ARCHITECTURE, DATABASE, USER_FLOWS, UI_DESIGN_SYSTEM (provisional), SECURITY, RATING_SYSTEM, ROADMAP (backlog, risks, Phase 1 plan), TESTING, DEPLOYMENT, this review, and 12 ADRs.

@@ -58,3 +58,11 @@ Severity levels, owner, communication template (in-app banner + status note), se
 **Quality** ☐ CI all green on release commit ☐ Playwright lifecycle ☐ manual a11y checklist ☐ Turkish copy reviewed by a native speaker ☐ device matrix tested (min. 2 iOS, 3 Android incl. low-end, 3 browsers)
 **Operations** ☐ moderation owner + SLA defined ☐ admin runbook (reports, disputes, suspensions) ☐ support email/contact published in-app ☐ status/incident template ☐ analytics dashboards for pilot metrics ☐ feature flags/kill switches for risky features (creation, joining) via `app_config` row
 **Store** ☐ Apple UGC (report/block/contact) & account-deletion compliance ☐ Google Play data safety & UGC ☐ age rating ☐ identifiers final (ADR-0010)
+
+## 8. Phase 1 notes
+
+- **No hosted environment exists yet.** Everything was verified on the local Supabase stack; the Frankfurt project (D-04) is a Phase 2 task (PHASE1_REPORT §7). Settings that only exist on a hosted project (CAPTCHA, leaked-password protection, custom SMTP, production rate limits, backups/PITR) are unverified.
+- **CI** (`.github/workflows/ci.yml`): jobs `quality`, `secret-scan`, `database`, `e2e-web`. Linted with actionlint; never executed on GitHub (no remote yet).
+- **Web hosting prerequisites before any public URL:** CSP (no inline scripts; `connect-src` limited to the API origin), HSTS, `X-Content-Type-Options`, `Referrer-Policy`, frame-ancestors none, SPA fallback; the web session is in `localStorage` (ADR-0014).
+- **Bundle budget:** measured first-load JS ≈ 895 kB gzip vs 350 kB target; ratchet at 1400 kB total (`pnpm check:bundle-size`).
+- Keep the repository out of cloud-synced folders (DEVELOPMENT §1).
