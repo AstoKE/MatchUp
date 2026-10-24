@@ -19,7 +19,7 @@ export function adminClient() {
 let pool: pg.Pool | undefined;
 /** Direct superuser connection to the local database (fixtures + assertions the API cannot make). */
 export function db(): pg.Pool {
-  pool ??= new pg.Pool({ connectionString: getStack().dbUrl, max: 8 });
+  pool ??= new pg.Pool({ connectionString: getStack().dbUrl, max: 40 });
   return pool;
 }
 export async function closeDb(): Promise<void> {
