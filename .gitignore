@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.p8
+*.p12
+*.jks
+*.keystore
+google-services.json
+GoogleService-Info.plist
+
+# Build output
+dist/
+build/
+.expo/
+.expo-shared/
+web-build/
+ios/
+android/
+.turbo/
+coverage/
+playwright-report/
+test-results/
+
+# Supabase local state
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+supabase/functions/.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+.idea/
