@@ -171,7 +171,7 @@ Web config for MVP: `web.output: "single"` (SPA, static hosting) — ADR-0002.
 | Layer | Tooling |
 |---|---|
 | Pure TS (`domain`) + DB integration/concurrency | **Vitest ^5.0** (`pg` ^8.23 for multi-connection tests) |
-| RN components | **jest-expo ~58.0.12 (Jest 29)** + `@testing-library/react-native ^14.1` (peer `test-renderer ^1`) — Vitest cannot run the RN preset reliably, hence two runners (ADR-0008) |
+| RN components | **jest-expo ~58.0.12 (Jest 30; peers `@react-native/jest-preset`, `test-renderer`)** + `@testing-library/react-native ^14.1` (peer `test-renderer ^1`) — Vitest cannot run the RN preset reliably, hence two runners (ADR-0008) |
 | Web E2E + a11y | **@playwright/test ^1.64**, `@axe-core/playwright ^4.14` |
 | DB schema/RLS | pgTAP via `supabase test db` |
 | Mobile E2E | Maestro (flows) against dev builds — post-Phase 3, optional until pilot |

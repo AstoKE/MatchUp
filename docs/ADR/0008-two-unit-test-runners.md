@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 
-**Context.** The brief allows "Vitest or equivalent" and requires React Native Testing Library. `jest-expo` (the Expo-maintained preset, built on Jest 29 + `react-test-renderer`) is the supported path for React Native components; Vitest does not reliably run the RN preset/Metro transforms.
+**Context.** The brief allows "Vitest or equivalent" and requires React Native Testing Library. `jest-expo` (the Expo-maintained preset, built on Jest 30 + `test-renderer`; corrected from Jest 29 after the M0 spike) is the supported path for React Native components; Vitest does not reliably run the RN preset/Metro transforms.
 
 **Decision.** Use **Vitest** for `packages/domain` and database integration/concurrency tests (fast, TypeScript-native, good for parallel async tests with `pg`), and **jest-expo + @testing-library/react-native** for RN components. Playwright for web E2E; pgTAP for schema/RLS.
 
