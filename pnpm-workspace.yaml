@@ -1,0 +1,18 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Supply-chain safety: dependency build scripts are denied by default (pnpm 10).
+# Add a package to onlyBuiltDependencies only after reviewing why it needs a build step.
+onlyBuiltDependencies: []
+
+overrides:
+  # GHSA-mrhx-c7xc-m3w5: Expo CLI (dev tooling) pulls zod <4.6.6; our own zod is already patched.
+  '@expo/cli>zod': ^4.6.7
+
+auditConfig:
+  ignoreGhsas:
+    # GHSA-86w9-cpqp-85rv (node-forge <=1.4.0): reached only via @expo/cli (local dev-server tooling),
+    # never bundled into the app or run in production; no patched release exists at 2026-10-24.
+    # Re-evaluate on every Expo SDK/CLI bump (tracked in docs/PHASE1_REPORT.md known limitations).
+    - GHSA-86w9-cpqp-85rv
