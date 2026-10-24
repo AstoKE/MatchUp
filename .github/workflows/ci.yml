@@ -43,6 +43,8 @@ jobs:
           CI: '1'
       - name: No privileged credentials in the web bundle
         run: pnpm check:bundle
+      - name: Web bundle size ratchet (regression guard; target budget in ARCHITECTURE §8)
+        run: pnpm check:bundle-size
       - name: Native bundle compile smoke (Metro + Hermes, no device)
         run: pnpm --filter @matchup/app export:native
         env:

@@ -10,6 +10,7 @@ import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
 import { z } from 'zod';
 import { env } from '@/lib/env';
+import { log } from '@/lib/observability';
 import { supabase } from '@/lib/supabase/client';
 import { AuthFlowError, classifyAuthError, isAlreadyRegistered } from './classify-auth-error';
 
@@ -29,9 +30,13 @@ function callbackUrl(next?: '/reset-password'): string {
 }
 
 function fail(error: unknown): never {
-  throw new AuthFlowError(classifyAuthError(error as Parameters<typeof classifyAuthError>[0]), {
-    cause: error,
-  });
+  const failure = classifyAuthError(error as Parameters<typeof classifyAuthError>[0]);
+  if (failure === 'UNKNOWN') {
+    // Only stable identifiers are logged — never the server's message text.
+    const { code, status } = (error ?? {}) as { code?: string; status?: number };
+    log.warn('auth', 'UNCLASSIFIED_AUTH_ERROR', { code, status });
+  }
+  throw new AuthFlowError(failure, { cause: error });
 }
 
 /**
