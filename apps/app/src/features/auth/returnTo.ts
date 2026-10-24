@@ -14,3 +14,15 @@ export function sanitizeReturnTo(value: string | string[] | undefined | null): s
   }
   return raw.length > 512 ? '/' : raw;
 }
+
+/**
+ * Where the email-link landing page sends the user once a session exists. This is an ALLOW-LIST of
+ * exactly one non-home destination (not a free-form path), because the value arrives in a URL that
+ * anyone can craft.
+ */
+export type CallbackNext = '/' | '/reset-password';
+
+export function sanitizeCallbackNext(value: string | string[] | undefined | null): CallbackNext {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return raw === '/reset-password' ? '/reset-password' : '/';
+}

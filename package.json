@@ -14,15 +14,19 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:brand": "node scripts/check-brand-literals.mjs",
-    "test": "pnpm -r test",
-    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:brand && pnpm test",
+    "test": "pnpm -r --filter=!@matchup/db-tests test",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:brand && pnpm test:scripts && pnpm test",
     "prepare": "husky",
     "db:start": "supabase start -x studio,imgproxy,logflare,vector,supavisor",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
     "db:types": "node scripts/gen-types.mjs",
-    "env:local": "node scripts/write-local-env.mjs"
+    "env:local": "node scripts/write-local-env.mjs",
+    "test:integration": "pnpm --filter @matchup/db-tests test",
+    "test:e2e": "pnpm --filter @matchup/app test:e2e",
+    "test:scripts": "node --test \"scripts/**/*.test.mjs\"",
+    "check:bundle": "node scripts/check-bundle-secrets.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs,cjs,json,md,yml,yaml}": "prettier --write"

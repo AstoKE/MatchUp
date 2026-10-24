@@ -4,7 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initI18n } from '@/lib/i18n';
 import { ThemeProvider } from '@/ui';
 import { RequireAuth } from './RequireAuth';
-import { sanitizeReturnTo } from './returnTo';
+import { sanitizeCallbackNext, sanitizeReturnTo } from './returnTo';
 import { SessionContext, type SessionState } from './session';
 
 const mockRedirect = jest.fn();
@@ -93,5 +93,24 @@ describe('sanitizeReturnTo (no open redirects)', () => {
   it('uses the first value when the param is repeated', () => {
     expect(sanitizeReturnTo(['/e/1', '//evil'])).toBe('/e/1');
     expect(sanitizeReturnTo(['//evil', '/e/1'])).toBe('/');
+  });
+});
+
+describe('sanitizeCallbackNext (email-link landing destination)', () => {
+  it.each([
+    ['/reset-password', '/reset-password'],
+    ['/', '/'],
+    [undefined, '/'],
+    ['/my-events', '/'],
+    ['//evil.example', '/'],
+    ['https://evil.example', '/'],
+    ['/reset-password/../../x', '/'],
+    ['/reset-password?x=1', '/'],
+  ])('%j → %j', (input, expected) => {
+    expect(sanitizeCallbackNext(input as string | undefined)).toBe(expected);
+  });
+  it('takes the first value of a repeated parameter', () => {
+    expect(sanitizeCallbackNext(['/reset-password', '//evil'])).toBe('/reset-password');
+    expect(sanitizeCallbackNext(['//evil', '/reset-password'])).toBe('/');
   });
 });

@@ -22,6 +22,11 @@ module.exports = [
               group: ['@/features/*/*'],
               message: 'Import other features only through their public index (@/features/<name>).',
             },
+            {
+              group: ['@/lib/supabase', '@/lib/supabase/*'],
+              message:
+                'Use the Supabase client only from a feature api folder (src/features/*/api).',
+            },
           ],
         },
       ],

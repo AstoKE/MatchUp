@@ -1,0 +1,21 @@
+{
+  "name": "@matchup/db-tests",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Integration tests against the LOCAL Supabase stack (real Postgres, Auth, PostgREST, Mailpit). Never run against hosted projects.",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.0",
+    "vitest": "^5.0.5"
+  }
+}
