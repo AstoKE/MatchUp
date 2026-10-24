@@ -1,0 +1,16 @@
+appId: com.example.matchup.dev
+# 01 Cold start, guest discovery, tab navigation, protected-route redirect
+---
+- launchApp:
+    clearState: true
+- assertVisible: 'Discover'
+- assertVisible: 'No events yet'
+# The four MVP destinations are present in the tab bar
+- assertVisible: 'My Events'
+- assertVisible: 'Create'
+- assertVisible: 'Profile'
+- takeScreenshot: 01-discover-guest
+# Protected tab sends a guest to sign-in (guard is UX; the server enforces the real rules)
+- tapOn: 'My Events'
+- assertVisible: 'Welcome back'
+- takeScreenshot: 01-redirected-to-sign-in

@@ -1,0 +1,9 @@
+appId: com.example.matchup.dev
+# 04 Session persists after the process is killed and relaunched — requires -e EMAIL
+---
+- stopApp
+- launchApp
+- assertVisible: 'Discover'
+- tapOn: 'Profile'
+- assertVisible: 'Signed in as ${EMAIL}'
+- takeScreenshot: 04-session-restored

@@ -1,0 +1,9 @@
+# ADR-0015 — Build Android in a pinned Linux container; run on the emulator
+
+**Status:** Accepted (2026-10-25)
+
+**Context.** Native Android builds on the Windows development machine fail: CMake/ninja object-file paths for React Native's autolinked codegen targets reach 326 characters (limit 259) because the source path is mirrored into the object path (`…/CMakeFiles/<target>.dir/C_/dev/matchup/node_modules/<pkg>/…`) and AGP appends `Debug\<hash>\<abi>`. Measured with `scripts/android/measure-cmake-paths.mjs`: path shortening (hoisted linker, `subst`, relocated staging dir, removing the worst library) leaves a 0–2 character margin at best. Enabling Windows long paths needs an administrator registry change and a newer ninja than the CMake 3.22.1 that React Native pins. The founder authorised no destructive or system-wide changes and no admin rights were available.
+
+**Decision.** Android APKs are built inside `docker/android` (JDK 21, Node 24.11.1, pnpm 10.33, Android command-line tools, platforms 36/37.0, build-tools 37.0.0, NDK 27.1.12297006, CMake 3.22.1 — all pinned and checksum-verified) from a rsync'd copy of the working tree on a Linux volume (`scripts/android/build-apk.sh`). The resulting x86_64 debug APK is installed on the Windows emulator; JavaScript is served by Metro on the host. The same image can be used in CI. The pnpm `hoisted` experiment is reverted (isolated layout stays, as validated in M0).
+
+**Consequences.** + Reproducible, no host SDK needed for *building*, no path limits, CI-ready. + No system changes. − Docker is required to build (the emulator and Maestro still run on the host); first build downloads ~2 GB and takes ~7 min. − Native code changes require a rebuild cycle; JS changes do not. − Release/signing builds and EAS cloud builds remain future work. If the team later enables long paths and a newer CMake/ninja, host builds become possible without changing this decision's outputs.

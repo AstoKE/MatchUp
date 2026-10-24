@@ -19,8 +19,8 @@ build/
 .expo/
 .expo-shared/
 web-build/
-ios/
-android/
+/apps/app/ios/
+/apps/app/android/
 .turbo/
 coverage/
 playwright-report/
@@ -37,3 +37,7 @@ supabase/functions/.env
 Thumbs.db
 *.log
 .idea/
+
+# Android build output and generated native projects (CNG: regenerate with expo prebuild)
+apps/app/.android-build/
+apps/app/e2e-mobile/results/

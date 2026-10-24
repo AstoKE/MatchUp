@@ -1,0 +1,8 @@
+appId: com.example.matchup.dev
+# 09 After connectivity returns the same form succeeds (no restart needed) — continues from flow 08's screen
+---
+- tapOn: 'Sign in'
+- assertVisible: 'Discover'
+- tapOn: 'Profile'
+- assertVisible: 'Signed in as.*'
+- takeScreenshot: 09-recovered

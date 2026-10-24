@@ -1,0 +1,8 @@
+appId: com.example.matchup.dev
+# 03 After the emailed link opened the app via deep link the user is signed in — requires -e EMAIL
+---
+# No launchApp: the deep link (sent by the orchestrator via adb) already brought the app forward.
+- assertVisible: 'Discover'
+- tapOn: 'Profile'
+- assertVisible: 'Signed in as ${EMAIL}'
+- takeScreenshot: 03-signed-in

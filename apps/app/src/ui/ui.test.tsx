@@ -73,7 +73,12 @@ describe('TextField', () => {
     const input = screen.getByLabelText('E-posta');
     await fireEvent.changeText(input, 'a@b.co');
     expect(onChangeText).toHaveBeenCalledWith('a@b.co');
-    expect(screen.getAllByText('E-posta').length).toBeGreaterThan(0);
+    // The visible label is rendered, but hidden from assistive tech on native: the input already
+    // carries the accessible name, and exposing both made TalkBack stop on every label twice.
+    const label = screen.getByText('E-posta', { includeHiddenElements: true });
+    expect(label.props.accessibilityElementsHidden).toBe(true);
+    expect(screen.queryByText('E-posta')).toBeNull();
+    expect(screen.getAllByLabelText('E-posta')).toHaveLength(1);
   });
 
   it('announces errors via an alert and marks the field invalid', async () => {
