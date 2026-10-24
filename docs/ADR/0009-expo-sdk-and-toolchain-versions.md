@@ -14,3 +14,7 @@
 + Avoids a forced SDK upgrade in the middle of MVP; current store-requirement alignment.
 − Newer SDK ⇒ fewer community reports, possible library lag, no Expo Go for the first weeks; breaking changes list in ARCHITECTURE §6.2 must be respected (strict TS API, removed `InteractionManager`, `web.output` default).
 − If we choose SDK 57 instead, plan an upgrade to the then-current SDK before the pilot.
+
+## Outcome (M0 spike, 2026-10-24)
+
+**SDK 58 adopted; fallback to 57 not needed.** The spike and all subsequent milestones ran on expo 58.0.19 / RN 0.88.0 / React 19.3.0 with pnpm 10 (isolated linker, no `hoisted` workaround), TypeScript 6.0.3 and ESLint 9.39.5. Corrections to the context above: **Jest 30** is required by jest-expo 58; TypeScript 6 needs explicit `types`; `expo-doctor` is run via `npx`. Native launch on a device/emulator remains unverified. Details: [PHASE1_M0_REPORT](../PHASE1_M0_REPORT.md).

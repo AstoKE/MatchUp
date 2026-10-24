@@ -2,6 +2,8 @@
 
 Status: Phase 0 · Source of scope: [PRD](PRD.md) · Priorities: **P0** launch-blocking · **P1** launch-critical, may slip one iteration · **P2** first post-MVP · **P3** later · Complexity: S (≤ 2 d) · M (≤ 1 wk) · L (1–2 wk) · XL (> 2 wk) for a solo developer working with Claude Code (rough, for ordering not scheduling).
 
+> **Status 2026-10-24: Phase 0 and Phase 1 are complete** ([PHASE1_REPORT](PHASE1_REPORT.md)). Recommended Phase 2 milestones (including a native-device validation spike first) are in PHASE1_REPORT §7. The Phase 1 plan below is retained as written; deviations are listed in PHASE1_REPORT §6.
+
 ## 1. Phases
 
 | Phase | Name | Exit deliverable |

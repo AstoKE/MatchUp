@@ -7,14 +7,24 @@ MatchUp (working name) is a multi-platform (iOS, Android, Web) sports community 
 
 ## Status
 
-**Phase 0 — Product & architecture: complete, awaiting review.** No application code exists yet. Phase 1 (foundation) starts only after explicit approval.
+**Phase 1 — Foundation: complete** (2026-10-24; see [docs/PHASE1_REPORT.md](docs/PHASE1_REPORT.md)). Web is verified end to end; **Android and iOS have never been launched** (bundles compile only). Phase 2 has not started.
+
+Quick start (details and troubleshooting: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)):
+
+```bash
+pnpm install && pnpm db:start && pnpm env:local   # Docker Desktop must be running
+pnpm --filter @matchup/app web                    # http://localhost:8081
+pnpm check && pnpm db:test && pnpm test:integration && pnpm test:e2e
+```
 
 ## Where to read
 
-| Start here                                     |                                                                 |
-| ---------------------------------------------- | --------------------------------------------------------------- |
-| [docs/PHASE0_REVIEW.md](docs/PHASE0_REVIEW.md) | Summary, consistency review, **open decisions you must answer** |
-| [CLAUDE.md](CLAUDE.md)                         | Durable engineering rules for AI-assisted work                  |
+| Start here                                     |                                                                    |
+| ---------------------------------------------- | ------------------------------------------------------------------ |
+| [docs/PHASE0_REVIEW.md](docs/PHASE0_REVIEW.md) | Summary, consistency review, **open decisions you must answer**    |
+| [CLAUDE.md](CLAUDE.md)                         | Durable engineering rules for AI-assisted work                     |
+| [docs/PHASE1_REPORT.md](docs/PHASE1_REPORT.md) | What Phase 1 delivered, test results, unverified areas, next steps |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)     | Setup, commands, repo map, platform status, troubleshooting        |
 
 | Document                                             | Purpose                                                                |
 | ---------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -33,7 +43,7 @@ MatchUp (working name) is a multi-platform (iOS, Android, Web) sports community 
 
 ## Branding
 
-The name is temporary. All user-visible brand values live in one config module (planned: `packages/config`). Store identifiers (iOS bundle ID, Android package, domains) are **not** easily changeable after publication — see [ADR-0010](docs/ADR/0010-identifiers-and-branding.md).
+The name is temporary. All user-visible brand values live in one config module (`packages/config`). Store identifiers (iOS bundle ID, Android package, domains) are **not** easily changeable after publication — see [ADR-0010](docs/ADR/0010-identifiers-and-branding.md).
 
 ## Language policy
 

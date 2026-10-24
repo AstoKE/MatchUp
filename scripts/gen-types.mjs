@@ -12,4 +12,7 @@ const types = execSync('pnpm exec supabase gen types typescript --local --schema
 });
 
 writeFileSync(OUTPUT, types.replace(/\r\n/g, '\n'));
+// Deterministic formatting: the committed file and a fresh generation must be byte-identical, so the
+// CI drift check (`git diff --exit-code`) only fires on real schema/type changes.
+execSync(`pnpm exec prettier --write ${OUTPUT}`, { stdio: 'ignore' });
 console.log(`wrote ${OUTPUT} (${types.split('\n').length} lines)`);

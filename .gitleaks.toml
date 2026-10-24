@@ -1,0 +1,15 @@
+title = "Gitleaks config"
+
+[extend]
+useDefault = true
+
+# Synthetic fixtures used by the scanner/redaction/env-validation tests. They are deliberately
+# shaped like credentials (that is what the tests exercise) but are not credentials. Allowlisted by
+# EXACT VALUE, not by file, so a real secret pasted into a test file would still be detected.
+[allowlist]
+description = "Synthetic credential-shaped test fixtures"
+regexes = [
+  '''AKIAABCDEFGHIJKLMNOP''',
+  '''sb_(publishable|secret)_0123456789abcdef[a-z0-9]*''',
+  '''eyJhbGciOiJIUzI1NiJ9\.eyJyb2xlIjoic2VydmljZV9yb2xlIn0\.c2lnbmF0dXJlLXBsYWNlaG9sZGVy''',
+]

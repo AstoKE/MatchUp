@@ -4,6 +4,10 @@ Status: Phase 0 design (no migrations exist yet) · Engine: PostgreSQL (Supabase
 
 Related: [ARCHITECTURE](ARCHITECTURE.md) · [SECURITY](SECURITY.md) · [RATING_SYSTEM](RATING_SYSTEM.md) · ADR-0003, ADR-0004
 
+## 0. As built at the end of Phase 1
+
+Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `profiles`, `user_settings`, `user_consents`, `platform_admins`, `app_config`; enums `account_status`, `profile_visibility`, `consent_kind`; `private.set_updated_at`, `private.is_admin`, `private.assert_active_verified_user`, `private.handle_new_user` (trigger on `auth.users`); RPC `public.get_my_account`. Default privileges are revoked so every grant is explicit; **no table has any write grant or policy for API roles**; the only guest-readable object is `app_config`. Not yet created: sport/geo/event/progression/safety tables, PostGIS, `user_sport_profiles`/positions, rate-limit and analytics tables (Phases 2–7). The profile row has no FK to `auth.users` (ADR-0003). pgTAP tests assert all of the above (`supabase/tests/database`).
+
 ## 1. Principles
 
 1. **The database is the authority** for state transitions, capacity and progression. Clients never write core tables directly.

@@ -102,3 +102,7 @@ Direct, friendly, second-person informal ("sen"), short sentences, no jargon, sp
 4. Confirm logo/name placement driven by `packages/config` (name is temporary). A raster `image.png` (three stylized figures in orange / green / blue, 1.2 MB) was found in the repo root on 2026-10-24 and is treated as a **logo candidate, not yet adopted**: if chosen, the palette in §3 must be re-derived from its hues (orange, green, blue), and a vector (SVG) master plus app-icon/adaptive-icon/favicon exports are needed — a raster file alone is not sufficient for store assets. The file also needs relocation (e.g. `docs/design/`) once its status is decided.
 5. Confirm iconography and illustration sources/licenses.
 6. Update this document's §3–§5 to "derived from design.md" and remove the PROVISIONAL banner.
+
+## 11. As built in Phase 1 (provisional)
+
+Tokens live in `apps/app/src/ui/tokens` (primitives → semantic), the theme in `src/ui/theme`, components in `src/ui/components` (Text, Button, TextField, Screen, Skeleton, Banner, EmptyState, Toast, SkipLink). A Jest test asserts all 19 required contrast pairs in **both** themes (`requiredContrast` in `semantic.ts`) — any palette change from `design.md` must keep it green. `design.md` has **not** been received; the provisional logo (`apps/app/assets/brand/logo-provisional-512.png`) is a raster with an opaque white background and its orange/green/blue palette is not used by the UI. Navigation: bottom bar < 768 px, left rail 184 px (medium) / 248 px (expanded), data-driven from `src/navigation/config.ts`.

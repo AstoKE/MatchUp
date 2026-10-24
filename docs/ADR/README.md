@@ -17,3 +17,4 @@ Format: Context · Decision · Consequences · Status. One decision per file, im
 | [0011](0011-location-data-and-map-providers.md) | Location data, tiles and geocoding | Accepted (provider choice deferred to Phase 4) |
 | [0012](0012-participation-and-attendance-model.md) | Single participation table with independent attendance field | Accepted |
 | [0013](0013-guest-discovery.md) | Guest (unauthenticated) event discovery | Accepted (D-09) |
+| [0014](0014-auth-sessions-and-enumeration-posture.md) | Auth sessions, email links and account-enumeration posture | Accepted |
