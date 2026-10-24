@@ -1,0 +1,21 @@
+{
+  "NOT_AUTHENTICATED": "Bu işlem için giriş yapmalısın.",
+  "NOT_ALLOWED": "Bu işlemi yapmaya yetkin yok.",
+  "ACCOUNT_RESTRICTED": "Hesabın kısıtlanmış durumda. Lütfen destek ile iletişime geç.",
+  "EMAIL_NOT_VERIFIED": "Önce e-posta adresini doğrulamalısın.",
+  "NOT_FOUND": "Aradığın içerik bulunamadı.",
+  "VALIDATION_FAILED": "Girdiğin bilgileri kontrol edip tekrar dene.",
+  "INVALID_TRANSITION": "Bu işlem şu an yapılamıyor.",
+  "EVENT_FULL": "Etkinlik dolu.",
+  "REGISTRATION_CLOSED": "Bu etkinliğin katılım kaydı kapandı.",
+  "ALREADY_REQUESTED": "Bu etkinlik için zaten istek gönderdin.",
+  "REQUEST_LIMIT_REACHED": "Bu etkinlik için istek hakkın doldu.",
+  "BLOCKED": "Bu işlem yapılamıyor.",
+  "RATE_LIMITED": "Çok fazla işlem yaptın. Lütfen biraz sonra tekrar dene.",
+  "REVIEW_NOT_ELIGIBLE": "Bu oyuncuyu değerlendiremezsin.",
+  "ALREADY_REVIEWED": "Bu oyuncuyu zaten değerlendirdin.",
+  "WINDOW_CLOSED": "Değerlendirme süresi doldu.",
+  "NETWORK": "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.",
+  "TIMEOUT": "İşlem zaman aşımına uğradı. Lütfen tekrar dene.",
+  "UNKNOWN": "Bir şeyler ters gitti. Lütfen tekrar dene."
+}
