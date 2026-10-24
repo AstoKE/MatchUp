@@ -6,12 +6,19 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { SessionProvider } from '@/features/auth';
+import { env } from '@/lib/env';
 import { currentLocale, initI18n } from '@/lib/i18n';
+import { configureLogger, initObservability, reportError } from '@/lib/observability';
 import { QueryProvider } from '@/lib/query/QueryProvider';
 import { EmptyState, Screen, SkipLink, ThemeProvider, ToastProvider, useTheme } from '@/ui';
 
 // Bundled resources, so initialization is synchronous and complete before first render.
 initI18n();
+
+// Development shows debug logs; release builds keep warnings and errors. Error reporting starts only
+// when a DSN is configured, and everything is redacted before it leaves the device.
+configureLogger({ minLevel: env.EXPO_PUBLIC_APP_ENV === 'development' ? 'debug' : 'warn' });
+initObservability();
 
 function ThemedStatusBar() {
   const { isDark } = useTheme();
@@ -56,7 +63,10 @@ export default function RootLayout() {
 }
 
 /** Last-resort boundary for render errors in any route (expo-router convention). */
-export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  useEffect(() => {
+    reportError('app', 'RENDER_ERROR', error);
+  }, [error]);
   return (
     <SafeAreaProvider>
       <ThemeProvider>
