@@ -61,5 +61,5 @@ export function fulfilled<T>(results: PromiseSettledResult<T>[]): T[] {
   return results.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []));
 }
 export function rejected(results: PromiseSettledResult<unknown>[]): unknown[] {
-  return results.flatMap((r) => (r.status === 'rejected' ? [r.reason] : []));
+  return results.flatMap((r): unknown[] => (r.status === 'rejected' ? [r.reason as unknown] : []));
 }
