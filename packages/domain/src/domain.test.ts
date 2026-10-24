@@ -4,7 +4,10 @@ import {
   DOMAIN_ERROR_CODES,
   isDomainErrorCode,
   levelFromXp,
+  isAuthValidationKey,
   mapRpcError,
+  newPasswordSchema,
+  resetRequestSchema,
   PASSWORD_MIN_LENGTH,
   signInSchema,
   signUpSchema,
@@ -78,14 +81,47 @@ describe('error mapping', () => {
 });
 
 describe('auth schemas', () => {
+  const messages = (result: { success: boolean; error?: { issues: { message: string }[] } }) =>
+    result.error?.issues.map((i) => i.message) ?? [];
+
   it('normalizes email and enforces password policy on sign-up', () => {
     const ok = signUpSchema.parse({ email: '  Ayse@Example.COM ', password: 'x'.repeat(10) });
     expect(ok.email).toBe('ayse@example.com');
-    expect(signUpSchema.safeParse({ email: 'a@b.co', password: 'short' }).success).toBe(false);
     expect(PASSWORD_MIN_LENGTH).toBe(10);
   });
-  it('does not reveal password policy on sign-in', () => {
+
+  it('reports stable, localizable message keys (never prose)', () => {
+    const bad = signUpSchema.safeParse({ email: 'nope', password: 'short' });
+    expect(bad.success).toBe(false);
+    const keys = messages(bad);
+    expect(keys).toEqual(expect.arrayContaining(['EMAIL_INVALID', 'PASSWORD_TOO_SHORT']));
+    for (const key of keys) expect(isAuthValidationKey(key)).toBe(true);
+  });
+
+  it('rejects overlong passwords (bcrypt 72-byte limit) and overlong emails', () => {
+    expect(
+      messages(signUpSchema.safeParse({ email: 'a@b.co', password: 'x'.repeat(73) })),
+    ).toContain('PASSWORD_TOO_LONG');
+    expect(
+      messages(
+        signUpSchema.safeParse({ email: 'a'.repeat(250) + '@b.co', password: 'x'.repeat(10) }),
+      ),
+    ).toContain('EMAIL_INVALID');
+  });
+
+  it('does not reveal the password policy on sign-in', () => {
     expect(signInSchema.safeParse({ email: 'a@b.co', password: 'x' }).success).toBe(true);
+    expect(messages(signInSchema.safeParse({ email: 'a@b.co', password: '' }))).toEqual([
+      'PASSWORD_REQUIRED',
+    ]);
     expect(signInSchema.safeParse({ email: 'not-an-email', password: 'x' }).success).toBe(false);
+  });
+
+  it('reset and new-password schemas reuse the same rules', () => {
+    expect(resetRequestSchema.safeParse({ email: 'a@b.co' }).success).toBe(true);
+    expect(messages(resetRequestSchema.safeParse({ email: '' }))).toContain('EMAIL_INVALID');
+    expect(messages(newPasswordSchema.safeParse({ password: 'short' }))).toContain(
+      'PASSWORD_TOO_SHORT',
+    );
   });
 });

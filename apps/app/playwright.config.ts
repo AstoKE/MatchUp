@@ -1,6 +1,16 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import { join } from 'node:path';
+
 const PORT = 4173;
+
+// Load apps/app/.env.local (written by `pnpm env:local`) BEFORE building the public env below, so the
+// exported SPA talks to the local Supabase stack. Existing environment variables win (CI).
+try {
+  process.loadEnvFile(join(__dirname, '.env.local'));
+} catch {
+  /* no local env file: placeholder values are used */
+}
 
 // Public, non-secret placeholder values so the SPA can be exported when no .env is present (CI sets
 // the same ones). Tests that need a real backend (auth) use the local Supabase stack instead.

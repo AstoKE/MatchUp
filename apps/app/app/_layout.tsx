@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { SessionProvider } from '@/features/auth';
 import { currentLocale, initI18n } from '@/lib/i18n';
 import { QueryProvider } from '@/lib/query/QueryProvider';
 import { EmptyState, Screen, SkipLink, ThemeProvider, ToastProvider, useTheme } from '@/ui';
@@ -43,7 +44,9 @@ export default function RootLayout() {
         <ThemeProvider>
           <QueryProvider>
             <ToastProvider>
-              <Shell />
+              <SessionProvider>
+                <Shell />
+              </SessionProvider>
             </ToastProvider>
           </QueryProvider>
         </ThemeProvider>
