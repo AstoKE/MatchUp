@@ -1,0 +1,20 @@
+appId: com.example.matchup.dev
+# 02 Sign up shows "check your email" (enumeration-safe) — requires -e EMAIL and -e PASSWORD
+---
+- launchApp:
+    clearState: true
+- tapOn: 'Profile'
+- assertVisible: 'Welcome back'
+- tapOn: "Don't have an account? Sign up"
+- assertVisible: 'Create your account'
+- tapOn: 'Email'
+- inputText: ${EMAIL}
+- hideKeyboard
+- tapOn: 'Password'
+- inputText: ${PASSWORD}
+- hideKeyboard
+- takeScreenshot: 02-signup-filled
+- tapOn: 'Sign up'
+- assertVisible: 'Check your email'
+- assertVisible: '.*${EMAIL}.*'
+- takeScreenshot: 02-check-your-email

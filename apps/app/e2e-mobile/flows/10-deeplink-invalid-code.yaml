@@ -1,0 +1,6 @@
+appId: com.example.matchup.dev
+# 10 A forged/expired email-link code is rejected with a clear message (deep link sent by the orchestrator)
+---
+- assertVisible: 'Link not valid'
+- assertNotVisible: 'Signed in as.*'
+- takeScreenshot: 10-invalid-link

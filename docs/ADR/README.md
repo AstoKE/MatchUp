@@ -18,3 +18,4 @@ Format: Context · Decision · Consequences · Status. One decision per file, im
 | [0012](0012-participation-and-attendance-model.md) | Single participation table with independent attendance field | Accepted |
 | [0013](0013-guest-discovery.md) | Guest (unauthenticated) event discovery | Accepted (D-09) |
 | [0014](0014-auth-sessions-and-enumeration-posture.md) | Auth sessions, email links and account-enumeration posture | Accepted |
+| [0015](0015-native-android-build-in-container.md) | Build Android in a pinned Linux container; run on the emulator | Accepted |

@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { navItems } from '@/navigation/config';
 import { useTheme } from '@/ui';
@@ -21,6 +22,9 @@ const railSize = (width: number) => ({
 export default function TabsLayout() {
   const { t } = useTranslation('nav');
   const { colors, breakpoint, spacing } = useTheme();
+  // Android edge-to-edge: the explicit bar height below must include the system gesture/nav bar inset,
+  // or the labels collide with it (found on the emulator, docs/native-validation/).
+  const insets = useSafeAreaInsets();
   const wide = breakpoint !== 'compact';
 
   return (
@@ -35,7 +39,11 @@ export default function TabsLayout() {
           backgroundColor: colors.surfaceRaised,
           borderColor: colors.borderSubtle,
           ...(breakpoint === 'compact'
-            ? { height: 68, paddingTop: spacing[1], paddingBottom: spacing[2] }
+            ? {
+                height: 68 + insets.bottom,
+                paddingTop: spacing[1],
+                paddingBottom: spacing[2] + insets.bottom,
+              }
             : { ...railSize(breakpoint === 'medium' ? 184 : 248), paddingTop: spacing[4] }),
         },
         tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },

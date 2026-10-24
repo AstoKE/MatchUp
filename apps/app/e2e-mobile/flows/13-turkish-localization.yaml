@@ -1,0 +1,14 @@
+appId: com.example.matchup.dev
+# 13 With the device language set to Turkish the UI is Turkish (tab labels, headings, special characters)
+---
+- launchApp:
+    clearState: true
+- assertVisible: 'Keşfet'
+- assertVisible: 'Etkinliklerim'
+- assertVisible: 'Oluştur'
+- assertVisible: 'Profil'
+- assertVisible: 'Henüz etkinlik yok'
+- assertVisible: 'Sporunu seç, takımını bul, oyuna katıl.'
+- tapOn: 'Etkinliklerim'
+- assertVisible: 'Tekrar hoş geldin'
+- takeScreenshot: 13-turkish-sign-in

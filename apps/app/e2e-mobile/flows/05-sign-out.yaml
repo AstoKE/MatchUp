@@ -1,0 +1,12 @@
+appId: com.example.matchup.dev
+# 05 Sign out lands on the guest home page and the session is gone after restart
+---
+- tapOn: 'Profile'
+- tapOn: 'Sign out'
+- assertVisible: 'Discover'
+- assertVisible: 'No events yet'
+- stopApp
+- launchApp
+- tapOn: 'My Events'
+- assertVisible: 'Welcome back'
+- takeScreenshot: 05-signed-out-after-restart

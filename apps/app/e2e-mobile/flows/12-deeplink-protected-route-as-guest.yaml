@@ -1,0 +1,5 @@
+appId: com.example.matchup.dev
+# 12 Deep link to a protected route while signed out redirects to sign-in
+---
+- assertVisible: 'Welcome back'
+- takeScreenshot: 12-protected-deeplink-redirect

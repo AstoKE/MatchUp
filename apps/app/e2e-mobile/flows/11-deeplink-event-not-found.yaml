@@ -1,0 +1,5 @@
+appId: com.example.matchup.dev
+# 11 Event deep link resolves to the honest not-found state (no events exist until Phase 3)
+---
+- assertVisible: "We couldn't find what you were looking for."
+- takeScreenshot: 11-event-not-found

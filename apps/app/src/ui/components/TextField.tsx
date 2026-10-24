@@ -1,6 +1,6 @@
-import { forwardRef, useId, useRef, useState } from 'react';
+import { forwardRef, useId, useState } from 'react';
 import {
-  Pressable,
+  Platform,
   TextInput,
   View,
   type StyleProp,
@@ -27,25 +27,29 @@ export const TextField = forwardRef<TextInputInstance, TextFieldProps>(function 
 ) {
   const { colors, radius, spacing, typography } = useTheme();
   const [focused, setFocused] = useState(false);
-  const innerRef = useRef<TextInputInstance | null>(null);
   const id = useId();
+  const webLabelProps = (Platform.OS === 'web' ? { htmlFor: id } : {}) as object;
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
 
   return (
     <View style={[{ gap: spacing[1] }, containerStyle]}>
-      <Pressable
-        accessible={false}
-        importantForAccessibility="no"
-        onPress={() => innerRef.current?.focus()}
+      {/*
+        Label association: on web this renders a real <label for=…> (screen readers and click-to-focus).
+        On native the input carries its own accessibility label, so the visible label is hidden from
+        assistive tech — otherwise TalkBack/VoiceOver would stop on, and read, every label twice
+        (found by the Android accessibility-tree dump, docs/NATIVE_VALIDATION.md).
+      */}
+      <Text
+        variant="label"
+        accessibilityElementsHidden={Platform.OS !== 'web'}
+        importantForAccessibility={Platform.OS === 'web' ? 'auto' : 'no'}
+        {...webLabelProps}
       >
-        <Text variant="label">{label}</Text>
-      </Pressable>
+        {label}
+      </Text>
       <TextInput
-        ref={(node) => {
-          innerRef.current = node;
-          if (typeof forwardedRef === 'function') forwardedRef(node);
-          else if (forwardedRef) forwardedRef.current = node;
-        }}
+        ref={forwardedRef}
+        nativeID={id}
         accessibilityLabel={label}
         accessibilityHint={hint}
         aria-invalid={error ? true : undefined}
