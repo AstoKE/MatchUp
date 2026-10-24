@@ -13,7 +13,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "jest",
-    "doctor": "expo-doctor"
+    "doctor": "expo-doctor",
+    "test:e2e": "playwright test",
+    "e2e:install": "playwright install chromium"
   },
   "jest": {
     "preset": "jest-expo",
@@ -23,7 +25,10 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/e2e/"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    }
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.15",
@@ -37,6 +42,7 @@
     "expo": "~58.0.19",
     "expo-constants": "~58.0.13",
     "expo-font": "~58.0.10",
+    "expo-image": "~58.0.17",
     "expo-linking": "~58.0.14",
     "expo-localization": "~58.0.5",
     "expo-router": "~58.0.26",
@@ -57,6 +63,8 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
     "@react-native/jest-preset": "^0.88.0",
     "@testing-library/react-native": "^14.1.0",
     "@types/jest": "^30.0.0",
@@ -65,6 +73,7 @@
     "eslint-config-expo": "~58.0.4",
     "jest": "^30.5.2",
     "jest-expo": "~58.0.12",
+    "serve": "^14.2.6",
     "test-renderer": "^1.3.1",
     "typescript": "~6.0.3"
   }
