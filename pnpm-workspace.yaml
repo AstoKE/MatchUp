@@ -4,7 +4,9 @@ packages:
 
 # Supply-chain safety: dependency build scripts are denied by default (pnpm 10).
 # Add a package to onlyBuiltDependencies only after reviewing why it needs a build step.
-onlyBuiltDependencies: []
+onlyBuiltDependencies:
+  # Reviewed exception: the `supabase` CLI package downloads its official platform binary on install.
+  - supabase
 
 overrides:
   # GHSA-mrhx-c7xc-m3w5: Expo CLI (dev tooling) pulls zod <4.6.6; our own zod is already patched.

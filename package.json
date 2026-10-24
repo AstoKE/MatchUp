@@ -16,10 +16,16 @@
     "check:brand": "node scripts/check-brand-literals.mjs",
     "test": "pnpm -r test",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:brand && pnpm test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:start": "supabase start -x studio,imgproxy,logflare,vector,supavisor",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:test": "supabase test db",
+    "db:types": "node scripts/gen-types.mjs",
+    "env:local": "node scripts/write-local-env.mjs"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,mjs,cjs,json,md,yml,yaml,sql}": "prettier --write"
+    "*.{ts,tsx,js,jsx,mjs,cjs,json,md,yml,yaml}": "prettier --write"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
@@ -27,6 +33,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
+    "supabase": "^2.122.0",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.0"
   }
