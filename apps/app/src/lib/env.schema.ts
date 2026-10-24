@@ -1,0 +1,68 @@
+import { z } from 'zod';
+
+/**
+ * Public (client-bundled) configuration. Everything here ships to users, so it must never contain
+ * secrets: only the Supabase *anon/publishable* key is allowed — service-role/secret keys are rejected.
+ */
+
+function decodeJwtRole(token: string): string | null {
+  const parts = token.split('.');
+  if (parts.length !== 3 || !parts[1]) return null;
+  try {
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const json = atob(base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '='));
+    const payload: unknown = JSON.parse(json);
+    if (typeof payload === 'object' && payload !== null && 'role' in payload) {
+      const role = (payload as { role: unknown }).role;
+      return typeof role === 'string' ? role : null;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+const supabaseKey = z
+  .string()
+  .min(20, 'looks too short to be a Supabase key')
+  .refine((key) => !key.startsWith('sb_secret_'), 'a Supabase SECRET key must never be bundled')
+  .refine(
+    (key) => decodeJwtRole(key) !== 'service_role',
+    'a service_role key must never be bundled in a client',
+  );
+
+export const envSchema = z.object({
+  EXPO_PUBLIC_APP_ENV: z.enum(['development', 'staging', 'production']),
+  EXPO_PUBLIC_SUPABASE_URL: z.url(),
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: supabaseKey,
+  EXPO_PUBLIC_WEB_URL: z.url().default('http://localhost:8081'),
+  EXPO_PUBLIC_SENTRY_DSN: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.url().optional(),
+  ),
+});
+
+export type Env = z.infer<typeof envSchema>;
+
+export class EnvError extends Error {
+  readonly issues: string[];
+  constructor(issues: string[]) {
+    super(
+      `Invalid environment configuration:\n${issues.map((i) => `  - ${i}`).join('\n')}\n` +
+        'See apps/app/.env.example. Local values: run `pnpm env:local` (requires the Supabase local stack).',
+    );
+    this.name = 'EnvError';
+    this.issues = issues;
+  }
+}
+
+/** Pure parser (used by the app, app.config.ts and tests). Never echoes values, only key names. */
+export function parseEnv(raw: Record<string, string | undefined>): Env {
+  const result = envSchema.safeParse(raw);
+  if (!result.success) {
+    throw new EnvError(
+      result.error.issues.map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`),
+    );
+  }
+  return result.data;
+}

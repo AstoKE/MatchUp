@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Public, non-secret placeholder configuration used only for build smoke tests.
+  EXPO_PUBLIC_APP_ENV: development
+  EXPO_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key-for-build-smoke-test
+  EXPO_PUBLIC_WEB_URL: http://localhost:8081
+
+jobs:
+  quality:
+    name: Typecheck, lint, unit tests, web build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm check:brand
+      - run: pnpm test
+      - name: Web export (SPA) smoke build
+        run: pnpm --filter @matchup/app export:web
+        env:
+          CI: '1'
+      - name: Native bundle compile smoke (Metro + Hermes, no device)
+        run: pnpm --filter @matchup/app export:native
+        env:
+          CI: '1'
+      - name: Expo doctor
+        run: npx --yes expo-doctor@latest
+        working-directory: apps/app
+        env:
+          CI: '1'
+      - name: Dependency audit (fail on high/critical)
+        run: pnpm audit --audit-level high --prod
+
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,33 @@
+{
+  "name": "matchup",
+  "private": true,
+  "version": "0.0.0",
+  "description": "MatchUp (working name) — sports community app. See docs/.",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=24.3.0 <25",
+    "pnpm": ">=10.33.0 <11"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:brand": "node scripts/check-brand-literals.mjs",
+    "test": "pnpm -r test",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:brand && pnpm test",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,mjs,cjs,json,md,yml,yaml,sql}": "prettier --write"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "eslint": "~9.39.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.0"
+  }
+}
