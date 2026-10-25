@@ -1,0 +1,31 @@
+{
+  "displayName": "Display name",
+  "displayNameHint": "Other players will see this. 2–40 characters.",
+  "bio": "About you",
+  "bioHint": "Optional, up to {{max}} characters.",
+  "city": "City",
+  "district": "District",
+  "locationHint": "Location is optional and only used to show you games near you.",
+  "notSet": "Not set",
+  "sports": "Your sports",
+  "level": "Level",
+  "levelValue": "Level {{value}}",
+  "levelLower": "Lower level",
+  "levelHigher": "Higher level",
+  "levelNote": "This is your own estimate; it becomes more accurate with feedback from other players.",
+  "positions": "Positions (optional, up to {{max}})",
+  "validation": {
+    "NAME_TOO_SHORT": "Use at least 2 characters.",
+    "NAME_TOO_LONG": "You can use at most 40 characters.",
+    "NAME_INVALID": "Remove invisible special characters.",
+    "BIO_TOO_LONG": "You can use at most 280 characters.",
+    "BIO_INVALID": "Remove invisible special characters.",
+    "LEVEL_INVALID": "Choose a valid level.",
+    "SPORTS_REQUIRED": "Pick at least one sport.",
+    "TOO_MANY_SPORTS": "Each sport can be picked once, and you can pick at most 10.",
+    "TOO_MANY_POSITIONS": "You can pick at most 3 different positions.",
+    "ADULT_REQUIRED": "You must be 18 or older to use {{appName}}.",
+    "TERMS_REQUIRED": "Please accept the Terms of Use and Privacy Notice to continue.",
+    "DISTRICT_NEEDS_CITY": "Choose a city first."
+  }
+}
