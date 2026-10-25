@@ -21,13 +21,17 @@ select is(
   'anon/authenticated have no INSERT/UPDATE/DELETE/TRUNCATE/REFERENCES/TRIGGER on public tables'
 );
 
--- 3. The only thing guests (anon) may read is public operational config
+-- 3. Guests (anon) may read only public operational config and the reference catalog (ADR-0013).
+--    Adding anything here is a deliberate, reviewed decision — never a side effect.
 select is(
   (select coalesce(array_agg(g.table_name || ':' || g.privilege_type order by g.table_name), '{}')
    from information_schema.role_table_grants g
    where g.table_schema = 'public' and g.grantee = 'anon'),
-  array['app_config:SELECT'],
-  'anon may only SELECT app_config (guest-readable whitelist, ADR-0013)'
+  array[
+    'app_config:SELECT', 'cities:SELECT', 'districts:SELECT',
+    'sport_formats:SELECT', 'sport_positions:SELECT', 'sports:SELECT'
+  ],
+  'anon may only SELECT app_config and the reference catalog (guest-readable whitelist, ADR-0013)'
 );
 
 -- 4. No table/sequence in public is granted to PUBLIC

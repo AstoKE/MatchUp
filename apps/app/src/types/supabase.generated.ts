@@ -22,6 +22,67 @@ export type Database = {
         };
         Relationships: [];
       };
+      cities: {
+        Row: {
+          country_code: string;
+          id: string;
+          is_active: boolean;
+          names: NonNullable<Json>;
+          slug: string;
+          timezone: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          country_code: string;
+          id?: string;
+          is_active?: boolean;
+          names: NonNullable<Json>;
+          slug: string;
+          timezone: string;
+        };
+        Update: {
+          country_code?: string;
+          id?: string;
+          is_active?: boolean;
+          names?: NonNullable<Json>;
+          slug?: string;
+          timezone?: string;
+        };
+        Relationships: [];
+      };
+      districts: {
+        Row: {
+          city_id: string;
+          id: string;
+          is_active: boolean;
+          names: NonNullable<Json>;
+          slug: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          city_id: string;
+          id?: string;
+          is_active?: boolean;
+          names: NonNullable<Json>;
+          slug: string;
+        };
+        Update: {
+          city_id?: string;
+          id?: string;
+          is_active?: boolean;
+          names?: NonNullable<Json>;
+          slug?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'districts_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'cities';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       platform_admins: {
         Row: {
           granted_at: string;
@@ -58,10 +119,13 @@ export type Database = {
           adult_confirmed_at: string | null;
           avatar_path: string | null;
           bio: string | null;
+          city_id: string | null;
           created_at: string;
           deletion_requested_at: string | null;
           display_name: string | null;
+          district_id: string | null;
           id: string;
+          onboarded_at: string | null;
           updated_at: string;
         };
         ComputedFields: never;
@@ -70,10 +134,13 @@ export type Database = {
           adult_confirmed_at?: string | null;
           avatar_path?: string | null;
           bio?: string | null;
+          city_id?: string | null;
           created_at?: string;
           deletion_requested_at?: string | null;
           display_name?: string | null;
+          district_id?: string | null;
           id: string;
+          onboarded_at?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -81,10 +148,155 @@ export type Database = {
           adult_confirmed_at?: string | null;
           avatar_path?: string | null;
           bio?: string | null;
+          city_id?: string | null;
           created_at?: string;
           deletion_requested_at?: string | null;
           display_name?: string | null;
+          district_id?: string | null;
           id?: string;
+          onboarded_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'profiles_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'cities';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'profiles_district_matches_city';
+            columns: ['district_id', 'city_id'];
+            isOneToOne: false;
+            referencedRelation: 'districts';
+            referencedColumns: ['id', 'city_id'];
+          },
+        ];
+      };
+      sport_formats: {
+        Row: {
+          default_capacity: number;
+          id: string;
+          is_active: boolean;
+          is_flexible: boolean;
+          max_participants: number;
+          min_participants: number;
+          names: NonNullable<Json>;
+          slug: string;
+          sort_order: number;
+          sport_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          default_capacity: number;
+          id?: string;
+          is_active?: boolean;
+          is_flexible?: boolean;
+          max_participants: number;
+          min_participants: number;
+          names: NonNullable<Json>;
+          slug: string;
+          sort_order?: number;
+          sport_id: string;
+        };
+        Update: {
+          default_capacity?: number;
+          id?: string;
+          is_active?: boolean;
+          is_flexible?: boolean;
+          max_participants?: number;
+          min_participants?: number;
+          names?: NonNullable<Json>;
+          slug?: string;
+          sort_order?: number;
+          sport_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'sport_formats_sport_id_fkey';
+            columns: ['sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sports';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      sport_positions: {
+        Row: {
+          id: string;
+          is_active: boolean;
+          names: NonNullable<Json>;
+          slug: string;
+          sort_order: number;
+          sport_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          id?: string;
+          is_active?: boolean;
+          names: NonNullable<Json>;
+          slug: string;
+          sort_order?: number;
+          sport_id: string;
+        };
+        Update: {
+          id?: string;
+          is_active?: boolean;
+          names?: NonNullable<Json>;
+          slug?: string;
+          sort_order?: number;
+          sport_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'sport_positions_sport_id_fkey';
+            columns: ['sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sports';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      sports: {
+        Row: {
+          created_at: string;
+          icon_key: string;
+          id: string;
+          is_active: boolean;
+          is_team_sport: boolean;
+          names: NonNullable<Json>;
+          settings: NonNullable<Json>;
+          skill_descriptors: NonNullable<Json>;
+          slug: string;
+          sort_order: number;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          icon_key: string;
+          id?: string;
+          is_active?: boolean;
+          is_team_sport: boolean;
+          names: NonNullable<Json>;
+          settings?: NonNullable<Json>;
+          skill_descriptors: NonNullable<Json>;
+          slug: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          icon_key?: string;
+          id?: string;
+          is_active?: boolean;
+          is_team_sport?: boolean;
+          names?: NonNullable<Json>;
+          settings?: NonNullable<Json>;
+          skill_descriptors?: NonNullable<Json>;
+          slug?: string;
+          sort_order?: number;
           updated_at?: string;
         };
         Relationships: [];
@@ -170,19 +382,128 @@ export type Database = {
           },
         ];
       };
+      user_sport_positions: {
+        Row: {
+          position_id: string;
+          sport_id: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          position_id: string;
+          sport_id: string;
+          user_id: string;
+        };
+        Update: {
+          position_id?: string;
+          sport_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_sport_positions_position_id_sport_id_fkey';
+            columns: ['position_id', 'sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sport_positions';
+            referencedColumns: ['id', 'sport_id'];
+          },
+          {
+            foreignKeyName: 'user_sport_positions_user_id_sport_id_fkey';
+            columns: ['user_id', 'sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_sport_profiles';
+            referencedColumns: ['user_id', 'sport_id'];
+          },
+        ];
+      };
+      user_sport_profiles: {
+        Row: {
+          created_at: string;
+          self_assessed_at: string;
+          self_assessed_level: number;
+          sport_id: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          self_assessed_at?: string;
+          self_assessed_level: number;
+          sport_id: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          self_assessed_at?: string;
+          self_assessed_level?: number;
+          sport_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_sport_profiles_sport_id_fkey';
+            columns: ['sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sports';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_sport_profiles_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      complete_onboarding: {
+        Args: {
+          p_adult_confirmed: boolean;
+          p_city_id: string;
+          p_display_name: string;
+          p_district_id: string;
+          p_marketing_consent: boolean;
+          p_privacy_version: string;
+          p_sports: Json;
+          p_terms_version: string;
+        };
+        Returns: undefined;
+      };
       get_my_account: {
         Args: Record<PropertyKey, never>;
         Returns: {
           account_status: Database['public']['Enums']['account_status'];
+          adult_confirmed: boolean;
           email_verified: boolean;
           is_admin: boolean;
+          onboarded: boolean;
           user_id: string;
         }[];
+      };
+      remove_sport_profile: { Args: { p_sport_id: string }; Returns: undefined };
+      set_marketing_consent: { Args: { p_granted: boolean }; Returns: undefined };
+      set_sport_profile: {
+        Args: { p_level: number; p_position_ids: string[]; p_sport_id: string };
+        Returns: undefined;
+      };
+      update_my_profile: {
+        Args: { p_bio: string; p_city_id: string; p_display_name: string; p_district_id: string };
+        Returns: undefined;
+      };
+      update_my_settings: {
+        Args: {
+          p_locale: string;
+          p_profile_visibility: Database['public']['Enums']['profile_visibility'];
+          p_show_badges: boolean;
+          p_show_reliability: boolean;
+          p_theme: string;
+        };
+        Returns: undefined;
       };
     };
     Enums: {
