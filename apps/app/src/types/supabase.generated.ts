@@ -461,6 +461,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      accept_current_legal_terms: {
+        Args: { p_privacy_version: string; p_terms_version: string };
+        Returns: undefined;
+      };
       complete_onboarding: {
         Args: {
           p_adult_confirmed: boolean;
@@ -481,6 +485,7 @@ export type Database = {
           adult_confirmed: boolean;
           email_verified: boolean;
           is_admin: boolean;
+          legal_consent_current: boolean;
           onboarded: boolean;
           user_id: string;
         }[];

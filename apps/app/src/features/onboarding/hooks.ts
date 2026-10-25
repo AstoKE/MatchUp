@@ -1,7 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { OnboardingInput } from '@matchup/domain';
 import { useSession } from '@/features/auth';
-import { completeOnboarding, fetchLegalVersions, fetchMyAccount } from './api/onboarding-api';
+import {
+  acceptCurrentLegalTerms,
+  completeOnboarding,
+  fetchLegalVersions,
+  fetchMyAccount,
+} from './api/onboarding-api';
 
 export const accountQueryKey = (userId: string) => ['account', userId] as const;
 
@@ -42,6 +47,19 @@ export function useCompleteOnboarding() {
         await queryClient.invalidateQueries({ queryKey: accountQueryKey(session.userId) });
       }
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+}
+
+export function useAcceptLegalTerms() {
+  const queryClient = useQueryClient();
+  const session = useSession();
+  return useMutation({
+    mutationFn: acceptCurrentLegalTerms,
+    onSuccess: async () => {
+      if (session.status === 'authenticated') {
+        await queryClient.invalidateQueries({ queryKey: accountQueryKey(session.userId) });
+      }
     },
   });
 }

@@ -7,7 +7,7 @@ Status 2026-10-25. **Nothing here is done for a hosted project: no hosted projec
 - [ ] Terms of Use and Privacy Notice reviewed and approved by counsel (`apps/app/src/locales/{tr,en}/legal.json` are drafts).
 - [ ] Data controller identity, contact, retention periods, deletion/export procedure and KVKK information duties added to the Privacy Notice (SECURITY §8).
 - [ ] Decide whether a separate explicit-consent text is needed for any processing beyond the Terms; marketing stays a separate, optional, revocable consent (built).
-- [ ] Publish new text as a **new version**: change `legal.terms_version` / `legal.privacy_version` in `app_config` through a migration and set `legal.draft` to `false`. Users are asked again because `complete_onboarding` only accepts the current versions (`CONSENT_VERSION_MISMATCH`). *Existing users are not re-prompted yet* — a re-consent gate for already-onboarded users is not built.
+- [ ] Publish new text as a **new version**: change `legal.terms_version` / `legal.privacy_version` in `app_config` through a migration and set `legal.draft` to `false`. New users accept the new versions in onboarding (`complete_onboarding` only accepts the current versions, `CONSENT_VERSION_MISMATCH`); **already-onboarded users are re-prompted** by the re-consent gate (built: writes return `CONSENT_REQUIRED` and the app shows the re-consent screen until they accept, DATABASE §2). Decide with counsel whether a user who declines may keep browsing guest-readable content (current behaviour) and whether the re-consent wording is sufficient.
 - [ ] 18+ is a self-declaration (checkbox + server-recorded timestamp). Decide with counsel whether that is sufficient for the product.
 
 ## 2. Abuse and enumeration (decision 7 — planned, not implemented)

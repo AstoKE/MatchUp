@@ -10,6 +10,7 @@ const accountRow = z.object({
   is_admin: z.boolean(),
   adult_confirmed: z.boolean(),
   onboarded: z.boolean(),
+  legal_consent_current: z.boolean(),
 });
 
 export interface MyAccount {
@@ -18,6 +19,8 @@ export interface MyAccount {
   emailVerified: boolean;
   adultConfirmed: boolean;
   onboarded: boolean;
+  /** False after new Terms/Privacy versions were published and not yet accepted (re-consent gate). */
+  legalConsentCurrent: boolean;
 }
 
 /** Server-authoritative account state (the client never decides who is onboarded). */
@@ -31,6 +34,7 @@ export async function fetchMyAccount(): Promise<MyAccount> {
     emailVerified: row.email_verified,
     adultConfirmed: row.adult_confirmed,
     onboarded: row.onboarded,
+    legalConsentCurrent: row.legal_consent_current,
   };
 }
 
@@ -79,6 +83,17 @@ export async function completeOnboarding(
       level: s.level,
       position_ids: s.positionIds,
     })),
+  });
+  if (error) throw mapRpcError(error);
+}
+
+/** Re-consent for already-onboarded users; the versions must be the ones the user was shown. */
+export async function acceptCurrentLegalTerms(
+  versions: Pick<LegalVersions, 'termsVersion' | 'privacyVersion'>,
+): Promise<void> {
+  const { error } = await supabase.rpc('accept_current_legal_terms', {
+    p_terms_version: versions.termsVersion,
+    p_privacy_version: versions.privacyVersion,
   });
   if (error) throw mapRpcError(error);
 }
