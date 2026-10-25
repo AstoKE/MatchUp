@@ -23,6 +23,7 @@
     "db:test": "supabase test db",
     "db:types": "node scripts/gen-types.mjs",
     "env:local": "node scripts/write-local-env.mjs",
+    "env:hosted": "node scripts/write-hosted-env.mjs",
     "test:integration": "pnpm --filter @matchup/db-tests test",
     "test:e2e": "pnpm --filter @matchup/app test:e2e",
     "test:scripts": "node --test \"scripts/**/*.test.mjs\"",

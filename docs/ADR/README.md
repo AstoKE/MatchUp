@@ -21,3 +21,4 @@ Format: Context · Decision · Consequences · Status. One decision per file, im
 | [0015](0015-native-android-build-in-container.md) | Build Android in a pinned Linux container; run on the emulator | Accepted |
 | [0016](0016-auth-abuse-controls.md) | Authentication abuse controls and the account-enumeration posture (amends 0014 §4) | Accepted |
 | [0017](0017-account-deletion-and-export-in-sql.md) | Account deletion and data export in SQL with pg_cron, no Edge Function (amends DATABASE §11, SECURITY §9) | Accepted |
+| [0018](0018-hosted-supabase-region-paris.md) | Hosted Supabase project in eu-west-3 (Paris) (amends D-04) | Accepted |

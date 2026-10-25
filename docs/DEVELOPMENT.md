@@ -22,6 +22,7 @@ Not required for Phase 1: Android Studio, Xcode, EAS account, a hosted Supabase 
 pnpm install                      # frozen versions via pnpm-lock.yaml; installs git hooks (husky)
 pnpm db:start                     # starts the local Supabase stack in Docker (first run downloads images), applies migrations + seed
 pnpm env:local                    # writes apps/app/.env.local with PUBLIC values only (API URL + anon key)
+pnpm env:hosted                   # same for the linked HOSTED project (publishable key); env:local switches back
 pnpm --filter @matchup/app e2e:install   # one-time Playwright browser download
 ```
 

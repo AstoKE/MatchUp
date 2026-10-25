@@ -1,6 +1,6 @@
 # Public registration checklist
 
-Status 2026-10-25. **Nothing here is done for a hosted project: no hosted project is connected yet.** Public sign-up must stay **disabled** on any hosted Supabase project (`[auth] enable_signup = false` in the project's Auth settings) until every item below is checked. This is not legal advice; items marked ⚖ need a qualified lawyer.
+Status 2026-10-25. A hosted development/staging project now exists (DEPLOYMENT §9) and holds the schema only; none of the items below is done for it. Public sign-up must stay **disabled** on any hosted Supabase project (`[auth] enable_signup = false` in the project's Auth settings) until every item below is checked. This is not legal advice; items marked ⚖ need a qualified lawyer.
 
 ## 1. Legal (⚖ blocks launch)
 

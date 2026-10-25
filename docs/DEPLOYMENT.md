@@ -14,6 +14,8 @@ Related: [ARCHITECTURE §11](ARCHITECTURE.md) · [SECURITY](SECURITY.md)
 
 **Region (D-04 confirmed):** the initial development/staging project uses Supabase `eu-central-1` (Frankfurt). Data-residency note: this is processing outside Turkey; no real user data is placed there until counsel has addressed the KVKK cross-border transfer requirements (SECURITY §8 item 4). Phase 1 development uses the **local** Supabase stack only; no hosted project, credentials or real data are involved yet.
 
+**Update 2026-10-25 (ADR-0018):** the first hosted project exists and is in **eu-west-3 (Paris)**, ref `wmgeugsqblwnhnqnczab`, free plan, Postgres 17. It serves as the development/staging project; see §9.
+
 Branches: `main` protected; PRs required; staging deploys from `main`; production from tagged releases.
 
 ## 2. Configuration and secrets
@@ -61,8 +63,32 @@ Severity levels, owner, communication template (in-app banner + status note), se
 
 ## 8. Phase 1 notes
 
-- **No hosted environment exists yet.** Everything was verified on the local Supabase stack; the Frankfurt project (D-04) is a Phase 2 task (PHASE1_REPORT §7). Settings that only exist on a hosted project (CAPTCHA, leaked-password protection, custom SMTP, production rate limits, backups/PITR) are unverified.
+- *(Phase 1 snapshot; superseded by §9.)* **No hosted environment exists yet.** Everything was verified on the local Supabase stack; the Frankfurt project (D-04) is a Phase 2 task (PHASE1_REPORT §7). Settings that only exist on a hosted project (CAPTCHA, leaked-password protection, custom SMTP, production rate limits, backups/PITR) are unverified.
 - **CI** (`.github/workflows/ci.yml`): jobs `quality`, `secret-scan`, `database`, `e2e-web`. Linted with actionlint; never executed on GitHub (no remote yet).
 - **Web hosting prerequisites before any public URL:** CSP (no inline scripts; `connect-src` limited to the API origin), HSTS, `X-Content-Type-Options`, `Referrer-Policy`, frame-ancestors none, SPA fallback; the web session is in `localStorage` (ADR-0014).
 - **Bundle budget:** measured first-load JS ≈ 895 kB gzip vs 350 kB target; ratchet at 1400 kB total (`pnpm check:bundle-size`).
 - Keep the repository out of cloud-synced folders (DEVELOPMENT §1).
+
+## 9. Hosted project (connected 2026-10-25)
+
+Project `wmgeugsqblwnhnqnczab`, eu-west-3 (Paris, ADR-0018), free plan. It holds the **schema only**: the local stack's rows are automated-test fixtures and were deliberately not copied. Real records appear when the app is pointed at it.
+
+**Schema changes (manual, until a CI deploy job with approval exists):**
+
+```powershell
+pnpm exec supabase login                                   # once per machine; browser, token stays local
+pnpm exec supabase link --project-ref wmgeugsqblwnhnqnczab # once per clone; writes git-ignored supabase/.temp
+pnpm exec supabase db push --linked --dry-run              # review the list first
+pnpm exec supabase db push --linked                        # only migrations already merged to main
+pnpm exec supabase db advisors --linked                    # Supabase security/performance advisor
+```
+
+No database password is needed with CLI ≥ 2.122 (login-role via the access token). Never push a migration that is not on `main`.
+
+**Auth settings are configured in the dashboard, not pushed from `config.toml`** (its values are for local development: localhost, sign-up on). Required on the hosted project: sign-up **disabled** (LAUNCH_CHECKLIST), email confirmation on, minimum password length 10, site URL `http://localhost:8081`, redirect URLs `matchup-dev://**` and `http://localhost:8081/**`. Test accounts are created in Authentication → Users with *Auto Confirm User*. CAPTCHA stays off until a Turnstile site key exists (and then app and project switch together).
+
+**Pointing the app at it:** `pnpm env:hosted` writes `apps/app/.env.local` with the project URL and its **publishable** key (never a secret key); `pnpm env:local` switches back. On the emulator: `.\scripts\android\dev.ps1 up hosted` (Metro restarts with a clean cache whenever the backend changes, because `EXPO_PUBLIC_*` values are inlined at bundle time). Automated tests always run against the local stack.
+
+**First push, verified:** 6 migrations applied; every public table has RLS; API roles have no write grants; guests read only `app_config` and the catalog (10 sports, 19 formats, 20 positions, Ankara + 25 districts); the `process-deletion-queue` cron job exists. The advisor flagged a hosted-only platform function `public.rls_auto_enable()` (event trigger helper, SECURITY DEFINER, executable by `anon`); `20261025160000_platform_function_grants.sql` revokes that grant (it cannot be called directly anyway: HTTP 400). The other advisor warnings are by design (self-service RPCs callable by signed-in users, ADR-0003) or minor (several permissive SELECT policies on `profiles` and sport tables).
+
+**Not verified on the hosted project yet:** the purge job actually running at 03:17 UTC (check `cron.job_run_details` after the first night), email delivery with the default SMTP (rate-limited), latency from Ankara.
