@@ -55,19 +55,24 @@ echo "== Metro"
 # switch between local and hosted needs a fresh bundle too. Restart with --clear when either changed.
 LOCK_SUM="$(cat pnpm-lock.yaml apps/app/.env.local | sha256sum | cut -d' ' -f1)"
 METRO_STAMP=apps/app/.android-build/metro-lock.sha256
-if curl -s localhost:8081/status | grep -q running && [ "$(cat "$METRO_STAMP" 2>/dev/null)" != "$LOCK_SUM" ]; then
+# Not `curl | grep -q`: under pipefail grep's early exit can fail curl (SIGPIPE) and flip the answer.
+metro_running() { [[ "$(curl -s localhost:8081/status 2>/dev/null || true)" == *running* ]]; }
+if metro_running && [ "$(cat "$METRO_STAMP" 2>/dev/null)" != "$LOCK_SUM" ]; then
   echo "Dependencies or backend changed since Metro started: restarting it with a clean cache"
   for pid in $(netstat -ano | grep -E ':8081 .*LISTENING' | awk '{print $NF}' | sort -u); do
     taskkill //PID "$pid" //T //F >/dev/null 2>&1 || true
   done
   sleep 2
 fi
-if ! curl -s localhost:8081/status | grep -q running; then
+if ! metro_running; then
   mkdir -p apps/app/.android-build
   # NOT CI=1: CI mode disables file watching (stale JS). Output goes to a log so JS warnings can be read.
   (cd apps/app && nohup pnpm exec expo start --port 8081 --clear >.android-build/metro.log 2>&1 &)
-  until curl -s localhost:8081/status | grep -q running; do sleep 2; done
+  until metro_running; do sleep 2; done
   echo "$LOCK_SUM" >"$METRO_STAMP"
+  # A running app keeps the old bundle in memory: restart it so it loads the new one.
+  adb shell am force-stop "$PKG"
+  adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || true
 fi
 if [ "$BACKEND" = hosted ]; then
   echo "Ready (HOSTED backend). Open the MatchUp app on the emulator. Records: Supabase dashboard."
