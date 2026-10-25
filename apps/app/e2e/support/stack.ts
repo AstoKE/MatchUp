@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
 
@@ -111,6 +111,26 @@ export async function createOnboardedUser(
     });
   }
   return user;
+}
+
+/**
+ * TEST-ONLY: makes ONE user's legal acceptance outdated by revoking it in the local database
+ * (bumping app_config instead would race every other test that onboards). API roles have no write
+ * access to user_consents by design, so this goes through psql in the local stack's DB container.
+ */
+export function revokeLegalConsent(userId: string) {
+  if (!/^[0-9a-f-]{36}$/.test(userId)) throw new Error('not a uuid');
+  execFileSync('docker', [
+    'exec',
+    'supabase_db_matchup',
+    'psql',
+    '-U',
+    'postgres',
+    '-v',
+    'ON_ERROR_STOP=1',
+    '-c',
+    `update public.user_consents set revoked_at = now() where user_id = '${userId}' and kind = 'PRIVACY_NOTICE'`,
+  ]);
 }
 
 export async function deleteUser(stack: LocalStack, id: string) {

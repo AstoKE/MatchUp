@@ -18,6 +18,14 @@
     "marketing": "Haber ve ipuçları almak istiyorum (isteğe bağlı). Bunu istediğin zaman değiştirebilirsin.",
     "draftNotice": "Hukuki metinler henüz bir avukat tarafından incelenmemiş taslaklardır."
   },
+  "reconsent": {
+    "title": "Koşullarımız güncellendi",
+    "intro": "Kullanım Koşulları'nı ve Gizlilik Bildirimi'ni güncelledik. Etkinlik oluşturmaya, katılmaya ve profilini düzenlemeye devam etmek için yeni sürümleri onaylaman gerekiyor. 18 yaş onayın ve iletişim tercihin aynen kalır.",
+    "accept": "Güncellenen Kullanım Koşulları'nı ve Gizlilik Bildirimi'ni okudum, kabul ediyorum.",
+    "submit": "Kabul et ve devam et",
+    "submitting": "Kaydediliyor…",
+    "later": "Şimdi değil"
+  },
   "basics": {
     "title": "Seni tanıyalım"
   },

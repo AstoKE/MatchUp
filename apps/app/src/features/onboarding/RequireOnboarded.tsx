@@ -9,7 +9,8 @@ import { useMyAccount } from './hooks';
 
 /**
  * Route guard for screens that need a completed profile (18+ confirmed, consent recorded). Guests go
- * to sign-in; signed-in users who have not onboarded go to the onboarding flow and come back here.
+ * to sign-in; signed-in users who have not onboarded go to the onboarding flow, and onboarded users
+ * whose consent predates the current legal versions go to the re-consent screen; both come back here.
  * UX only — the database enforces the same rule on every write (private.assert_onboarded_user).
  */
 export function RequireOnboarded({ children }: { children: ReactNode }) {
@@ -49,6 +50,9 @@ function OnboardedGate({ children }: { children: ReactNode }) {
   }
   if (!account.data.onboarded) {
     return <Redirect href={{ pathname: '/onboarding', params: { returnTo: pathname } }} />;
+  }
+  if (!account.data.legalConsentCurrent) {
+    return <Redirect href={{ pathname: '/consent-update', params: { returnTo: pathname } }} />;
   }
   return <>{children}</>;
 }

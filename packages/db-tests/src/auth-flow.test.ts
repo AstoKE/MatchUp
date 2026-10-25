@@ -86,7 +86,7 @@ describe('registration with email verification (PKCE, real Auth + Mailpit)', () 
     // Server-side account state agrees.
     const account = await client.rpc('get_my_account');
     expect(account.error).toBeNull();
-    // A brand-new account has verified its email but has not yet confirmed 18+ or onboarded.
+    // A brand-new account has verified its email but has not yet confirmed 18+, onboarded or consented.
     expect(account.data).toEqual([
       {
         user_id: userId,
@@ -95,6 +95,7 @@ describe('registration with email verification (PKCE, real Auth + Mailpit)', () 
         is_admin: false,
         adult_confirmed: false,
         onboarded: false,
+        legal_consent_current: false,
       },
     ]);
 

@@ -3,6 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { renderApp } from '@/test/render';
 import type { SessionState } from '@/features/auth';
 import { RequireOnboarded } from './RequireOnboarded';
+import { ConsentUpdateScreen } from './screens/ConsentUpdateScreen';
 import { LegalDocScreen } from './screens/LegalDocScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { Text } from 'react-native';
@@ -57,12 +58,14 @@ const mockApi = {
   fetchMyAccount: jest.fn(),
   fetchLegalVersions: jest.fn(),
   completeOnboarding: jest.fn(),
+  acceptCurrentLegalTerms: jest.fn(),
   fetchCatalog: jest.fn(),
 };
 jest.mock('./api/onboarding-api', () => ({
   fetchMyAccount: (...a: unknown[]) => mockApi.fetchMyAccount(...a),
   fetchLegalVersions: (...a: unknown[]) => mockApi.fetchLegalVersions(...a),
   completeOnboarding: (...a: unknown[]) => mockApi.completeOnboarding(...a),
+  acceptCurrentLegalTerms: (...a: unknown[]) => mockApi.acceptCurrentLegalTerms(...a),
 }));
 jest.mock('@/features/catalog/api/catalog-api', () => ({
   fetchCatalog: (...a: unknown[]) => mockApi.fetchCatalog(...a),
@@ -95,6 +98,7 @@ const account = (overrides: Record<string, unknown> = {}) => ({
   emailVerified: true,
   adultConfirmed: false,
   onboarded: false,
+  legalConsentCurrent: true,
   ...overrides,
 });
 const versions = { termsVersion: 'draft-0.1', privacyVersion: 'draft-0.1', draft: true };
@@ -106,6 +110,7 @@ beforeEach(() => {
   mockApi.fetchLegalVersions.mockResolvedValue(versions);
   mockApi.fetchCatalog.mockResolvedValue(catalog);
   mockApi.completeOnboarding.mockResolvedValue(undefined);
+  mockApi.acceptCurrentLegalTerms.mockResolvedValue(undefined);
 });
 
 describe('RequireOnboarded', () => {
@@ -124,6 +129,17 @@ describe('RequireOnboarded', () => {
     await renderApp(gated(), { session: signedIn() });
     const redirect = await screen.findByTestId('redirect');
     expect(redirect).toHaveTextContent(/onboarding/);
+    expect(redirect).toHaveTextContent(/profile/);
+    expect(screen.queryByText('gizli içerik')).toBeNull();
+  });
+
+  it('sends an onboarded user with outdated consent to the re-consent screen and remembers the page', async () => {
+    mockApi.fetchMyAccount.mockResolvedValue(
+      account({ onboarded: true, adultConfirmed: true, legalConsentCurrent: false }),
+    );
+    await renderApp(gated(), { session: signedIn() });
+    const redirect = await screen.findByTestId('redirect');
+    expect(redirect).toHaveTextContent(/consent-update/);
     expect(redirect).toHaveTextContent(/profile/);
     expect(screen.queryByText('gizli içerik')).toBeNull();
   });
@@ -306,6 +322,97 @@ describe('OnboardingScreen', () => {
     expect(await screen.findByText('Before we start')).toBeTruthy();
     await press('Next');
     expect(await screen.findByText(/^You must be 18 or older to use /)).toBeTruthy();
+  });
+});
+
+describe('ConsentUpdateScreen', () => {
+  const ACCEPT =
+    "Güncellenen Kullanım Koşulları'nı ve Gizlilik Bildirimi'ni okudum, kabul ediyorum.";
+  const outdated = () =>
+    mockApi.fetchMyAccount.mockResolvedValue(
+      account({ onboarded: true, adultConfirmed: true, legalConsentCurrent: false }),
+    );
+
+  it('does not accept anything until the user ticks the box', async () => {
+    outdated();
+    await renderApp(<ConsentUpdateScreen />, { session: signedIn() });
+    await screen.findByText('Koşullarımız güncellendi');
+    await fireEvent.press(screen.getByRole('button', { name: 'Kabul et ve devam et' }));
+    expect(await screen.findByText(/kabul etmelisin/)).toBeTruthy();
+    expect(mockApi.acceptCurrentLegalTerms).not.toHaveBeenCalled();
+  });
+
+  it('only asks for the legal texts again (no 18+, no marketing) and flags drafts', async () => {
+    outdated();
+    await renderApp(<ConsentUpdateScreen />, { session: signedIn() });
+    await screen.findByText('Koşullarımız güncellendi');
+    expect(screen.getAllByRole('checkbox')).toHaveLength(1);
+    expect(screen.getByText(/henüz bir avukat tarafından incelenmemiş/)).toBeTruthy();
+  });
+
+  it('accepts exactly the versions shown and returns to the page that needed it', async () => {
+    outdated();
+    mockParams = { returnTo: '/profile' };
+    await renderApp(<ConsentUpdateScreen />, { session: signedIn() });
+    await fireEvent.press(await screen.findByRole('checkbox', { name: ACCEPT }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Kabul et ve devam et' }));
+    await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith('/profile'));
+    expect(mockApi.acceptCurrentLegalTerms.mock.calls[0]?.[0]).toMatchObject({
+      termsVersion: 'draft-0.1',
+      privacyVersion: 'draft-0.1',
+    });
+  });
+
+  it('never returns into the re-consent screen itself', async () => {
+    outdated();
+    mockParams = { returnTo: '/consent-update' };
+    await renderApp(<ConsentUpdateScreen />, { session: signedIn() });
+    await fireEvent.press(await screen.findByRole('checkbox', { name: ACCEPT }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Kabul et ve devam et' }));
+    await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith('/'));
+  });
+
+  it('on a version change mid-way shows the error, reloads the versions and asks again', async () => {
+    outdated();
+    mockApi.acceptCurrentLegalTerms.mockRejectedValueOnce(new AppError('CONSENT_VERSION_MISMATCH'));
+    await renderApp(<ConsentUpdateScreen />, { session: signedIn() });
+    await fireEvent.press(await screen.findByRole('checkbox', { name: ACCEPT }));
+    const before = mockApi.fetchLegalVersions.mock.calls.length;
+    await fireEvent.press(screen.getByRole('button', { name: 'Kabul et ve devam et' }));
+    expect(await screen.findByText(/güncellenmiş/)).toBeTruthy();
+    await waitFor(() =>
+      expect(mockApi.fetchLegalVersions.mock.calls.length).toBeGreaterThan(before),
+    );
+    expect(screen.getByRole('checkbox', { name: ACCEPT })).not.toBeChecked();
+    expect(mockRouter.replace).not.toHaveBeenCalled();
+  });
+
+  it('lets the user decline for now and go back to the public Discover screen', async () => {
+    outdated();
+    await renderApp(<ConsentUpdateScreen />, { session: signedIn() });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Şimdi değil' }));
+    expect(mockRouter.replace).toHaveBeenCalledWith('/');
+    expect(mockApi.acceptCurrentLegalTerms).not.toHaveBeenCalled();
+  });
+
+  it('skips the screen when consent is already current', async () => {
+    mockParams = { returnTo: '/my-events' };
+    mockApi.fetchMyAccount.mockResolvedValue(account({ onboarded: true }));
+    await renderApp(<ConsentUpdateScreen />, { session: signedIn() });
+    expect(await screen.findByTestId('redirect')).toHaveTextContent(/my-events/);
+  });
+
+  it('sends a user who never onboarded to onboarding instead', async () => {
+    mockApi.fetchMyAccount.mockResolvedValue(account({ legalConsentCurrent: false }));
+    await renderApp(<ConsentUpdateScreen />, { session: signedIn() });
+    expect(await screen.findByTestId('redirect')).toHaveTextContent(/onboarding/);
+  });
+
+  it('works in English too', async () => {
+    outdated();
+    await renderApp(<ConsentUpdateScreen />, { session: signedIn(), locale: 'en' });
+    expect(await screen.findByText('Our terms have been updated')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Accept and continue' })).toBeTruthy();
   });
 });
 

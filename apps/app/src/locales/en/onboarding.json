@@ -18,6 +18,14 @@
     "marketing": "I'd like to receive news and tips (optional). You can change this at any time.",
     "draftNotice": "The legal texts are drafts that have not been reviewed by a lawyer yet."
   },
+  "reconsent": {
+    "title": "Our terms have been updated",
+    "intro": "We updated the Terms of Use and the Privacy Notice. To keep creating and joining events and editing your profile, please accept the new versions. Your 18+ confirmation and your communication preference stay as they are.",
+    "accept": "I have read and accept the updated Terms of Use and Privacy Notice.",
+    "submit": "Accept and continue",
+    "submitting": "Saving…",
+    "later": "Not now"
+  },
   "basics": {
     "title": "Tell us about you"
   },

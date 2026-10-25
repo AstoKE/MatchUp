@@ -6,6 +6,7 @@ import {
   deleteUser,
   getLocalStack,
   PASSWORD,
+  revokeLegalConsent,
   uniqueEmail,
   type LocalStack,
 } from './support/stack';
@@ -39,6 +40,16 @@ const termsBox = (page: Page) =>
     name: "Kullanım Koşulları'nı ve Gizlilik Bildirimi'ni okudum, kabul ediyorum.",
   });
 const next = (page: Page) => page.getByRole('button', { name: 'İleri' });
+
+const axeTags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
+
+async function expectNoBlocking(page: Page) {
+  const results = await new AxeBuilder({ page }).withTags(axeTags).analyze();
+  const blocking = results.violations.filter((v) =>
+    ['serious', 'critical'].includes(v.impact ?? ''),
+  );
+  expect(blocking.map((v) => `${v.id}: ${v.help} (${v.nodes.length} nodes)`)).toEqual([]);
+}
 
 test.describe('onboarding gate', () => {
   test('guests are sent to sign-in; an account that has not onboarded is sent to onboarding', async ({
@@ -109,6 +120,36 @@ test.describe('onboarding gate', () => {
     await page.goto('/onboarding?returnTo=%2Fmy-events');
     await expect(page).toHaveURL(/\/my-events$/);
   });
+
+  test('an onboarded user with an outdated acceptance must re-consent, then returns to the page', async ({
+    page,
+  }) => {
+    const s = requireStack();
+    const email = uniqueEmail('reconsent');
+    const user = await createOnboardedUser(s, email);
+    createdIds.push(user.id);
+    revokeLegalConsent(user.id);
+    await signIn(page, email);
+
+    await page.getByRole('tab', { name: 'Profil' }).click();
+    await expect(page).toHaveURL(/\/consent-update\?returnTo=%2Fprofile$/);
+    await expect(
+      page.getByRole('heading', { name: 'Koşullarımız güncellendi', level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByRole('checkbox')).toHaveCount(1); // no second 18+ or marketing question
+    await expectNoBlocking(page);
+
+    await page.getByRole('button', { name: 'Kabul et ve devam et' }).click();
+    await expect(page.getByText(/kabul etmelisin/)).toBeVisible();
+    await page
+      .getByRole('checkbox', {
+        name: "Güncellenen Kullanım Koşulları'nı ve Gizlilik Bildirimi'ni okudum, kabul ediyorum.",
+      })
+      .click();
+    await page.getByRole('button', { name: 'Kabul et ve devam et' }).click();
+    await expect(page).toHaveURL(/\/profile$/);
+    await expect(page.getByRole('heading', { name: 'E2E Kullanıcı', level: 1 })).toBeVisible();
+  });
 });
 
 test.describe('profile screens', () => {
@@ -162,16 +203,6 @@ test.describe('profile screens', () => {
 });
 
 test.describe('accessibility of onboarding, legal and profile screens (axe, WCAG 2.2 AA tags)', () => {
-  const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
-
-  async function expectNoBlocking(page: Page) {
-    const results = await new AxeBuilder({ page }).withTags(tags).analyze();
-    const blocking = results.violations.filter((v) =>
-      ['serious', 'critical'].includes(v.impact ?? ''),
-    );
-    expect(blocking.map((v) => `${v.id}: ${v.help} (${v.nodes.length} nodes)`)).toEqual([]);
-  }
-
   for (const path of ['/legal/terms', '/legal/privacy']) {
     test(`no serious or critical violations on ${path} (guest)`, async ({ page }) => {
       await page.goto(path);
