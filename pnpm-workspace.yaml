@@ -11,6 +11,8 @@ onlyBuiltDependencies:
 overrides:
   # GHSA-mrhx-c7xc-m3w5: Expo CLI (dev tooling) pulls zod <4.6.6; our own zod is already patched.
   '@expo/cli>zod': ^4.6.7
+  # GHSA for compression <1.8.2 (DoS via memory leak): `serve` (dev-only, serves the web export for E2E) pins 1.8.1.
+  'serve>compression': ^1.8.2
 
 auditConfig:
   ignoreGhsas:
