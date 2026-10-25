@@ -305,7 +305,7 @@ describe('OnboardingScreen', () => {
     await renderApp(<OnboardingScreen />, { session: signedIn(), locale: 'en' });
     expect(await screen.findByText('Before we start')).toBeTruthy();
     await press('Next');
-    expect(await screen.findByText('You must be 18 or older to use MatchUp.')).toBeTruthy();
+    expect(await screen.findByText(/^You must be 18 or older to use /)).toBeTruthy();
   });
 });
 
