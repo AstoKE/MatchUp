@@ -41,3 +41,6 @@ Thumbs.db
 # Android build output and generated native projects (CNG: regenerate with expo prebuild)
 apps/app/.android-build/
 apps/app/e2e-mobile/results/
+
+# Generated throw-away auth-abuse lab stack (scripts/auth-lab.mjs)
+supabase-lab/
