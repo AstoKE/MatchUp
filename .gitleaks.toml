@@ -12,4 +12,6 @@ regexes = [
   '''AKIAABCDEFGHIJKLMNOP''',
   '''sb_(publishable|secret)_0123456789abcdef[a-z0-9]*''',
   '''eyJhbGciOiJIUzI1NiJ9\.eyJyb2xlIjoic2VydmljZV9yb2xlIn0\.c2lnbmF0dXJlLXBsYWNlaG9sZGVy''',
+  # Cloudflare's published Turnstile TEST secret (always passes); used only by scripts/auth-lab.mjs.
+  '''1x0000000000000000000000000000000AA''',
 ]

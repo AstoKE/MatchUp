@@ -48,4 +48,17 @@ Durable rules only. Details live in `docs/` (read the relevant doc before changi
 `pnpm check` (typecheck + lint + format + brand + script tests + unit/component) · `pnpm db:start|stop|reset|test|types` (Docker required) · `pnpm test:integration` · `pnpm test:e2e` (`REQUIRE_STACK=1` to fail instead of skip) · `pnpm env:local` · `pnpm check:bundle` / `check:bundle-size` after `export:web`.
 
 - Gate on **real exit codes**, not on piped/grepped output. Write source files with the editor tools, not shell heredocs/`node -e` (quoting bugs cost real time). Never run formatters over the repo-root `settings.json` (the owner's local hook; it is in `.prettierignore`).
-- State of the repo: Phases 0–1 complete; Phase 2 starts only on explicit instruction (see docs/PHASE1_REPORT.md §7–8).
+- **Commit only when the gates exit 0**: `pnpm check`, `pnpm db:test` and `pnpm test:integration` (and `pnpm test:e2e` when UI changed). Chain them with `&&`/exit-code checks; a piped or `;`-separated command can commit a red tree.
+- Use **`zod/mini`**, never classic `zod` (ESLint blocks it): the unused locale/JSON-Schema modules are resolved to an empty module in `apps/app/metro.config.js`; re-check `node scripts/bundle-files.mjs zod` after zod upgrades. Bundle ratchets (total + initial) live in `scripts/check-bundle-size.mjs`; numbers and plan in `docs/PERFORMANCE.md`.
+- Web controls must use `aria-checked` / `aria-expanded` (not only `accessibilityState`): React Native Web does not map them and axe fails.
+
+## Native Android (Windows host, see docs/ANDROID_SETUP.md and docs/NATIVE_VALIDATION.md)
+
+- The repo lives at `C:\dev\matchup` (not OneDrive). Native builds run in the pinned Linux container (ADR-0015, MAX_PATH makes Windows builds impossible); the app runs on the Windows emulator with JS from Metro.
+- From PowerShell use `.\scripts\android\dev.ps1 up|down|validate`; plain `bash` there is WSL. **Never start Metro with `CI=1`** (no file watching → stale JS). After changing `metro.config.js` restart Metro with `--clear`.
+- Device suite: `node scripts/android/native-validation.mjs --skip-install` (22 checks incl. database assertions). It takes ~8 minutes: run it in the background and do not edit app code while it runs (Metro hot-reloads the device).
+- Say what is verified on the emulator and what is not (physical devices, iOS, real TalkBack use are not).
+
+## State of the repo
+
+Phases 0–1 complete. Phase 2 (identity, catalog, onboarding gate with 18+ and versioned consent, profile screens, in-app language) is built and tested; legal texts are **drafts** and hosted public sign-up must stay disabled (docs/LAUNCH_CHECKLIST.md, ADR-0016). Hosted Supabase, Expo/EAS and the GitHub remote are intentionally **not connected yet**. The Event Engine (Phase 3) starts only on explicit instruction.

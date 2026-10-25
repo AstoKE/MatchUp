@@ -12,6 +12,13 @@ module.exports = [
       'no-restricted-imports': [
         'error',
         {
+          paths: [
+            {
+              name: 'zod',
+              message:
+                "Import from 'zod/mini': classic zod drags ~60 kB gzip into the web bundle (docs/PERFORMANCE.md).",
+            },
+          ],
           patterns: [
             {
               group: ['@supabase/*'],
@@ -39,6 +46,13 @@ module.exports = [
       'no-restricted-imports': [
         'error',
         {
+          paths: [
+            {
+              name: 'zod',
+              message:
+                "Import from 'zod/mini': classic zod drags ~60 kB gzip into the web bundle (docs/PERFORMANCE.md).",
+            },
+          ],
           patterns: [
             {
               group: ['@/features/*/*'],
