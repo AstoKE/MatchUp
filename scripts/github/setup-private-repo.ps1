@@ -40,7 +40,8 @@ pnpm check | Out-Null
 if ($LASTEXITCODE -ne 0) { Fail 'pnpm check failed.' }
 
 Write-Host 'Scanning full git history with gitleaks (Docker) ...'
-docker run --rm -v "${repoRoot}:/repo" zricethezav/gitleaks:latest detect --source /repo --config /repo/.gitleaks.toml --log-opts="--all" --no-banner --redact | Out-Null
+# Same version as the secret-scan job in .github/workflows/ci.yml.
+docker run --rm -v "${repoRoot}:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --config /repo/.gitleaks.toml --log-opts="--all" --no-banner --redact | Out-Null
 if ($LASTEXITCODE -ne 0) { Fail 'gitleaks found potential secrets in history.' }
 Write-Host 'Pre-flight OK' -ForegroundColor Green
 
