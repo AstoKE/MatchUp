@@ -1,6 +1,7 @@
 import { AxeBuilder } from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import {
+  createOnboardedUser,
   createVerifiedUser,
   deleteUser,
   getLocalStack,
@@ -28,6 +29,21 @@ function requireStack(): LocalStack {
 async function fillCredentials(page: Page, email: string, password: string) {
   await page.getByLabel('E-posta', { exact: true }).fill(email);
   await page.getByLabel('Şifre', { exact: true }).fill(password);
+}
+
+/** Walks the three onboarding steps in the UI with valid input (Turkish UI, football at the default level). */
+async function completeOnboarding(page: Page, displayName: string) {
+  await page.getByRole('checkbox', { name: '18 yaşından büyük olduğumu onaylıyorum.' }).click();
+  await page
+    .getByRole('checkbox', {
+      name: "Kullanım Koşulları'nı ve Gizlilik Bildirimi'ni okudum, kabul ediyorum.",
+    })
+    .click();
+  await page.getByRole('button', { name: 'İleri' }).click();
+  await page.getByLabel('Görünen ad', { exact: true }).fill(displayName);
+  await page.getByRole('button', { name: 'İleri' }).click();
+  await page.getByRole('checkbox', { name: 'Futbol', exact: true }).click();
+  await page.getByRole('button', { name: 'Bitir' }).click();
 }
 
 test.describe('registration and email verification', () => {
@@ -61,8 +77,13 @@ test.describe('registration and email verification', () => {
     expect(page.url()).not.toContain('code=');
     expect(page.url()).not.toContain('access_token');
 
+    // A new account has not onboarded: the profile tab opens the onboarding flow and comes back after it.
     await page.getByRole('tab', { name: 'Profil' }).click();
+    await expect(page).toHaveURL(/\/onboarding\?returnTo=%2Fprofile$/);
+    await completeOnboarding(page, 'Ayşe Yılmaz');
+    await expect(page).toHaveURL(/\/profile$/);
     await expect(page.getByText(`${email} olarak giriş yapıldı`)).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ayşe Yılmaz', level: 1 })).toBeVisible();
     await expect(page.getByRole('alert')).toHaveCount(0); // verified: no warning banner
 
     await page.getByRole('button', { name: 'Çıkış yap' }).click();
@@ -89,7 +110,7 @@ test.describe('registration and email verification', () => {
   test('the session persists across a reload and is gone after sign-out', async ({ page }) => {
     const s = requireStack();
     const email = uniqueEmail('persist');
-    createdIds.push((await createVerifiedUser(s, email)).id);
+    createdIds.push((await createOnboardedUser(s, email)).id);
 
     await page.goto('/sign-in');
     await fillCredentials(page, email, PASSWORD);
@@ -149,7 +170,7 @@ test.describe('password reset', () => {
   test('request link → set a new password → old password stops working', async ({ page }) => {
     const s = requireStack();
     const email = uniqueEmail('reset');
-    createdIds.push((await createVerifiedUser(s, email)).id);
+    createdIds.push((await createOnboardedUser(s, email)).id);
     const newPassword = 'a-brand-new-long-password';
 
     await page.goto('/forgot-password');

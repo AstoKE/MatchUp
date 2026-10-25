@@ -1,5 +1,5 @@
 import { mapRpcError, type OnboardingInput } from '@matchup/domain';
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 import { nullableArg } from '@/lib/supabase/rpc-args';
 
@@ -24,7 +24,7 @@ export interface MyAccount {
 export async function fetchMyAccount(): Promise<MyAccount> {
   const { data, error } = await supabase.rpc('get_my_account');
   if (error) throw mapRpcError(error);
-  const row = z.array(accountRow).min(1).parse(data)[0]!;
+  const row = z.array(accountRow).check(z.minLength(1)).parse(data)[0]!;
   return {
     userId: row.user_id,
     status: row.account_status,
@@ -55,10 +55,10 @@ export async function fetchLegalVersions(): Promise<LegalVersions> {
       .map((r) => [r.key, r.value]),
   );
   return {
-    termsVersion: z.string().min(1).parse(byKey.get('legal.terms_version')),
-    privacyVersion: z.string().min(1).parse(byKey.get('legal.privacy_version')),
+    termsVersion: z.string().check(z.minLength(1)).parse(byKey.get('legal.terms_version')),
+    privacyVersion: z.string().check(z.minLength(1)).parse(byKey.get('legal.privacy_version')),
     // Absent means "not a draft"; the server only ever sets this to true while texts are unreviewed.
-    draft: z.boolean().catch(false).parse(byKey.get('legal.draft')),
+    draft: z.catch(z.boolean(), false).parse(byKey.get('legal.draft')),
   };
 }
 

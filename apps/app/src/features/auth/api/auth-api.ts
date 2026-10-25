@@ -3,12 +3,10 @@ import {
   type ResetRequestInput,
   type SignInInput,
   type SignUpInput,
-  mapRpcError,
 } from '@matchup/domain';
 import type { Session } from '@supabase/supabase-js';
 import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
-import { z } from 'zod';
 import { env } from '@/lib/env';
 import { log } from '@/lib/observability';
 import { supabase } from '@/lib/supabase/client';
@@ -111,19 +109,4 @@ export function subscribeToSession(
     listener(mapped, session);
   });
   return () => data.subscription.unsubscribe();
-}
-
-const accountSchema = z.object({
-  user_id: z.uuid(),
-  account_status: z.enum(['ACTIVE', 'SUSPENDED', 'PENDING_DELETION', 'DELETED']),
-  email_verified: z.boolean(),
-  is_admin: z.boolean(),
-});
-export type MyAccount = z.infer<typeof accountSchema>;
-
-/** Server-authoritative account state (UX hints only; the database enforces the same rules). */
-export async function getMyAccount(): Promise<MyAccount> {
-  const { data, error } = await supabase.rpc('get_my_account');
-  if (error) throw mapRpcError(error);
-  return accountSchema.parse(data[0]);
 }

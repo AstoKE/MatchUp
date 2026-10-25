@@ -9,7 +9,7 @@ import {
   type ThemePreference,
 } from '@matchup/domain';
 import { SUPPORTED_LOCALES, type Locale } from '@matchup/config';
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 import { nullableArg } from '@/lib/supabase/rpc-args';
 
@@ -33,10 +33,10 @@ export interface MyProfile {
 }
 
 const profileRow = z.object({
-  display_name: z.string().nullable(),
-  bio: z.string().nullable(),
-  city_id: z.uuid().nullable(),
-  district_id: z.uuid().nullable(),
+  display_name: z.nullable(z.string()),
+  bio: z.nullable(z.string()),
+  city_id: z.nullable(z.uuid()),
+  district_id: z.nullable(z.uuid()),
 });
 const settingsRow = z.object({
   locale: z.enum(SUPPORTED_LOCALES),
@@ -44,7 +44,7 @@ const settingsRow = z.object({
   profile_visibility: z.enum(PROFILE_VISIBILITIES),
   show_reliability: z.boolean(),
   show_badges: z.boolean(),
-  marketing_consent_at: z.string().nullable(),
+  marketing_consent_at: z.nullable(z.string()),
 });
 const sportRow = z.object({ sport_id: z.uuid(), self_assessed_level: z.number() });
 const positionRow = z.object({ sport_id: z.uuid(), position_id: z.uuid() });

@@ -1,9 +1,10 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 
 /**
  * Profile / onboarding input rules. They mirror the database checks (migration
  * 20261025110000_onboarding_and_profiles.sql) so the app can reject early; the database remains the
  * authority. Validation messages are STABLE KEYS (not prose) so the UI can localize them.
+ * Uses `zod/mini` (docs/PERFORMANCE.md).
  */
 export const DISPLAY_NAME_MIN = 2;
 export const DISPLAY_NAME_MAX = 40;
@@ -47,59 +48,64 @@ const CONTROL_CHARS = /[\u0000-\u001F\u007F]/;
 // eslint-disable-next-line no-control-regex -- see above
 const BIO_FORBIDDEN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/;
 
-export const displayNameSchema = z
-  .string()
-  .trim()
-  .min(DISPLAY_NAME_MIN, 'NAME_TOO_SHORT')
-  .max(DISPLAY_NAME_MAX, 'NAME_TOO_LONG')
-  .refine((value) => !CONTROL_CHARS.test(value), 'NAME_INVALID');
+export const displayNameSchema = z.string().check(
+  z.trim(),
+  z.minLength(DISPLAY_NAME_MIN, 'NAME_TOO_SHORT'),
+  z.maxLength(DISPLAY_NAME_MAX, 'NAME_TOO_LONG'),
+  z.refine((value) => !CONTROL_CHARS.test(value), 'NAME_INVALID'),
+);
 
 /** Empty input means "no bio"; the result is trimmed text or null. */
-export const bioSchema = z
-  .string()
-  .trim()
-  .max(BIO_MAX, 'BIO_TOO_LONG')
-  .refine((value) => !BIO_FORBIDDEN.test(value), 'BIO_INVALID')
-  .transform((value) => (value === '' ? null : value));
+export const bioSchema = z.pipe(
+  z.string().check(
+    z.trim(),
+    z.maxLength(BIO_MAX, 'BIO_TOO_LONG'),
+    z.refine((value) => !BIO_FORBIDDEN.test(value), 'BIO_INVALID'),
+  ),
+  z.transform((value): string | null => (value === '' ? null : value)),
+);
 
 const idSchema = z.uuid();
 
 export const sportSelectionSchema = z.object({
   sportId: idSchema,
-  level: z.number().refine((value) => isSkillLevel(value), 'LEVEL_INVALID'),
-  positionIds: z
-    .array(idSchema)
-    .max(MAX_POSITIONS_PER_SPORT, 'TOO_MANY_POSITIONS')
-    .refine((ids) => new Set(ids).size === ids.length, 'TOO_MANY_POSITIONS'),
+  // `custom` keeps the narrow SkillLevel type that a plain number check would lose.
+  level: z.custom<SkillLevel>((value) => isSkillLevel(value), 'LEVEL_INVALID'),
+  positionIds: z.array(idSchema).check(
+    z.maxLength(MAX_POSITIONS_PER_SPORT, 'TOO_MANY_POSITIONS'),
+    z.refine((ids) => new Set(ids).size === ids.length, 'TOO_MANY_POSITIONS'),
+  ),
 });
 export type SportSelection = z.infer<typeof sportSelectionSchema>;
 
 /** 1–10 sports, each at most once (used by onboarding and by editing the sports later). */
-export const sportListSchema = z
-  .array(sportSelectionSchema)
-  .min(1, 'SPORTS_REQUIRED')
-  .max(MAX_SPORTS_PER_ONBOARDING, 'TOO_MANY_SPORTS')
-  .refine((items) => new Set(items.map((s) => s.sportId)).size === items.length, 'TOO_MANY_SPORTS');
+export const sportListSchema = z.array(sportSelectionSchema).check(
+  z.minLength(1, 'SPORTS_REQUIRED'),
+  z.maxLength(MAX_SPORTS_PER_ONBOARDING, 'TOO_MANY_SPORTS'),
+  z.refine(
+    (items) => new Set(items.map((s) => s.sportId)).size === items.length,
+    'TOO_MANY_SPORTS',
+  ),
+);
 
 /** A district only makes sense inside a city (mirrors the composite foreign key in the database). */
-const districtNeedsCity = {
-  check: (value: { cityId: string | null; districtId: string | null }) =>
-    value.districtId === null || value.cityId !== null,
-  issue: { message: 'DISTRICT_NEEDS_CITY', path: ['districtId'] as string[] },
-};
+const districtNeedsCity = z.refine<{ cityId: string | null; districtId: string | null }>(
+  (value) => value.districtId === null || value.cityId !== null,
+  { error: 'DISTRICT_NEEDS_CITY', path: ['districtId'] },
+);
 
 export const profileLocationSchema = z
-  .object({ cityId: idSchema.nullable(), districtId: idSchema.nullable() })
-  .refine(districtNeedsCity.check, districtNeedsCity.issue);
+  .object({ cityId: z.nullable(idSchema), districtId: z.nullable(idSchema) })
+  .check(districtNeedsCity);
 
 export const profileEditSchema = z
   .object({
     displayName: displayNameSchema,
     bio: bioSchema,
-    cityId: idSchema.nullable(),
-    districtId: idSchema.nullable(),
+    cityId: z.nullable(idSchema),
+    districtId: z.nullable(idSchema),
   })
-  .refine(districtNeedsCity.check, districtNeedsCity.issue);
+  .check(districtNeedsCity);
 export type ProfileEditInput = z.infer<typeof profileEditSchema>;
 
 export const onboardingSchema = z
@@ -108,11 +114,11 @@ export const onboardingSchema = z
     termsAccepted: z.literal(true, 'TERMS_REQUIRED'),
     marketingConsent: z.boolean(),
     displayName: displayNameSchema,
-    cityId: idSchema.nullable(),
-    districtId: idSchema.nullable(),
+    cityId: z.nullable(idSchema),
+    districtId: z.nullable(idSchema),
     sports: sportListSchema,
   })
-  .refine(districtNeedsCity.check, districtNeedsCity.issue);
+  .check(districtNeedsCity);
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
 
 export const PROFILE_VISIBILITIES = ['EVERYONE', 'EVENT_PEERS'] as const;

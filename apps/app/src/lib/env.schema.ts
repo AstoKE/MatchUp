@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 
 /**
  * Public (client-bundled) configuration. Everything here ships to users, so it must never contain
@@ -22,23 +22,24 @@ function decodeJwtRole(token: string): string | null {
   return null;
 }
 
-const supabaseKey = z
-  .string()
-  .min(20, 'looks too short to be a Supabase key')
-  .refine((key) => !key.startsWith('sb_secret_'), 'a Supabase SECRET key must never be bundled')
-  .refine(
+const supabaseKey = z.string().check(
+  z.minLength(20, 'looks too short to be a Supabase key'),
+  z.refine((key) => !key.startsWith('sb_secret_'), 'a Supabase SECRET key must never be bundled'),
+  z.refine(
     (key) => decodeJwtRole(key) !== 'service_role',
     'a service_role key must never be bundled in a client',
-  );
+  ),
+);
 
 export const envSchema = z.object({
   EXPO_PUBLIC_APP_ENV: z.enum(['development', 'staging', 'production']),
   EXPO_PUBLIC_SUPABASE_URL: z.url(),
   EXPO_PUBLIC_SUPABASE_ANON_KEY: supabaseKey,
-  EXPO_PUBLIC_WEB_URL: z.url().default('http://localhost:8081'),
-  EXPO_PUBLIC_SENTRY_DSN: z.preprocess(
-    (value) => (value === '' ? undefined : value),
-    z.url().optional(),
+  EXPO_PUBLIC_WEB_URL: z._default(z.url(), 'http://localhost:8081'),
+  // An empty variable means "not configured".
+  EXPO_PUBLIC_SENTRY_DSN: z.pipe(
+    z.transform((value) => (value === '' ? undefined : value)),
+    z.optional(z.url()),
   ),
 });
 
