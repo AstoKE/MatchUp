@@ -137,7 +137,7 @@ select throws_ok($$select pg_temp.onboard(p_sports := jsonb_build_array(jsonb_bu
 
 select is((select onboarded from public.get_my_account()), false, 'after all rejections B is still not onboarded');
 select is((select count(*)::int from public.user_consents), 0, 'rejected onboarding recorded no consent (atomic)');
-select is((select count(*)::int from public.user_sport_profiles), 0, 'rejected onboarding stored no sport profile (atomic)');
+select is((select count(*)::int from public.user_sport_profiles where user_id = '00000000-0000-4000-8000-0000000000b1'), 0, 'rejected onboarding stored no sport profile (atomic)');
 reset role;
 
 -- unverified email cannot onboard
@@ -200,7 +200,7 @@ select throws_ok($$select public.set_sport_profile((select id from public.sports
   array[(select sp.id from public.sport_positions sp join public.sports s on s.id = sp.sport_id where s.slug = 'volleyball' and sp.slug = 'libero')])$$,
   'P0001', 'VALIDATION_FAILED', 'set_sport_profile also rejects another sport''s position');
 select lives_ok($$select public.remove_sport_profile((select id from public.sports where slug = 'basketball'))$$, 'a sport profile can be removed');
-select is((select count(*)::int from public.user_sport_profiles), 1, 'only the football profile remains');
+select is((select count(*)::int from public.user_sport_profiles where user_id = '00000000-0000-4000-8000-0000000000a1'), 1, 'only the football profile remains');
 select lives_ok($$select public.set_marketing_consent(false)$$, 'marketing consent can be withdrawn');
 select is((select marketing_consent_at from public.user_settings), null, 'withdrawal clears the settings timestamp');
 reset role;

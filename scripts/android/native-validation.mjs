@@ -134,6 +134,13 @@ function maestro(flow, env = {}, tag = flow) {
       const text = [error.stdout ?? '', error.stderr ?? ''].join('\n').trim();
       // First run on a fresh device: the Maestro driver APK is still being installed.
       if (attempt === 1 && /instrumentation could not be initialized/i.test(text)) continue;
+      // The Maestro driver sometimes dies before running a single step (nothing was tested, so retrying
+      // cannot hide an app defect). A flow that ran at least one step is never retried.
+      const ranAStep = /\.\.\. (COMPLETED|FAILED)/.test(text);
+      if (attempt === 1 && !ranAStep) {
+        console.log(`    (Maestro ran no step for ${flow}; retrying once)`);
+        continue;
+      }
       return { ok: false, out: text.split('\n').slice(-25).join('\n') };
     }
   }
@@ -298,6 +305,28 @@ if (code) {
     record(
       'N03c',
       'Server state matches the UI: 18+ confirmed, terms+privacy consent versions recorded, no marketing consent, football 3.5',
+      row === expected ? 'PASS' : 'FAIL',
+      row === expected ? '' : `expected ${expected} but database has ${row}`,
+    );
+  }
+  const edited = onboarded
+    ? await flow(
+        'N03d',
+        'Profile on the device: edit bio, add a sport, make the profile visible to everyone',
+        '16-profile-edit.yaml',
+        env,
+      )
+    : false;
+  if (edited) {
+    const row = dbScalar(
+      `select coalesce(p.bio, '') || ',' || s.profile_visibility::text || ',' ||
+        coalesce((select string_agg(sp.slug || ':' || usp.self_assessed_level, ';' order by sp.slug) from public.user_sport_profiles usp join public.sports sp on sp.id = usp.sport_id where usp.user_id = p.id), '')
+       from public.profiles p join public.user_settings s on s.user_id = p.id join auth.users u on u.id = p.id where u.email = '${email}'`,
+    );
+    const expected = 'Plays on weekends,EVERYONE,football:3.5;tennis:3.0';
+    record(
+      'N03e',
+      'Server state matches the edits: bio, visibility EVERYONE, football 3.5 + tennis 3.0',
       row === expected ? 'PASS' : 'FAIL',
       row === expected ? '' : `expected ${expected} but database has ${row}`,
     );

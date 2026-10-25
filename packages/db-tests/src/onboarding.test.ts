@@ -103,6 +103,7 @@ describe('reference catalog over the Data API', () => {
     'set_marketing_consent',
     'set_sport_profile',
     'remove_sport_profile',
+    'replace_my_sport_profiles',
   ])('rpc/%s is not callable by guests', async (name) => {
     const { status } = await rpc(name, {});
     expect([401, 403, 404]).toContain(status);
@@ -114,6 +115,7 @@ describe('reference catalog over the Data API', () => {
     'clean_display_name',
     'assert_location',
     'upsert_sport_profile',
+    'apply_sport_selection',
   ])('private helper %s is not routable', async (name) => {
     const { status } = await rpc(name, {});
     expect([401, 403, 404]).toContain(status);
@@ -245,6 +247,39 @@ describe('onboarding gate (account created through the raw Auth API, no app invo
     );
     expect(rows[0]?.n).toBe(1);
     expect(levels).toContain(rows[0]?.level);
+  });
+
+  it('replaces sport profiles atomically, and parallel saves never mix two requests', async () => {
+    const sets = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 2].map((level) => [
+      { sport_id: catalog.sport('tennis'), level, position_ids: [] },
+      { sport_id: catalog.sport('padel'), level, position_ids: [] },
+    ]);
+    const results = await Promise.all(
+      sets.map((p_sports) => rpc('replace_my_sport_profiles', { p_sports }, token)),
+    );
+    expect(results.map((r) => r.status)).toEqual(Array(10).fill(204));
+
+    const { rows } = await db().query<{ slug: string; level: number }>(
+      `select s.slug, u.self_assessed_level::float as level
+         from public.user_sport_profiles u join public.sports s on s.id = u.sport_id
+        where u.user_id = $1 order by s.slug`,
+      [user.id],
+    );
+    // football (from onboarding) was removed; tennis and padel come from the SAME request.
+    expect(rows.map((r) => r.slug)).toEqual(['padel', 'tennis']);
+    expect(rows[0]?.level).toBe(rows[1]?.level);
+
+    const bad = await rpc(
+      'replace_my_sport_profiles',
+      { p_sports: [{ sport_id: catalog.sport('tennis'), level: 99, position_ids: [] }] },
+      token,
+    );
+    expect(bad.body as RpcError).toMatchObject({ message: 'VALIDATION_FAILED' });
+    const after = await db().query(
+      'select count(*)::int as n from public.user_sport_profiles where user_id = $1',
+      [user.id],
+    );
+    expect((after.rows[0] as { n: number }).n).toBe(2);
   });
 
   it('maps validation failures to a stable code the app can localize', async () => {

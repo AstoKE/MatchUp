@@ -117,6 +117,14 @@ describe('profileEditSchema', () => {
     );
   });
 
+  it('rejects a district without a city, like onboarding does', () => {
+    const result = profileEditSchema.safeParse({ ...base, districtId: id(2) });
+    expect(firstIssue(result)).toBe('DISTRICT_NEEDS_CITY');
+    expect(profileEditSchema.safeParse({ ...base, cityId: id(1), districtId: id(2) }).success).toBe(
+      true,
+    );
+  });
+
   it(`rejects bios over ${BIO_MAX} characters`, () => {
     expect(firstIssue(profileEditSchema.safeParse({ ...base, bio: 'x'.repeat(BIO_MAX + 1) }))).toBe(
       'BIO_TOO_LONG',

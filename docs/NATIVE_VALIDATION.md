@@ -6,7 +6,9 @@ Device: Android Studio emulator `matchup_api36` (Pixel 7 profile, Android 16 / A
 
 "Automated" = Maestro flow run by `scripts/android/native-validation.mjs` (results in `apps/app/e2e-mobile/results/`, git-ignored). "Manual" = the founder using the emulator by hand.
 
-## Latest full run — 20 / 20 passed (exit code 0)
+## Latest full run — 22 / 22 passed (exit code 0)
+
+One earlier full run of the same build failed 6 steps in a cascade: the Maestro driver died before running a single step of N03, so everything depending on that state failed too. It was not an app result; the runner now retries once a flow that executed no step (and never retries one that ran a step), and the following full run was green without needing a retry.
 
 | ID | What | How |
 |---|---|---|
@@ -16,6 +18,8 @@ Device: Android Studio emulator `matchup_api36` (Pixel 7 profile, Android 16 / A
 | N03 | Warm deep link completes verification → signed in; a brand-new (not onboarded) account is sent to onboarding when it opens Profile | Automated |
 | N03b | Onboarding on the device: 18+/terms missing → blocked; empty name → blocked; no sport → blocked; valid submission returns to Profile | Automated |
 | N03c | Server state equals what the UI did: `onboarded`, 18+ confirmed, name, **2** consent rows at the draft version, **0** marketing rows, football level 3.5 (queried from the database) | Automated |
+| N03d | Profile on the device: edit bio, add a sport (Edit sports), make the profile visible to everyone (Settings), system back returns to the updated profile | Automated |
+| N03e | Server state equals the edits: bio, visibility `EVERYONE`, football 3.5 + tennis 3.0 (queried from the database) | Automated |
 | N04 | Session persists after the process is killed and relaunched | Automated |
 | N05 | Sign out → guest home; still signed out after restart | Automated |
 | N06 | Sign in returns to the page that required it | Automated |

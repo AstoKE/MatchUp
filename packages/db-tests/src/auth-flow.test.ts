@@ -230,7 +230,7 @@ describe('sessions and account state', () => {
   it('a signed-out (local scope) client loses access to its own data', async () => {
     const user = await createUser();
     const { client } = await signedInClient(user);
-    expect((await client.from('profiles').select('id')).data).toHaveLength(1);
+    expect((await client.from('profiles').select('id').eq('id', user.id)).data).toHaveLength(1);
     await client.auth.signOut({ scope: 'local' });
     const after = await client.from('profiles').select('id');
     expect(after.error?.code ?? 'none').toBe('42501'); // back to anon: no grants
