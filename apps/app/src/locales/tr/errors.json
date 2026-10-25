@@ -6,6 +6,7 @@
   "ONBOARDING_REQUIRED": "Devam etmeden önce profilini tamamlamalısın.",
   "ADULT_CONFIRMATION_REQUIRED": "Devam etmek için 18 yaşından büyük olduğunu onaylamalısın.",
   "CONSENT_VERSION_MISMATCH": "Kullanım koşulları veya gizlilik bildirimi güncellenmiş. Uygulamayı yenileyip tekrar dene.",
+  "CONSENT_REQUIRED": "Devam etmek için güncellenen Kullanım Koşulları'nı ve Gizlilik Bildirimi'ni onaylamalısın.",
   "NOT_FOUND": "Aradığın içerik bulunamadı.",
   "VALIDATION_FAILED": "Girdiğin bilgileri kontrol edip tekrar dene.",
   "INVALID_TRANSITION": "Bu işlem şu an yapılamıyor.",

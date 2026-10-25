@@ -293,6 +293,81 @@ describe('onboarding gate (account created through the raw Auth API, no app invo
   });
 });
 
+describe('legal re-consent gate over the Data API', () => {
+  // Bumping app_config would race the other files' onboarding tests, so the outdated state is made
+  // per user instead: revoking this user's acceptance has the same effect on the gate.
+  let user: TestUser;
+  let token: string;
+
+  beforeAll(async () => {
+    const catalog = await ids();
+    user = await createUser();
+    token = (await signedInClient(user)).accessToken;
+    const onboarded = await rpc('complete_onboarding', onboardingArgs({}, catalog), token);
+    expect(onboarded.status).toBe(204);
+  });
+  afterAll(async () => {
+    await deleteCreatedUsers();
+    await closeDb();
+  });
+
+  const setMarketing = () => rpc('set_marketing_consent', { p_granted: false }, token);
+  const accept = (terms = 'draft-0.1', privacy = 'draft-0.1', as = token) =>
+    rpc('accept_current_legal_terms', { p_terms_version: terms, p_privacy_version: privacy }, as);
+
+  it('reports consent as current right after onboarding', async () => {
+    expect((await rpc('get_my_account', {}, token)).body).toMatchObject([
+      { onboarded: true, legal_consent_current: true },
+    ]);
+    expect((await setMarketing()).status).toBe(204);
+  });
+
+  it('blocks writes with CONSENT_REQUIRED once the acceptance is no longer current', async () => {
+    await db().query(
+      `update public.user_consents set revoked_at = now() where user_id = $1 and kind = 'PRIVACY_NOTICE'`,
+      [user.id],
+    );
+    expect((await rpc('get_my_account', {}, token)).body).toMatchObject([
+      { onboarded: true, legal_consent_current: false },
+    ]);
+    const blocked = await setMarketing();
+    expect(blocked.status).toBe(400);
+    expect(blocked.body as RpcError).toMatchObject({ code: 'P0001', message: 'CONSENT_REQUIRED' });
+  });
+
+  it('refuses guests and versions the user was not shown', async () => {
+    const guest = await rest('/rpc/accept_current_legal_terms', {
+      method: 'POST',
+      body: JSON.stringify({ p_terms_version: 'draft-0.1', p_privacy_version: 'draft-0.1' }),
+    });
+    expect([401, 403]).toContain(guest.status);
+    expect((await accept('old', 'draft-0.1')).body as RpcError).toMatchObject({
+      message: 'CONSENT_VERSION_MISMATCH',
+    });
+    expect((await setMarketing()).body as RpcError).toMatchObject({ message: 'CONSENT_REQUIRED' });
+  });
+
+  it('survives ten simultaneous acceptances: one active row per kind, writes open again', async () => {
+    const results = await Promise.all(Array.from({ length: 10 }, () => accept()));
+    expect(results.map((r) => r.status)).toEqual(Array(10).fill(204));
+    const { rows } = await db().query(
+      `select kind::text, count(*)::int as n, count(*) filter (where revoked_at is null)::int as active
+         from public.user_consents
+        where user_id = $1 and kind in ('TERMS', 'PRIVACY_NOTICE') and version = 'draft-0.1'
+        group by kind order by kind`,
+      [user.id],
+    );
+    expect(rows).toEqual([
+      { kind: 'PRIVACY_NOTICE', n: 1, active: 1 },
+      { kind: 'TERMS', n: 1, active: 1 },
+    ]);
+    expect((await rpc('get_my_account', {}, token)).body).toMatchObject([
+      { legal_consent_current: true },
+    ]);
+    expect((await setMarketing()).status).toBe(204);
+  });
+});
+
 describe('profile visibility over the Data API', () => {
   let owner: TestUser;
   let stranger: TestUser;

@@ -15,6 +15,7 @@ import { profileValidationMessage } from '@/lib/profile-validation';
 import { Banner, Button, EmptyState, Screen, Text, TextField, useTheme } from '@/ui';
 import { useCompleteOnboarding, useLegalVersions, useMyAccount } from '../hooks';
 import { ConsentStep, type ConsentDraft } from '../components/ConsentStep';
+import { destination } from '../destination';
 
 const STEPS = 3;
 
@@ -34,11 +35,6 @@ const initialDraft: Draft = {
   districtId: null,
   sports: [],
 };
-
-/** Never send the user back into the flow they just finished. */
-function destination(returnTo: string): string {
-  return returnTo.startsWith('/onboarding') || returnTo.startsWith('/legal') ? '/' : returnTo;
-}
 
 export function OnboardingScreen() {
   return (
