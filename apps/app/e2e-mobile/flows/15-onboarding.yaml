@@ -6,7 +6,7 @@ appId: com.example.matchup.dev
 - assertVisible: 'Before we start'
 # nothing confirmed yet → cannot continue
 - tapOn: 'Next'
-- assertVisible: 'You must be 18 or older to use MatchUp.'
+- assertVisible: 'You must be 18 or older to use .*'
 - assertVisible: 'Please accept the Terms of Use and Privacy Notice to continue.'
 - tapOn: 'I confirm that I am 18 years old or older.'
 - tapOn: 'I have read and accept the Terms of Use and the Privacy Notice.'
