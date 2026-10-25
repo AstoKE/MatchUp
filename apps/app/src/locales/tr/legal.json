@@ -43,6 +43,10 @@
       "heading": "Kimler görebilir",
       "body": "Profilin varsayılan olarak gizlidir. Profilini herkese açık yapmayı sen seçersin; bu durumda görünen adın ve sporların diğer kullanıcılara gösterilir. E-posta adresin başka kullanıcılara gösterilmez."
     },
+    "security": {
+      "heading": "Güvenlik doğrulaması",
+      "body": "Otomatik kötüye kullanımı önlemek için kayıt, giriş ve şifre sıfırlama sırasında Cloudflare Turnstile güvenlik doğrulamasını kullanabiliriz. Bu doğrulama, insan ile otomatik yazılımı ayırt etmek için cihazından ve tarayıcından teknik bilgileri (ör. IP adresi ve tarayıcı özellikleri) Cloudflare'e iletir. Bu aktarımın hukuki dayanağı ve yurt dışına aktarım bilgisi yasal inceleme sonrasında bu metne eklenecektir."
+    },
     "retention": {
       "heading": "Saklama ve silme",
       "body": "Verilerini hesabın açık olduğu sürece saklarız. Hesabını silme talebi hakkında ayrıntılar yayın öncesinde bu metne eklenecektir."

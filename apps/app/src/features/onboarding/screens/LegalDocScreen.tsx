@@ -5,7 +5,14 @@ import { Banner, Button, Screen, Text, useTheme } from '@/ui';
 import { useLegalVersions } from '../hooks';
 
 const TERMS_SECTIONS = ['service', 'eligibility', 'conduct', 'risk', 'content', 'changes'] as const;
-const PRIVACY_SECTIONS = ['collected', 'purpose', 'visibility', 'retention', 'rights'] as const;
+const PRIVACY_SECTIONS = [
+  'collected',
+  'purpose',
+  'visibility',
+  'security',
+  'retention',
+  'rights',
+] as const;
 
 /**
  * Terms of Use / Privacy Notice. The text is a DRAFT until counsel has reviewed it; the banner is

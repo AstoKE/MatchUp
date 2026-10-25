@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Banner, Button, TextField } from '@/ui';
 import { requestPasswordReset } from '../api/auth-api';
 import { AuthFlowError, type AuthFailure } from '../api/classify-auth-error';
+import { useCaptcha } from '../captcha';
 import { AuthLink } from '../components/AuthLink';
 import { AuthScreenLayout } from '../components/AuthScreenLayout';
 import { failureText, validationMessage } from '../validation-messages';
@@ -25,6 +26,7 @@ export function ForgotPasswordScreen() {
     defaultValues: { email: '' },
   });
 
+  const captcha = useCaptcha();
   const request = useMutation({
     mutationFn: requestPasswordReset,
     onMutate: () => {
@@ -34,9 +36,13 @@ export function ForgotPasswordScreen() {
     // Identical message whether or not the address has an account (no enumeration).
     onSuccess: () => setDone(true),
     onError: (error) => setFailure(error instanceof AuthFlowError ? error.failure : 'UNKNOWN'),
+    onSettled: () => captcha.reset(),
   });
 
-  const submit = handleSubmit((values) => request.mutate(values));
+  const submit = handleSubmit((values) => {
+    const extra = captcha.take();
+    if (extra) request.mutate({ ...values, ...extra });
+  });
 
   return (
     <AuthScreenLayout title={t('auth:forgotPasswordTitle')} subtitle={t('auth:forgotPasswordBody')}>
@@ -63,6 +69,7 @@ export function ForgotPasswordScreen() {
           />
         )}
       />
+      {captcha.widget}
       <Button
         label={t('auth:sendResetLink')}
         loading={request.isPending}

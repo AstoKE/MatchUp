@@ -38,30 +38,44 @@ function fail(error: unknown): never {
 }
 
 /**
+ * A one-time CAPTCHA token (Cloudflare Turnstile) for the endpoints Supabase protects when the
+ * project's Auth CAPTCHA is on. Undefined when CAPTCHA is off (EXPO_PUBLIC_TURNSTILE_SITE_KEY empty).
+ */
+export interface WithCaptcha {
+  captchaToken?: string | undefined;
+}
+
+/**
  * Sign-up is enumeration-safe: with email confirmation enabled, Supabase answers identically for
  * new and already-registered addresses, and the UI always shows "check your email".
  */
-export async function signUpWithEmail(input: SignUpInput): Promise<void> {
+export async function signUpWithEmail(input: SignUpInput & WithCaptcha): Promise<void> {
   const { error } = await supabase.auth.signUp({
     email: input.email,
     password: input.password,
-    options: { emailRedirectTo: callbackUrl() },
+    options: { emailRedirectTo: callbackUrl(), captchaToken: input.captchaToken },
   });
   // "Already registered" must look exactly like success to the user (no account enumeration in the UI).
   if (error && !isAlreadyRegistered(error)) fail(error);
 }
 
-export async function resendVerificationEmail(email: string): Promise<void> {
+export async function resendVerificationEmail(
+  input: { email: string } & WithCaptcha,
+): Promise<void> {
   const { error } = await supabase.auth.resend({
     type: 'signup',
-    email,
-    options: { emailRedirectTo: callbackUrl() },
+    email: input.email,
+    options: { emailRedirectTo: callbackUrl(), captchaToken: input.captchaToken },
   });
   if (error) fail(error);
 }
 
-export async function signInWithEmail(input: SignInInput): Promise<void> {
-  const { error } = await supabase.auth.signInWithPassword(input);
+export async function signInWithEmail(input: SignInInput & WithCaptcha): Promise<void> {
+  const { error } = await supabase.auth.signInWithPassword({
+    email: input.email,
+    password: input.password,
+    options: { captchaToken: input.captchaToken },
+  });
   if (error) fail(error);
 }
 
@@ -71,9 +85,10 @@ export async function signOut(): Promise<void> {
   if (error) fail(error);
 }
 
-export async function requestPasswordReset(input: ResetRequestInput): Promise<void> {
+export async function requestPasswordReset(input: ResetRequestInput & WithCaptcha): Promise<void> {
   const { error } = await supabase.auth.resetPasswordForEmail(input.email, {
     redirectTo: callbackUrl('/reset-password'),
+    captchaToken: input.captchaToken,
   });
   // The UI always says "if an account exists…", so only transport/rate errors are surfaced.
   if (error) fail(error);

@@ -43,6 +43,10 @@
       "heading": "Who can see it",
       "body": "Your profile is private by default. You choose whether to make it public; then your display name and sports are shown to other users. Your email address is never shown to other users."
     },
+    "security": {
+      "heading": "Security check",
+      "body": "To prevent automated abuse we may use Cloudflare Turnstile during sign-up, sign-in and password reset. To tell people from automated software, it sends technical information from your device and browser (for example your IP address and browser characteristics) to Cloudflare. The legal basis for this and information on transfers abroad will be added to this text after legal review."
+    },
     "retention": {
       "heading": "Retention and deletion",
       "body": "We keep your data while your account is open. Details about requesting account deletion will be added to this text before launch."

@@ -17,3 +17,5 @@
 4. `scripts/auth-probe.mjs` is re-run against the hosted project after any Auth setting change.
 
 **Consequences.** + The risk is measured, bounded and written down instead of assumed. + No new moving part. − CAPTCHA integration (web widget, native WebView) is still to build and adds friction. − Timing and reset-oracle signals remain for anyone willing to pay for solves. − Hosted behaviour is unverified.
+
+**Update 2026-10-25.** The app-side CAPTCHA integration is built (web widget, native WebView via `react-native-webview`, off unless `EXPO_PUBLIC_TURNSTILE_SITE_KEY` is set) and verified on the auth lab with Cloudflare test keys; hosted configuration and a real site key remain open (AUTH_ABUSE §5).

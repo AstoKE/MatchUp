@@ -39,7 +39,7 @@ Boundaries: **client (untrusted)** ⇄ Supabase API (PostgREST/Auth/Realtime/Sto
 
 ## 3. Authentication and sessions
 
-- Supabase Auth, email + password; **email verification required** before creating events or requesting to join; password reset by email; leaked-password protection and minimum length ≥ 10 enabled; CAPTCHA (Cloudflare Turnstile or hCaptcha) on sign-up, sign-in after failures, and reset.
+- Supabase Auth, email + password; **email verification required** before creating events or requesting to join; password reset by email; leaked-password protection and minimum length ≥ 10 enabled; CAPTCHA (Cloudflare Turnstile) on sign-up, every sign-in, reset and the verification resend (app side built; hosted configuration pending, LAUNCH_CHECKLIST §2).
 - JWT lifetime short (≤ 1 h) with refresh rotation; refresh-token reuse detection on; sign-out revokes the session; password change revokes other sessions.
 - Production email requires **custom SMTP** (the built-in server is limited to 2 messages/hour and team addresses only) with SPF/DKIM/DMARC, a dedicated sending domain, and a standby provider; Auth rate limits tuned.
 - Native: session encrypted at rest (key in Keychain/Keystore via `expo-secure-store`). Web: Supabase default storage; mitigations are a strict CSP (no inline scripts, `connect-src` limited to our Supabase domain and tile provider), no third-party scripts, `Referrer-Policy: strict-origin-when-cross-origin` (note: if OSM tiles were ever used the Referer must not be stripped — we do not use them), HSTS, `X-Content-Type-Options`, frame-ancestors none.
