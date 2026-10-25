@@ -1,9 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { navItems } from '@/navigation/config';
-import { useTheme } from '@/ui';
+import { Icon, useTheme } from '@/ui';
 
 /** Fixed-width rail (React Navigation otherwise sizes the left bar to its container). */
 const railSize = (width: number) => ({
@@ -58,8 +57,9 @@ export default function TabsLayout() {
           options={{
             title: t(item.labelKey),
             tabBarIcon: ({ color, size, focused }) => (
-              <Ionicons
-                name={focused ? item.iconFocused : item.icon}
+              <Icon
+                name={item.icon}
+                variant={focused || item.emphasized ? 'filled' : 'outline'}
                 size={item.emphasized ? size + 6 : size}
                 color={
                   item.emphasized
@@ -68,8 +68,6 @@ export default function TabsLayout() {
                       ? color
                       : colors.textSecondary
                 }
-                accessibilityElementsHidden
-                importantForAccessibility="no"
               />
             ),
           }}

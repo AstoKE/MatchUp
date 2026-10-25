@@ -170,9 +170,14 @@ describe('account enumeration resistance', () => {
     const email = uniqueEmail('unconfirmed');
     const first = await anonClient().auth.signUp({ email, password: STRONG_PASSWORD });
     if (first.data.user) trackUser(first.data.user.id);
-    // Wait out the per-address email frequency limit (config.toml max_frequency = 1s locally).
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    const again = await anonClient().auth.signUp({ email, password: STRONG_PASSWORD });
+    // Wait out the per-address email frequency limit (config.toml max_frequency = 1s locally). A fixed
+    // sleep was flaky under parallel load (the window starts when the mail is sent, not when signUp
+    // returns), so retry only on that specific code, within a bound.
+    let again = await anonClient().auth.signUp({ email, password: STRONG_PASSWORD });
+    for (let i = 0; i < 10 && again.error?.code === 'over_email_send_rate_limit'; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      again = await anonClient().auth.signUp({ email, password: STRONG_PASSWORD });
+    }
     expect(first.error).toBeNull();
     expect(again.error).toBeNull();
     expect(again.data.session).toBeNull();
