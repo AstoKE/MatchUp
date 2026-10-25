@@ -41,7 +41,12 @@ pnpm --filter @matchup/app e2e:install   # one-time Playwright browser download
 | `pnpm db:reset` | drops and recreates the local DB from migrations + seed |
 | `pnpm db:types` | regenerates `apps/app/src/types/supabase.generated.ts` (CI fails if it drifts) |
 | `pnpm db:stop` | stops the stack |
-| `pnpm check:bundle` / `check:bundle-size` | after `pnpm --filter @matchup/app export:web`: no privileged keys in the bundle / size ratchet |
+| `pnpm check:bundle` / `check:bundle-size` | after `pnpm --filter @matchup/app export:web`: no privileged keys in the bundle / size ratchets (total + initial, docs/PERFORMANCE.md) |
+| `.\scripts\android\dev.ps1 up` / `down` / `validate` | Android bench on Windows (PowerShell): local Supabase + emulator + tunnels + Metro; `validate` runs the 22-check device suite (docs/ANDROID_SETUP.md) |
+| `bash scripts/android/build-apk.sh debug x86_64` | builds the debug APK in the pinned Linux container (needed only after native changes: a new native dependency, app config) |
+| `node scripts/auth-probe.mjs` / `node scripts/auth-lab.mjs up` | account-enumeration probe and the isolated CAPTCHA lab stack (docs/AUTH_ABUSE.md) |
+
+The pgTAP and integration tests scope their assertions to their own fixtures, so they also pass on a database that already holds users from device runs; `pnpm db:reset` gives a pristine one (what CI uses).
 
 Local-only services: API http://127.0.0.1:54321 · Postgres 127.0.0.1:54322 · **Mailpit** (all auth emails) http://127.0.0.1:54324.
 
@@ -49,8 +54,11 @@ Local-only services: API http://127.0.0.1:54321 · Postgres 127.0.0.1:54322 · *
 
 ```
 apps/app/            Expo app (iOS, Android, Web) — routes in app/, code in src/
-  src/features/auth  the only feature so far (api/ is the only place that calls Supabase Auth)
-  src/lib            env, i18n, supabase client, observability, query client
+  src/features/      auth, catalog (sports/cities + pickers), onboarding (gate, 18+/consent, legal drafts),
+                     profile (view/edit/sports/settings), settings (language picker); api/ folders are the
+                     only places that call Supabase
+  src/lib            env, i18n (+ stored language choice), supabase client (+ crypto polyfill), observability, query client
+  e2e-mobile/        Maestro flows for the Android device suite (results are git-ignored)
   src/ui             tokens, theme, components (provisional design — see UI_DESIGN_SYSTEM.md)
   e2e/               Playwright specs (+ support/)
 packages/domain      pure TypeScript: error codes, auth schemas, level formula
@@ -66,12 +74,13 @@ Rules enforced by lint/CI: Supabase is imported only in `src/lib/supabase` and `
 
 | Platform | Status |
 |---|---|
-| Web (Chromium) | **Verified**: dev server, static export, 28 Playwright tests, axe (WCAG 2.2 AA tags) on all pages |
+| Web (Chromium) | **Verified**: dev server, static export, 40 Playwright tests, axe (WCAG 2.2 AA tags) on the account, onboarding, legal and profile screens |
 | Web (Firefox, Safari) | **Not tested** |
-| Android | Metro + Hermes **bundle compiles**. **Never launched** — no Android SDK/emulator/device on the development machine |
+| Android | **Verified on an emulator** (Android 16, x86_64): 22 automated device checks incl. sign-up, onboarding, profile edit and database assertions; see docs/NATIVE_VALIDATION.md for what is and is not covered |
+| Android (physical device, release build, TalkBack walk-through) | **Not tested** |
 | iOS | Bundle compiles. **Never launched** — iOS builds need macOS or EAS cloud builds + an Apple Developer account |
 
-To run on Android later: install Android Studio (SDK + an emulator, needs hardware virtualization), then `pnpm --filter @matchup/app exec expo run:android` (development build; Expo Go for SDK 58 was not yet published when this was written). Items that **only** a device can confirm are listed in PHASE1_REPORT §5.
+Android setup, the container build and the Windows-specific pitfalls are in docs/ANDROID_SETUP.md and ADR-0015.
 
 ## 6. Troubleshooting
 

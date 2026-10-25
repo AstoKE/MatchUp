@@ -34,6 +34,18 @@ export default tseslint.config(
       ],
       eqeqeq: ['error', 'always'],
       'no-console': ['error', { allow: ['warn', 'error'] }],
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'zod',
+              message:
+                "Import from 'zod/mini': classic zod drags ~60 kB gzip into the web bundle (docs/PERFORMANCE.md).",
+            },
+          ],
+        },
+      ],
     },
   },
   {
