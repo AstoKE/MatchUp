@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Banner, Button, TextField } from '@/ui';
 import { AuthFlowError, type AuthFailure } from '../api/classify-auth-error';
 import { signInWithEmail } from '../api/auth-api';
+import { useCaptcha } from '../captcha';
 import { AuthLink } from '../components/AuthLink';
 import { AuthScreenLayout } from '../components/AuthScreenLayout';
 import { PasswordField } from '../components/PasswordField';
@@ -32,16 +33,21 @@ export function SignInScreen() {
     defaultValues: { email: '', password: '' },
   });
 
+  const captcha = useCaptcha();
   const signIn = useMutation({
     mutationFn: signInWithEmail,
     onMutate: () => setFailure(null),
     onSuccess: () => router.replace(returnTo),
     onError: (error) => setFailure(error instanceof AuthFlowError ? error.failure : 'UNKNOWN'),
+    onSettled: () => captcha.reset(),
   });
 
   if (session.status === 'authenticated') return <Redirect href={returnTo} />;
 
-  const submit = handleSubmit((values) => signIn.mutate(values));
+  const submit = handleSubmit((values) => {
+    const extra = captcha.take();
+    if (extra) signIn.mutate({ ...values, ...extra });
+  });
 
   return (
     <AuthScreenLayout title={t('auth:signInTitle')}>
@@ -83,6 +89,7 @@ export function SignInScreen() {
           />
         )}
       />
+      {captcha.widget}
       <Button
         label={t('auth:signIn')}
         loading={signIn.isPending}

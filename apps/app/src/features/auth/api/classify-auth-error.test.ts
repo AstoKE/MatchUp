@@ -4,6 +4,7 @@ describe('classifyAuthError', () => {
   it.each([
     [{ code: 'invalid_credentials', status: 400 }, 'INVALID_CREDENTIALS'],
     [{ code: 'email_not_confirmed', status: 400 }, 'EMAIL_NOT_CONFIRMED'],
+    [{ code: 'captcha_failed', status: 400 }, 'CAPTCHA_FAILED'],
     [{ code: 'over_request_rate_limit', status: 429 }, 'RATE_LIMITED'],
     [{ code: 'over_email_send_rate_limit', status: 429 }, 'RATE_LIMITED'],
     [{ status: 429 }, 'RATE_LIMITED'],
@@ -36,6 +37,7 @@ describe('failureMessage', () => {
       key: 'errors.invalidCredentials',
     });
     expect(failureMessage('RATE_LIMITED').ns).toBe('auth');
+    expect(failureMessage('CAPTCHA_FAILED')).toEqual({ ns: 'auth', key: 'errors.captchaFailed' });
   });
   it('maps shared failures to the errors namespace', () => {
     expect(failureMessage('NETWORK')).toEqual({ ns: 'errors', key: 'NETWORK' });

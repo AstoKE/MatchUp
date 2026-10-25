@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Banner, Button, TextField } from '@/ui';
 import { resendVerificationEmail } from '../api/auth-api';
 import { AuthFlowError, type AuthFailure } from '../api/classify-auth-error';
+import { useCaptcha } from '../captcha';
 import { AuthLink } from '../components/AuthLink';
 import { AuthScreenLayout } from '../components/AuthScreenLayout';
 import { getPendingEmail, setPendingEmail } from '../pending-email';
@@ -28,21 +29,27 @@ export function VerifyEmailScreen() {
     defaultValues: { email: '' },
   });
 
+  const captcha = useCaptcha();
   const resend = useMutation({
     mutationFn: resendVerificationEmail,
     onMutate: () => {
       setFailure(null);
       setSent(false);
     },
-    onSuccess: (_data, email) => {
+    onSuccess: (_data, { email }) => {
       setPendingEmail(email);
       setPending(email);
       setSent(true);
     },
     onError: (error) => setFailure(error instanceof AuthFlowError ? error.failure : 'UNKNOWN'),
+    onSettled: () => captcha.reset(),
   });
 
-  const submit = handleSubmit(({ email }) => resend.mutate(email));
+  const send = (email: string) => {
+    const extra = captcha.take();
+    if (extra) resend.mutate({ email, ...extra });
+  };
+  const submit = handleSubmit(({ email }) => send(email));
 
   return (
     <AuthScreenLayout
@@ -53,13 +60,14 @@ export function VerifyEmailScreen() {
     >
       {failure ? <Banner kind="danger" message={failureText(failure)} /> : null}
       {sent ? <Banner kind="success" message={t('auth:resent')} /> : null}
+      {captcha.widget}
       {pending ? (
         <Button
           variant="secondary"
           label={t('auth:resend')}
           loading={resend.isPending}
           loadingLabel={t('common:loading')}
-          onPress={() => resend.mutate(pending)}
+          onPress={() => send(pending)}
           fullWidth
         />
       ) : (

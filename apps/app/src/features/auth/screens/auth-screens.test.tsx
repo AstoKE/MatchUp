@@ -159,7 +159,9 @@ describe('VerifyEmailScreen', () => {
     expect(screen.getByText(/yeni@example.com adresine bir doğrulama bağlantısı/)).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Bağlantıyı tekrar gönder' }));
     await waitFor(() => expect(mockApi.resendVerificationEmail).toHaveBeenCalled());
-    expect(mockApi.resendVerificationEmail.mock.calls[0]?.[0]).toBe('yeni@example.com');
+    expect(mockApi.resendVerificationEmail.mock.calls[0]?.[0]).toEqual({
+      email: 'yeni@example.com',
+    });
     expect(await screen.findByText('Bağlantı tekrar gönderildi.')).toBeTruthy();
   });
 

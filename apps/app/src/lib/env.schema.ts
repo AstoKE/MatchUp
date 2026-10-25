@@ -41,6 +41,12 @@ export const envSchema = z.object({
     z.transform((value) => (value === '' ? undefined : value)),
     z.optional(z.url()),
   ),
+  // Cloudflare Turnstile site key (public by design). Empty = CAPTCHA off, which must match the
+  // Supabase project: when its Auth CAPTCHA is on, every sign-up/sign-in/reset needs a token.
+  EXPO_PUBLIC_TURNSTILE_SITE_KEY: z.pipe(
+    z.transform((value) => (value === '' ? undefined : value)),
+    z.optional(z.string().check(z.regex(/^[0-9A-Za-z_-]{10,64}$/, 'not a Turnstile site key'))),
+  ),
 });
 
 export type Env = z.infer<typeof envSchema>;
