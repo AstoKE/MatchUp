@@ -1,6 +1,10 @@
 # GitHub setup (private repository)
 
-Status 2026-10-25: **not created.** The GitHub CLI is installed (portable, checksum-verified, `C:\dev\tools\gh`) but is **not authenticated**, and I will not assume or request credentials in chat. Everything below is ready to run once you have signed in. Nothing here pushes secrets: the full history was scanned with gitleaks (clean; four synthetic test fixtures are allow-listed by exact value in `.gitleaks.toml`), `.env*` files and `supabase/.temp` are git-ignored, and `settings.json` / `image.png` are excluded locally (`.git/info/exclude`).
+Status 2026-10-25: **connected.** The private repo is `AstoKE/MatchUp` (personal account; it was created on 2026-10-24 with the Phase 1 history, and `main` was fast-forwarded to the Phase 2 history on 2026-10-25). `gh` is signed in by the founder (token in the Windows credential store); git uses it through a **repo-local** credential helper (`credential.https://github.com.helper` in `.git/config`, which resets the global Git Credential Manager for github.com only). Nothing here pushes secrets: the full history was scanned with gitleaks (clean; four synthetic test fixtures are allow-listed by exact value in `.gitleaks.toml`), `.env*` files and `supabase/.temp` are git-ignored, and `settings.json` / `image.png` are excluded locally (`.git/info/exclude`).
+
+Applied settings: squash + rebase merges only, head branches deleted on merge, read-only default workflow token, Dependabot alerts and security updates on. **Branch protection is not available**: GitHub requires Pro (or a public repo) for protection rules and rulesets on private repos (API answers 403). Decision (founder, 2026-10-25): stay on the free plan and keep the discipline by convention: every change goes through a branch + PR and is merged only when the four CI checks are green. If the plan changes, the protection block at the end of the setup script applies the rules below.
+
+Sections 1–2 describe the original one-time setup and are kept for re-creating the repo elsewhere.
 
 ## 1. What I need from you (one time)
 
@@ -36,7 +40,7 @@ git push -u origin main
 | Default branch | `main` | |
 | Branch protection on `main` | require PR + 1 review (self-review allowed while solo), required checks **`quality`, `secret-scan`, `database`, `e2e-web`**, linear history, block force-push and deletion, require conversation resolution | CI is the release gate (TESTING §4) |
 | Actions → workflow permissions | read-only default token (`permissions: contents: read` is already in `ci.yml`) | least privilege |
-| Actions → allowed actions | GitHub-owned + `pnpm/action-setup`, `gitleaks/gitleaks-action`, `actions/*` | supply-chain |
+| Actions → allowed actions | GitHub-owned + `pnpm/action-setup`, `actions/*` (gitleaks runs as a pinned, checksum-verified CLI, not an action) | supply-chain |
 | Dependabot alerts + security updates | on (`.github/dependabot.yml` already groups Expo packages) | audit |
 | Secret scanning + push protection | on **if available** (private repos need GitHub Advanced Security on personal plans) | defense in depth next to gitleaks in CI |
 | Auto-delete head branches | on | hygiene |
@@ -54,7 +58,7 @@ CI needs **no secrets** today: it uses placeholder public values and a local Sup
 
 ## 5. First CI run — what to expect and what is unverified
 
-`ci.yml` is actionlint-clean and every step has been executed locally (fresh clone), but **it has never run on GitHub**. Likely first-run friction, in order of probability: (1) `gitleaks-action` licensing if `<owner>` is an organization; (2) the `e2e-web` job downloading Playwright browsers with `--with-deps` (apt) — slower, not wrong; (3) `database`/`e2e-web` pulling Supabase images (several minutes, cached afterwards); (4) the pnpm `hoisted` linker (ADR-0015) — covered by the same lockfile. I will watch the first run with `gh run watch` and fix whatever it reveals; results go into the next report.
+First runs on GitHub (2026-10-24, Phase 1 history): `quality`, `database` and `e2e-web` **passed** on `ubuntu-latest`. `secret-scan` failed without finding anything: `gitleaks/gitleaks-action@v2` scans `<first pushed commit>^..HEAD`, and the first push contained the root commit, which has no parent ("no leaks found in partial scan", then exit 1). Fix: the job now downloads a pinned gitleaks release, verifies its SHA-256 and scans the full history itself. Dependabot's npm job also reports failure: it cannot move Expo-pinned packages (`react`, `react-native-gesture-handler`, …), which is expected; those are upgraded with `npx expo install --fix` during an SDK upgrade, not by Dependabot.
 
 ## 6. Android CI
 
