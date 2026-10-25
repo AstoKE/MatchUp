@@ -26,7 +26,7 @@ export function Checkbox({
       <Pressable
         accessibilityRole="checkbox"
         accessibilityLabel={label}
-        accessibilityState={{ checked }}
+        aria-checked={checked}
         aria-invalid={error ? true : undefined}
         onPress={() => onChange(!checked)}
         onFocus={() => setFocused(true)}

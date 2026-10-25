@@ -50,7 +50,8 @@ export function Select({
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${label}: ${current?.label ?? placeholder}`}
-        accessibilityState={{ expanded: open, disabled }}
+        aria-expanded={open}
+        aria-disabled={disabled}
         disabled={disabled}
         onPress={() => setOpen((v) => !v)}
         style={{
@@ -126,7 +127,7 @@ function Row({
     <Pressable
       accessibilityRole="radio"
       accessibilityLabel={label}
-      accessibilityState={{ checked: selected }}
+      aria-checked={selected}
       onPress={onPress}
       style={{
         minHeight: TOUCH_TARGET,

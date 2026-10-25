@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 
 const localized = z.object({ tr: z.string(), en: z.string() });

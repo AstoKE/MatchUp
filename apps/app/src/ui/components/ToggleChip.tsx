@@ -22,7 +22,8 @@ export function ToggleChip({
     <Pressable
       accessibilityRole="checkbox"
       accessibilityLabel={label}
-      accessibilityState={{ checked: selected, disabled }}
+      aria-checked={selected}
+      aria-disabled={disabled}
       disabled={disabled}
       onPress={onPress}
       onFocus={() => setFocused(true)}
