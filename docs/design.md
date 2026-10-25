@@ -140,7 +140,8 @@ Rules: no exclamation-mark inflation, no emoji in system messages (allowed in us
 | `ember.700/300` → `warning` + `urgency` semantic | `semantic.ts` | added in Phase 2 (this change: `urgency`, `onUrgency`) |
 | Plus Jakarta Sans / Inter | `expo-font` + theme `fontFamily` | **not yet loaded** (needs Turkish glyph visual test + bundle measurement) |
 | Sport tints | `sportTints` map keyed by `sports.slug` | **not yet implemented** (Phase 3) |
-| Court-line pattern, SVG icon subset | `src/ui/graphics` | **not yet implemented** |
+| SVG icon subset | `src/ui/graphics/Icon.tsx` (`react-native-svg`) | **started**: 4 tab icons (compass, calendar, add-circle, person), outline + filled; more icons are added there as screens need them |
+| Court-line pattern | `src/ui/graphics` | **not yet implemented** |
 
 **Acceptance gate for any visual change:** `pnpm test` (contrast pairs in both themes) green · Playwright axe clean · screenshot review at 390/800/1280 in light and dark · Turkish glyph check · bundle ratchet not increased without a recorded reason.
 

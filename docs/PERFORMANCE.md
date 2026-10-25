@@ -21,18 +21,19 @@ Sizes are gzip level 9 of the exported files. Per-package numbers are source-map
 
 | | gzip |
 |---|---|
-| TOTAL web JS | **1051 kB** (1113 kB at the start of this work; 1400 kB was the Phase 1 ratchet) |
-| INITIAL (`entry` 287 + `__common` 231 + runtime 4) | **~522 kB** |
-| route chunk `_layout` (tab bar) | 149 kB |
+| TOTAL web JS | **917 kB** (1051 kB before the SVG tab icons; 1113 kB at the start of this work; 1400 kB was the Phase 1 ratchet) |
+| INITIAL (`entry` 287 + `__common` 247 + runtime 4) | **~537 kB** |
+| route chunk `_layout` (tab bar) | 1 kB (was 149 kB with Ionicons) |
 | route chunk `index` (Sentry, lazy) | 373 kB |
+| **first tabbed screen** (INITIAL + tab `_layout`) | **~538 kB** (was ~670 kB) |
 
 What is in them:
 
 | Chunk | Contents (minified) | Loaded |
 |---|---|---|
 | `entry` 287 kB | expo-router 423k, react-native-web 276k, react-dom 203k, expo-modules-core 16k | always |
-| `__common` 231 kB | zod 145k, @supabase/auth-js 123k, app + workspace code 102k, @tanstack/query-core 60k, react-hook-form 48k | always |
-| `_layout` 149 kB | **Ionicons**: the complete glyph table (the chunk contains 2389 `…-outline` names alone) for the 4 tab icons, plus expo-font and expo-asset | with the tab screens |
+| `__common` 247 kB | zod 145k, @supabase/auth-js 123k, app + workspace code 102k, @tanstack/query-core 60k, react-hook-form 48k, react-native-svg (web renderer, ~16 kB gzip) | always |
+| `_layout` 1 kB | tab bar configuration (until 2026-10-25: 149 kB, the complete Ionicons glyph table plus expo-font and expo-asset) | with the tab screens |
 | `index` 373 kB | **Sentry** (core 468k, conventions 340k, react-native 298k, replay 125k, browser 103k) | **only when `EXPO_PUBLIC_SENTRY_DSN` is set**, after start (dynamic `import()` in `lib/observability/sentry.ts`) |
 
 Correction to an earlier reading: Sentry is about a third of the *total* but **not** part of the initial load; it is already lazy. It still costs bandwidth on every session once a DSN is configured.
@@ -43,12 +44,13 @@ Correction to an earlier reading: Sentry is about a third of the *total* but **n
 2. **zod → `zod/mini`** (domain, env schema, API parsers; one unused duplicate loader deleted). Same rules, same stable error keys; all 42 domain, 236 app, 72 integration, 40 web e2e and 22 device checks pass. Alone this saved only ~7 kB, because of the next item.
 3. **Unused zod modules resolved to an empty module** (`apps/app/metro.config.js`). `zod/mini` and `zod/v4/core` re-export (`export *`) every locale (~80 files), the JSON-Schema generator and the schema compiler; Metro does not tree-shake, so they shipped. They were ~90 % of zod's minified size. zod's own schema code only `import type`s from them. **zod: 471 kB → 145 kB minified, 114 → 37 kB gzip; TOTAL 1106 → 1051 kB.** Risk: a zod upgrade that renames those files would silently stop the stubbing (the size ratchet catches that) or, if zod starts using them at runtime, break validation (tests catch that). Re-check after every zod upgrade with `node scripts/bundle-files.mjs zod` (expect ~25 files, ~145 kB).
 4. **Ratchets tightened**: TOTAL 1400 → 1080 kB, plus a new INITIAL ratchet of 540 kB (`scripts/check-bundle-size.mjs`).
+5. **In-house SVG tab icons instead of Ionicons** (`src/ui/graphics/Icon.tsx`, `react-native-svg` 15.16.0 via `npx expo install`; `@expo/vector-icons` removed). Ionicons, expo-font and the icon font are no longer in the web bundle (checked by searching the exported chunks). **TOTAL 1048 → 917 kB (−131 kB); tab `_layout` 149 → 1 kB; INITIAL 521 → 537 kB (+16 kB)**, because the SVG renderer is shared code. Net for the first tabbed screen: ~670 → ~538 kB. Ratchets: TOTAL 1080 → 940 kB; INITIAL raised 540 → 555 kB with this reason recorded in the script. `expo-font` stays a direct dependency: `expo` and `@expo/router-server` depend on it and removing it risks native autolinking for no web gain. Native: `react-native-svg` is a native module, so the Android dev APK must be rebuilt (ADR-0015 container).
 
 ## 4. Plan, in order of measured benefit
 
 | # | Change | Expected effect | Needs |
 |---|---|---|---|
-| 1 | **Replace Ionicons for the tab bar with a few inline icons** (compass, calendar, plus-circle, person). Drops the whole glyph table, `@expo/vector-icons`, and probably `expo-font` + the icon font download. | **−~140 kB gzip** on the route chunk (and a separate font file); first screen with tabs loads ~20 % less | A decision on how to draw icons (`react-native-svg` = native dependency and an APK rebuild, or small component-drawn glyphs) and keeping `docs/design.md`'s icon rules. Visual check on device. |
+| 1 | ~~Replace Ionicons for the tab bar with inline icons~~ | **Done 2026-10-25** (§3.5): −131 kB total, first tabbed screen −~130 kB | Visual check on a device is the founder's manual test. |
 | 2 | **Sentry on web**: leave out replay + feedback (~42 kB gzip) and check whether `@sentry/conventions` (81 kB) can be avoided with the browser SDK instead of `@sentry/react-native`'s web build. | up to −40…−120 kB, lazily loaded, only with a DSN | Measure first; the same resolver trick may apply. Error reporting must keep working (test with a dummy DSN). |
 | 3 | **Supabase realtime** (`realtime-js` 10 + `phoenix` 6.5 kB) is unused today. | −~16 kB | Keep until Phase 3: chat/notifications may need it. Decide then. |
 | 4 | Re-check zod, react-hook-form (12 kB) and i18next (18 kB) only if they grow. | small | — |

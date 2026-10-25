@@ -5,15 +5,19 @@
 // recorded baseline + headroom. Lower them as optimizations land; never raise one without writing down
 // why. This is a regression guard, not a claim that the budget is met.
 //
-//   TOTAL   all web JS chunks (gzip)                       measured 1051 kB on 2026-10-25
-//   INITIAL scripts referenced by index.html (gzip)        measured  518 kB on 2026-10-25 (first paint cost,
+//   TOTAL   all web JS chunks (gzip)                       measured  917 kB on 2026-10-25
+//   INITIAL scripts referenced by index.html (gzip)        measured  537 kB on 2026-10-25 (first paint cost,
 //           before any route chunk; lazily loaded chunks such as Sentry are not in it)
+//
+// INITIAL was raised 540 -> 555 on purpose (2026-10-25): the in-house SVG tab icons put react-native-svg
+// (~16 kB) into the shared chunk, but removed the 149 kB Ionicons chunk that every tabbed screen loaded
+// right after it, so the first tabbed screen got ~130 kB cheaper (docs/PERFORMANCE.md §3.5).
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 1080;
-const INITIAL_RATCHET_KB = 540;
+const TOTAL_RATCHET_KB = 940;
+const INITIAL_RATCHET_KB = 555;
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';
 
 if (!existsSync(dir)) {
