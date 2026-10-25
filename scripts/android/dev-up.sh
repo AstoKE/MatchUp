@@ -18,6 +18,11 @@ pnpm db:start >/dev/null
 pnpm env:local
 
 echo "== Emulator"
+# A stale adb server (e.g. left over from an earlier session) answers "error: closed"; restart it once.
+if ! adb devices >/dev/null 2>&1; then
+  adb kill-server >/dev/null 2>&1 || true
+  adb start-server
+fi
 if ! adb devices | grep -q "emulator-.*device$"; then
   nohup emulator -avd matchup_api36 -no-boot-anim -no-audio -gpu auto -no-snapshot >/dev/null 2>&1 &
   adb wait-for-device
@@ -28,16 +33,33 @@ adb reverse tcp:8081 tcp:8081
 adb shell settings put secure show_ime_with_hard_keyboard 1
 
 echo "== App"
-if ! adb shell pm list packages | grep -q "$PKG"; then
-  [ -f "$APK" ] || { echo "APK missing: build it with: bash scripts/android/build-apk.sh debug x86_64"; exit 1; }
+# Reinstall whenever the APK changed, not only when the app is missing: new JS on an old APK crashes
+# as soon as it needs a native module that APK does not contain.
+[ -f "$APK" ] || { echo "APK missing: build it with: bash scripts/android/build-apk.sh debug x86_64"; exit 1; }
+APK_SUM="$(sha256sum "$APK" | cut -d' ' -f1)"
+STAMP=apps/app/.android-build/installed-apk.sha256
+if ! adb shell pm list packages | grep -q "$PKG" || [ "$(cat "$STAMP" 2>/dev/null)" != "$APK_SUM" ]; then
   adb install -r "$APK"
+  echo "$APK_SUM" >"$STAMP"
 fi
 
 echo "== Metro"
+# A Metro started before a dependency change does not see packages added since (pnpm links on Windows):
+# the bundle then fails with "Unable to resolve". Restart it with --clear when the lockfile changed.
+LOCK_SUM="$(sha256sum pnpm-lock.yaml | cut -d' ' -f1)"
+METRO_STAMP=apps/app/.android-build/metro-lock.sha256
+if curl -s localhost:8081/status | grep -q running && [ "$(cat "$METRO_STAMP" 2>/dev/null)" != "$LOCK_SUM" ]; then
+  echo "Dependencies changed since Metro started: restarting it with a clean cache"
+  for pid in $(netstat -ano | grep -E ':8081 .*LISTENING' | awk '{print $NF}' | sort -u); do
+    taskkill //PID "$pid" //T //F >/dev/null 2>&1 || true
+  done
+  sleep 2
+fi
 if ! curl -s localhost:8081/status | grep -q running; then
   mkdir -p apps/app/.android-build
   # NOT CI=1: CI mode disables file watching (stale JS). Output goes to a log so JS warnings can be read.
-  (cd apps/app && nohup pnpm exec expo start --port 8081 >.android-build/metro.log 2>&1 &)
+  (cd apps/app && nohup pnpm exec expo start --port 8081 --clear >.android-build/metro.log 2>&1 &)
   until curl -s localhost:8081/status | grep -q running; do sleep 2; done
+  echo "$LOCK_SUM" >"$METRO_STAMP"
 fi
 echo "Ready. Open the MatchUp app on the emulator. Mailpit (emails): http://127.0.0.1:54324"
