@@ -64,6 +64,18 @@ module.exports = [
     },
   },
   {
+    // UI copy comes from the i18n resources (CLAUDE.md): literal text in JSX is an error. Only decorative
+    // glyphs that are not words are allowed.
+    files: ['src/**/*.tsx', 'app/**/*.tsx'],
+    ignores: ['**/*.test.tsx'],
+    rules: {
+      'react/jsx-no-literals': [
+        'error',
+        { noStrings: false, ignoreProps: true, allowedStrings: ['✓', '·'] },
+      ],
+    },
+  },
+  {
     files: ['**/*.test.{ts,tsx}', 'jest.setup.js', 'e2e/**'],
     rules: { 'no-console': 'off', 'no-restricted-imports': 'off' },
   },
