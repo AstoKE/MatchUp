@@ -19,3 +19,4 @@ Format: Context · Decision · Consequences · Status. One decision per file, im
 | [0013](0013-guest-discovery.md) | Guest (unauthenticated) event discovery | Accepted (D-09) |
 | [0014](0014-auth-sessions-and-enumeration-posture.md) | Auth sessions, email links and account-enumeration posture | Accepted |
 | [0015](0015-native-android-build-in-container.md) | Build Android in a pinned Linux container; run on the emulator | Accepted |
+| [0016](0016-auth-abuse-controls.md) | Authentication abuse controls and the account-enumeration posture (amends 0014 §4) | Accepted |

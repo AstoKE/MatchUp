@@ -15,8 +15,9 @@ Status 2026-10-25. **Nothing here is done for a hosted project: no hosted projec
 - [ ] CAPTCHA on sign-up, sign-in and password reset (Supabase Auth Attack Protection with a provider such as Cloudflare Turnstile). The local stack can use Turnstile's documented test secrets.
 - [ ] Auth rate limits reviewed on the hosted project (sign-in, sign-up, email send, token verification, anonymous IP limits); the local `config.toml` values are developer defaults.
 - [ ] Email sending through a real SMTP provider with SPF/DKIM; hosted default SMTP is rate limited and not for production.
-- [ ] Account-enumeration posture (ADR-0014) re-tested against the hosted project: sign-up answers identically for new and existing addresses; sign-in uses one generic message. Timing differences are **not** measured yet.
-- [ ] Decide on an Edge proxy only if measurements show a benefit; the current analysis says CAPTCHA + provider rate limits cover the same ground without a new moving part.
+- [ ] Re-run `node scripts/auth-probe.mjs --url … --anon-key … --service-key …` against the hosted project and record the numbers in `docs/AUTH_ABUSE.md`. **Known from local measurement (ADR-0016): all three endpoints leak** (sign-up 422 vs 200; sign-in timing; reset cooldown 429). We do not claim to prevent enumeration; counsel confirms the residual risk is acceptable (⚖).
+- [ ] CAPTCHA token is actually sent by the app (web widget + native WebView) — **not built**; the server side was verified on the lab stack only.
+- [ ] Decision on a closed / invite-only pilot with public sign-up disabled. An Edge proxy is **not** recommended (ADR-0016): the Auth API stays reachable without it.
 
 ## 3. Platform
 

@@ -1,6 +1,6 @@
 # ADR-0014 — Authentication sessions, email links and account-enumeration posture
 
-**Status:** Accepted (Phase 1, 2026-10-24)
+**Status:** Accepted (Phase 1, 2026-10-24). §4 is amended by [ADR-0016](0016-auth-abuse-controls.md): sign-in timing and the reset cooldown also leak, and an Edge proxy is not recommended.
 
 **Context.** Phase 1 had to deliver a secure auth foundation on three platforms using Supabase Auth, with Turkish-first UX and the guest-discovery decision (ADR-0013). Several choices were forced by what we observed against the real local stack rather than by documentation.
 
