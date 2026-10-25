@@ -6,14 +6,16 @@ Device: Android Studio emulator `matchup_api36` (Pixel 7 profile, Android 16 / A
 
 "Automated" = Maestro flow run by `scripts/android/native-validation.mjs` (results in `apps/app/e2e-mobile/results/`, git-ignored). "Manual" = the founder using the emulator by hand.
 
-## Latest full run — 18 / 18 passed (exit code 0)
+## Latest full run — 20 / 20 passed (exit code 0)
 
 | ID | What | How |
 |---|---|---|
 | N01 | Cold start, guest discovery, four tabs, protected-route redirect | Automated |
 | N02 | Sign up → "check your email" screen | Automated |
 | N02b | Verification email delivered (Mailpit); Supabase redirects to the app scheme with a PKCE code | Automated |
-| N03 | Warm deep link completes verification → signed in | Automated |
+| N03 | Warm deep link completes verification → signed in; a brand-new (not onboarded) account is sent to onboarding when it opens Profile | Automated |
+| N03b | Onboarding on the device: 18+/terms missing → blocked; empty name → blocked; no sport → blocked; valid submission returns to Profile | Automated |
+| N03c | Server state equals what the UI did: `onboarded`, 18+ confirmed, name, **2** consent rows at the draft version, **0** marketing rows, football level 3.5 (queried from the database) | Automated |
 | N04 | Session persists after the process is killed and relaunched | Automated |
 | N05 | Sign out → guest home; still signed out after restart | Automated |
 | N06 | Sign in returns to the page that required it | Automated |
@@ -47,7 +49,9 @@ Earlier the founder confirmed by hand: sign-up, sign-in, staying signed in after
 
 ## Harness notes (not app defects)
 
-Maestro's `hideKeyboard` leaves the app when Android shows only Gboard's floating toolbar (hardware keyboard emulation), so the flows do not use it. Clearing app data also resets the per-app language, so N13 sets the language after the clear. Metro must not run with `CI=1` (no file watching → stale JS). Run from PowerShell via `scripts/android/dev.ps1` (plain `bash` there is WSL).
+**Open item — first tap after typed text.** On this emulator (hardware-keyboard mode: only Gboard's floating toolbar, no on-screen keys) the first tap on a button right after Maestro's `inputText` did not fire; the second did. The same tap sent with `adb input tap` after `adb input text` fired at once. It was not reproducible with real key presses because the emulator has no on-screen keyboard. It is therefore **not known** whether real users on a phone can hit this; flow 15 releases focus by tapping the heading first. Re-check on a physical device. Before this, `Screen` already uses `keyboardShouldPersistTaps="handled"`.
+
+Metro's first bundle after JavaScript changes can take a minute; the runner now waits for the home screen once before the flows (a blank white screen in the first flow was this, not a defect). Maestro's `hideKeyboard` leaves the app when Android shows only Gboard's floating toolbar (hardware keyboard emulation), so the flows do not use it. Clearing app data also resets the per-app language, so N13 sets the language after the clear. Metro must not run with `CI=1` (no file watching → stale JS). Run from PowerShell via `scripts/android/dev.ps1` (plain `bash` there is WSL).
 
 ## Next
 

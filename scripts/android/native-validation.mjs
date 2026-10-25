@@ -53,6 +53,27 @@ function stackInfo() {
 }
 const stack = stackInfo();
 
+/** One value from the local database (test fixture checks only; the app never sees this connection). */
+function dbScalar(sql) {
+  return sh(
+    'docker',
+    [
+      'exec',
+      'supabase_db_matchup',
+      'psql',
+      '-U',
+      'postgres',
+      '-d',
+      'postgres',
+      '-t',
+      '-A',
+      '-c',
+      sql,
+    ],
+    { shell: false },
+  ).trim();
+}
+
 async function waitForAuthLink(email, timeoutMs = 20000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -177,7 +198,8 @@ if (!metro?.includes('running')) {
   const m = spawn('pnpm', ['--filter', '@matchup/app', 'exec', 'expo', 'start', '--port', '8081'], {
     cwd: root,
     shell: true,
-    env: { ...process.env, CI: '1' },
+    // Never CI=1: it disables file watching and the device would run stale JavaScript.
+    env: Object.fromEntries(Object.entries(process.env).filter(([key]) => key !== 'CI')),
     stdio: 'ignore',
     detached: false,
   });
@@ -202,6 +224,26 @@ if (!args.includes('--skip-install')) {
   pre.push(`installed ${APK.split(/[\\/]/).pop()}`);
 }
 adb('shell', 'pm', 'grant', PKG, 'android.permission.POST_NOTIFICATIONS').toString();
+
+// After JavaScript changes Metro builds the bundle on the first app start (up to a minute or two): wait
+// once for the home screen, so a cold bundle is not mistaken for an app defect by the first flow.
+async function warmUpApp() {
+  adb('shell', 'am', 'force-stop', PKG);
+  adb('shell', 'am', 'start', '-n', `${PKG}/.MainActivity`);
+  const deadline = Date.now() + 180_000;
+  while (Date.now() < deadline) {
+    await sleep(3000);
+    try {
+      adb('shell', 'uiautomator', 'dump', '/sdcard/warm.xml');
+      const screen = adb('shell', 'cat', '/sdcard/warm.xml');
+      if (/Discover|Keşfet/.test(screen)) return true;
+    } catch {
+      /* the app is still starting */
+    }
+  }
+  return false;
+}
+pre.push(`app warm-up ${(await warmUpApp()) ? 'OK' : 'TIMED OUT'}`);
 console.log('Pre-flight:', pre.join(' · '), '\n');
 
 // ---- flows
@@ -233,10 +275,33 @@ if (code) {
   await sleep(2500);
   await flow(
     'N03',
-    'Deep link (warm) completes verification → signed in',
+    'Deep link (warm) completes verification → signed in; unonboarded account is sent to onboarding',
     '03-signed-in-after-verification.yaml',
     env,
   );
+  const onboarded = await flow(
+    'N03b',
+    'Onboarding on the device: 18+/terms/name/sport rules, then profile saved',
+    '15-onboarding.yaml',
+    env,
+  );
+  if (onboarded) {
+    // What the UI did must be what the SERVER recorded (consent evidence, profile, sport level).
+    const row = dbScalar(
+      `select (p.onboarded_at is not null)::text || ',' || (p.adult_confirmed_at is not null)::text || ',' || p.display_name || ',' ||
+        (select count(*) from public.user_consents c where c.user_id = p.id and c.kind in ('TERMS','PRIVACY_NOTICE') and c.version = 'draft-0.1' and c.revoked_at is null) || ',' ||
+        (select count(*) from public.user_consents c where c.user_id = p.id and c.kind = 'MARKETING') || ',' ||
+        coalesce((select string_agg(s.slug || ':' || usp.self_assessed_level, ';') from public.user_sport_profiles usp join public.sports s on s.id = usp.sport_id where usp.user_id = p.id), '')
+       from public.profiles p join auth.users u on u.id = p.id where u.email = '${email}'`,
+    );
+    const expected = 'true,true,Ayse Yilmaz,2,0,football:3.5';
+    record(
+      'N03c',
+      'Server state matches the UI: 18+ confirmed, terms+privacy consent versions recorded, no marketing consent, football 3.5',
+      row === expected ? 'PASS' : 'FAIL',
+      row === expected ? '' : `expected ${expected} but database has ${row}`,
+    );
+  }
   await flow(
     'N04',
     'Session persists after the process is killed and relaunched',

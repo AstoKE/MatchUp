@@ -1,0 +1,31 @@
+{
+  "displayName": "Görünen ad",
+  "displayNameHint": "Diğer oyuncular bunu görür. 2–40 karakter.",
+  "bio": "Hakkında",
+  "bioHint": "İsteğe bağlı, en fazla {{max}} karakter.",
+  "city": "Şehir",
+  "district": "İlçe",
+  "locationHint": "Konum isteğe bağlıdır; yalnızca sana yakın etkinlikleri göstermek için kullanılır.",
+  "notSet": "Seçilmedi",
+  "sports": "Sporların",
+  "level": "Seviye",
+  "levelValue": "Seviye {{value}}",
+  "levelLower": "Seviyeyi düşür",
+  "levelHigher": "Seviyeyi yükselt",
+  "levelNote": "Bu senin kendi tahminin; zamanla diğer oyuncuların geri bildirimleriyle netleşir.",
+  "positions": "Pozisyonlar (isteğe bağlı, en fazla {{max}})",
+  "validation": {
+    "NAME_TOO_SHORT": "En az 2 karakter kullan.",
+    "NAME_TOO_LONG": "En fazla 40 karakter kullanabilirsin.",
+    "NAME_INVALID": "Görünmeyen özel karakterleri kaldır.",
+    "BIO_TOO_LONG": "En fazla 280 karakter kullanabilirsin.",
+    "BIO_INVALID": "Görünmeyen özel karakterleri kaldır.",
+    "LEVEL_INVALID": "Geçerli bir seviye seç.",
+    "SPORTS_REQUIRED": "En az bir spor seç.",
+    "TOO_MANY_SPORTS": "Bir spor yalnızca bir kez seçilebilir ve en fazla 10 spor seçebilirsin.",
+    "TOO_MANY_POSITIONS": "En fazla 3 farklı pozisyon seçebilirsin.",
+    "ADULT_REQUIRED": "{{appName}} kullanmak için 18 yaşından büyük olmalısın.",
+    "TERMS_REQUIRED": "Devam etmek için Kullanım Koşulları ve Gizlilik Bildirimi'ni kabul etmelisin.",
+    "DISTRICT_NEEDS_CITY": "Önce bir şehir seç."
+  }
+}

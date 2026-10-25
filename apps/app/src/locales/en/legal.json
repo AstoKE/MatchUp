@@ -1,0 +1,55 @@
+{
+  "draftBanner": "DRAFT — This text has not been reviewed by a lawyer and will change before public release. It is not legally binding.",
+  "version": "Version: {{version}}",
+  "back": "Go back",
+  "terms": {
+    "title": "Terms of Use (draft)",
+    "service": {
+      "heading": "The service",
+      "body": "{{appName}} is a community app that helps adults find, organise and join sports events. Events are organised by users; {{appName}} is not the organiser of, or a party to, any event."
+    },
+    "eligibility": {
+      "heading": "Who can use it",
+      "body": "Only people aged 18 or over may use the app. The information you give must be accurate and your account must be used only by you."
+    },
+    "conduct": {
+      "heading": "Conduct",
+      "body": "Treat other users with respect. Harassment, threats, discrimination, fake accounts and fake events are not allowed. Accounts that break the rules may be restricted."
+    },
+    "risk": {
+      "heading": "Sport and health",
+      "body": "Sport carries physical risk. You take part in events according to your own fitness and at your own responsibility. Event organisers are not required to be professional coaches."
+    },
+    "content": {
+      "heading": "What you share",
+      "body": "You are responsible for what you share in your profile and in events. Content that infringes other people's rights may be removed."
+    },
+    "changes": {
+      "heading": "Changes",
+      "body": "These terms may change. For important changes we will ask you to accept the new version. The version you accept is recorded."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Notice (draft)",
+    "collected": {
+      "heading": "What data we collect",
+      "body": "Your email address, display name, optionally your city and district, the sports you play and your self-assessed level, and your consent records (which version you accepted and when). Precise location is not required."
+    },
+    "purpose": {
+      "heading": "Why we use it",
+      "body": "To manage your account, show you relevant events, keep the community safe and improve the service. Marketing messages are sent only if you give separate consent."
+    },
+    "visibility": {
+      "heading": "Who can see it",
+      "body": "Your profile is private by default. You choose whether to make it public; then your display name and sports are shown to other users. Your email address is never shown to other users."
+    },
+    "retention": {
+      "heading": "Retention and deletion",
+      "body": "We keep your data while your account is open. Details about requesting account deletion will be added to this text before launch."
+    },
+    "rights": {
+      "heading": "Your rights",
+      "body": "How to exercise your rights to access, correct and delete your personal data, and the identity of the data controller, will be added after legal review."
+    }
+  }
+}

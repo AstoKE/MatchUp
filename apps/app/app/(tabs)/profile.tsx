@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { RequireAuth, signOut, useSession, VerifyEmailBanner } from '@/features/auth';
+import { signOut, useSession, VerifyEmailBanner } from '@/features/auth';
+import { RequireOnboarded } from '@/features/onboarding';
 import { LanguagePicker } from '@/features/settings';
 import { Button, EmptyState, Screen, Text } from '@/ui';
 
@@ -13,7 +14,7 @@ export default function Profile() {
   // After signing out, land on the guest home page rather than a sign-in prompt.
   const logout = useMutation({ mutationFn: signOut, onSuccess: () => router.replace('/') });
   return (
-    <RequireAuth>
+    <RequireOnboarded>
       <Screen>
         <VerifyEmailBanner />
         <EmptyState title={t('nav:profile')} />
@@ -31,6 +32,6 @@ export default function Profile() {
           onPress={() => logout.mutate()}
         />
       </Screen>
-    </RequireAuth>
+    </RequireOnboarded>
   );
 }

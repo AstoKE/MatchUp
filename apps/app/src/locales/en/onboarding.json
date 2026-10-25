@@ -1,0 +1,29 @@
+{
+  "title": "Let's set up your profile",
+  "stepOf": "Step {{current}} of {{total}}",
+  "next": "Next",
+  "back": "Back",
+  "finish": "Finish",
+  "finishing": "Saving…",
+  "loadFailed": "We couldn't load what we need.",
+  "verifyFirstTitle": "Verify your email first",
+  "verifyFirstBody": "We need to confirm your email address before you can set up your profile. Open the link we sent you.",
+  "consent": {
+    "title": "Before we start",
+    "intro": "{{appName}} is for adults who want to play sports together. We need a few confirmations.",
+    "adult": "I confirm that I am 18 years old or older.",
+    "terms": "I have read and accept the Terms of Use and the Privacy Notice.",
+    "termsLink": "Terms of Use",
+    "privacyLink": "Privacy Notice",
+    "marketing": "I'd like to receive news and tips (optional). You can change this at any time.",
+    "draftNotice": "The legal texts are drafts that have not been reviewed by a lawyer yet."
+  },
+  "basics": {
+    "title": "Tell us about you"
+  },
+  "sports": {
+    "title": "Which sports do you play?",
+    "intro": "Pick the sports you play and your level. You can change this later in your profile.",
+    "selected": "selected"
+  }
+}

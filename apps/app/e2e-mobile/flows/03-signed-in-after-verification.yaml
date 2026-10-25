@@ -1,8 +1,9 @@
 appId: com.example.matchup.dev
-# 03 After the emailed link opened the app via deep link the user is signed in — requires -e EMAIL
+# 03 After the emailed link opened the app via deep link the user is signed in; a brand-new account has not
+# onboarded, so the profile tab opens the onboarding flow (server-side gate, UX side)
 ---
 # No launchApp: the deep link (sent by the orchestrator via adb) already brought the app forward.
 - assertVisible: 'Discover'
 - tapOn: 'Profile'
-- assertVisible: 'Signed in as ${EMAIL}'
-- takeScreenshot: 03-signed-in
+- assertVisible: "Let's set up your profile"
+- takeScreenshot: 03-signed-in-needs-onboarding

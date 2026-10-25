@@ -1,0 +1,37 @@
+appId: com.example.matchup.dev
+# 15 Onboarding gate, end to end on the device — continues from flow 03's screen (the onboarding flow the gate opened)
+# Covers the negative paths first (18+/terms, name, sport), then a valid submission that returns to Profile.
+---
+- assertVisible: "Let's set up your profile"
+- assertVisible: 'Before we start'
+# nothing confirmed yet → cannot continue
+- tapOn: 'Next'
+- assertVisible: 'You must be 18 or older to use MatchUp.'
+- assertVisible: 'Please accept the Terms of Use and Privacy Notice to continue.'
+- tapOn: 'I confirm that I am 18 years old or older.'
+- tapOn: 'I have read and accept the Terms of Use and the Privacy Notice.'
+- tapOn: 'Next'
+- assertVisible: 'Tell us about you'
+# empty name is rejected before anything is sent
+- tapOn: 'Next'
+- assertVisible: 'Use at least 2 characters.'
+- tapOn: 'Display name'
+- inputText: 'Ayse Yilmaz'
+# the error disappears as soon as the field is edited
+- assertNotVisible: 'Use at least 2 characters.'
+# Emulator/Maestro quirk: after injected text the first tap on a button is consumed by the input method, so
+# release focus by tapping the heading first (see docs/NATIVE_VALIDATION.md; to be re-checked on a real device).
+- tapOn: 'Tell us about you'
+- tapOn: 'Next'
+- assertVisible: 'Which sports do you play?'
+# no sport chosen → cannot finish
+- tapOn: 'Finish'
+- assertVisible: 'Pick at least one sport.'
+- tapOn: 'Football'
+- tapOn: 'Higher level'
+- assertVisible: 'Level 3.5'
+- takeScreenshot: 15-sports-step
+- tapOn: 'Finish'
+# the gate sent us back to the page that required it
+- assertVisible: 'Signed in as ${EMAIL}'
+- takeScreenshot: 15-onboarded-profile

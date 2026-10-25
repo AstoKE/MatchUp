@@ -1,0 +1,29 @@
+{
+  "title": "Profilini oluşturalım",
+  "stepOf": "Adım {{current}} / {{total}}",
+  "next": "İleri",
+  "back": "Geri",
+  "finish": "Bitir",
+  "finishing": "Kaydediliyor…",
+  "loadFailed": "Gerekli bilgiler yüklenemedi.",
+  "verifyFirstTitle": "Önce e-postanı doğrula",
+  "verifyFirstBody": "Profilini oluşturabilmen için e-posta adresini doğrulamamız gerekiyor. Sana gönderdiğimiz bağlantıyı aç.",
+  "consent": {
+    "title": "Başlamadan önce",
+    "intro": "{{appName}}, birlikte spor yapmak isteyen yetişkinler içindir. Birkaç onay almamız gerekiyor.",
+    "adult": "18 yaşından büyük olduğumu onaylıyorum.",
+    "terms": "Kullanım Koşulları'nı ve Gizlilik Bildirimi'ni okudum, kabul ediyorum.",
+    "termsLink": "Kullanım Koşulları",
+    "privacyLink": "Gizlilik Bildirimi",
+    "marketing": "Haber ve ipuçları almak istiyorum (isteğe bağlı). Bunu istediğin zaman değiştirebilirsin.",
+    "draftNotice": "Hukuki metinler henüz bir avukat tarafından incelenmemiş taslaklardır."
+  },
+  "basics": {
+    "title": "Seni tanıyalım"
+  },
+  "sports": {
+    "title": "Hangi sporları yapıyorsun?",
+    "intro": "Oynadığın sporları ve seviyeni seç. Bunu sonra profilinden değiştirebilirsin.",
+    "selected": "seçildi"
+  }
+}

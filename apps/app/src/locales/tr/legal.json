@@ -1,0 +1,55 @@
+{
+  "draftBanner": "TASLAK — Bu metin bir avukat tarafından incelenmemiştir ve herkese açık yayından önce değişecektir. Hukuki bağlayıcılık taşımaz.",
+  "version": "Sürüm: {{version}}",
+  "back": "Geri dön",
+  "terms": {
+    "title": "Kullanım Koşulları (taslak)",
+    "service": {
+      "heading": "Hizmet",
+      "body": "{{appName}}, yetişkinlerin spor etkinlikleri bulmasını, düzenlemesini ve bu etkinliklere katılmasını sağlayan bir topluluk uygulamasıdır. Etkinlikleri kullanıcılar düzenler; {{appName}} etkinliklerin düzenleyicisi veya tarafı değildir."
+    },
+    "eligibility": {
+      "heading": "Kimler kullanabilir",
+      "body": "Uygulamayı yalnızca 18 yaşını doldurmuş kişiler kullanabilir. Verdiğin bilgilerin doğru olması ve hesabını yalnızca senin kullanman gerekir."
+    },
+    "conduct": {
+      "heading": "Davranış kuralları",
+      "body": "Diğer kullanıcılara saygılı davran. Taciz, tehdit, ayrımcılık, sahte hesap veya sahte etkinlik oluşturmak yasaktır. Kuralları ihlal eden hesaplar kısıtlanabilir."
+    },
+    "risk": {
+      "heading": "Spor ve sağlık",
+      "body": "Spor fiziksel risk taşır. Etkinliklere kendi sağlık durumuna uygun olarak ve kendi sorumluluğunda katılırsın. Etkinlik düzenleyicileri profesyonel eğitmen olmak zorunda değildir."
+    },
+    "content": {
+      "heading": "Paylaştığın içerik",
+      "body": "Profilinde ve etkinliklerde paylaştığın bilgilerden sen sorumlusun. Başkalarının haklarını ihlal eden içerik kaldırılabilir."
+    },
+    "changes": {
+      "heading": "Değişiklikler",
+      "body": "Bu koşullar değişebilir. Önemli değişikliklerde yeni sürümü kabul etmeni isteriz. Kabul ettiğin sürüm kayıt altında tutulur."
+    }
+  },
+  "privacy": {
+    "title": "Gizlilik Bildirimi (taslak)",
+    "collected": {
+      "heading": "Hangi verileri topluyoruz",
+      "body": "E-posta adresin, görünen adın, isteğe bağlı olarak şehir ve ilçen, yaptığın sporlar ve kendi belirttiğin seviyen, ayrıca onay kayıtların (hangi sürümü ne zaman kabul ettiğin). Tam konum bilgisi zorunlu değildir."
+    },
+    "purpose": {
+      "heading": "Neden kullanıyoruz",
+      "body": "Hesabını yönetmek, sana uygun etkinlikleri göstermek, güvenliği sağlamak ve hizmeti geliştirmek için. Pazarlama iletileri yalnızca ayrıca onay verirsen gönderilir."
+    },
+    "visibility": {
+      "heading": "Kimler görebilir",
+      "body": "Profilin varsayılan olarak gizlidir. Profilini herkese açık yapmayı sen seçersin; bu durumda görünen adın ve sporların diğer kullanıcılara gösterilir. E-posta adresin başka kullanıcılara gösterilmez."
+    },
+    "retention": {
+      "heading": "Saklama ve silme",
+      "body": "Verilerini hesabın açık olduğu sürece saklarız. Hesabını silme talebi hakkında ayrıntılar yayın öncesinde bu metne eklenecektir."
+    },
+    "rights": {
+      "heading": "Haklarının kullanımı",
+      "body": "Kişisel verilerine erişme, düzeltme ve silme gibi haklarını kullanma yöntemleri ile veri sorumlusunun kimliği, yasal inceleme sonrasında bu metne eklenecektir."
+    }
+  }
+}
