@@ -68,7 +68,7 @@ supabase/            config.toml, migrations/, seed/, functions/health, tests/da
 scripts/             repo tooling (type generation, env writer, brand/bundle/secret checks) + tests
 ```
 
-Rules enforced by lint/CI: Supabase is imported only in `src/lib/supabase` and `src/features/*/api`; features are imported only through their `index.ts`; no hard-coded product name outside `packages/config`; no hard-coded UI strings are *linted yet* (parity tests cover resources — a literal-string lint rule is a Phase 2 item).
+Rules enforced by lint/CI: Supabase is imported only in `src/lib/supabase` and `src/features/*/api`; features are imported only through their `index.ts`; no hard-coded product name outside `packages/config`; literal text in JSX is a lint error (`react/jsx-no-literals`, two decorative glyphs allowed; UI copy lives in `src/locales`, and parity tests keep tr/en keys identical); importing classic `zod` is a lint error (use `zod/mini`).
 
 ## 5. Platform validation status (be honest about this)
 
