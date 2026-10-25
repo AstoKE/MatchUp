@@ -106,7 +106,9 @@ Technical hooks already designed: versioned consents (`user_consents`), export, 
 
 ## 9. Account deletion and anonymization
 
-See DATABASE §11. Security points: deletion requires recent re-authentication; 30-day grace with cancel; Edge Function with service role performs auth-user deletion and storage cleanup; every step is audit-logged without PII; export link is a single-use signed URL with short expiry; admin cannot restore after purge.
+See DATABASE §11. Security points: deletion requires recent re-authentication; 30-day grace with cancel; every step is audit-logged without PII; admin cannot restore after purge.
+
+As built (ADR-0017): re-authentication is checked **server-side** from the token's `amr` (password within 10 minutes, `REAUTH_REQUIRED`); the purge is SQL run by `pg_cron` as the owner role (no service-role key anywhere); export is an RPC returning only the caller's data, once per 24 h, serialized per user; the audit log lives in `private` (not reachable through the Data API) and is append-only. Storage cleanup arrives with avatars (a Storage API step in the purge).
 
 ## 10. Platform policy and licensing compliance
 

@@ -82,7 +82,7 @@ The 31 MVP items from the product brief map 1-to-1 to feature IDs. Detailed back
 | 24 | Reporting and blocking | F-27 | 6 |
 | 25 | Essential admin/moderation | F-28 | 6 |
 | 26 | Account/privacy settings | F-08 | 2 |
-| 27 | Account deletion workflow | F-29 | 6 |
+| 27 | Account deletion workflow | F-29 | 2 (moved, ADR-0017) |
 | 28 | Turkish localization | F-32 | cross-cutting |
 | 29 | Responsive web support | F-03, F-04 | cross-cutting |
 | 30 | Production security baseline | F-05, F-30, F-34 | cross-cutting |

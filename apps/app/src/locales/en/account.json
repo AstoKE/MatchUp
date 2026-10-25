@@ -1,0 +1,28 @@
+{
+  "section": "Account",
+  "export": {
+    "help": "Get the data of your account (account, profile, settings, sports and consent records) as a JSON file. Possible once a day.",
+    "action": "Download my data",
+    "preparing": "Preparing…",
+    "done": "Your data is ready.",
+    "rateLimited": "You already downloaded your data in the last 24 hours. You can try again tomorrow."
+  },
+  "delete": {
+    "help": "You request the deletion of your account; you can change your mind within 30 days.",
+    "action": "Delete my account",
+    "title": "Delete your account",
+    "grace": "After your request your account waits for 30 days: your profile is hidden and you cannot do anything new. During this time you can sign in and cancel the request.",
+    "permanent": "After 30 days your login, profile, settings and sport profiles are deleted permanently. This cannot be undone.",
+    "kept": "Records of which legal text you accepted and when may be kept, linked to an anonymous record without your name or email (legal review pending).",
+    "exportFirst": "You may want to download your data before deleting: Settings › Account › Download my data.",
+    "password": "Your password",
+    "passwordHint": "For your security, please enter your password again.",
+    "confirm": "Request account deletion"
+  },
+  "pending": {
+    "title": "Your account will be deleted",
+    "body": "Your account will be deleted permanently on {{date}}. Until then you can change your mind.",
+    "meanwhile": "Meanwhile your profile is hidden and nothing new can be done with your account.",
+    "cancel": "Cancel the deletion request"
+  }
+}
