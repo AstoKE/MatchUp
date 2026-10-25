@@ -400,6 +400,8 @@ Retention numbers are **proposals pending legal review** (SECURITY §8).
 
 **Export.** `export_my_data` Edge Function assembles JSON (profile, settings, sport profiles, participations, own reviews, XP ledger, achievements, notifications, reports filed) and delivers via short-lived signed URL; rate-limited to 1/day.
 
+**As built (2026-10-25, ADR-0017 — supersedes the Edge Function parts above).** Migration `20261025150000_account_deletion_export.sql`: `request_account_deletion()` requires a password sign-in within 10 minutes (token `amr`, `REAUTH_REQUIRED`), is idempotent and returns the due time; `cancel_account_deletion()`; `private.purge_account()` / `private.process_deletion_queue()` run daily via `pg_cron` (`process-deletion-queue`, 03:17 UTC) as the owner role and delete sport profiles, settings, admin rows and the `auth.users` row, leaving the tombstone and the consent evidence; `export_my_data()` is an RPC returning the caller's JSON (account incl. email, profile, settings, sport profiles with positions, consents), once per 24 h; `get_my_account()` gains `deletion_due_at`; `private.audit_logs` records request/cancel/purge/purge-failure/export without PII. Not built yet: event effects of a deletion request (Phase 3 obligation), storage cleanup (with avatars), the daily auth↔profile reconciliation. A pgTAP inventory test fails when a new per-user table is not handled by export and purge.
+
 ## 12. Migrations, seeds, tooling
 
 - Supabase CLI migrations in `supabase/migrations/` (timestamped, forward-only; never edit applied files). Each migration is reviewed for locks (use `CREATE INDEX CONCURRENTLY` where tables are large, `NOT VALID` + `VALIDATE` for constraints on populated tables).

@@ -49,7 +49,7 @@
     },
     "retention": {
       "heading": "Retention and deletion",
-      "body": "We keep your data while your account is open. Details about requesting account deletion will be added to this text before launch."
+      "body": "We keep your data while your account is open. In Settings › Account you can download your data as a JSON file and request the deletion of your account. You can cancel a deletion request within 30 days; after that your login, profile, settings and sport profiles are deleted permanently. Records of which legal text you accepted and when may be kept without your name or email; their retention period will be added to this text after legal review."
     },
     "rights": {
       "heading": "Your rights",

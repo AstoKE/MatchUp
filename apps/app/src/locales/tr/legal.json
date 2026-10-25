@@ -49,7 +49,7 @@
     },
     "retention": {
       "heading": "Saklama ve silme",
-      "body": "Verilerini hesabın açık olduğu sürece saklarız. Hesabını silme talebi hakkında ayrıntılar yayın öncesinde bu metne eklenecektir."
+      "body": "Verilerini hesabın açık olduğu sürece saklarız. Ayarlar › Hesap bölümünden verilerini JSON dosyası olarak indirebilir ve hesabını silmeyi talep edebilirsin. Silme talebinden sonra 30 gün içinde iptal edebilirsin; bu sürenin sonunda giriş bilgilerin, profilin, ayarların ve spor profillerin kalıcı olarak silinir. Hangi hukuki metni ne zaman kabul ettiğine dair kayıtlar adın ve e-postan olmadan saklanabilir; bunların saklama süresi yasal inceleme sonrasında bu metne eklenecektir."
     },
     "rights": {
       "heading": "Haklarının kullanımı",

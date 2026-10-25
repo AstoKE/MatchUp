@@ -1,0 +1,28 @@
+{
+  "section": "Hesap",
+  "export": {
+    "help": "Hesabına ait verileri (hesap, profil, ayarlar, sporların ve onay kayıtların) bir JSON dosyası olarak alırsın. Günde bir kez yapılabilir.",
+    "action": "Verilerimi indir",
+    "preparing": "Hazırlanıyor…",
+    "done": "Verilerin hazır.",
+    "rateLimited": "Verilerini son 24 saat içinde zaten indirdin. Yarın tekrar deneyebilirsin."
+  },
+  "delete": {
+    "help": "Hesabını silmek için talep oluşturursun; 30 gün içinde fikrini değiştirebilirsin.",
+    "action": "Hesabımı sil",
+    "title": "Hesabını sil",
+    "grace": "Talebinden sonra hesabın 30 gün beklemede kalır: profilin gizlenir ve yeni işlem yapamazsın. Bu süre içinde giriş yapıp talebi iptal edebilirsin.",
+    "permanent": "30 günün sonunda giriş bilgilerin, profilin, ayarların ve spor profillerin kalıcı olarak silinir. Bu geri alınamaz.",
+    "kept": "Hangi hukuki metni ne zaman kabul ettiğine dair kayıtlar, adın ve e-postan olmadan anonim bir kayda bağlı olarak saklanabilir (hukuki inceleme sürüyor).",
+    "exportFirst": "Silmeden önce verilerini indirmek isteyebilirsin: Ayarlar › Hesap › Verilerimi indir.",
+    "password": "Şifren",
+    "passwordHint": "Güvenliğin için şifreni yeniden girmen gerekiyor.",
+    "confirm": "Hesabımı silmeyi talep et"
+  },
+  "pending": {
+    "title": "Hesabın silinecek",
+    "body": "Hesabın {{date}} tarihinde kalıcı olarak silinecek. O zamana kadar fikrini değiştirebilirsin.",
+    "meanwhile": "Bu süre içinde profilin gizli ve hesabınla yeni işlem yapılamaz.",
+    "cancel": "Silme talebini iptal et"
+  }
+}

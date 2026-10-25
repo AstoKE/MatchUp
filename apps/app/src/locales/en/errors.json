@@ -7,6 +7,7 @@
   "ADULT_CONFIRMATION_REQUIRED": "You need to confirm that you are 18 or older to continue.",
   "CONSENT_VERSION_MISMATCH": "The terms or privacy notice were updated. Please reload the app and try again.",
   "CONSENT_REQUIRED": "To continue, please accept the updated Terms of Use and Privacy Notice.",
+  "REAUTH_REQUIRED": "For your security, please enter your password again before doing this.",
   "NOT_FOUND": "We couldn't find what you were looking for.",
   "VALIDATION_FAILED": "Please check the information you entered and try again.",
   "INVALID_TRANSITION": "That can't be done right now.",

@@ -96,6 +96,7 @@ describe('registration with email verification (PKCE, real Auth + Mailpit)', () 
         adult_confirmed: false,
         onboarded: false,
         legal_consent_current: false,
+        deletion_due_at: null,
       },
     ]);
 

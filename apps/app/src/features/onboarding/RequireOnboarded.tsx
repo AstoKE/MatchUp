@@ -48,6 +48,10 @@ function OnboardedGate({ children }: { children: ReactNode }) {
       />
     );
   }
+  // A pending deletion outranks everything: the only things left to do are cancel or sign out.
+  if (account.data.status === 'PENDING_DELETION') {
+    return <Redirect href="/account-deletion" />;
+  }
   if (!account.data.onboarded) {
     return <Redirect href={{ pathname: '/onboarding', params: { returnTo: pathname } }} />;
   }

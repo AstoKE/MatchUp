@@ -11,6 +11,7 @@ const accountRow = z.object({
   adult_confirmed: z.boolean(),
   onboarded: z.boolean(),
   legal_consent_current: z.boolean(),
+  deletion_due_at: z.nullable(z.string()),
 });
 
 export interface MyAccount {
@@ -21,6 +22,8 @@ export interface MyAccount {
   onboarded: boolean;
   /** False after new Terms/Privacy versions were published and not yet accepted (re-consent gate). */
   legalConsentCurrent: boolean;
+  /** ISO time the account will be purged while a deletion request is pending; otherwise null. */
+  deletionDueAt: string | null;
 }
 
 /** Server-authoritative account state (the client never decides who is onboarded). */
@@ -35,6 +38,7 @@ export async function fetchMyAccount(): Promise<MyAccount> {
     adultConfirmed: row.adult_confirmed,
     onboarded: row.onboarded,
     legalConsentCurrent: row.legal_consent_current,
+    deletionDueAt: row.deletion_due_at,
   };
 }
 
