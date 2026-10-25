@@ -3,6 +3,7 @@ import { brand, DEFAULT_LOCALE, isSupportedLocale, type Locale } from '@matchup/
 import { getLocales } from 'expo-localization';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { readStoredLocale, storeLocale } from './locale-preference';
 import { defaultNS, namespaces, resources } from './resources';
 
 /** Device language if we support it; otherwise the market default (Turkish). */
@@ -37,6 +38,18 @@ export function initI18n(locale: Locale = detectDeviceLocale()) {
 export function currentLocale(): Locale {
   const lng = i18n.language;
   return isSupportedLocale(lng) ? lng : DEFAULT_LOCALE;
+}
+
+/** Switches the UI language now and remembers the choice on this device. */
+export function setLocale(locale: Locale): void {
+  void i18n.changeLanguage(locale);
+  void storeLocale(locale);
+}
+
+/** Applies a previously chosen language (once, at startup) — the choice beats the device language. */
+export async function restoreStoredLocale(): Promise<void> {
+  const stored = await readStoredLocale();
+  if (stored && stored !== currentLocale()) await i18n.changeLanguage(stored);
 }
 
 export { i18n };

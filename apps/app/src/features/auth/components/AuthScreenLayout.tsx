@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { LanguagePicker } from '@/features/settings';
 import { Screen, Text, useTheme } from '@/ui';
 
 const logo = require('../../../../assets/brand/logo-provisional-512.png') as number;
@@ -28,6 +29,7 @@ export function AuthScreenLayout({
         {subtitle ? <Text tone="secondary">{subtitle}</Text> : null}
       </View>
       {children}
+      <LanguagePicker />
     </Screen>
   );
 }

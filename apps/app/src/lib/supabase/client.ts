@@ -1,4 +1,5 @@
 import 'react-native-url-polyfill/auto';
+import './crypto-polyfill';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 import { AppState, Platform } from 'react-native';

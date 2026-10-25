@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { RequireAuth, signOut, useSession, VerifyEmailBanner } from '@/features/auth';
+import { LanguagePicker } from '@/features/settings';
 import { Button, EmptyState, Screen, Text } from '@/ui';
 
 /** Profile — needs an account. Profile content is built in Phase 2; sign-out is needed already. */
@@ -21,6 +22,7 @@ export default function Profile() {
             {t('auth:signedInAs', { email: session.email })}
           </Text>
         ) : null}
+        <LanguagePicker />
         <Button
           label={t('auth:signOut')}
           variant="secondary"

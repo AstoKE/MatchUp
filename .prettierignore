@@ -11,3 +11,4 @@ supabase/.branches
 docs/
 *.png
 settings.json
+expo-env.d.ts
