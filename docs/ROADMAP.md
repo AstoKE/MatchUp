@@ -18,7 +18,7 @@ Status: Phase 0 · Source of scope: [PRD](PRD.md) · Priorities: **P0** launch-b
 | 7 | Hardening & pilot | Perf, security, a11y, load, ops → Ankara pilot release candidate |
 | Later | Push (P-01), community, recurring, QR, partners, payments … | per demand |
 
-Sequencing note: basic in-app notifications arrive with Phase 3 (the event engine is unusable without them); Phase 6 completes the catalogue. Account deletion/export are in Phase 6 but their schema hooks (statuses) exist from Phase 1.
+Sequencing note: basic in-app notifications arrive with Phase 3 (the event engine is unusable without them); Phase 6 completes the catalogue. Account deletion/export were planned for Phase 6 but were built in Phase 2 at the founder's request (ADR-0017); every later phase that adds per-user data must extend export and purge (enforced by a pgTAP inventory test).
 
 ## 2. Principles for scope control
 
@@ -62,7 +62,7 @@ Dependencies refer to feature IDs. "AC" = acceptance criteria (abbreviated; expa
 | F-26 | Achievements (7 badges) | P1 | F-25 | M | Rule edge cases | Each rule has positive/negative fixtures; awards idempotent | 5 |
 | F-27 | Report + block | P0 | F-13 | M | Abuse of reports | Report from 4 surfaces; blocked pairs invisible and cannot request/review (S-12) | 6 |
 | F-28 | Admin/moderation console (reports, users, events, venues, disputes, audit) | P0 | F-27, F-23 | L | Admin security; scope creep | MFA required (S-14); every action audit-logged; queue to resolution in ≤ 3 clicks | 6 |
-| F-29 | Account deletion + data export | P0 | F-08 | L | Anonymization correctness; legal | Grace + cancel works; post-purge no PII in any table (automated scan); export complete | 6 |
+| F-29 | Account deletion + data export | P0 | F-08 | L | Anonymization correctness; legal | Grace + cancel works; post-purge no PII in any table (automated scan); export complete | **2** (moved from 6 by the founder 2026-10-25, ADR-0017; event effects follow in 3) |
 | F-30 | Abuse controls: rate limits, CAPTCHA, new-account limits | P0 | F-06, F-11 | M | False positives | Quotas enforced server-side (S-16); CAPTCHA on sign-up/reset | 3, 6 |
 | F-31 | Analytics + error tracking + health checks | P1 | F-05 | M | PII leakage | Event allowlist enforced; Sentry scrubber test; health endpoint monitored | 1 (Sentry), 3 (server-side events with first RPCs), 7 (client `track_event`, dashboards) |
 | F-32 | Turkish localization complete + English parity | P0 | all UI | M | Missed strings; İ/ı bugs | No hard-coded strings (lint); TR screens reviewed by a native speaker; plural/date tests | cross |

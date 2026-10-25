@@ -1,6 +1,6 @@
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '@matchup/domain';
 import { i18n } from '@/lib/i18n';
-import { failureMessage, type AuthFailure } from './api/classify-auth-error';
+import { AuthFlowError, failureMessage, type AuthFailure } from './api/classify-auth-error';
 
 /** Turns the stable validation keys emitted by `@matchup/domain` auth schemas into localized text. */
 export function validationMessage(key: string | undefined): string | undefined {
@@ -18,6 +18,11 @@ export function validationMessage(key: string | undefined): string | undefined {
     default:
       return i18n.t('errors:VALIDATION_FAILED');
   }
+}
+
+/** Localized text for any error thrown by the auth API (unknown errors stay generic). */
+export function authErrorText(error: unknown): string {
+  return failureText(error instanceof AuthFlowError ? error.failure : 'UNKNOWN');
 }
 
 export function failureText(failure: AuthFailure): string {

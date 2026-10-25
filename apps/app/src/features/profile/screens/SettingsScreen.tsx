@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { AccountSection } from '@/features/account';
 import { LanguagePicker } from '@/features/settings';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
@@ -147,6 +148,8 @@ function Settings({ profile }: { profile: MyProfile }) {
           />
         </View>
       </Section>
+
+      <AccountSection />
 
       <Button variant="tertiary" label={t('common:back')} onPress={() => router.back()} />
     </Screen>

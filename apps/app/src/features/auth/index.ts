@@ -1,5 +1,8 @@
-export { signOut } from './api/auth-api';
+export { signInWithEmail, signOut } from './api/auth-api';
+export { useCaptcha } from './captcha';
+export { PasswordField } from './components/PasswordField';
 export { VerifyEmailBanner } from './components/VerifyEmailBanner';
+export { authErrorText } from './validation-messages';
 export { RequireAuth } from './RequireAuth';
 export { sanitizeReturnTo } from './returnTo';
 export { AuthCallbackScreen } from './screens/AuthCallbackScreen';

@@ -30,6 +30,6 @@ Status 2026-10-25. **Nothing here is done for a hosted project: no hosted projec
 
 ## 4. Product
 
-- [ ] Account deletion and data export exist in the app (SECURITY §8 core features) — **not built**.
+- [ ] Account deletion and data export exist in the app (SECURITY §8 core features) — **built** (ADR-0017: 30-day grace, password re-entry, daily purge, JSON export). Still open: retention of consent evidence and whether suspended accounts may self-delete (⚖), event effects of a deletion request (Phase 3), storage cleanup (with avatars), `pg_cron` enabled and the job verified on the hosted project, a device check of the native share sheet.
 - [ ] Report / block flows exist before any user-to-user content — **not built** (Phase 6 per roadmap).
 - [ ] Support contact reachable from the app.
