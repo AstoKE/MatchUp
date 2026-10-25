@@ -2,6 +2,7 @@
 # One command to bring up the whole local native test bench:
 #   Docker (must already be running) -> local Supabase -> emulator -> adb tunnels -> APK installed -> Metro.
 #   bash scripts/android/dev-up.sh          (stop everything again with: bash scripts/android/dev-down.sh)
+#   MATCHUP_BACKEND=hosted bash scripts/android/dev-up.sh   the app talks to the linked HOSTED project
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
@@ -11,11 +12,16 @@ export MSYS_NO_PATHCONV=1
 PKG=com.example.matchup.dev
 APK=apps/app/.android-build/matchup-debug-x86_64.apk
 
-docker info >/dev/null 2>&1 || { echo "Docker Desktop is not running. Start it first."; exit 1; }
-
-echo "== Supabase (local)"
-pnpm db:start >/dev/null
-pnpm env:local
+BACKEND="${MATCHUP_BACKEND:-local}"
+if [ "$BACKEND" = hosted ]; then
+  echo "== Supabase (hosted, linked project)"
+  pnpm env:hosted
+else
+  docker info >/dev/null 2>&1 || { echo "Docker Desktop is not running. Start it first."; exit 1; }
+  echo "== Supabase (local)"
+  pnpm db:start >/dev/null
+  pnpm env:local
+fi
 
 echo "== Emulator"
 # A stale adb server (e.g. left over from an earlier session) answers "error: closed"; restart it once.
@@ -45,11 +51,12 @@ fi
 
 echo "== Metro"
 # A Metro started before a dependency change does not see packages added since (pnpm links on Windows):
-# the bundle then fails with "Unable to resolve". Restart it with --clear when the lockfile changed.
-LOCK_SUM="$(sha256sum pnpm-lock.yaml | cut -d' ' -f1)"
+# the bundle then fails with "Unable to resolve". EXPO_PUBLIC_* values are inlined at bundle time, so a
+# switch between local and hosted needs a fresh bundle too. Restart with --clear when either changed.
+LOCK_SUM="$(cat pnpm-lock.yaml apps/app/.env.local | sha256sum | cut -d' ' -f1)"
 METRO_STAMP=apps/app/.android-build/metro-lock.sha256
 if curl -s localhost:8081/status | grep -q running && [ "$(cat "$METRO_STAMP" 2>/dev/null)" != "$LOCK_SUM" ]; then
-  echo "Dependencies changed since Metro started: restarting it with a clean cache"
+  echo "Dependencies or backend changed since Metro started: restarting it with a clean cache"
   for pid in $(netstat -ano | grep -E ':8081 .*LISTENING' | awk '{print $NF}' | sort -u); do
     taskkill //PID "$pid" //T //F >/dev/null 2>&1 || true
   done
@@ -62,4 +69,8 @@ if ! curl -s localhost:8081/status | grep -q running; then
   until curl -s localhost:8081/status | grep -q running; do sleep 2; done
   echo "$LOCK_SUM" >"$METRO_STAMP"
 fi
-echo "Ready. Open the MatchUp app on the emulator. Mailpit (emails): http://127.0.0.1:54324"
+if [ "$BACKEND" = hosted ]; then
+  echo "Ready (HOSTED backend). Open the MatchUp app on the emulator. Records: Supabase dashboard."
+else
+  echo "Ready. Open the MatchUp app on the emulator. Mailpit (emails): http://127.0.0.1:54324"
+fi
