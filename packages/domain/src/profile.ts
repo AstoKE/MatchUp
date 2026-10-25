@@ -74,19 +74,32 @@ export const sportSelectionSchema = z.object({
 });
 export type SportSelection = z.infer<typeof sportSelectionSchema>;
 
+/** 1–10 sports, each at most once (used by onboarding and by editing the sports later). */
+export const sportListSchema = z
+  .array(sportSelectionSchema)
+  .min(1, 'SPORTS_REQUIRED')
+  .max(MAX_SPORTS_PER_ONBOARDING, 'TOO_MANY_SPORTS')
+  .refine((items) => new Set(items.map((s) => s.sportId)).size === items.length, 'TOO_MANY_SPORTS');
+
+/** A district only makes sense inside a city (mirrors the composite foreign key in the database). */
+const districtNeedsCity = {
+  check: (value: { cityId: string | null; districtId: string | null }) =>
+    value.districtId === null || value.cityId !== null,
+  issue: { message: 'DISTRICT_NEEDS_CITY', path: ['districtId'] as string[] },
+};
+
 export const profileLocationSchema = z
   .object({ cityId: idSchema.nullable(), districtId: idSchema.nullable() })
-  .refine((value) => value.districtId === null || value.cityId !== null, {
-    message: 'DISTRICT_NEEDS_CITY',
-    path: ['districtId'],
-  });
+  .refine(districtNeedsCity.check, districtNeedsCity.issue);
 
-export const profileEditSchema = z.object({
-  displayName: displayNameSchema,
-  bio: bioSchema,
-  cityId: idSchema.nullable(),
-  districtId: idSchema.nullable(),
-});
+export const profileEditSchema = z
+  .object({
+    displayName: displayNameSchema,
+    bio: bioSchema,
+    cityId: idSchema.nullable(),
+    districtId: idSchema.nullable(),
+  })
+  .refine(districtNeedsCity.check, districtNeedsCity.issue);
 export type ProfileEditInput = z.infer<typeof profileEditSchema>;
 
 export const onboardingSchema = z
@@ -97,17 +110,12 @@ export const onboardingSchema = z
     displayName: displayNameSchema,
     cityId: idSchema.nullable(),
     districtId: idSchema.nullable(),
-    sports: z
-      .array(sportSelectionSchema)
-      .min(1, 'SPORTS_REQUIRED')
-      .max(MAX_SPORTS_PER_ONBOARDING, 'TOO_MANY_SPORTS')
-      .refine(
-        (items) => new Set(items.map((s) => s.sportId)).size === items.length,
-        'TOO_MANY_SPORTS',
-      ),
+    sports: sportListSchema,
   })
-  .refine((value) => value.districtId === null || value.cityId !== null, {
-    message: 'DISTRICT_NEEDS_CITY',
-    path: ['districtId'],
-  });
+  .refine(districtNeedsCity.check, districtNeedsCity.issue);
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
+
+export const PROFILE_VISIBILITIES = ['EVERYONE', 'EVENT_PEERS'] as const;
+export type ProfileVisibility = (typeof PROFILE_VISIBILITIES)[number];
+export const THEME_PREFERENCES = ['system', 'light', 'dark'] as const;
+export type ThemePreference = (typeof THEME_PREFERENCES)[number];

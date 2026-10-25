@@ -50,8 +50,8 @@ select is((select account_status::text from public.profiles
 -- ---- authenticated user A: reads --------------------------------------------------------------
 select pg_temp.act_as('00000000-0000-4000-8000-00000000000a');
 
-select is((select count(*)::int from public.profiles), 1, 'A sees exactly one profile (their own)');
-select is((select id from public.profiles), '00000000-0000-4000-8000-00000000000a'::uuid, 'A sees their own profile');
+select is((select count(*)::int from public.profiles where id::text like '00000000-0000-4000-8000-00000000000_'), 1, 'A sees exactly one of the fixture profiles (their own)');
+select is((select id from public.profiles where id::text like '00000000-0000-4000-8000-00000000000_'), '00000000-0000-4000-8000-00000000000a'::uuid, 'A sees their own profile');
 select is((select count(*)::int from public.user_settings), 1, 'A sees only their own settings');
 select is((select count(*)::int from public.user_consents), 0, 'A cannot see B''s consent records');
 select is((select count(*)::int from public.platform_admins), 0, 'non-admin sees no admin rows');

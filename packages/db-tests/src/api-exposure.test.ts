@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   closeDb,
   createUser,
+  db,
   deleteCreatedUsers,
   rest,
   signedInClient,
@@ -60,11 +61,21 @@ describe('Data API exposure (guest and signed-in)', () => {
   });
 
   describe('signed-in users', () => {
-    it('see only their own profile row', async () => {
+    it('see their own profile, plus only profiles whose owners chose EVERYONE', async () => {
       const response = await rest('/profiles?select=id', { token: aliceToken });
       expect(response.status).toBe(200);
-      const rows = (await response.json()) as { id: string }[];
-      expect(rows).toEqual([{ id: alice.id }]);
+      const ids = ((await response.json()) as { id: string }[]).map((row) => row.id);
+      expect(ids).toContain(alice.id);
+      expect(ids).not.toContain(bob.id); // default visibility is private
+      // The database may hold other people's data (device runs, other suites): whatever else is
+      // visible must be explicitly public — never anything else.
+      const others = ids.filter((id) => id !== alice.id);
+      const { rows } = await db().query<{ n: number }>(
+        `select count(*)::int as n from public.user_settings
+          where user_id = any($1::uuid[]) and profile_visibility <> 'EVERYONE'`,
+        [others],
+      );
+      expect(rows[0]?.n).toBe(0);
     });
 
     it("cannot read another user's profile by id (S-4/IDOR)", async () => {

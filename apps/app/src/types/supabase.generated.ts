@@ -486,6 +486,7 @@ export type Database = {
         }[];
       };
       remove_sport_profile: { Args: { p_sport_id: string }; Returns: undefined };
+      replace_my_sport_profiles: { Args: { p_sports: Json }; Returns: undefined };
       set_marketing_consent: { Args: { p_granted: boolean }; Returns: undefined };
       set_sport_profile: {
         Args: { p_level: number; p_position_ids: string[]; p_sport_id: string };

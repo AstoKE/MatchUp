@@ -1,0 +1,33 @@
+appId: com.example.matchup.dev
+# 16 Edit the profile, the sports and the privacy setting on the device — continues from flow 15 (on the Profile tab)
+---
+- assertVisible: 'Ayse Yilmaz'
+- assertVisible: 'Football · Level 3.5'
+- assertVisible: 'No location set'
+
+- tapOn: 'Edit profile'
+- assertVisible: 'Edit your profile'
+- tapOn: 'About you'
+- inputText: 'Plays on weekends'
+# release focus first (see flow 15 and docs/NATIVE_VALIDATION.md)
+- tapOn: 'Edit your profile'
+- tapOn: 'Save'
+- assertVisible: 'Plays on weekends'
+
+- tapOn: 'Edit sports'
+- assertVisible: 'Edit your sports'
+- tapOn: 'Tennis'
+- tapOn: 'Save'
+- assertVisible: 'Tennis · Level 3'
+- assertVisible: 'Football · Level 3.5'
+
+- tapOn: 'Settings'
+- assertVisible: 'Who can see your profile?'
+- tapOn: 'Everyone'
+- tapOn: 'Save'
+- assertVisible: 'Saved.'
+- takeScreenshot: 16-settings-saved
+# the "Back" button is below the fold on this screen; the system back gesture is what a user would use
+- back
+- assertVisible: 'Plays on weekends'
+- takeScreenshot: 16-profile-after-edit
