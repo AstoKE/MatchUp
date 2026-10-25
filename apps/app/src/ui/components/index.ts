@@ -2,6 +2,7 @@ export * from './Banner';
 export * from './Button';
 export * from './EmptyState';
 export * from './Screen';
+export * from './SegmentedChoice';
 export * from './Skeleton';
 export * from './SkipLink';
 export * from './Text';

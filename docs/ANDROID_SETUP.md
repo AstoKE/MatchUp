@@ -36,6 +36,8 @@ node scripts/android/native-validation.mjs --skip-install   # automated device r
 node scripts/android/ui-dump.mjs    # print what TalkBack/automation "see" on the current screen
 ```
 
+In PowerShell, plain `bash` is WSL's `bash.exe` and cannot run these scripts; use the wrapper instead: `.\scripts\android\dev.ps1 up | down | validate` (it calls Git Bash explicitly).
+
 The app is a debug (development) build: native code is in the APK, JavaScript is served live by Metro through `adb reverse tcp:8081`. The local Supabase API is reached through `adb reverse tcp:54321` (so `.env.local`'s `http://127.0.0.1:54321` is correct on the device and cleartext is allowed only in debug variants).
 
 ## 4. Findings that shaped the setup

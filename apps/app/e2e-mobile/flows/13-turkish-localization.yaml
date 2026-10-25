@@ -1,8 +1,8 @@
 appId: com.example.matchup.dev
 # 13 With the device language set to Turkish the UI is Turkish (tab labels, headings, special characters)
 ---
-- launchApp:
-    clearState: true
+# No clearState: clearing app data also resets the per-app language the orchestrator set (adb cmd locale).
+- launchApp
 - assertVisible: 'Keşfet'
 - assertVisible: 'Etkinliklerim'
 - assertVisible: 'Oluştur'

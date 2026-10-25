@@ -6,7 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { SessionProvider } from '@/features/auth';
 import { env } from '@/lib/env';
-import { currentLocale, initI18n } from '@/lib/i18n';
+import { currentLocale, initI18n, restoreStoredLocale } from '@/lib/i18n';
 import { configureLogger, initObservability, reportError } from '@/lib/observability';
 import { QueryProvider } from '@/lib/query/QueryProvider';
 import { EmptyState, Screen, SkipLink, ThemeProvider, ToastProvider, useTheme } from '@/ui';
@@ -34,6 +34,10 @@ function useDocumentLanguage() {
 
 function Shell() {
   useDocumentLanguage();
+  // A language chosen in the app wins over the device language.
+  useEffect(() => {
+    void restoreStoredLocale();
+  }, []);
   return (
     <>
       <SkipLink />

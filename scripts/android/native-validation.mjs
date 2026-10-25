@@ -283,7 +283,9 @@ await flow(
   '10-deeplink-invalid-code.yaml',
   {},
   async () => {
+    // Must start signed out: with a live session the callback route just continues to the home screen.
     forceStop();
+    adb('shell', 'pm', 'clear', PKG);
     openDeepLink(`${SCHEME}://auth/callback?code=forged-code-0000`);
     await sleep(9000);
   },
@@ -313,25 +315,31 @@ await flow(
   },
 );
 
+// In-app language selector (does not depend on the device language)
+await flow(
+  'N14L',
+  'In-app language selector switches the UI and persists across a restart',
+  '14-language-selector.yaml',
+);
+
 // Localization: per-app locale (Android 13+); falls back to the system locale on failure.
-let localeOk = true;
+// Clearing app data also resets the per-app language, so the language is set AFTER the clear and the
+// flow itself must not use clearState.
+await flow(
+  'N13',
+  'Turkish device language → Turkish UI incl. İ ı Ş Ğ characters',
+  '13-turkish-localization.yaml',
+  {},
+  async () => {
+    forceStop();
+    adb('shell', 'pm', 'clear', PKG);
+    adb('shell', 'cmd', 'locale', 'set-app-locales', PKG, '--locales', 'tr-TR');
+  },
+);
 try {
-  adb('shell', 'cmd', 'locale', 'set-app-locales', PKG, '--locales', 'tr-TR');
-} catch (e) {
-  localeOk = false;
-  record('N13a', 'Set device/app language to Turkish', 'FAIL', String(e.message).slice(0, 200));
-}
-if (localeOk) {
-  await flow(
-    'N13',
-    'Turkish device language → Turkish UI incl. İ ı Ş Ğ characters',
-    '13-turkish-localization.yaml',
-  );
-  try {
-    adb('shell', 'cmd', 'locale', 'set-app-locales', PKG, '--locales', 'en-US');
-  } catch {
-    /* ignore */
-  }
+  adb('shell', 'cmd', 'locale', 'set-app-locales', PKG, '--locales', 'en-US');
+} catch {
+  /* ignore */
 }
 
 // Crash / error evidence

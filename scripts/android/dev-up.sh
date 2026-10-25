@@ -35,7 +35,9 @@ fi
 
 echo "== Metro"
 if ! curl -s localhost:8081/status | grep -q running; then
-  (cd apps/app && nohup pnpm exec expo start --port 8081 >/dev/null 2>&1 &)  # NOT CI=1: CI mode disables file watching (stale JS)
+  mkdir -p apps/app/.android-build
+  # NOT CI=1: CI mode disables file watching (stale JS). Output goes to a log so JS warnings can be read.
+  (cd apps/app && nohup pnpm exec expo start --port 8081 >.android-build/metro.log 2>&1 &)
   until curl -s localhost:8081/status | grep -q running; do sleep 2; done
 fi
 echo "Ready. Open the MatchUp app on the emulator. Mailpit (emails): http://127.0.0.1:54324"

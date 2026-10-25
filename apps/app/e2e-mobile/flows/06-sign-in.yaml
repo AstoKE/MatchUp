@@ -7,10 +7,8 @@ appId: com.example.matchup.dev
 - assertVisible: 'Welcome back'
 - tapOn: 'Email'
 - inputText: ${EMAIL}
-- hideKeyboard
 - tapOn: 'Password'
 - inputText: ${PASSWORD}
-- hideKeyboard
 - tapOn: 'Sign in'
 # returnTo brought us back to My Events (a protected tab) rather than the home page
 - assertVisible: 'My Events'

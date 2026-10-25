@@ -2,43 +2,55 @@
 
 Status 2026-10-25. **Android only.** iOS is **pending** — it needs macOS or EAS cloud builds plus an Apple Developer account, none of which are available yet. Nothing in this document says anything about iOS.
 
-Device: Android Studio emulator `matchup_api36` (Pixel 7 profile, Android 16 / API 36, x86_64, 1080×2400, 420 dpi), debug build produced in the Linux container (ADR-0015), JS served by Metro, local Supabase through `adb reverse`.
+Device: Android Studio emulator `matchup_api36` (Pixel 7 profile, Android 16 / API 36, x86_64, 1080×2400, 420 dpi), debug build produced in the Linux container (ADR-0015), JavaScript served by Metro, local Supabase through `adb reverse`. **An emulator is not a physical device**: no real keyboard/IME variety, no real network transitions, no OEM behaviour, and timing is not representative.
 
-How each result was obtained is stated explicitly. "Automated" = Maestro flow, run by `scripts/android/native-validation.mjs`, result recorded in `apps/app/e2e-mobile/results/` (git-ignored). "Manual" = the founder using the emulator by hand. "Not verified" means exactly that.
+"Automated" = Maestro flow run by `scripts/android/native-validation.mjs` (results in `apps/app/e2e-mobile/results/`, git-ignored). "Manual" = the founder using the emulator by hand.
 
-## Results
+## Latest full run — 18 / 18 passed (exit code 0)
 
-| Area | Result | Evidence |
+| ID | What | How |
 |---|---|---|
-| Cold start, guest discovery, four tabs, protected-route redirect (N01) | **PASS** | Automated |
-| Forged / expired auth-callback deep link rejected clearly (N10) | **PASS** | Automated |
-| Deep link to a non-existent event → "not found" state (N11) | **PASS** | Automated |
-| Deep link to a protected route as a guest → sign-in (N12) | **PASS** | Automated |
-| Further deep-link / network-error cases N14–N16 | **PASS** | Automated (earlier run, see `results.json` of the first runs) |
-| Sign-up, then sign-in with the new account | **PASS** | Manual (founder) |
-| Session still signed in after leaving the app / reopening | **PASS** | Manual (founder). The exact restart condition (swipe-away vs. force-stop vs. device reboot) was not specified, so cold-restart persistence is not yet established beyond this. |
-| Wrong password → one generic error message | **PASS** | Manual (founder) |
-| Sign-up / sign-in / wrong-password / offline-recovery as *automated* flows (N02–N09) | **Not verified** | The automated runs of these failed. Cause analysis below — all harness/environment, none confirmed as app defects — but they have **not** been re-run green yet. |
-| Turkish localization (N13) | **Not verified** | Not run successfully. Not tested manually either. |
-| Landscape / large font | **Not verified** | |
-| Verification-email link → app (N02b–N05) | **Not verified** | Depends on N02 passing in automation. |
-| iOS | **Pending** | Not started. |
+| N01 | Cold start, guest discovery, four tabs, protected-route redirect | Automated |
+| N02 | Sign up → "check your email" screen | Automated |
+| N02b | Verification email delivered (Mailpit); Supabase redirects to the app scheme with a PKCE code | Automated |
+| N03 | Warm deep link completes verification → signed in | Automated |
+| N04 | Session persists after the process is killed and relaunched | Automated |
+| N05 | Sign out → guest home; still signed out after restart | Automated |
+| N06 | Sign in returns to the page that required it | Automated |
+| N07 | Wrong password → one generic error message | Automated |
+| N08 | Server unreachable → clear, localized network error | Automated |
+| N09 | Connectivity restored → same form succeeds without restart | Automated |
+| N10 | Forged/expired link code rejected clearly (cold start, signed out) | Automated |
+| N11 | Event deep link to a non-existent event → honest "not found" | Automated |
+| N12 | Protected-route deep link as a guest → sign-in | Automated |
+| N14L | In-app language selector switches the UI and persists across a restart | Automated |
+| N13 | Per-app Android language = Turkish → Turkish UI (İ ı Ş Ğ ç ü ö) | Automated |
+| N14 | No native crashes / fatal exceptions during the whole run | Automated (logcat crash buffer) |
+| N15 | `ReactNativeJS:E` error log empty | Automated |
+| N16 | Cold start time (debug build + Metro; **not** a performance claim) | Automated |
 
-## Defects found on the device and fixed
+Earlier the founder confirmed by hand: sign-up, sign-in, staying signed in after leaving the app, wrong-password message.
 
-1. **Tab bar collided with the system gesture bar** (first launch screenshot `docs/native-validation/00-first-launch-defect-tabbar-overlap.png`). Fix: the tab bar height and bottom padding add the bottom safe-area inset. Confirmed on the device after the fix (`01-discover-after-fix.png`: the bar sits above the gesture handle).
-2. **Every form label was announced twice by TalkBack** (the visible label and the input both carried the name). Fix: the label is hidden from assistive technology on native (the input keeps the accessible name) and linked with `htmlFor` on web. Covered by a unit test. *Not yet re-verified with a fresh accessibility-tree dump on the device.*
-3. **Three unused optional native libraries removed** (gesture-handler, reanimated, worklets): smaller bundle and fewer native build targets.
+**Not verified:** landscape / large-font / TalkBack on the real screen reader (only the accessibility *tree* was inspected, see below), physical devices, release (minified) builds, iOS, low-memory process death while a form is half-filled, push/deep links from other apps (e.g. a real mail client tapping the link — the link was opened with `adb`).
 
-## Why N02–N09 failed (harness, not shown to be app defects)
+## What native testing found (and fixed)
 
-- Metro was started with `CI=1`, which disables file watching, so the device was running JavaScript from *before* the fixes. Fixed in `dev-up.sh`; confirmed by inspecting the served bundle.
-- With a hardware keyboard enabled Android shows no soft keyboard, and Maestro's `hideKeyboard` then sends *Back*, which leaves the app. `dev-up.sh` now sets `show_ime_with_hard_keyboard=1`; the flows still need one more pass (remove the `index: 1` selectors) and a rerun.
-- Maestro on Windows needs `JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8` for Turkish text, `-e` flags before the flow path, and flow names free of Windows-illegal characters. All handled in the orchestrator.
+1. **PKCE was silently weakened on native (security).** Hermes has no global `crypto`, so supabase-js generated the code verifier with `Math.random()` and fell back to the `plain` challenge method (it only logged a warning: *"WebCrypto API is not supported…"*). Unit tests and the web build could not show this. Fix: `src/lib/supabase/crypto-polyfill.ts` supplies `getRandomValues` and `subtle.digest` from `expo-crypto` (new native dependency, Expo-pinned `~58.0.7`; needs a native rebuild). Covered by a unit test against the RFC 7636 appendix-B vector. On the device the warning no longer appears (the Metro log count stayed unchanged across the whole 18-step run, which includes three PKCE sign-ups). *Not independently proven on the wire* — the check is the absence of the warning plus the unit-tested digest, not a capture of the request.
+2. **Tab bar overlapped the system gesture bar** (`docs/native-validation/00-…png`). Fixed with bottom safe-area insets; confirmed on the device (`01-…png`).
+3. **Duplicate TalkBack stops on every form field** (label and input both announced). Label hidden from assistive tech on native; unit-tested. *The tree was inspected before the fix; a post-fix dump on the sign-in screen was not recorded.*
+4. Removed three unused optional native libraries (gesture-handler, reanimated, worklets).
+
+## Product decisions confirmed by testing
+
+- With a live session, opening a forged/expired callback link silently continues to the home screen (nothing to authenticate, nothing leaked). The test therefore clears app data first.
+- The dev-only warning toast ("Open debugger to view warnings") covers the bottom tab bar in debug builds; it was how finding 1 surfaced. Release builds do not show it.
+
+## Harness notes (not app defects)
+
+Maestro's `hideKeyboard` leaves the app when Android shows only Gboard's floating toolbar (hardware keyboard emulation), so the flows do not use it. Clearing app data also resets the per-app language, so N13 sets the language after the clear. Metro must not run with `CI=1` (no file watching → stale JS). Run from PowerShell via `scripts/android/dev.ps1` (plain `bash` there is WSL).
 
 ## Next
 
-1. Fix the flow selectors, rerun the full suite with Metro in normal mode, and record the real result per flow here.
-2. Turkish localization run (per-app locale), then the in-app language selector (requested by the founder; it also makes this test independent of device settings).
-3. Cold-restart session persistence test with an explicit force-stop.
-4. iOS validation once a macOS / EAS route and Apple account exist.
+1. Physical Android device pass; TalkBack walk-through on the real screen reader.
+2. iOS validation once a macOS / EAS route and Apple account exist.
+3. Re-run this suite against the hosted Supabase project before any public launch.

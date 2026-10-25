@@ -1,0 +1,18 @@
+appId: com.example.matchup.dev
+# 14 The in-app language choice switches the UI immediately and survives a restart (independent of the device language)
+---
+- launchApp:
+    clearState: true
+- tapOn: 'Profile'
+- assertVisible: 'Welcome back'
+- tapOn: 'Türkçe'
+- assertVisible: 'Tekrar hoş geldin'
+- assertVisible: 'Şifreyi göster'
+- assertVisible: 'Hesabın yok mu\? Kayıt ol'
+- stopApp
+- launchApp
+- tapOn: 'Profil'
+- assertVisible: 'Tekrar hoş geldin'
+- tapOn: 'English'
+- assertVisible: 'Welcome back'
+- takeScreenshot: 14-language-selector
