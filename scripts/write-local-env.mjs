@@ -26,6 +26,8 @@ const lines = [
   `EXPO_PUBLIC_SUPABASE_ANON_KEY=${anonKey}`,
   'EXPO_PUBLIC_WEB_URL=http://localhost:8081',
   'EXPO_PUBLIC_SENTRY_DSN=',
+  // The local stack runs with Auth CAPTCHA off, so the app must not ask for it either.
+  'EXPO_PUBLIC_TURNSTILE_SITE_KEY=',
   '',
 ];
 writeFileSync('apps/app/.env.local', lines.join('\n'));

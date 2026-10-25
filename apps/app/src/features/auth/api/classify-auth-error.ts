@@ -1,7 +1,8 @@
 import type { AppErrorCode } from '@matchup/domain';
 
 /** Auth-specific outcomes plus the shared transport/domain codes. */
-export type AuthFailure = 'INVALID_CREDENTIALS' | 'EMAIL_NOT_CONFIRMED' | AppErrorCode;
+export type AuthFailure =
+  'INVALID_CREDENTIALS' | 'EMAIL_NOT_CONFIRMED' | 'CAPTCHA_FAILED' | AppErrorCode;
 
 interface AuthErrorLike {
   code?: string | undefined;
@@ -21,6 +22,8 @@ export function classifyAuthError(error: AuthErrorLike | null | undefined): Auth
 
   if (code === 'invalid_credentials') return 'INVALID_CREDENTIALS';
   if (code === 'email_not_confirmed') return 'EMAIL_NOT_CONFIRMED';
+  // Missing, expired, reused or rejected Turnstile token (Supabase Auth CAPTCHA protection).
+  if (code === 'captcha_failed') return 'CAPTCHA_FAILED';
   if (
     status === 429 ||
     code === 'over_request_rate_limit' ||
@@ -54,6 +57,8 @@ export function failureMessage(failure: AuthFailure): { ns: 'auth' | 'errors'; k
       return { ns: 'auth', key: 'errors.emailNotConfirmed' };
     case 'RATE_LIMITED':
       return { ns: 'auth', key: 'errors.rateLimited' };
+    case 'CAPTCHA_FAILED':
+      return { ns: 'auth', key: 'errors.captchaFailed' };
     default:
       return { ns: 'errors', key: failure };
   }

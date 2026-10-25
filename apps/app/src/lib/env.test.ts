@@ -25,6 +25,23 @@ describe('parseEnv', () => {
     ).toBeUndefined();
   });
 
+  it('treats an empty or missing Turnstile site key as CAPTCHA off, and accepts a real-shaped one', () => {
+    expect(parseEnv(valid).EXPO_PUBLIC_TURNSTILE_SITE_KEY).toBeUndefined();
+    expect(
+      parseEnv({ ...valid, EXPO_PUBLIC_TURNSTILE_SITE_KEY: '' }).EXPO_PUBLIC_TURNSTILE_SITE_KEY,
+    ).toBeUndefined();
+    expect(
+      parseEnv({ ...valid, EXPO_PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA' })
+        .EXPO_PUBLIC_TURNSTILE_SITE_KEY,
+    ).toBe('1x00000000000000000000AA');
+  });
+
+  it('rejects a Turnstile value that cannot be a site key (e.g. a pasted URL or secret with spaces)', () => {
+    expect(() =>
+      parseEnv({ ...valid, EXPO_PUBLIC_TURNSTILE_SITE_KEY: 'https://example.com/key' }),
+    ).toThrow(/EXPO_PUBLIC_TURNSTILE_SITE_KEY/);
+  });
+
   it('fails fast and names the missing variables without echoing values', () => {
     let error: unknown;
     try {
