@@ -21,6 +21,9 @@ export const brand = {
     slug: 'matchup',
     appId: 'com.example.matchup.dev',
     scheme: 'matchup-dev',
+    /** Expo account that owns the EAS project, and the project's id (linked 2026-10-25). Not secrets. */
+    expoOwner: 'matchupproject',
+    easProjectId: '6c20128e-275c-4b45-babd-869e6a1dd5df',
   },
   /** Provisional logo — NOT final; its palette is not the design system (docs/UI_DESIGN_SYSTEM.md). */
   logo: { provisional: true },
