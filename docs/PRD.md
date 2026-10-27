@@ -128,7 +128,7 @@ The 31 MVP items from the product brief map 1-to-1 to feature IDs. Detailed back
 Tabs: *Organizing*, *Pending*, *Approved*, *Waitlisted*, *Past* (completed/canceled/rejected). Organizing events show pending-request badge counts.
 
 ### 4.6 Locations & venues (F-20, F-21)
-- Phase 3: event location = district + label + map pin/coordinates chosen by organizer; no geocoding provider needed.
+- Phase 3: event location = district + place label + optional street address chosen by the organizer; **no coordinates or map pin until Phase 4** (ADR-0019). With "approved only" location, others see just the district until approved.
 - Phase 4: venue directory (public/community spaces and commercial facilities), data provenance and verification kept as separate fields, per-event **booking status** labels (`NOT_REQUIRED`, `NOT_YET_BOOKED`, `BOOKED_EXTERNALLY`, `TO_BE_CONFIRMED`) always labeled "declared by the organizer". The app never claims availability or reservation.
 - Cost information is informational; MatchUp does not collect or hold money in the MVP.
 

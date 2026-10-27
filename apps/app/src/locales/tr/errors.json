@@ -17,6 +17,8 @@
   "REQUEST_LIMIT_REACHED": "Bu etkinlik için istek hakkın doldu.",
   "BLOCKED": "Bu işlem yapılamıyor.",
   "RATE_LIMITED": "Çok fazla işlem yaptın. Lütfen biraz sonra tekrar dene.",
+  "QUOTA_EXCEEDED": "Şu an için etkinlik sınırına ulaştın. Mevcut etkinliklerinden biri tamamlanınca ya da yarın tekrar deneyebilirsin.",
+  "START_TOO_SOON": "Etkinlik en az 1 saat sonra başlamalı.",
   "REVIEW_NOT_ELIGIBLE": "Bu oyuncuyu değerlendiremezsin.",
   "ALREADY_REVIEWED": "Bu oyuncuyu zaten değerlendirdin.",
   "WINDOW_CLOSED": "Değerlendirme süresi doldu.",

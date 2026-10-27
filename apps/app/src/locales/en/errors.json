@@ -17,6 +17,8 @@
   "REQUEST_LIMIT_REACHED": "You've reached the request limit for this event.",
   "BLOCKED": "That action isn't available.",
   "RATE_LIMITED": "You're doing that too often. Please try again in a little while.",
+  "QUOTA_EXCEEDED": "You've reached the event limit for now. Try again when one of your events is over, or tomorrow.",
+  "START_TOO_SOON": "The event must start at least 1 hour from now.",
   "REVIEW_NOT_ELIGIBLE": "You can't review this player.",
   "ALREADY_REVIEWED": "You've already reviewed this player.",
   "WINDOW_CLOSED": "The review window has closed.",

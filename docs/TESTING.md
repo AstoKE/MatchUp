@@ -41,6 +41,7 @@ Decision record: ADR-0008 (two unit runners).
   3. Parallel capacity decrease vs approve → never below approved count.
   4. Re-run of each scenario 50× (flake detection) and with random delays.
   5. Consistency query (`approved_count` vs actual count; `> capacity`) returns zero rows after every integration test run.
+- **Race tests go through the concurrency harness (`runConcurrently`), never through parallel HTTP calls.** Measured in Phase 3 / M1: requests sent "in parallel" through PostgREST start ~15–20 ms apart, more than a typical race window of a few milliseconds, so a `Promise.all` of RPC calls kept passing with the protecting lock deliberately removed, while the harness (real connections released by a barrier) failed as it should. Every race test is checked once against a mutation that removes its lock. Follow-up: the Phase 2 HTTP "parallel" tests (onboarding, sport profiles, deletion request, export) are to be moved to the harness.
 - Cancellation: excused vs late computation; slot reopened → organizer notification; no auto-promotion.
 - Event cancel: all active users notified once; no participant penalty after finalization logic runs.
 - Attendance: marking window; ABSENT→DISPUTED path; auto-finalize; NOT_CONFIRMED neutral; organizer-row default.
