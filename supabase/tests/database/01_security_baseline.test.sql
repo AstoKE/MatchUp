@@ -28,10 +28,10 @@ select is(
    from information_schema.role_table_grants g
    where g.table_schema = 'public' and g.grantee = 'anon'),
   array[
-    'app_config:SELECT', 'cities:SELECT', 'districts:SELECT',
+    'app_config:SELECT', 'cities:SELECT', 'districts:SELECT', 'events:SELECT',
     'sport_formats:SELECT', 'sport_positions:SELECT', 'sports:SELECT'
   ],
-  'anon may only SELECT app_config and the reference catalog (guest-readable whitelist, ADR-0013)'
+  'anon may only SELECT app_config, the reference catalog and (published public rows of) events — guest discovery, ADR-0013'
 );
 
 -- 4. No table/sequence in public is granted to PUBLIC

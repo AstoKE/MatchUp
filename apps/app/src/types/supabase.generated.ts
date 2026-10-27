@@ -83,6 +83,320 @@ export type Database = {
           },
         ];
       };
+      event_participations: {
+        Row: {
+          approved_at: string | null;
+          attendance: Database['public']['Enums']['attendance_status'];
+          canceled_at: string | null;
+          cancellation_excused: boolean;
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          event_id: string;
+          id: string;
+          is_organizer: boolean;
+          preferred_position_id: string | null;
+          request_count: number;
+          request_message: string | null;
+          requested_at: string;
+          status: Database['public']['Enums']['participation_status'];
+          status_reason: string | null;
+          updated_at: string;
+          user_id: string;
+          waitlisted_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          approved_at?: string | null;
+          attendance?: Database['public']['Enums']['attendance_status'];
+          canceled_at?: string | null;
+          cancellation_excused?: boolean;
+          created_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          event_id: string;
+          id?: string;
+          is_organizer?: boolean;
+          preferred_position_id?: string | null;
+          request_count?: number;
+          request_message?: string | null;
+          requested_at?: string;
+          status: Database['public']['Enums']['participation_status'];
+          status_reason?: string | null;
+          updated_at?: string;
+          user_id: string;
+          waitlisted_at?: string | null;
+        };
+        Update: {
+          approved_at?: string | null;
+          attendance?: Database['public']['Enums']['attendance_status'];
+          canceled_at?: string | null;
+          cancellation_excused?: boolean;
+          created_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          event_id?: string;
+          id?: string;
+          is_organizer?: boolean;
+          preferred_position_id?: string | null;
+          request_count?: number;
+          request_message?: string | null;
+          requested_at?: string;
+          status?: Database['public']['Enums']['participation_status'];
+          status_reason?: string | null;
+          updated_at?: string;
+          user_id?: string;
+          waitlisted_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_participations_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_participations_preferred_position_id_fkey';
+            columns: ['preferred_position_id'];
+            isOneToOne: false;
+            referencedRelation: 'sport_positions';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_participations_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      event_private_details: {
+        Row: {
+          address_text: string | null;
+          event_id: string;
+          location_label: string;
+          participant_notes: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          address_text?: string | null;
+          event_id: string;
+          location_label: string;
+          participant_notes?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          address_text?: string | null;
+          event_id?: string;
+          location_label?: string;
+          participant_notes?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_private_details_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      events: {
+        Row: {
+          approved_count: number;
+          booking_status: Database['public']['Enums']['booking_status'];
+          cancel_message: string | null;
+          cancel_reason: Database['public']['Enums']['event_cancel_reason'] | null;
+          canceled_at: string | null;
+          capacity: number;
+          city_id: string;
+          client_request_id: string;
+          completed_at: string | null;
+          cost_amount_minor: number | null;
+          cost_currency: string;
+          cost_note: string | null;
+          created_at: string;
+          description: string | null;
+          district_id: string;
+          duration_minutes: number;
+          ends_at: string;
+          equipment_note: string | null;
+          event_type: Database['public']['Enums']['event_type'];
+          id: string;
+          invite_token: string | null;
+          last_material_change_at: string | null;
+          location_visibility: Database['public']['Enums']['location_visibility'];
+          organizer_id: string;
+          organizer_plays: boolean;
+          public_location_label: string | null;
+          published_at: string | null;
+          registration_closes_at: string | null;
+          skill_max: number | null;
+          skill_min: number | null;
+          sport_format_id: string;
+          sport_id: string;
+          starts_at: string;
+          status: Database['public']['Enums']['event_status'];
+          title: string;
+          updated_at: string;
+          visibility: Database['public']['Enums']['event_visibility'];
+          waitlist_enabled: boolean;
+        };
+        ComputedFields: never;
+        Insert: {
+          approved_count?: number;
+          booking_status?: Database['public']['Enums']['booking_status'];
+          cancel_message?: string | null;
+          cancel_reason?: Database['public']['Enums']['event_cancel_reason'] | null;
+          canceled_at?: string | null;
+          capacity: number;
+          city_id: string;
+          client_request_id: string;
+          completed_at?: string | null;
+          cost_amount_minor?: number | null;
+          cost_currency?: string;
+          cost_note?: string | null;
+          created_at?: string;
+          description?: string | null;
+          district_id: string;
+          duration_minutes: number;
+          ends_at: string;
+          equipment_note?: string | null;
+          event_type?: Database['public']['Enums']['event_type'];
+          id?: string;
+          invite_token?: string | null;
+          last_material_change_at?: string | null;
+          location_visibility?: Database['public']['Enums']['location_visibility'];
+          organizer_id: string;
+          organizer_plays?: boolean;
+          public_location_label?: string | null;
+          published_at?: string | null;
+          registration_closes_at?: string | null;
+          skill_max?: number | null;
+          skill_min?: number | null;
+          sport_format_id: string;
+          sport_id: string;
+          starts_at: string;
+          status?: Database['public']['Enums']['event_status'];
+          title: string;
+          updated_at?: string;
+          visibility?: Database['public']['Enums']['event_visibility'];
+          waitlist_enabled?: boolean;
+        };
+        Update: {
+          approved_count?: number;
+          booking_status?: Database['public']['Enums']['booking_status'];
+          cancel_message?: string | null;
+          cancel_reason?: Database['public']['Enums']['event_cancel_reason'] | null;
+          canceled_at?: string | null;
+          capacity?: number;
+          city_id?: string;
+          client_request_id?: string;
+          completed_at?: string | null;
+          cost_amount_minor?: number | null;
+          cost_currency?: string;
+          cost_note?: string | null;
+          created_at?: string;
+          description?: string | null;
+          district_id?: string;
+          duration_minutes?: number;
+          ends_at?: string;
+          equipment_note?: string | null;
+          event_type?: Database['public']['Enums']['event_type'];
+          id?: string;
+          invite_token?: string | null;
+          last_material_change_at?: string | null;
+          location_visibility?: Database['public']['Enums']['location_visibility'];
+          organizer_id?: string;
+          organizer_plays?: boolean;
+          public_location_label?: string | null;
+          published_at?: string | null;
+          registration_closes_at?: string | null;
+          skill_max?: number | null;
+          skill_min?: number | null;
+          sport_format_id?: string;
+          sport_id?: string;
+          starts_at?: string;
+          status?: Database['public']['Enums']['event_status'];
+          title?: string;
+          updated_at?: string;
+          visibility?: Database['public']['Enums']['event_visibility'];
+          waitlist_enabled?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'events_district_id_city_id_fkey';
+            columns: ['district_id', 'city_id'];
+            isOneToOne: false;
+            referencedRelation: 'districts';
+            referencedColumns: ['id', 'city_id'];
+          },
+          {
+            foreignKeyName: 'events_organizer_id_fkey';
+            columns: ['organizer_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'events_sport_format_id_sport_id_fkey';
+            columns: ['sport_format_id', 'sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sport_formats';
+            referencedColumns: ['id', 'sport_id'];
+          },
+          {
+            foreignKeyName: 'events_sport_id_fkey';
+            columns: ['sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sports';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      notifications: {
+        Row: {
+          created_at: string;
+          dedupe_key: string;
+          id: string;
+          payload: NonNullable<Json>;
+          read_at: string | null;
+          type: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          dedupe_key: string;
+          id?: string;
+          payload?: NonNullable<Json>;
+          read_at?: string | null;
+          type: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          dedupe_key?: string;
+          id?: string;
+          payload?: NonNullable<Json>;
+          read_at?: string | null;
+          type?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       platform_admins: {
         Row: {
           granted_at: string;
@@ -466,6 +780,11 @@ export type Database = {
         Returns: undefined;
       };
       cancel_account_deletion: { Args: Record<PropertyKey, never>; Returns: undefined };
+      cancel_event: {
+        Args: { p_event_id: string; p_message?: string; p_reason: string };
+        Returns: undefined;
+      };
+      complete_event: { Args: { p_event_id: string }; Returns: undefined };
       complete_onboarding: {
         Args: {
           p_adult_confirmed: boolean;
@@ -479,6 +798,11 @@ export type Database = {
         };
         Returns: undefined;
       };
+      create_event: {
+        Args: { p_client_request_id: string; p_input: Json; p_publish?: boolean };
+        Returns: string;
+      };
+      delete_draft: { Args: { p_event_id: string }; Returns: undefined };
       export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
       get_my_account: {
         Args: Record<PropertyKey, never>;
@@ -493,6 +817,8 @@ export type Database = {
           user_id: string;
         }[];
       };
+      mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number };
+      publish_event: { Args: { p_event_id: string }; Returns: undefined };
       remove_sport_profile: { Args: { p_sport_id: string }; Returns: undefined };
       replace_my_sport_profiles: { Args: { p_sports: Json }; Returns: undefined };
       request_account_deletion: { Args: Record<PropertyKey, never>; Returns: string };
@@ -501,6 +827,7 @@ export type Database = {
         Args: { p_level: number; p_position_ids: string[]; p_sport_id: string };
         Returns: undefined;
       };
+      update_event: { Args: { p_event_id: string; p_input: Json }; Returns: undefined };
       update_my_profile: {
         Args: { p_bio: string; p_city_id: string; p_display_name: string; p_district_id: string };
         Returns: undefined;
@@ -518,7 +845,17 @@ export type Database = {
     };
     Enums: {
       account_status: 'ACTIVE' | 'SUSPENDED' | 'PENDING_DELETION' | 'DELETED';
+      attendance_status: 'NOT_CONFIRMED' | 'PRESENT' | 'ABSENT' | 'DISPUTED';
+      booking_status: 'NOT_REQUIRED' | 'NOT_YET_BOOKED' | 'BOOKED_EXTERNALLY' | 'TO_BE_CONFIRMED';
       consent_kind: 'TERMS' | 'PRIVACY_NOTICE' | 'MARKETING';
+      event_cancel_reason:
+        'WEATHER' | 'VENUE_UNAVAILABLE' | 'NOT_ENOUGH_PLAYERS' | 'ORGANIZER_UNAVAILABLE' | 'OTHER';
+      event_status: 'DRAFT' | 'PUBLISHED' | 'CANCELED' | 'COMPLETED';
+      event_type: 'COMMUNITY' | 'PARTNER';
+      event_visibility: 'PUBLIC' | 'INVITE_ONLY';
+      location_visibility: 'PUBLIC' | 'APPROVED_ONLY';
+      participation_status:
+        'REQUESTED' | 'APPROVED' | 'REJECTED' | 'WAITLISTED' | 'CANCELED' | 'REMOVED';
       profile_visibility: 'EVERYONE' | 'EVENT_PEERS';
     };
     CompositeTypes: {
@@ -632,7 +969,28 @@ export const Constants = {
   public: {
     Enums: {
       account_status: ['ACTIVE', 'SUSPENDED', 'PENDING_DELETION', 'DELETED'],
+      attendance_status: ['NOT_CONFIRMED', 'PRESENT', 'ABSENT', 'DISPUTED'],
+      booking_status: ['NOT_REQUIRED', 'NOT_YET_BOOKED', 'BOOKED_EXTERNALLY', 'TO_BE_CONFIRMED'],
       consent_kind: ['TERMS', 'PRIVACY_NOTICE', 'MARKETING'],
+      event_cancel_reason: [
+        'WEATHER',
+        'VENUE_UNAVAILABLE',
+        'NOT_ENOUGH_PLAYERS',
+        'ORGANIZER_UNAVAILABLE',
+        'OTHER',
+      ],
+      event_status: ['DRAFT', 'PUBLISHED', 'CANCELED', 'COMPLETED'],
+      event_type: ['COMMUNITY', 'PARTNER'],
+      event_visibility: ['PUBLIC', 'INVITE_ONLY'],
+      location_visibility: ['PUBLIC', 'APPROVED_ONLY'],
+      participation_status: [
+        'REQUESTED',
+        'APPROVED',
+        'REJECTED',
+        'WAITLISTED',
+        'CANCELED',
+        'REMOVED',
+      ],
       profile_visibility: ['EVERYONE', 'EVENT_PEERS'],
     },
   },
