@@ -12,12 +12,17 @@
 // INITIAL was raised 540 -> 555 on purpose (2026-10-25): the in-house SVG tab icons put react-native-svg
 // (~16 kB) into the shared chunk, but removed the 149 kB Ionicons chunk that every tabbed screen loaded
 // right after it, so the first tabbed screen got ~130 kB cheaper (docs/PERFORMANCE.md §3.5).
+//
+// INITIAL raised again 555 -> 570 (2026-10-27, Phase 3 / M2): the event screens share their form, API
+// and hooks across four routes, and Metro's web splitting puts code used by more than one route into
+// __common, which index.html always loads (app code in __common 102 -> 158 kB minified, +14 kB gzip).
+// Structural follow-up in docs/PERFORMANCE.md §4 (item 5) before the next raise.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
 const TOTAL_RATCHET_KB = 940;
-const INITIAL_RATCHET_KB = 555;
+const INITIAL_RATCHET_KB = 570;
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';
 
 if (!existsSync(dir)) {
