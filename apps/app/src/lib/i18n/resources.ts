@@ -2,6 +2,7 @@ import enAccount from '@/locales/en/account.json';
 import enAuth from '@/locales/en/auth.json';
 import enCommon from '@/locales/en/common.json';
 import enErrors from '@/locales/en/errors.json';
+import enEvents from '@/locales/en/events.json';
 import enLegal from '@/locales/en/legal.json';
 import enNav from '@/locales/en/nav.json';
 import enOnboarding from '@/locales/en/onboarding.json';
@@ -10,6 +11,7 @@ import trAccount from '@/locales/tr/account.json';
 import trAuth from '@/locales/tr/auth.json';
 import trCommon from '@/locales/tr/common.json';
 import trErrors from '@/locales/tr/errors.json';
+import trEvents from '@/locales/tr/events.json';
 import trLegal from '@/locales/tr/legal.json';
 import trNav from '@/locales/tr/nav.json';
 import trOnboarding from '@/locales/tr/onboarding.json';
@@ -25,6 +27,7 @@ export const resources = {
     onboarding: trOnboarding,
     legal: trLegal,
     account: trAccount,
+    events: trEvents,
   },
   en: {
     common: enCommon,
@@ -35,6 +38,7 @@ export const resources = {
     onboarding: enOnboarding,
     legal: enLegal,
     account: enAccount,
+    events: enEvents,
   },
 } as const;
 
@@ -48,4 +52,5 @@ export const namespaces = [
   'onboarding',
   'legal',
   'account',
+  'events',
 ] as const;

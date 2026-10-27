@@ -45,7 +45,7 @@ test.describe('protected routes', () => {
 });
 
 test.describe('deep links and errors', () => {
-  test('event deep link resolves to the (honest) not-found state until events exist', async ({
+  test('an event deep link to an unknown event shows the honest not-found state', async ({
     page,
   }) => {
     await page.goto('/e/00000000-0000-0000-0000-000000000000');

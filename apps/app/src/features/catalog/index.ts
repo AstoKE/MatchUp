@@ -2,6 +2,7 @@ export type {
   Catalog,
   CatalogCity,
   CatalogDistrict,
+  CatalogFormat,
   CatalogPosition,
   CatalogSport,
   LocalizedName,
