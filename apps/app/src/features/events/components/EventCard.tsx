@@ -7,13 +7,27 @@ import { currentLocale } from '@/lib/i18n';
 import { Text, TOUCH_TARGET, useTheme } from '@/ui';
 import type { EventListItem } from '../api/search-api';
 import { formatCost, formatEventStart } from '../format';
-import { SlotMeter } from './SlotMeter';
+import { Pill, SlotMeter } from './SlotMeter';
 
 /**
  * One Discover row (USER_FLOWS FL-2): sport and format, title, when, where, filled slots, skill range,
  * cost note and organizer. Only guest-readable fields; tapping opens the event at /e/<id>.
  */
-export function EventCard({ event, catalog }: { event: EventListItem; catalog: Catalog }) {
+export interface CardBadge {
+  label: string;
+  tone: 'neutral' | 'success' | 'warning' | 'danger';
+}
+
+export function EventCard({
+  event,
+  catalog,
+  badges = [],
+}: {
+  event: EventListItem;
+  catalog: Catalog;
+  /** Extra state labels (e.g. "Draft", "Request sent"), shown above the sport line. */
+  badges?: readonly CardBadge[];
+}) {
   const { t } = useTranslation('events');
   const { colors, radius, spacing } = useTheme();
   const router = useRouter();
@@ -65,6 +79,13 @@ export function EventCard({ event, catalog }: { event: EventListItem; catalog: C
           : null),
       })}
     >
+      {badges.length > 0 ? (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+          {badges.map((badge) => (
+            <Pill key={badge.label} label={badge.label} tone={badge.tone} />
+          ))}
+        </View>
+      ) : null}
       <Text variant="caption" tone="secondary">
         {[
           sport && localizedName(sport.names, locale),

@@ -10,6 +10,16 @@ export const SEARCH_PAGE_SIZE = 20;
 export const TIME_OF_DAY_PARTS = ['MORNING', 'AFTERNOON', 'EVENING'] as const;
 export type TimeOfDay = (typeof TIME_OF_DAY_PARTS)[number];
 
+/** The My Events tabs (PRD §4.5) and the buckets `list_my_events` understands. */
+export const MY_EVENT_BUCKETS = [
+  'ORGANIZING',
+  'PENDING',
+  'APPROVED',
+  'WAITLISTED',
+  'PAST',
+] as const;
+export type MyEventBucket = (typeof MY_EVENT_BUCKETS)[number];
+
 export const DATE_PRESETS = ['ANY', 'TODAY', 'TOMORROW', 'WEEK'] as const;
 export type DatePreset = (typeof DATE_PRESETS)[number];
 

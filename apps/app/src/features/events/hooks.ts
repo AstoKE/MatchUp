@@ -1,5 +1,6 @@
-import type { SearchPayload } from '@matchup/domain';
+import type { MyEventBucket, SearchPayload } from '@matchup/domain';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchMyEvents } from './api/my-events-api';
 import { searchEvents, type SearchCursor } from './api/search-api';
 import {
   cancelEvent,
@@ -24,6 +25,17 @@ export function useEventSearch(payload: SearchPayload) {
     queryFn: ({ pageParam }) => searchEvents(payload, pageParam),
     initialPageParam: null as SearchCursor | null,
     getNextPageParam: (last) => last.nextCursor,
+  });
+}
+
+/** One My Events tab; also under ['events'], so publishing or canceling refreshes it. */
+export function useMyEvents(bucket: MyEventBucket, enabled = true) {
+  return useInfiniteQuery({
+    queryKey: ['events', 'mine', bucket],
+    queryFn: ({ pageParam }) => fetchMyEvents(bucket, pageParam),
+    initialPageParam: null as SearchCursor | null,
+    getNextPageParam: (last) => last.nextCursor,
+    enabled,
   });
 }
 

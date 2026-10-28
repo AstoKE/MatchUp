@@ -817,6 +817,10 @@ export type Database = {
           user_id: string;
         }[];
       };
+      list_my_events: {
+        Args: { p_bucket: string; p_cursor?: Json; p_limit?: number };
+        Returns: Json;
+      };
       mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number };
       publish_event: { Args: { p_event_id: string }; Returns: undefined };
       remove_sport_profile: { Args: { p_sport_id: string }; Returns: undefined };

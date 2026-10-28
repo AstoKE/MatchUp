@@ -29,6 +29,8 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 
 - **M3 — `20261028100000_search_events.sql`.** `search_events(p_filters jsonb = '{}', p_cursor jsonb = null) → jsonb {items, next_cursor}`, the only function `anon` may execute (the security baseline test enumerates it). `SECURITY DEFINER` (it joins the organizer's display name and the city time zone), `STABLE`, `statement_timeout = 5s`. Lists only `PUBLISHED ∧ PUBLIC` events that have not started and whose organizer account is `ACTIVE`; ordered by `(starts_at, id)` with a keyset cursor `{starts_at, id}`; page size 20 by default, capped at 50. Filters (all optional, unknown keys ignored, malformed or out-of-bounds → `VALIDATION_FAILED`): `city_id`, `district_ids[≤10]`, `sport_ids[≤10]`, `sport_format_id`, `from`/`to` (on `starts_at`), `time_of_day[MORNING 05–12 | AFTERNOON 12–17 | EVENING 17–05, city time zone]`, `skill_level` (events whose range contains it; no range = any), `only_open`, `limit`. Items carry exactly the public fields (a pgTAP test pins the key list): no organizer id, invite token, address or notes; `place_label` is null unless the location is `PUBLIC`; `open_slots`, `registration_open` are derived. Not yet: distance/radius and the map (Phase 4), blocked pairs (Phase 6, additive), a `get_event` RPC (the detail screen still reads `events` through RLS).
 
+- **M3b — `20261028110000_list_my_events.sql`.** `list_my_events(p_bucket text, p_cursor jsonb = null, p_limit int = 20) → jsonb {items, next_cursor}`, `authenticated` only (`NOT_AUTHENTICATED` otherwise), `SECURITY DEFINER` + `STABLE` + 5 s timeout, every row restricted to `auth.uid()`. Buckets: `ORGANIZING` (my drafts and published events that have not ended, with `pending_count` = open `REQUESTED` rows), `PENDING` / `WAITLISTED` (my requests / waitlist places on upcoming published events), `APPROVED` (upcoming events I was approved for, not my own), `PAST` (ended, canceled or completed events I organized or was approved/rejected/removed for; newest first). Items are the `search_events` fields plus `status`, `my_status` (`ORGANIZER` or my participation status) and `pending_count` (organizer only). The place label is the private one only for the organizer and `APPROVED` players, otherwise the public label (null when hidden). Page size 20, cap 50, keyset `(starts_at, id)`. Until M4 adds the participation RPCs only `ORGANIZING` and `PAST` can hold rows.
+
 ## 1. Principles
 
 1. **The database is the authority** for state transitions, capacity and progression. Clients never write core tables directly.
@@ -352,7 +354,8 @@ All RPCs: `SECURITY DEFINER`, `SET search_path = ''`, `REVOKE ALL FROM PUBLIC, a
 | `get_event_by_invite(token)` | 3 | authenticated | |
 | `request_join(event_id, message, position_id)`, `cancel_participation(event_id)` | 3 | participant | |
 | `approve_participation(id)`, `reject_participation(id)`, `waitlist_participation(id)`, `remove_participant(id, reason)` | 3 | organizer | |
-| `list_my_events(bucket, cursor)`, `list_event_requests(event_id)` | 3 | self / organizer | |
+| `list_my_events(bucket, cursor, limit)` | 3 — **built (M3b)**, see §0c | self | buckets `ORGANIZING / PENDING / APPROVED / WAITLISTED / PAST` |
+| `list_event_requests(event_id)` | 3 (M4) | organizer | |
 | `mark_attendance(participation_id, value)`, `finalize_attendance(event_id)`, `dispute_attendance(participation_id, reason)` | 5 | organizer / participant | |
 | `submit_reviews(event_id, reviews[])` | 5 | participant | validates eligibility for each pair atomically |
 | `mark_notifications_read(ids)` | 3 | self | |

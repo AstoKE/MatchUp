@@ -169,3 +169,47 @@ test.describe('discovering events (Phase 3 / M3)', () => {
     await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
   });
 });
+
+test.describe('My Events (Phase 3 / M3b)', () => {
+  test('the organizer finds their draft and published event; someone else does not', async ({
+    page,
+    browser,
+  }) => {
+    const s = requireStack();
+    const email = uniqueEmail('mine');
+    createdIds.push((await createOnboardedUser(s, email)).id);
+    const tag = email.slice(5, 13);
+    await createPublishedEvent(s, email, `E2E yayında ${tag}`);
+    await createPublishedEvent(s, email, `E2E taslak ${tag}`, { publish: false });
+
+    await signIn(page, email);
+    await page.getByRole('tab', { name: 'Etkinliklerim' }).click();
+    await expect(page.getByRole('heading', { name: 'Etkinliklerim', level: 1 })).toBeVisible();
+    const main = page.getByRole('main');
+    await expect(main.getByRole('link', { name: new RegExp(`E2E yayında ${tag}`) })).toBeVisible();
+    const draft = main.getByRole('link', { name: new RegExp(`E2E taslak ${tag}`) });
+    await expect(draft).toBeVisible();
+    await expect(draft).toContainText('Taslak');
+    await expectNoBlocking(page);
+
+    // The other tabs are empty for an organizer who has not asked to join anything.
+    await main.getByRole('radio', { name: 'Bekleyen' }).click();
+    await expect(main.getByText('Bekleyen isteğin yok')).toBeVisible();
+    await main.getByRole('radio', { name: 'Düzenlediklerim' }).click();
+    await draft.click();
+    await expect(page).toHaveURL(/\/e\/[0-9a-f-]{36}$/);
+    await expect(
+      page.getByRole('heading', { name: new RegExp(`E2E taslak ${tag}`), level: 1 }),
+    ).toBeVisible();
+
+    const strangerEmail = uniqueEmail('stranger');
+    createdIds.push((await createOnboardedUser(s, strangerEmail)).id);
+    const context = await browser.newContext();
+    const stranger = await context.newPage();
+    await signIn(stranger, strangerEmail);
+    await stranger.getByRole('tab', { name: 'Etkinliklerim' }).click();
+    await expect(stranger.getByText('Düzenlediğin etkinlik yok')).toBeVisible();
+    await expect(stranger.getByRole('main').getByText(new RegExp(`E2E .* ${tag}`))).toHaveCount(0);
+    await context.close();
+  });
+});

@@ -138,6 +138,7 @@ export async function createPublishedEvent(
   stack: LocalStack,
   email: string,
   title: string,
+  options: { publish?: boolean } = {},
 ): Promise<string> {
   const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
   const tokenResponse = await fetch(`${stack.apiUrl}/auth/v1/token?grant_type=password`, {
@@ -162,7 +163,7 @@ export async function createPublishedEvent(
     headers,
     body: JSON.stringify({
       p_client_request_id: randomUUID(),
-      p_publish: true,
+      p_publish: options.publish ?? true,
       p_input: {
         sport_id: sport.id,
         sport_format_id: format.id,
