@@ -128,6 +128,46 @@
     "ORGANIZER_UNAVAILABLE": "Organizatör katılamıyor",
     "OTHER": "Diğer"
   },
+  "discover": {
+    "filtersTitle": "Filtreler",
+    "datePreset": "Ne zaman",
+    "date": {
+      "ANY": "Fark etmez",
+      "TODAY": "Bugün",
+      "TOMORROW": "Yarın",
+      "WEEK": "Bu hafta"
+    },
+    "timeOfDayTitle": "Günün saati",
+    "timeOfDay": {
+      "MORNING": "Sabah",
+      "AFTERNOON": "Öğleden sonra",
+      "EVENING": "Akşam"
+    },
+    "sportsTitle": "Spor",
+    "district": "İlçe",
+    "districtAny": "Tüm ilçeler",
+    "districtPlaceholder": "Tüm ilçeler",
+    "onlyOpen": "Yalnızca yeri olan etkinlikler",
+    "clear": "Filtreleri temizle",
+    "resultCount_one": "{{count}} etkinlik",
+    "resultCount_other": "{{count}} etkinlik",
+    "loadMore": "Daha fazla göster",
+    "loadMoreLoading": "Daha fazla etkinlik yükleniyor…",
+    "loadFailed": "Etkinlikler yüklenemedi",
+    "emptyTitle": "Henüz etkinlik yok",
+    "emptyBody": "İlk etkinliği sen düzenle.",
+    "emptyCreate": "Etkinlik oluştur",
+    "noMatchTitle": "Bu filtrelere uyan etkinlik yok",
+    "noMatchBody": "Başka bir gün dene ya da bir filtreyi kaldır.",
+    "card": {
+      "slots": "{{approved}}/{{capacity}} kişi",
+      "full": "Dolu",
+      "fullWaitlist": "Dolu · bekleme listesi açık",
+      "closed": "Kayıt kapandı",
+      "organizer": "{{name}} düzenliyor",
+      "placeHidden": "{{district}} · tam yer onaylananlara gösterilir"
+    }
+  },
   "validation": {
     "SPORT_REQUIRED": "Bir spor seç.",
     "FORMAT_REQUIRED": "Bir format seç.",

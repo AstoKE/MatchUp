@@ -73,15 +73,15 @@ select is(
   'no function in public/private is executable by PUBLIC'
 );
 
--- 7. anon can execute only the explicit guest-readable whitelist (empty in Phase 1)
+-- 7. anon can execute only the explicit guest-readable whitelist (search_events since Phase 3 / M3)
 select is(
   (select coalesce(array_agg(n.nspname || '.' || p.proname order by p.proname), '{}')
    from pg_catalog.pg_proc p
    join pg_catalog.pg_namespace n on n.oid = p.pronamespace
    where n.nspname in ('public', 'private')
      and has_function_privilege('anon', p.oid, 'EXECUTE')),
-  array[]::text[],
-  'anon can execute no function in public/private (whitelist is empty until Phase 3)'
+  array['public.search_events']::text[],
+  'anon can execute only the guest whitelist: public.search_events (D-09)'
 );
 
 -- 8. Admin helper is not usable by anon, usable by authenticated policies

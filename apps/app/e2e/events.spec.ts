@@ -2,6 +2,8 @@ import { AxeBuilder } from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import {
   createOnboardedUser,
+  createPublishedEvent,
+  deleteEventsOf,
   deleteUser,
   getLocalStack,
   PASSWORD,
@@ -15,6 +17,7 @@ test.skip(!stack && process.env.REQUIRE_STACK !== '1', 'local Supabase stack is 
 
 const createdIds: string[] = [];
 test.afterAll(async () => {
+  for (const id of createdIds) deleteEventsOf(id);
   if (stack) await Promise.all(createdIds.map((id) => deleteUser(stack, id)));
 });
 
@@ -117,5 +120,34 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
     await page.getByRole('button', { name: 'Etkinliği iptal et' }).click();
     await expect(page.getByText('İptal sebebi: Hava durumu — Yağmur bekleniyor')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Düzenle' })).toHaveCount(0);
+  });
+});
+
+test.describe('discovering events (Phase 3 / M3)', () => {
+  test('a guest finds a published event, filters it away and opens it', async ({ page }) => {
+    const s = requireStack();
+    const email = uniqueEmail('discover');
+    createdIds.push((await createOnboardedUser(s, email, { displayName: 'Ayşe Düzenleyen' })).id);
+    const title = `E2E keşif ${email.slice(9, 17)}`;
+    const eventId = await createPublishedEvent(s, email, title);
+
+    await page.goto('/');
+    const card = page.getByRole('link', { name: new RegExp(title) });
+    await expect(card).toBeVisible();
+    await expect(card).toContainText('Çankaya · ODTÜ Halı Saha 2');
+    await expect(card).toContainText('1/12 kişi');
+    await expect(card).toContainText('Ayşe Düzenleyen düzenliyor');
+    await expectNoBlocking(page);
+
+    // A sport the event is not in hides it and says why; clearing the filter brings it back.
+    await page.getByRole('checkbox', { name: 'Tenis', exact: true }).click();
+    await expect(page.getByText('Bu filtrelere uyan etkinlik yok')).toBeVisible();
+    await expect(card).toHaveCount(0);
+    await page.getByRole('button', { name: 'Filtreleri temizle' }).first().click();
+    await expect(card).toBeVisible();
+
+    await card.click();
+    await expect(page).toHaveURL(new RegExp(`/e/${eventId}$`));
+    await expect(page.getByRole('heading', { name: title, level: 1 })).toBeVisible();
   });
 });

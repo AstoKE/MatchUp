@@ -33,7 +33,7 @@ export function SegmentedChoice<T extends string>({
       >
         {label}
       </Text>
-      <View style={{ flexDirection: 'row', gap: spacing[2] }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
         {options.map((option) => {
           const selected = option.value === value;
           return (

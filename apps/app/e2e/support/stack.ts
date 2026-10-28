@@ -133,6 +133,73 @@ export function revokeLegalConsent(userId: string) {
   ]);
 }
 
+/** TEST-ONLY: publishes a football 5v5 event in Ankara/Çankaya for `email` through the real RPC, 2 days ahead. */
+export async function createPublishedEvent(
+  stack: LocalStack,
+  email: string,
+  title: string,
+): Promise<string> {
+  const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
+  const tokenResponse = await fetch(`${stack.apiUrl}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: base,
+    body: JSON.stringify({ email, password: PASSWORD }),
+  });
+  const { access_token: token } = (await tokenResponse.json()) as { access_token: string };
+  const headers = { ...base, Authorization: `Bearer ${token}` };
+  const get = async <T>(path: string) =>
+    ((await (await fetch(`${stack.apiUrl}/rest/v1/${path}`, { headers })).json()) as T[])[0]!;
+  const sport = await get<{ id: string }>('sports?select=id&slug=eq.football');
+  const format = await get<{ id: string }>(
+    `sport_formats?select=id&slug=eq.5v5&sport_id=eq.${sport.id}`,
+  );
+  const city = await get<{ id: string }>('cities?select=id&slug=eq.ankara');
+  const district = await get<{ id: string }>(
+    `districts?select=id&slug=eq.cankaya&city_id=eq.${city.id}`,
+  );
+  const response = await fetch(`${stack.apiUrl}/rest/v1/rpc/create_event`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      p_client_request_id: randomUUID(),
+      p_publish: true,
+      p_input: {
+        sport_id: sport.id,
+        sport_format_id: format.id,
+        title,
+        starts_at: new Date(Date.now() + 2 * 86_400_000).toISOString(),
+        duration_minutes: 90,
+        city_id: city.id,
+        district_id: district.id,
+        location_label: 'ODTÜ Halı Saha 2',
+        capacity: 12,
+      },
+    }),
+  });
+  if (!response.ok)
+    throw new Error(`create_event failed: ${response.status} ${await response.text()}`);
+  return (await response.json()) as string;
+}
+
+/**
+ * TEST-ONLY: deleting an Auth user leaves its events behind (no FK, ADR-0003), so Discover would keep
+ * listing them for later runs. API roles cannot delete events, hence psql in the DB container.
+ */
+export function deleteEventsOf(userId: string) {
+  if (!/^[0-9a-f-]{36}$/.test(userId)) throw new Error('not a uuid');
+  execFileSync('docker', [
+    'exec',
+    'supabase_db_matchup',
+    'psql',
+    '-U',
+    'postgres',
+    '-v',
+    'ON_ERROR_STOP=1',
+    '-c',
+    `delete from public.events where organizer_id = '${userId}'`,
+  ]);
+}
+
 export async function deleteUser(stack: LocalStack, id: string) {
   await fetch(`${stack.apiUrl}/auth/v1/admin/users/${id}`, {
     method: 'DELETE',

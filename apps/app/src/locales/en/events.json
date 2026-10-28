@@ -128,6 +128,46 @@
     "ORGANIZER_UNAVAILABLE": "Organizer can't make it",
     "OTHER": "Other"
   },
+  "discover": {
+    "filtersTitle": "Filters",
+    "datePreset": "When",
+    "date": {
+      "ANY": "Any day",
+      "TODAY": "Today",
+      "TOMORROW": "Tomorrow",
+      "WEEK": "This week"
+    },
+    "timeOfDayTitle": "Time of day",
+    "timeOfDay": {
+      "MORNING": "Morning",
+      "AFTERNOON": "Afternoon",
+      "EVENING": "Evening"
+    },
+    "sportsTitle": "Sport",
+    "district": "District",
+    "districtAny": "All districts",
+    "districtPlaceholder": "All districts",
+    "onlyOpen": "Only events with open spots",
+    "clear": "Clear filters",
+    "resultCount_one": "{{count}} event",
+    "resultCount_other": "{{count}} events",
+    "loadMore": "Show more",
+    "loadMoreLoading": "Loading more events…",
+    "loadFailed": "Couldn't load events",
+    "emptyTitle": "No events yet",
+    "emptyBody": "Be the first to organize one.",
+    "emptyCreate": "Create an event",
+    "noMatchTitle": "No events match these filters",
+    "noMatchBody": "Try a different day or clear a filter.",
+    "card": {
+      "slots": "{{approved}}/{{capacity}} players",
+      "full": "Full",
+      "fullWaitlist": "Full · waitlist open",
+      "closed": "Registration closed",
+      "organizer": "by {{name}}",
+      "placeHidden": "{{district}} · exact place shown to approved players"
+    }
+  },
   "validation": {
     "SPORT_REQUIRED": "Choose a sport.",
     "FORMAT_REQUIRED": "Choose a format.",

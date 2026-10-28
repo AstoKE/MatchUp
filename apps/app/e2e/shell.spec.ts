@@ -8,7 +8,8 @@ test.describe('guest browsing (D-09)', () => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
     await expect(page.getByText('Sporunu seç, takımını bul, oyuna katıl.')).toBeVisible();
-    await expect(page.getByText('Henüz etkinlik yok')).toBeVisible();
+    // The list depends on what the database holds; the filters appear once Discover has loaded.
+    await expect(page.getByRole('radio', { name: 'Bugün' })).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('lang', 'tr');
   });
 
