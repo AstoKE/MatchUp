@@ -1,3 +1,4 @@
+import type pg from 'pg';
 import { expect } from 'vitest';
 import { createUser, db, rest, signedInClient, type TestUser } from './helpers';
 
@@ -69,4 +70,17 @@ export async function onboardedUser(
   );
   expect(done.status).toBe(204);
   return { user, token };
+}
+
+/** Inside a harness transaction: act as that user exactly like PostgREST does for a request. */
+export async function actAs(client: pg.PoolClient, userId: string) {
+  await client.query(`select set_config('request.jwt.claims', $1, true)`, [
+    JSON.stringify({ sub: userId, role: 'authenticated', aal: 'aal1' }),
+  ]);
+  await client.query('set local role authenticated');
+}
+
+/** The stable domain code of a rejected harness task (the RPC raises it as the error message). */
+export function codeOf(error: unknown) {
+  return (error as { message?: string }).message;
 }

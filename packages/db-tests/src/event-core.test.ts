@@ -1,8 +1,15 @@
 import { randomUUID } from 'node:crypto';
-import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { fulfilled, rejected, runConcurrently } from './concurrency';
-import { catalog, eventInput, onboardedUser, rpc, type Catalog } from './event-fixtures';
+import {
+  actAs,
+  catalog,
+  codeOf,
+  eventInput,
+  onboardedUser,
+  rpc,
+  type Catalog,
+} from './event-fixtures';
 import { closeDb, db, deleteCreatedUsers, rest } from './helpers';
 
 /**
@@ -11,18 +18,6 @@ import { closeDb, db, deleteCreatedUsers, rest } from './helpers';
  * start ~15–20 ms apart, more than the few-millisecond race window, so an HTTP "parallel" test passes
  * even with the protecting lock removed (measured); the harness fails in that case.
  */
-
-/** Inside a harness transaction: act as that user exactly like PostgREST does for a request. */
-async function actAs(client: pg.PoolClient, userId: string) {
-  await client.query(`select set_config('request.jwt.claims', $1, true)`, [
-    JSON.stringify({ sub: userId, role: 'authenticated', aal: 'aal1' }),
-  ]);
-  await client.query('set local role authenticated');
-}
-
-function codeOf(error: unknown) {
-  return (error as { message?: string }).message;
-}
 
 let c: Catalog;
 beforeAll(async () => {

@@ -208,6 +208,7 @@ export type Database = {
       events: {
         Row: {
           approved_count: number;
+          auto_approve: boolean;
           booking_status: Database['public']['Enums']['booking_status'];
           cancel_message: string | null;
           cancel_reason: Database['public']['Enums']['event_cancel_reason'] | null;
@@ -249,6 +250,7 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           approved_count?: number;
+          auto_approve?: boolean;
           booking_status?: Database['public']['Enums']['booking_status'];
           cancel_message?: string | null;
           cancel_reason?: Database['public']['Enums']['event_cancel_reason'] | null;
@@ -289,6 +291,7 @@ export type Database = {
         };
         Update: {
           approved_count?: number;
+          auto_approve?: boolean;
           booking_status?: Database['public']['Enums']['booking_status'];
           cancel_message?: string | null;
           cancel_reason?: Database['public']['Enums']['event_cancel_reason'] | null;
@@ -779,11 +782,13 @@ export type Database = {
         Args: { p_privacy_version: string; p_terms_version: string };
         Returns: undefined;
       };
+      approve_participation: { Args: { p_participation_id: string }; Returns: undefined };
       cancel_account_deletion: { Args: Record<PropertyKey, never>; Returns: undefined };
       cancel_event: {
         Args: { p_event_id: string; p_message?: string; p_reason: string };
         Returns: undefined;
       };
+      cancel_participation: { Args: { p_event_id: string }; Returns: undefined };
       complete_event: { Args: { p_event_id: string }; Returns: undefined };
       complete_onboarding: {
         Args: {
@@ -817,15 +822,25 @@ export type Database = {
           user_id: string;
         }[];
       };
+      list_event_requests: { Args: { p_event_id: string }; Returns: Json };
       list_my_events: {
         Args: { p_bucket: string; p_cursor?: Json; p_limit?: number };
         Returns: Json;
       };
       mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number };
       publish_event: { Args: { p_event_id: string }; Returns: undefined };
+      reject_participation: { Args: { p_participation_id: string }; Returns: undefined };
+      remove_participant: {
+        Args: { p_participation_id: string; p_reason?: string };
+        Returns: undefined;
+      };
       remove_sport_profile: { Args: { p_sport_id: string }; Returns: undefined };
       replace_my_sport_profiles: { Args: { p_sports: Json }; Returns: undefined };
       request_account_deletion: { Args: Record<PropertyKey, never>; Returns: string };
+      request_join: {
+        Args: { p_event_id: string; p_message?: string; p_position_id?: string };
+        Returns: string;
+      };
       search_events: { Args: { p_cursor?: Json; p_filters?: Json }; Returns: Json };
       set_marketing_consent: { Args: { p_granted: boolean }; Returns: undefined };
       set_sport_profile: {
@@ -847,6 +862,7 @@ export type Database = {
         };
         Returns: undefined;
       };
+      waitlist_participation: { Args: { p_participation_id: string }; Returns: undefined };
     };
     Enums: {
       account_status: 'ACTIVE' | 'SUSPENDED' | 'PENDING_DELETION' | 'DELETED';

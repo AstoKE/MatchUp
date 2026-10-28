@@ -91,6 +91,8 @@ export interface EventDraft {
   capacity: number;
   organizerPlays: boolean;
   waitlistEnabled: boolean;
+  /** Approve join requests at once while a spot is free and nobody waits (organizer's choice, default off). */
+  autoApprove: boolean;
   visibility: EventVisibility;
   skillMin: number | null;
   skillMax: number | null;
@@ -308,6 +310,7 @@ export function toEventInput(draft: EventDraft, timeZone: string): EventInputPay
     participant_notes: text(draft.participantNotes),
     capacity: draft.capacity,
     waitlist_enabled: draft.waitlistEnabled,
+    auto_approve: draft.autoApprove,
     organizer_plays: draft.organizerPlays,
     skill_min: draft.skillMin,
     skill_max: draft.skillMax,

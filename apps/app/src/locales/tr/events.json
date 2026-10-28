@@ -47,6 +47,8 @@
     "increase": "Kontenjanı artır",
     "organizerPlays": "Ben de oynayacağım (bir kişilik yer tutar)",
     "waitlist": "Doluysa bekleme listesi açık olsun",
+    "autoApprove": "Yer varken istekleri otomatik onayla",
+    "autoApproveHint": "Yer boşken ve bekleyen yokken oyuncular hemen onaylanır. Aksi halde her isteğe sen karar verirsin.",
     "visibility": "Kimler bulabilsin?",
     "visibilityPublic": "Herkes (keşfette görünür)",
     "visibilityInvite": "Sadece davet bağlantısıyla",

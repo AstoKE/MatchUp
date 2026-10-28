@@ -23,3 +23,4 @@ Format: Context · Decision · Consequences · Status. One decision per file, im
 | [0017](0017-account-deletion-and-export-in-sql.md) | Account deletion and data export in SQL with pg_cron, no Edge Function (amends DATABASE §11, SECURITY §9) | Accepted |
 | [0018](0018-hosted-supabase-region-paris.md) | Hosted Supabase project in eu-west-3 (Paris) (amends D-04) | Accepted |
 | [0019](0019-phase-3-scope-decisions.md) | Phase 3 scope: location without coordinates, quotas in config, jsonb event input, polling, analytics in Phase 7 | Accepted |
+| [0020](0020-auto-approve-and-participation-rules.md) | Optional auto-approve for organizers; participation rules fixed in M4 (amends PRD §4.3) | Accepted |

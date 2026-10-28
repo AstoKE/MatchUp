@@ -134,6 +134,7 @@ function event(over: Partial<EventDetails> = {}): EventDetails {
     capacity: 12,
     approvedCount: 1,
     waitlistEnabled: true,
+    autoApprove: false,
     organizerPlays: true,
     skillMin: null,
     skillMax: null,
@@ -232,6 +233,7 @@ describe('CreateEventScreen', () => {
       starts_at: zonedTimeToUtc(expectedDate, '19:00', 'Europe/Istanbul'),
       duration_minutes: 90,
       organizer_plays: true,
+      auto_approve: false,
     });
     await waitFor(() =>
       expect(mockRouter.replace).toHaveBeenCalledWith({
@@ -239,6 +241,24 @@ describe('CreateEventScreen', () => {
         params: { id: EVENT },
       }),
     );
+  });
+
+  it('lets the organizer switch on automatic approval and sends that choice', async () => {
+    mockApi.createEvent.mockResolvedValue(EVENT);
+    await renderApp(<CreateEventScreen />, { session: signedIn });
+    await fillAll();
+    expect(
+      screen.getByText(/Yer boşken ve bekleyen yokken oyuncular hemen onaylanır/),
+    ).toBeTruthy();
+    const box = screen.getByRole('checkbox', {
+      name: 'Yer varken istekleri otomatik onayla',
+      checked: false,
+    });
+    await fireEvent.press(box);
+    await press('Yayınla');
+    await waitFor(() => expect(mockApi.createEvent).toHaveBeenCalledTimes(1));
+    const call = mockApi.createEvent.mock.calls[0]?.[0] as { input: Record<string, unknown> };
+    expect(call.input.auto_approve).toBe(true);
   });
 
   it('shows a server refusal and retries with the SAME request id (no duplicate event)', async () => {

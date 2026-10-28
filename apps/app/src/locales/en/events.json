@@ -47,6 +47,8 @@
     "increase": "Increase capacity",
     "organizerPlays": "I'll play too (takes one spot)",
     "waitlist": "Open a waitlist when full",
+    "autoApprove": "Approve requests automatically while a spot is free",
+    "autoApproveHint": "Players are approved at once while a spot is free and nobody is waiting. Otherwise you decide on each request.",
     "visibility": "Who can find it?",
     "visibilityPublic": "Everyone (shown in Discover)",
     "visibilityInvite": "Only with the invite link",
