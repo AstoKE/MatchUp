@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/features/auth';
@@ -8,6 +8,7 @@ import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { Banner, Button, EmptyState, Screen, Text, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
+import { Pill, SlotMeter } from '../components/SlotMeter';
 import { formatCost, formatEventStart } from '../format';
 import { useCompleteEvent, useDeleteDraft, useEvent, usePublishEvent } from '../hooks';
 
@@ -62,14 +63,33 @@ export function EventDetailScreen() {
   return <Detail event={event.data} catalog={catalog.data} />;
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({ label, value, large }: { label: string; value: string; large?: boolean }) {
   const { spacing } = useTheme();
   return (
     <View style={{ gap: spacing[1] }}>
       <Text variant="label" tone="secondary">
         {label}
       </Text>
-      <Text>{value}</Text>
+      <Text variant={large ? 'titleSm' : 'body'}>{value}</Text>
+    </View>
+  );
+}
+
+/** A raised group of facts; the outline keeps it visible in both themes without a shadow. */
+function Card({ children }: { children: ReactNode }) {
+  const { colors, radius, spacing } = useTheme();
+  return (
+    <View
+      style={{
+        gap: spacing[4],
+        padding: spacing[4],
+        borderRadius: radius.lg,
+        borderWidth: 1,
+        borderColor: colors.borderSubtle,
+        backgroundColor: colors.surfaceRaised,
+      }}
+    >
+      {children}
     </View>
   );
 }
@@ -99,19 +119,48 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
   const started = openedAt >= Date.parse(event.startsAt);
   const place = event.private?.placeLabel ?? event.publicPlaceLabel;
   const fail = (failure: unknown) => setError(errorText(failure));
+  // Time pressure only matters for an event people can still join (design.md §4.2 rule 4).
+  const joinable = event.status === 'PUBLISHED' && !started;
+  const openSlots = event.capacity - event.approvedCount;
+  const urgency = !joinable
+    ? null
+    : openSlots === 1
+      ? t('events:detail.lastSpot')
+      : Date.parse(event.startsAt) - openedAt < 2 * 3_600_000
+        ? t('events:detail.startsSoon')
+        : null;
 
   return (
     <Screen maxWidth={640}>
-      <View style={{ gap: spacing[2] }}>
-        <Text variant="caption" tone="secondary">
-          {[
-            sport && localizedName(sport.names, locale),
-            format && localizedName(format.names, locale),
-            t(`events:status.${event.status}`),
-          ]
-            .filter(Boolean)
-            .join(' · ')}
-        </Text>
+      <View style={{ alignItems: 'flex-start' }}>
+        <Button
+          variant="tertiary"
+          label={t('events:detail.backToDiscover')}
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+        />
+      </View>
+      <View style={{ gap: spacing[3] }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+          <Pill
+            label={[
+              sport && localizedName(sport.names, locale),
+              format && localizedName(format.names, locale),
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+          />
+          <Pill
+            label={t(`events:status.${event.status}`)}
+            tone={
+              event.status === 'PUBLISHED'
+                ? 'success'
+                : event.status === 'CANCELED'
+                  ? 'danger'
+                  : 'neutral'
+            }
+          />
+          {urgency ? <Pill label={urgency} tone="warning" /> : null}
+        </View>
         <Text variant="headline" heading={1}>
           {event.title}
         </Text>
@@ -131,12 +180,14 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
       ) : null}
       {error ? <Banner kind="danger" message={error} /> : null}
 
-      <View style={{ gap: spacing[4] }}>
+      <Card>
         <Row
+          large
           label={t('events:detail.when')}
           value={`${formatEventStart(event.startsAt, timeZone, locale)} · ${t('events:detail.durationValue', { count: event.durationMinutes })}`}
         />
         <Row
+          large
           label={t('events:detail.where')}
           value={
             place
@@ -144,13 +195,35 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
               : t('events:detail.whereHidden', { district: districtName })
           }
         />
-        <Row
-          label={t('events:detail.capacity')}
-          value={t('events:detail.capacityValue', {
-            approved: event.approvedCount,
-            capacity: event.capacity,
-          })}
-        />
+        <View style={{ gap: spacing[2] }}>
+          <Text variant="label" tone="secondary">
+            {t('events:detail.capacity')}
+          </Text>
+          <SlotMeter approved={event.approvedCount} capacity={event.capacity} />
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: spacing[2],
+            }}
+          >
+            <Text variant="titleSm">
+              {t('events:detail.capacityValue', {
+                approved: event.approvedCount,
+                capacity: event.capacity,
+              })}
+            </Text>
+            <Text tone="secondary">
+              {openSlots > 0
+                ? t('events:detail.spotsLeft', { count: openSlots })
+                : t('events:detail.full')}
+            </Text>
+          </View>
+        </View>
+      </Card>
+
+      <Card>
         <Row
           label={t('events:detail.skill')}
           value={
@@ -183,13 +256,14 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
         {event.private?.participantNotes ? (
           <Row label={t('events:detail.notes')} value={event.private.participantNotes} />
         ) : null}
-        {event.description ? <Text>{event.description}</Text> : null}
-        {event.visibility === 'INVITE_ONLY' ? (
-          <Text variant="caption" tone="secondary">
-            {t('events:detail.visibilityInvite')}
-          </Text>
-        ) : null}
-      </View>
+      </Card>
+
+      {event.description ? <Text>{event.description}</Text> : null}
+      {event.visibility === 'INVITE_ONLY' ? (
+        <Text variant="caption" tone="secondary">
+          {t('events:detail.visibilityInvite')}
+        </Text>
+      ) : null}
 
       {isOrganizer ? (
         <View style={{ gap: spacing[3] }}>

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { useTheme } from '@/ui';
+import { Text, useTheme } from '@/ui';
 
 /**
  * Filled-spots meter (design.md §4.2 rule 3): the track is a 1 px `borderStrong` outline on the sunken
@@ -29,6 +29,38 @@ export function SlotMeter({ approved, capacity }: { approved: number; capacity: 
           backgroundColor: colors.actionPrimary,
         }}
       />
+    </View>
+  );
+}
+
+/** Small status label. Never colour alone: it always carries words (design.md §4.2 rule 2). */
+export function Pill({
+  label,
+  tone = 'neutral',
+}: {
+  label: string;
+  tone?: 'neutral' | 'success' | 'warning' | 'danger';
+}) {
+  const { colors, radius, spacing } = useTheme();
+  const accent = {
+    neutral: colors.borderStrong,
+    success: colors.success,
+    warning: colors.warning,
+    danger: colors.danger,
+  }[tone];
+  return (
+    <View
+      style={{
+        alignSelf: 'flex-start',
+        paddingHorizontal: spacing[3],
+        paddingVertical: spacing[1],
+        borderRadius: radius.pill,
+        borderWidth: 1,
+        borderColor: accent,
+        backgroundColor: colors.surfaceSunken,
+      }}
+    >
+      <Text variant="label">{label}</Text>
     </View>
   );
 }

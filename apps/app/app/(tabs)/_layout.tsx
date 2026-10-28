@@ -28,6 +28,8 @@ export default function TabsLayout() {
 
   return (
     <Tabs
+      // Opening an event from a tab and going back returns to where the user came from.
+      backBehavior="history"
       screenOptions={{
         headerShown: false,
         tabBarPosition: wide ? 'left' : 'bottom',
@@ -72,6 +74,12 @@ export default function TabsLayout() {
             ),
           }}
         />
+      ))}
+      {/* Event routes (/e/<id>, edit, cancel) live in this group so the navigation stays visible, but
+          they are not destinations of their own: no bar/rail button. `href: null` is not an option,
+          it marks the tab hidden and navigating to a hidden tab redirects away (expo-router 58). */}
+      {(['e/[id]/index', 'e/[id]/edit', 'e/[id]/cancel'] as const).map((name) => (
+        <Tabs.Screen key={name} name={name} options={{ tabBarButton: () => null }} />
       ))}
     </Tabs>
   );

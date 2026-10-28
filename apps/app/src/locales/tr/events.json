@@ -104,6 +104,12 @@
     "deleted": "Taslak silindi.",
     "publishedToast": "Etkinliğin yayında.",
     "completedToast": "Etkinlik tamamlandı olarak işaretlendi.",
+    "backToDiscover": "Geri",
+    "lastSpot": "Son yer!",
+    "startsSoon": "2 saat içinde başlıyor",
+    "spotsLeft_one": "{{count}} yer kaldı",
+    "spotsLeft_other": "{{count}} yer kaldı",
+    "full": "Dolu",
     "durationValue": "{{count}} dk"
   },
   "edit": {

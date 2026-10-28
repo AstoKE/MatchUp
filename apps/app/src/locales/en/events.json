@@ -104,6 +104,12 @@
     "deleted": "Draft deleted.",
     "publishedToast": "Your event is live.",
     "completedToast": "Event marked as completed.",
+    "backToDiscover": "Back",
+    "lastSpot": "Last spot!",
+    "startsSoon": "Starts within 2 hours",
+    "spotsLeft_one": "{{count}} spot left",
+    "spotsLeft_other": "{{count}} spots left",
+    "full": "Full",
     "durationValue": "{{count}} min"
   },
   "edit": {

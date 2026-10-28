@@ -83,9 +83,16 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
     await expect(page).toHaveURL(/\/e\/[0-9a-f-]{36}$/);
     const eventUrl = page.url();
     await expect(page.getByRole('heading', { name: 'E2E perşembe maçı', level: 1 })).toBeVisible();
-    await expect(page.getByText('Futbol · 5v5 · Yayında')).toBeVisible();
-    await expect(page.getByText('1/11 kişi')).toBeVisible();
-    await expect(page.getByText('Çankaya · ODTÜ Halı Saha 2 · Üniversiteler Mh. 1')).toBeVisible();
+    const main = page.getByRole('main');
+    await expect(main.getByText('Futbol · 5v5', { exact: true })).toBeVisible();
+    await expect(main.getByText('Yayında', { exact: true })).toBeVisible();
+    // The main navigation stays available on the event page (it is not a dead end).
+    for (const name of ['Keşfet', 'Etkinliklerim', 'Oluştur', 'Profil']) {
+      await expect(page.getByRole('tab', { name })).toBeVisible();
+    }
+    await expect(page.getByRole('tab')).toHaveCount(4);
+    await expect(main.getByText('1/11 kişi')).toBeVisible();
+    await expect(main.getByText('Çankaya · ODTÜ Halı Saha 2 · Üniversiteler Mh. 1')).toBeVisible();
     await expectNoBlocking(page);
 
     await page.getByRole('button', { name: 'Düzenle' }).click();
@@ -149,5 +156,16 @@ test.describe('discovering events (Phase 3 / M3)', () => {
     await card.click();
     await expect(page).toHaveURL(new RegExp(`/e/${eventId}$`));
     await expect(page.getByRole('heading', { name: title, level: 1 })).toBeVisible();
+    const detail = page.getByRole('main');
+    await expect(detail.getByText('1/12 kişi', { exact: true })).toBeVisible();
+    await expect(detail.getByText('11 yer kaldı')).toBeVisible();
+    await expectNoBlocking(page);
+
+    // From the event page the guest can go back to the list and use the navigation.
+    await page.getByRole('button', { name: 'Geri' }).click();
+    await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
+    await page.getByRole('link', { name: new RegExp(title) }).click();
+    await page.getByRole('tab', { name: 'Keşfet' }).click();
+    await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
   });
 });
