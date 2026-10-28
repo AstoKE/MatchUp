@@ -12,12 +12,25 @@ const config = getDefaultConfig(__dirname);
  */
 const UNUSED_ZOD_MODULES =
   /[\\/]zod[\\/]v4[\\/](?:locales[\\/]index|core[\\/](?:compile|to-json-schema|json-schema-processors|json-schema-generator))\.c?js$/;
+/**
+ * Same idea for Sentry on web: `@sentry/browser` re-exports session replay and the feedback widget, so
+ * they ship (~57 kB gzip) in the lazily loaded Sentry chunk although the app never calls them (no replay
+ * in the MVP, sendDefaultPii off; see lib/observability/sentry.ts). They resolve to a stub (metro/sentry-unused-stub.js) because an empty module breaks Sentry's own
+ * initialization; using `replayIntegration` / `feedbackIntegration` then throws: remove this entry first. Verified with a dummy DSN in docs/PERFORMANCE.md §3.6.
+ */
+const UNUSED_SENTRY_MODULES =
+  /[\\/]node_modules[\\/]@sentry[\\/](?:replay|feedback)[\\/]build[\\/]npm[\\/](?:esm|cjs)[\\/]index\.js$/;
 const EMPTY_MODULE = path.join(__dirname, 'metro', 'empty-module.js');
+const SENTRY_STUB = path.join(__dirname, 'metro', 'sentry-unused-stub.js');
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   const resolution = context.resolveRequest(context, moduleName, platform);
-  if (resolution.type === 'sourceFile' && UNUSED_ZOD_MODULES.test(resolution.filePath)) {
+  if (resolution.type !== 'sourceFile') return resolution;
+  if (UNUSED_ZOD_MODULES.test(resolution.filePath)) {
     return { type: 'sourceFile', filePath: EMPTY_MODULE };
+  }
+  if (UNUSED_SENTRY_MODULES.test(resolution.filePath)) {
+    return { type: 'sourceFile', filePath: SENTRY_STUB };
   }
   return resolution;
 };
