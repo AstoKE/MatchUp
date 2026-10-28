@@ -1,5 +1,5 @@
 import { AxeBuilder } from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Browser, type Page } from '@playwright/test';
 import {
   createOnboardedUser,
   createPublishedEvent,
@@ -211,5 +211,83 @@ test.describe('My Events (Phase 3 / M3b)', () => {
     await expect(stranger.getByText('Düzenlediğin etkinlik yok')).toBeVisible();
     await expect(stranger.getByRole('main').getByText(new RegExp(`E2E .* ${tag}`))).toHaveCount(0);
     await context.close();
+  });
+});
+
+test.describe('joining an event (Phase 3 / M4)', () => {
+  async function userPage(browser: Browser, email: string) {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await signIn(page, email);
+    return { page, context };
+  }
+
+  test('request → organizer is notified and approves → player is in; withdraw; auto-approve', async ({
+    browser,
+  }) => {
+    const s = requireStack();
+    const organizerEmail = uniqueEmail('host');
+    const playerEmail = uniqueEmail('player');
+    createdIds.push((await createOnboardedUser(s, organizerEmail)).id);
+    createdIds.push(
+      (await createOnboardedUser(s, playerEmail, { displayName: 'Deniz Oyuncu' })).id,
+    );
+    const tag = organizerEmail.slice(5, 13);
+    const title = `E2E katılım ${tag}`;
+    const eventId = await createPublishedEvent(s, organizerEmail, title);
+
+    // The player asks to join, with a message.
+    const player = await userPage(browser, playerEmail);
+    await player.page.goto(`/e/${eventId}`);
+    const detail = player.page.getByRole('main');
+    await detail.getByRole('button', { name: 'Katılma isteği gönder' }).click();
+    await detail.getByLabel('Organizatöre mesaj (isteğe bağlı)').fill('Orta saha oynarım');
+    await expectNoBlocking(player.page);
+    await detail.getByRole('button', { name: 'İsteği gönder' }).click();
+    await expect(detail.getByText('İstek gönderildi', { exact: true })).toBeVisible();
+    await expect(detail.getByRole('button', { name: 'İsteği geri çek' })).toBeVisible();
+
+    // The organizer sees the request and approves it.
+    const host = await userPage(browser, organizerEmail);
+    await host.page.getByRole('tab', { name: 'Etkinliklerim' }).click();
+    const hostMain = host.page.getByRole('main');
+    await host.page.goto(`/e/${eventId}`);
+    await expect(hostMain.getByText('Deniz Oyuncu')).toBeVisible();
+    await expect(hostMain.getByText('Orta saha oynarım')).toBeVisible();
+    await expect(hostMain.getByRole('button', { name: 'Katılma isteği gönder' })).toHaveCount(0);
+    await expectNoBlocking(host.page);
+    await hostMain.getByRole('button', { name: 'Onayla' }).click();
+    await expect(hostMain.getByText('Onaylı oyuncu (1)')).toBeVisible();
+    await expect(hostMain.getByText('2/12 kişi', { exact: true })).toBeVisible();
+
+    // The player is in and sees it in My Events.
+    await player.page.reload();
+    await expect(
+      player.page.getByRole('main').getByText('Onaylandın', { exact: true }),
+    ).toBeVisible();
+    await player.page.getByRole('tab', { name: 'Etkinliklerim' }).click();
+    await player.page.getByRole('main').getByRole('radio', { name: 'Onaylı' }).click();
+    await expect(
+      player.page.getByRole('main').getByRole('link', { name: new RegExp(title) }),
+    ).toBeVisible();
+
+    // Withdrawing frees the spot again.
+    await player.page.goto(`/e/${eventId}`);
+    await player.page.getByRole('main').getByRole('button', { name: 'Etkinlikten ayrıl' }).click();
+    await expect(
+      player.page.getByRole('main').getByRole('button', { name: 'Katılma isteği gönder' }),
+    ).toBeVisible();
+
+    // An auto-approve event admits the player at once.
+    const autoTitle = `E2E otomatik ${tag}`;
+    const autoId = await createPublishedEvent(s, organizerEmail, autoTitle, { autoApprove: true });
+    await player.page.goto(`/e/${autoId}`);
+    const auto = player.page.getByRole('main');
+    await auto.getByRole('button', { name: 'Katılma isteği gönder' }).click();
+    await auto.getByRole('button', { name: 'İsteği gönder' }).click();
+    await expect(auto.getByText('Onaylandın', { exact: true })).toBeVisible();
+
+    await player.context.close();
+    await host.context.close();
   });
 });

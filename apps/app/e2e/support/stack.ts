@@ -138,7 +138,7 @@ export async function createPublishedEvent(
   stack: LocalStack,
   email: string,
   title: string,
-  options: { publish?: boolean } = {},
+  options: { publish?: boolean; autoApprove?: boolean } = {},
 ): Promise<string> {
   const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
   const tokenResponse = await fetch(`${stack.apiUrl}/auth/v1/token?grant_type=password`, {
@@ -174,6 +174,7 @@ export async function createPublishedEvent(
         district_id: district.id,
         location_label: 'ODTÜ Halı Saha 2',
         capacity: 12,
+        auto_approve: options.autoApprove ?? false,
       },
     }),
   });

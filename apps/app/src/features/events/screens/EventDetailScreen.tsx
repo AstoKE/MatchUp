@@ -8,6 +8,8 @@ import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { Banner, Button, EmptyState, Screen, Text, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
+import { JoinPanel } from '../components/JoinPanel';
+import { RequestsPanel } from '../components/RequestsPanel';
 import { Pill, SlotMeter } from '../components/SlotMeter';
 import { formatCost, formatEventStart } from '../format';
 import { useCompleteEvent, useDeleteDraft, useEvent, usePublishEvent } from '../hooks';
@@ -264,6 +266,9 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
           {t('events:detail.visibilityInvite')}
         </Text>
       ) : null}
+
+      {!isOrganizer && joinable ? <JoinPanel event={event} catalog={catalog} /> : null}
+      {isOrganizer && event.status === 'PUBLISHED' ? <RequestsPanel event={event} /> : null}
 
       {isOrganizer ? (
         <View style={{ gap: spacing[3] }}>
