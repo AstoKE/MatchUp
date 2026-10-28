@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { VerifyEmailBanner } from '@/features/auth';
 import { useCatalog } from '@/features/catalog';
+import { NotificationBell } from '@/features/notifications';
 import { RequireOnboarded } from '@/features/onboarding';
 import { errorText } from '@/lib/error-text';
 import { i18n } from '@/lib/i18n';
@@ -68,9 +69,20 @@ function MyEventsContent() {
     <>
       <Screen>
         <VerifyEmailBanner />
-        <Text variant="headline" heading={1}>
-          {t('nav:myEvents')}
-        </Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: spacing[3],
+          }}
+        >
+          <Text variant="headline" heading={1}>
+            {t('nav:myEvents')}
+          </Text>
+          <NotificationBell />
+        </View>
         <SegmentedChoice
           label={t('events:mine.bucketLabel')}
           options={MY_EVENT_BUCKETS.map((value) => ({

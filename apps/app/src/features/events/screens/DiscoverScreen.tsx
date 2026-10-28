@@ -11,6 +11,7 @@ import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useCatalog } from '@/features/catalog';
+import { NotificationBell } from '@/features/notifications';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { Button, EmptyState, Screen, Skeleton, Text, useTheme } from '@/ui';
@@ -61,6 +62,7 @@ export function DiscoverScreen() {
           </Text>
           <Text tone="secondary">{brand.taglines[currentLocale()]}</Text>
         </View>
+        <NotificationBell />
       </View>
 
       {catalog.data ? (

@@ -247,10 +247,11 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     await expect(detail.getByText('İstek gönderildi', { exact: true })).toBeVisible();
     await expect(detail.getByRole('button', { name: 'İsteği geri çek' })).toBeVisible();
 
-    // The organizer sees the request and approves it.
+    // The organizer sees the unread notification, the request, and approves it.
     const host = await userPage(browser, organizerEmail);
     await host.page.getByRole('tab', { name: 'Etkinliklerim' }).click();
     const hostMain = host.page.getByRole('main');
+    await expect(hostMain.getByRole('button', { name: 'Bildirimler, 1 okunmamış' })).toBeVisible();
     await host.page.goto(`/e/${eventId}`);
     await expect(hostMain.getByText('Deniz Oyuncu')).toBeVisible();
     await expect(hostMain.getByText('Orta saha oynarım')).toBeVisible();
@@ -260,7 +261,7 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     await expect(hostMain.getByText('Onaylı oyuncu (1)')).toBeVisible();
     await expect(hostMain.getByText('2/12 kişi', { exact: true })).toBeVisible();
 
-    // The player is in and sees it in My Events.
+    // The player is in, sees it in My Events, and has a notification.
     await player.page.reload();
     await expect(
       player.page.getByRole('main').getByText('Onaylandın', { exact: true }),
@@ -270,6 +271,15 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     await expect(
       player.page.getByRole('main').getByRole('link', { name: new RegExp(title) }),
     ).toBeVisible();
+    await player.page
+      .getByRole('main')
+      .getByRole('button', { name: /^Bildirimler/ })
+      .click();
+    await expect(player.page.getByRole('heading', { name: 'Bildirimler', level: 1 })).toBeVisible();
+    await expect(
+      player.page.getByRole('main').getByText(`${title} için isteğin onaylandı.`),
+    ).toBeVisible();
+    await expectNoBlocking(player.page);
 
     // Withdrawing frees the spot again.
     await player.page.goto(`/e/${eventId}`);
