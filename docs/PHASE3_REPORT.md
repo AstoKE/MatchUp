@@ -42,7 +42,7 @@ Each commit of the Phase 3 pull requests was built and gated on its own tree, no
 
 ## 4. Hosted project
 
-Schema pushed on 2026-10-29 for the first three migrations above (dry-run first, then the advisor: no errors, only expected warnings, see `docs/DEPLOYMENT.md` §9). `20261030100000_event_setting.sql` goes after its pull request is merged. The **signed-in** paths (request, approve, notifications) were exercised on the local stack only; nobody has used them on hosted. Public sign-up must stay disabled (legal texts are drafts).
+All Phase 3 migrations are on the hosted project (pushed on 2026-10-29 and 2026-10-30, dry-run first, only migrations already on `main`, then the advisor: no errors, only expected warnings; see `docs/DEPLOYMENT.md` §9). The **signed-in** paths (request, approve, notifications) were exercised on the local stack only; nobody has used them on hosted. Public sign-up must stay disabled (legal texts are drafts).
 
 ## 5. Not done, and limitations
 
@@ -64,4 +64,4 @@ Schema pushed on 2026-10-29 for the first three migrations above (dry-run first,
 
 ## 7. Recommended next step
 
-Phase 3's code gaps are closed. The one open item before calling it fully done is the **Android run of the checklist** (it needs the Windows bench). After that, Phase 4 (venues, map, distance) starts only on explicit instruction (CLAUDE.md). Also pending: the pull request for the UI/indoor-outdoor/`get_event` branch, then pushing its two migrations (`20261030100000_event_setting`, `20261030110000_get_event_and_invites`) to the hosted project.
+Phase 3's code gaps are closed. The one open item before calling it fully done is the **Android run of the checklist** (it needs the Windows bench). After that, Phase 4 (venues, map, distance) starts only on explicit instruction (CLAUDE.md). The pull requests are merged (#17–#19) and the hosted schema is current.
