@@ -57,6 +57,19 @@ Earlier the founder confirmed by hand: sign-up, sign-in, staying signed in after
 
 Metro's first bundle after JavaScript changes can take a minute; the runner now waits for the home screen once before the flows (a blank white screen in the first flow was this, not a defect). Maestro's `hideKeyboard` leaves the app when Android shows only Gboard's floating toolbar (hardware keyboard emulation), so the flows do not use it. Clearing app data also resets the per-app language, so N13 sets the language after the clear. Metro must not run with `CI=1` (no file watching → stale JS). Run from PowerShell via `scripts/android/dev.ps1` (plain `bash` there is WSL).
 
+## Phase 3 on the device: checklist, **not run yet**
+
+The 22 automated checks above date from Phase 2 and were **not** re-run for Phase 3; nothing here has been verified on a device, and no Maestro flow covers it yet (they would have to be written and run on the Windows bench, which this Linux machine cannot do). Run it by hand and write the result down. Rebuild the APK first (`bash scripts/android/build-apk.sh debug x86_64`): the Expo SDK patch versions changed after the last build. Start with `.\scripts\android\dev.ps1 up`, two accounts (organizer, player) and the Mailpit link for each.
+
+1. **Discover:** the first event is on the first screen; "Filters" opens and closes the panel; chips with sport icons; today / tomorrow headings; the profile note for a signed-in player and "Clear filters".
+2. **Create an event** with the indoor/outdoor choice and the auto-approve box; publish; it appears under My Events → Organizing and on Discover.
+3. **Event page as the player:** the pinned "Request to join" button stays visible while scrolling; open the request form and type with the **on-screen keyboard**: the form must stay usable (the area is limited to 360 px and scrolls); send; "Request sent" state.
+4. **Organizer:** the bell shows 1 unread; open the inbox, tap the item (it opens the event and marks it read); approve from the queue; the player sees "You're in", the place and the roster; withdraw works.
+5. **Auto-approve:** a second event with auto-approve admits the player at once.
+6. **Invite-only:** create one; copy/share the link from the page (the **system share sheet** opens on native); open it as a guest through a deep link (`adb shell am start -a android.intent.action.VIEW -d "matchup-dev://e/<id>?invite=<token>"`), then without `?invite=`: not found.
+7. **TalkBack:** event page reading order (title, facts, spots, request button last or pinned and announced), the filter button's expanded state, the roster list, the inbox items.
+8. Dark mode and a font scale of 1.6 on Discover and the event page (nothing truncated that matters: time, place, spots).
+
 ## Next
 
 1. Physical Android device pass; TalkBack walk-through on the real screen reader.

@@ -63,7 +63,9 @@
     "equipment": "Ekipman notu (isteğe bağlı)",
     "participantNotes": "Katılımcılara özel not (isteğe bağlı)",
     "participantNotesHint": "Sadece onayladığın katılımcılar görür (örn. buluşma yeri).",
-    "immutableHint": "Yayınlandıktan sonra spor, format ve oynama durumu değiştirilemez."
+    "immutableHint": "Yayınlandıktan sonra spor, format ve oynama durumu değiştirilemez.",
+    "setting": "Mekan türü",
+    "settingNone": "Belirtmeyeceğim"
   },
   "booking": {
     "NOT_REQUIRED": "Gerekmiyor",
@@ -112,7 +114,13 @@
     "spotsLeft_one": "{{count}} yer kaldı",
     "spotsLeft_other": "{{count}} yer kaldı",
     "full": "Dolu",
-    "durationValue": "{{count}} dk"
+    "durationValue": "{{count}} dk",
+    "setting": "Mekan türü",
+    "organizer": "Düzenleyen",
+    "participants_one": "Katılanlar ({{count}})",
+    "participants_other": "Katılanlar ({{count}})",
+    "participantsNone": "Henüz onaylanmış başka oyuncu yok.",
+    "participantsHidden": "Katılımcı listesi onaylanan oyunculara gösterilir."
   },
   "edit": {
     "title": "Etkinliği düzenle",
@@ -180,7 +188,9 @@
       "TOMORROW": "Yarın"
     },
     "fromProfile": "Profilindeki sporlar gösteriliyor. Daha fazlası için filtreleri değiştir ya da temizle.",
-    "filtersWithCount": "Filtreler ({{count}})"
+    "filtersWithCount": "Filtreler ({{count}})",
+    "setting": "Mekan türü",
+    "settingAny": "Fark etmez"
   },
   "join": {
     "signInToJoin": "Giriş yap ve katıl",
@@ -306,5 +316,17 @@
     "EQUIPMENT_TOO_LONG": "Ekipman notu en fazla 500 karakter olabilir.",
     "CANCEL_REASON_REQUIRED": "Bir sebep seç.",
     "CANCEL_MESSAGE_TOO_LONG": "Mesaj en fazla 500 karakter olabilir."
+  },
+  "setting": {
+    "INDOOR": "Kapalı salon",
+    "OUTDOOR": "Açık hava"
+  },
+  "invite": {
+    "title": "Davet bağlantısı",
+    "body": "Bu etkinlik yalnızca davetle görünür. Bağlantıya sahip herkes etkinliği görür ve katılma isteği gönderebilir; yalnızca seçtiğin kişilerle paylaş.",
+    "linkLabel": "Davet bağlantısı",
+    "share": "Bağlantıyı kopyala ya da paylaş",
+    "copied": "Bağlantı kopyalandı.",
+    "failed": "Bağlantı kopyalanamadı."
   }
 }

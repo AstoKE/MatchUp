@@ -43,11 +43,14 @@ export async function requestJoin(args: {
   eventId: string;
   message: string | null;
   positionId: string | null;
+  /** The secret of an invite-only event (from the shared link); ignored for public events. */
+  inviteToken?: string | null;
 }): Promise<(typeof JOIN_RESULTS)[number]> {
   const { data, error } = await supabase.rpc('request_join', {
     p_event_id: args.eventId,
     p_message: args.message ?? undefined,
     p_position_id: args.positionId ?? undefined,
+    p_invite_token: args.inviteToken ?? undefined,
   });
   if (error) throw mapRpcError(error);
   return z.enum(JOIN_RESULTS).parse(data);

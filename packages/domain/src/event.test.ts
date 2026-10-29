@@ -33,6 +33,7 @@ const draft = (over: Partial<EventDraft> = {}): EventDraft => ({
   organizerPlays: true,
   waitlistEnabled: true,
   autoApprove: false,
+  setting: null,
   visibility: 'PUBLIC',
   skillMin: null,
   skillMax: null,
@@ -235,6 +236,7 @@ describe('toEventInput', () => {
       capacity: 12,
       waitlist_enabled: true,
       auto_approve: false,
+      setting: null,
       organizer_plays: true,
       skill_min: null,
       skill_max: null,
@@ -243,6 +245,11 @@ describe('toEventInput', () => {
       cost_note: null,
       equipment_note: null,
     });
+  });
+
+  it('sends the indoor / outdoor choice, null when not stated', () => {
+    expect(toEventInput(draft(), IST).setting).toBeNull();
+    expect(toEventInput(draft({ setting: 'INDOOR' }), IST).setting).toBe('INDOOR');
   });
 
   it('sends the auto-approve choice, off unless chosen', () => {

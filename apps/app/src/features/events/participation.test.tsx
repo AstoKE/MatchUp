@@ -83,10 +83,11 @@ jest.mock('@/features/onboarding/api/onboarding-api', () => ({
   acceptCurrentLegalTerms: jest.fn(),
 }));
 
+let mockInvite: string | undefined;
 const mockRouter = { replace: jest.fn(), push: jest.fn(), back: jest.fn(), canGoBack: jest.fn() };
 jest.mock('expo-router', () => ({
   useRouter: () => mockRouter,
-  useLocalSearchParams: () => ({ id: '00000000-0000-4000-8000-0000000000e1' }),
+  useLocalSearchParams: () => ({ id: '00000000-0000-4000-8000-0000000000e1', invite: mockInvite }),
   usePathname: () => '/e/00000000-0000-4000-8000-0000000000e1',
 }));
 
@@ -101,7 +102,10 @@ const organizer: SessionState = { ...player, userId: ORGANIZER };
 function event(over: Partial<EventDetails> = {}): EventDetails {
   return {
     id: EVENT,
-    organizerId: ORGANIZER,
+    isOrganizer: false,
+    organizerName: 'Ayşe A',
+    inviteToken: null,
+    participants: null,
     status: 'PUBLISHED',
     title: 'Perşembe maçı',
     description: null,
@@ -125,6 +129,7 @@ function event(over: Partial<EventDetails> = {}): EventDetails {
     bookingStatus: 'NOT_REQUIRED',
     costAmountMinor: null,
     costNote: null,
+    setting: null,
     equipmentNote: null,
     cancelReason: null,
     cancelMessage: null,
@@ -169,6 +174,12 @@ const pressReady = async (name: string) =>
   fireEvent.press(await screen.findByRole('button', { name }));
 
 describe('joining an event', () => {
+  it('shows the indoor / outdoor row on the event page only when it was stated', async () => {
+    mockApi.fetchEvent.mockResolvedValue(event({ setting: 'INDOOR' }));
+    await renderApp(<EventDetailScreen />);
+    expect((await screen.findAllByText('Kapalı salon')).length).toBeGreaterThan(0);
+  });
+
   it('sends a guest to sign in and back to this event', async () => {
     await renderApp(<EventDetailScreen />);
     await pressReady('Giriş yap ve katıl');
@@ -192,6 +203,7 @@ describe('joining an event', () => {
       eventId: EVENT,
       message: 'Orta saha oynarım',
       positionId: null,
+      inviteToken: null,
     });
     expect(
       await screen.findByText('İstek gönderildi. Organizatör onaylayınca haber vereceğiz.'),
@@ -285,7 +297,62 @@ describe('joining an event', () => {
   });
 });
 
+describe('the event page for different viewers', () => {
+  it('shows the organizer and, to someone allowed to, the approved players', async () => {
+    mockApi.fetchEvent.mockResolvedValue(
+      event({ participants: [{ displayName: 'Deniz D' }, { displayName: null }] }),
+    );
+    await renderApp(<EventDetailScreen />, { session: player });
+    expect(await screen.findByText('Ayşe A')).toBeTruthy();
+    expect(screen.getByText('Katılanlar (2)')).toBeTruthy();
+    expect(screen.getByText('Deniz D')).toBeTruthy();
+    expect(screen.getByText('Oyuncu')).toBeTruthy();
+  });
+
+  it('says the list of players is reserved when it is not visible', async () => {
+    mockApi.fetchEvent.mockResolvedValue(event({ approvedCount: 5, participants: null }));
+    await renderApp(<EventDetailScreen />);
+    expect(
+      await screen.findByText('Katılımcı listesi onaylanan oyunculara gösterilir.'),
+    ).toBeTruthy();
+    expect(screen.queryByText(/^Katılanlar/)).toBeNull();
+  });
+
+  it('shows the invite link to the organizer of an invite-only event, and only to them', async () => {
+    mockApi.fetchEvent.mockResolvedValue(
+      event({ isOrganizer: true, visibility: 'INVITE_ONLY', inviteToken: 'abc123' }),
+    );
+    await renderApp(<EventDetailScreen />, { session: organizer });
+    expect(await screen.findByText('Davet bağlantısı')).toBeTruthy();
+    expect(screen.getByText(`http://localhost:8081/e/${EVENT}?invite=abc123`)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Bağlantıyı kopyala ya da paylaş' })).toBeTruthy();
+  });
+
+  it('shows no invite link to anyone else, and none for a public event', async () => {
+    mockApi.fetchEvent.mockResolvedValue(event({ visibility: 'INVITE_ONLY', inviteToken: null }));
+    await renderApp(<EventDetailScreen />, { session: player });
+    await screen.findByText('Perşembe maçı');
+    expect(screen.queryByText('Davet bağlantısı')).toBeNull();
+    expect(screen.queryByText(/invite=/)).toBeNull();
+  });
+
+  it('asks for the event with the token from the link and sends it with the request', async () => {
+    mockInvite = 'tok-from-link';
+    mockApi.fetchEvent.mockResolvedValue(event({ visibility: 'INVITE_ONLY' }));
+    await renderApp(<EventDetailScreen />, { session: player });
+    await pressReady('Katılma isteği gönder');
+    await press('İsteği gönder');
+    expect(mockApi.fetchEvent.mock.calls[0]).toEqual([EVENT, 'tok-from-link']);
+    expect(mockApi.requestJoin.mock.calls[0]?.[0]).toMatchObject({ inviteToken: 'tok-from-link' });
+    mockInvite = undefined;
+  });
+});
+
 describe("the organizer's queue", () => {
+  beforeEach(() => {
+    mockApi.fetchEvent.mockResolvedValue(event({ isOrganizer: true }));
+  });
+
   it('is not shown to players and the organizer does not see the join panel', async () => {
     await renderApp(<EventDetailScreen />, { session: organizer });
     await screen.findByText('Perşembe maçı');
@@ -295,6 +362,7 @@ describe("the organizer's queue", () => {
   });
 
   it('never asks for the queue on behalf of a player', async () => {
+    mockApi.fetchEvent.mockResolvedValue(event({ isOrganizer: false }));
     await renderApp(<EventDetailScreen />, { session: player });
     await screen.findByText('Perşembe maçı');
     expect(mockApi.fetchEventRequests).not.toHaveBeenCalled();
@@ -324,7 +392,7 @@ describe("the organizer's queue", () => {
   });
 
   it('cannot approve beyond the capacity and says why', async () => {
-    mockApi.fetchEvent.mockResolvedValue(event({ approvedCount: 12 }));
+    mockApi.fetchEvent.mockResolvedValue(event({ isOrganizer: true, approvedCount: 12 }));
     mockApi.fetchEventRequests.mockResolvedValue([request()]);
     await renderApp(<EventDetailScreen />, { session: organizer });
     await screen.findByText('Deniz D');

@@ -80,8 +80,8 @@ insert into public.user_sport_profiles (user_id, sport_id, self_assessed_level)
 values (pg_temp.u(2), (select id from public.sports where slug = 'football'), 3.5);
 
 -- ---- grants ------------------------------------------------------------------------------------------------
-select function_privs_are('public', 'request_join', array['uuid', 'text', 'uuid'], 'anon', array[]::text[], 'guests cannot request');
-select function_privs_are('public', 'request_join', array['uuid', 'text', 'uuid'], 'authenticated', array['EXECUTE'], 'users can request');
+select function_privs_are('public', 'request_join', array['uuid', 'text', 'uuid', 'text'], 'anon', array[]::text[], 'guests cannot request');
+select function_privs_are('public', 'request_join', array['uuid', 'text', 'uuid', 'text'], 'authenticated', array['EXECUTE'], 'users can request');
 select function_privs_are('public', 'cancel_participation', array['uuid'], 'anon', array[]::text[], 'guests cannot cancel');
 select function_privs_are('public', 'approve_participation', array['uuid'], 'anon', array[]::text[], 'guests cannot approve');
 select function_privs_are('public', 'reject_participation', array['uuid'], 'anon', array[]::text[], 'guests cannot reject');

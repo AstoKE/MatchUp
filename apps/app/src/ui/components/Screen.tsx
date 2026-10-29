@@ -10,6 +10,8 @@ export interface ScreenProps {
   /** Constrain and center content on wide layouts (UI_DESIGN_SYSTEM §6). */
   maxWidth?: number;
   contentStyle?: StyleProp<ViewStyle>;
+  /** Pinned below the scrolling content (the page's one dominant action on a phone, design.md §8). */
+  footer?: ReactNode;
   testID?: string;
 }
 
@@ -22,6 +24,7 @@ export function Screen({
   scroll = true,
   maxWidth = 960,
   contentStyle,
+  footer,
   testID,
 }: ScreenProps) {
   const { colors, spacing, breakpoint } = useTheme();
@@ -68,6 +71,20 @@ export function Screen({
       ) : (
         inner
       )}
+      {footer ? (
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: colors.borderSubtle,
+            backgroundColor: colors.surfaceRaised,
+            paddingHorizontal: gutter,
+            paddingVertical: spacing[3],
+            alignItems: 'center',
+          }}
+        >
+          <View style={{ width: '100%', maxWidth }}>{footer}</View>
+        </View>
+      ) : null}
     </View>
   );
 }

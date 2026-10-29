@@ -19,7 +19,16 @@ const MAX_REQUESTS = 3;
  * not just the colour. The server decides everything (capacity, who may ask, the three-request limit);
  * this panel only mirrors what it answers. Guests are sent to sign in and come back here.
  */
-export function JoinPanel({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
+export function JoinPanel({
+  event,
+  catalog,
+  inviteToken = null,
+}: {
+  event: EventDetails;
+  catalog: Catalog;
+  /** From the shared link of an invite-only event. */
+  inviteToken?: string | null;
+}) {
   const { t } = useTranslation(['events', 'common']);
   const { spacing } = useTheme();
   const router = useRouter();
@@ -139,7 +148,7 @@ export function JoinPanel({ event, catalog }: { event: EventDetails; catalog: Ca
         onPress={() => {
           setError(null);
           join.mutate(
-            { eventId: event.id, message: message.trim() || null, positionId },
+            { eventId: event.id, message: message.trim() || null, positionId, inviteToken },
             {
               onSuccess: (result) => {
                 setOpen(false);

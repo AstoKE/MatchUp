@@ -10,7 +10,16 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, type CatalogCity, type CatalogSport } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
-import { Button, Checkbox, SegmentedChoice, Select, Text, ToggleChip, useTheme } from '@/ui';
+import {
+  Button,
+  Checkbox,
+  SegmentedChoice,
+  Select,
+  SportIcon,
+  Text,
+  ToggleChip,
+  useTheme,
+} from '@/ui';
 
 function toggle<T>(list: readonly T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
@@ -67,12 +76,24 @@ export function DiscoverFilters({
             <ToggleChip
               key={sport.id}
               label={localizedName(sport.names, locale)}
+              icon={(color) => <SportIcon slug={sport.slug} color={color} size={20} />}
               selected={filters.sportIds.includes(sport.id)}
               onPress={() => set({ sportIds: toggle(filters.sportIds, sport.id) })}
             />
           ))}
         </View>
       </View>
+
+      <SegmentedChoice
+        label={t('discover.setting')}
+        value={filters.setting ?? 'ANY'}
+        onChange={(value) => set({ setting: value === 'ANY' ? null : value })}
+        options={[
+          { value: 'ANY', label: t('discover.settingAny') },
+          { value: 'INDOOR', label: t('setting.INDOOR') },
+          { value: 'OUTDOOR', label: t('setting.OUTDOOR') },
+        ]}
+      />
 
       {city ? (
         <Select

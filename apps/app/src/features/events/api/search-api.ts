@@ -1,4 +1,10 @@
-import { BOOKING_STATUSES, mapRpcError, type SearchPayload } from '@matchup/domain';
+import {
+  BOOKING_STATUSES,
+  EVENT_SETTINGS,
+  mapRpcError,
+  type EventSetting,
+  type SearchPayload,
+} from '@matchup/domain';
 import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 
@@ -26,6 +32,7 @@ export const itemRow = z.object({
   cost_amount_minor: z.nullable(z.number()),
   cost_note: z.nullable(z.string()),
   booking_status: z.enum(BOOKING_STATUSES),
+  setting: z.nullable(z.enum(EVENT_SETTINGS)),
   organizer_name: z.nullable(z.string()),
 });
 
@@ -55,6 +62,8 @@ export interface EventListItem {
   skillMax: number | null;
   costAmountMinor: number | null;
   costNote: string | null;
+  /** Indoor / outdoor as the organizer stated it, or null. */
+  setting: EventSetting | null;
   organizerName: string | null;
 }
 
@@ -97,6 +106,7 @@ export function toListItem(row: z.infer<typeof itemRow>): EventListItem {
     skillMax: row.skill_max,
     costAmountMinor: row.cost_amount_minor,
     costNote: row.cost_note,
+    setting: row.setting,
     organizerName: row.organizer_name,
   };
 }

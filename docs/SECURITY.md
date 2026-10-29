@@ -139,7 +139,7 @@ As built (ADR-0017): re-authentication is checked **server-side** from the token
 | S-15 | Capacity race: N parallel approvals for last slot | exactly one succeeds |
 | S-16 | Rate-limit exceeded (events, requests, reports) | `RATE_LIMITED` |
 | S-17 | Upload non-image / oversize / other user's path | rejected |
-| S-18 | `INVITE_ONLY` event discovery without token | not returned |
+| S-18 | `INVITE_ONLY` event discovery without token | not returned: absent from search and My Events listings of others, `get_event` and `request_join` answer `NOT_FOUND` without the token (pgTAP 11, integration `get-event`, E2E invite flow). Invite links are capability URLs (ADR-0021): no rotation yet, keep the query string out of analytics and logs |
 | S-19 | Schema checks: every public table has RLS; no `SECURITY DEFINER` function lacks `search_path`; no secrets in bundle | CI gate |
 | S-20 | XSS payloads in titles/descriptions/names | rendered as inert text |
 

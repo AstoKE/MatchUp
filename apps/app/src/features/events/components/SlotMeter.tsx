@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { Text, useTheme } from '@/ui';
 
@@ -37,8 +38,11 @@ export function SlotMeter({ approved, capacity }: { approved: number; capacity: 
 export function Pill({
   label,
   tone = 'neutral',
+  icon,
 }: {
   label: string;
+  /** Decorative leading glyph (e.g. the sport icon). */
+  icon?: ReactNode;
   tone?: 'neutral' | 'success' | 'warning' | 'danger';
 }) {
   const { colors, radius, spacing } = useTheme();
@@ -58,8 +62,12 @@ export function Pill({
         borderWidth: 1,
         borderColor: accent,
         backgroundColor: colors.surfaceSunken,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing[2],
       }}
     >
+      {icon}
       <Text variant="label">{label}</Text>
     </View>
   );

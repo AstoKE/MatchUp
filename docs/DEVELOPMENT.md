@@ -93,5 +93,6 @@ Android setup, the container build and the Windows-specific pitfalls are in docs
 | `EnvError: Invalid environment configuration` | missing `EXPO_PUBLIC_*` — run `pnpm env:local` (stack must be running) |
 | pnpm: "Ignored build scripts" | intentional (supply-chain safety). Only `supabase` is allow-listed in `pnpm-workspace.yaml` |
 | Types drift in CI | run `pnpm db:types` locally and commit the result |
+| `health` integration tests answer 503 | the local `supabase_edge_runtime_matchup` container was stopped (a reboot or sleep); `pnpm db:start` does **not** bring a single stopped service back. `docker start supabase_edge_runtime_matchup`, or `pnpm db:stop && pnpm db:start` for a clean stack (CI always starts clean) |
 | Port 54321/54322 already in use | another Supabase stack is running (`pnpm db:stop` or `supabase stop --all`) |
 | Prettier reformatted a file you must not touch | add it to `.prettierignore` (we do this for the local `settings.json`) |

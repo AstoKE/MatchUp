@@ -236,6 +236,7 @@ export type Database = {
           public_location_label: string | null;
           published_at: string | null;
           registration_closes_at: string | null;
+          setting: Database['public']['Enums']['event_setting'] | null;
           skill_max: number | null;
           skill_min: number | null;
           sport_format_id: string;
@@ -278,6 +279,7 @@ export type Database = {
           public_location_label?: string | null;
           published_at?: string | null;
           registration_closes_at?: string | null;
+          setting?: Database['public']['Enums']['event_setting'] | null;
           skill_max?: number | null;
           skill_min?: number | null;
           sport_format_id: string;
@@ -319,6 +321,7 @@ export type Database = {
           public_location_label?: string | null;
           published_at?: string | null;
           registration_closes_at?: string | null;
+          setting?: Database['public']['Enums']['event_setting'] | null;
           skill_max?: number | null;
           skill_min?: number | null;
           sport_format_id?: string;
@@ -809,6 +812,7 @@ export type Database = {
       };
       delete_draft: { Args: { p_event_id: string }; Returns: undefined };
       export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
+      get_event: { Args: { p_event_id: string; p_invite_token?: string }; Returns: Json };
       get_my_account: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -838,7 +842,12 @@ export type Database = {
       replace_my_sport_profiles: { Args: { p_sports: Json }; Returns: undefined };
       request_account_deletion: { Args: Record<PropertyKey, never>; Returns: string };
       request_join: {
-        Args: { p_event_id: string; p_message?: string; p_position_id?: string };
+        Args: {
+          p_event_id: string;
+          p_invite_token?: string;
+          p_message?: string;
+          p_position_id?: string;
+        };
         Returns: string;
       };
       search_events: { Args: { p_cursor?: Json; p_filters?: Json }; Returns: Json };
@@ -871,6 +880,7 @@ export type Database = {
       consent_kind: 'TERMS' | 'PRIVACY_NOTICE' | 'MARKETING';
       event_cancel_reason:
         'WEATHER' | 'VENUE_UNAVAILABLE' | 'NOT_ENOUGH_PLAYERS' | 'ORGANIZER_UNAVAILABLE' | 'OTHER';
+      event_setting: 'INDOOR' | 'OUTDOOR';
       event_status: 'DRAFT' | 'PUBLISHED' | 'CANCELED' | 'COMPLETED';
       event_type: 'COMMUNITY' | 'PARTNER';
       event_visibility: 'PUBLIC' | 'INVITE_ONLY';
@@ -1000,6 +1010,7 @@ export const Constants = {
         'ORGANIZER_UNAVAILABLE',
         'OTHER',
       ],
+      event_setting: ['INDOOR', 'OUTDOOR'],
       event_status: ['DRAFT', 'PUBLISHED', 'CANCELED', 'COMPLETED'],
       event_type: ['COMMUNITY', 'PARTNER'],
       event_visibility: ['PUBLIC', 'INVITE_ONLY'],

@@ -117,7 +117,10 @@ const signedIn: SessionState = {
 function event(over: Partial<EventDetails> = {}): EventDetails {
   return {
     id: EVENT,
-    organizerId: ME,
+    isOrganizer: true,
+    organizerName: 'Ayşe A',
+    inviteToken: null,
+    participants: null,
     status: 'PUBLISHED',
     title: 'Perşembe maçı',
     description: null,
@@ -141,6 +144,7 @@ function event(over: Partial<EventDetails> = {}): EventDetails {
     bookingStatus: 'NOT_REQUIRED',
     costAmountMinor: 15000,
     costNote: null,
+    setting: null,
     equipmentNote: null,
     cancelReason: null,
     cancelMessage: null,
@@ -234,6 +238,7 @@ describe('CreateEventScreen', () => {
       duration_minutes: 90,
       organizer_plays: true,
       auto_approve: false,
+      setting: null,
     });
     await waitFor(() =>
       expect(mockRouter.replace).toHaveBeenCalledWith({
@@ -241,6 +246,17 @@ describe('CreateEventScreen', () => {
         params: { id: EVENT },
       }),
     );
+  });
+
+  it('lets the organizer say indoor or outdoor and sends that choice', async () => {
+    mockApi.createEvent.mockResolvedValue(EVENT);
+    await renderApp(<CreateEventScreen />, { session: signedIn });
+    await fillAll();
+    await fireEvent.press(screen.getByRole('radio', { name: 'Açık hava' }));
+    await press('Yayınla');
+    await waitFor(() => expect(mockApi.createEvent).toHaveBeenCalledTimes(1));
+    const call = mockApi.createEvent.mock.calls[0]?.[0] as { input: Record<string, unknown> };
+    expect(call.input.setting).toBe('OUTDOOR');
   });
 
   it('lets the organizer switch on automatic approval and sends that choice', async () => {
@@ -349,7 +365,7 @@ describe('EventDetailScreen', () => {
     mockParams = { id: EVENT };
     mockApi.fetchEvent.mockResolvedValue(
       event({
-        organizerId: '00000000-0000-4000-8000-0000000000bb',
+        isOrganizer: false,
         locationVisibility: 'APPROVED_ONLY',
         publicPlaceLabel: null,
         private: null,

@@ -77,6 +77,7 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
     await expect(page.getByRole('heading', { name: 'Kimler, kaç kişi?' })).toBeVisible();
     await page.getByRole('button', { name: 'Kontenjanı artır' }).click();
     await expect(page.getByText('11 kişi', { exact: true })).toBeVisible();
+    await page.getByRole('radio', { name: 'Açık hava', exact: true }).click();
     await expectNoBlocking(page);
     await page.getByRole('button', { name: 'Yayınla' }).click();
 
@@ -92,6 +93,7 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
     }
     await expect(page.getByRole('tab')).toHaveCount(4);
     await expect(main.getByText('1/11 kişi')).toBeVisible();
+    await expect(main.getByText('Açık hava', { exact: true })).toBeVisible();
     await expect(main.getByText('Çankaya · ODTÜ Halı Saha 2 · Üniversiteler Mh. 1')).toBeVisible();
     await expectNoBlocking(page);
 
@@ -358,5 +360,116 @@ test.describe('Discover for a signed-in player (UI tour)', () => {
     await main.getByRole('checkbox', { name: 'Tenis', exact: true }).click();
     await expect(main.getByRole('button', { name: 'Filtreler (1)', exact: true })).toBeVisible();
     await expectNoBlocking(page);
+  });
+});
+
+test.describe('Sport icons and the pinned join action (UI tour)', () => {
+  test('cards and the event page show the sport icon; on a phone the join button stays on screen', async ({
+    page,
+  }) => {
+    const s = requireStack();
+    const hostEmail = uniqueEmail('iconhost');
+    const playerEmail = uniqueEmail('iconplayer');
+    createdIds.push((await createOnboardedUser(s, hostEmail)).id);
+    createdIds.push((await createOnboardedUser(s, playerEmail)).id);
+    const title = `E2E ikon ${hostEmail.slice(9, 17)}`;
+    const eventId = await createPublishedEvent(s, hostEmail, title);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await signIn(page, playerEmail);
+    const main = page.getByRole('main');
+    const card = main.getByRole('link', { name: new RegExp(title) });
+    await expect(card.locator('[data-testid="sport-icon-football"]')).toBeVisible();
+    await expectNoBlocking(page);
+
+    await card.click();
+    await expect(page).toHaveURL(new RegExp(`/e/${eventId}$`));
+    const detail = page.getByRole('main');
+    await expect(detail.locator('[data-testid="sport-icon-football"]').first()).toBeVisible();
+
+    // The action is pinned: it is on the first screen and still there after scrolling to the end.
+    const join = detail.getByRole('button', { name: 'Katılma isteği gönder' });
+    await expect(join).toBeInViewport({ ratio: 1 });
+    await detail.getByText('Çankaya · ODTÜ Halı Saha 2').scrollIntoViewIfNeeded();
+    await page.mouse.wheel(0, 2000);
+    await expect(join).toBeInViewport({ ratio: 1 });
+    await expectNoBlocking(page);
+
+    // The request form opens inside the pinned area and still works.
+    await join.click();
+    await detail.getByLabel('Organizatöre mesaj (isteğe bağlı)').fill('Pinned form');
+    await detail.getByRole('button', { name: 'İsteği gönder' }).click();
+    await expect(detail.getByText('İstek gönderildi', { exact: true })).toBeVisible();
+  });
+});
+
+test.describe('invite-only events and the page for other viewers (Phase 3 completion)', () => {
+  test('only the shared link opens an invite-only event; the roster shows once approved', async ({
+    browser,
+    page,
+  }) => {
+    const s = requireStack();
+    const hostEmail = uniqueEmail('invhost');
+    const playerEmail = uniqueEmail('invplayer');
+    createdIds.push(
+      (await createOnboardedUser(s, hostEmail, { displayName: 'Ayşe Düzenleyen' })).id,
+    );
+    createdIds.push(
+      (await createOnboardedUser(s, playerEmail, { displayName: 'Deniz Oyuncu' })).id,
+    );
+    const title = `E2E davetli ${hostEmail.slice(8, 16)}`;
+    const eventId = await createPublishedEvent(s, hostEmail, title, { inviteOnly: true });
+
+    // Without the link the event does not exist.
+    const guest = await browser.newContext();
+    const guestPage = await guest.newPage();
+    await guestPage.goto(`/e/${eventId}`);
+    await expect(guestPage.getByText('Aradığın içerik bulunamadı.')).toBeVisible();
+
+    // The organizer finds the link on the page, with the organizer's name and no roster yet.
+    await signIn(page, hostEmail);
+    await page.goto(`/e/${eventId}`);
+    const hostMain = page.getByRole('main');
+    await expect(hostMain.getByRole('heading', { name: title, level: 1 })).toBeVisible();
+    await expect(hostMain.getByRole('heading', { name: 'Davet bağlantısı' })).toBeVisible();
+    const link = (
+      await hostMain
+        .getByText(/\/e\/.*\?invite=/)
+        .first()
+        .innerText()
+    ).trim();
+    expect(link).toContain(`/e/${eventId}?invite=`);
+    await expectNoBlocking(page);
+
+    // With the link a guest sees the event (not the secret address) and is asked to sign in to join.
+    const path = link.slice(link.indexOf('/e/'));
+    await guestPage.goto(path);
+    const guestMain = guestPage.getByRole('main');
+    await expect(guestMain.getByRole('heading', { name: title, level: 1 })).toBeVisible();
+    await expect(guestMain.getByText('Ayşe Düzenleyen')).toBeVisible();
+    await expect(guestMain.getByRole('button', { name: 'Giriş yap ve katıl' })).toBeVisible();
+    await guest.close();
+
+    // A player with the link asks; the organizer approves; the player then sees the roster.
+    const player = await browser.newContext();
+    const playerPage = await player.newPage();
+    await signIn(playerPage, playerEmail);
+    await playerPage.goto(path);
+    const playerMain = playerPage.getByRole('main');
+    await playerMain.getByRole('button', { name: 'Katılma isteği gönder' }).click();
+    await playerMain.getByRole('button', { name: 'İsteği gönder' }).click();
+    await expect(playerMain.getByText('İstek gönderildi', { exact: true })).toBeVisible();
+    await expect(playerMain.getByText(/^Katılanlar/)).toHaveCount(0);
+
+    await page.reload();
+    await hostMain.getByRole('button', { name: 'Onayla' }).click();
+    await expect(hostMain.getByText('Onaylı oyuncu (1)')).toBeVisible();
+
+    await playerPage.goto(`/e/${eventId}`);
+    await expect(playerMain.getByText('Onaylandın', { exact: true })).toBeVisible();
+    await expect(playerMain.getByText('Katılanlar (1)')).toBeVisible();
+    await expect(playerMain.getByText('Deniz Oyuncu', { exact: true })).toBeVisible();
+    await expectNoBlocking(playerPage);
+    await player.close();
   });
 });

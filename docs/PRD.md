@@ -108,7 +108,7 @@ The 31 MVP items from the product brief map 1-to-1 to feature IDs. Detailed back
 - Sport ≠ format ≠ event ≠ team ≠ participation ≠ position (separate concepts, see DATABASE §2).
 
 ### 4.3 Event engine (F-11…F-18)
-- **Create:** sport, format, title (3–80), description (≤ 2000), start date/time, duration (15–480 min), location, capacity (within the format's bounds), skill range (optional, 1.0–5.0), visibility (`PUBLIC` | `INVITE_ONLY`), participation rules, optional: equipment note, cost info (informational), booking status, position needs (informational), participant notes (private to approved), whether the organizer also plays (default yes; occupies one slot).
+- **Create:** sport, format, title (3–80), optional indoor/outdoor label (public; also a Discover filter), description (≤ 2000), start date/time, duration (15–480 min), location, capacity (within the format's bounds), skill range (optional, 1.0–5.0), visibility (`PUBLIC` | `INVITE_ONLY`), participation rules, optional: equipment note, cost info (informational), booking status, position needs (informational), participant notes (private to approved), whether the organizer also plays (default yes; occupies one slot).
 - **Lead time:** publish requires start ≥ 60 min in the future (anti-fabrication of past events; configurable).
 - **Visibility:** `PUBLIC` appears in discovery. `INVITE_ONLY` is reachable only with its secret link; requests still need approval.
 - **Location privacy:** `PUBLIC` shows exact place; `APPROVED_ONLY` shows district + fuzzed pin until approved.

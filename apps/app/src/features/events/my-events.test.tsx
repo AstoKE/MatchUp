@@ -98,6 +98,7 @@ function item(over: Partial<MyEventItem> = {}): MyEventItem {
     skillMax: null,
     costAmountMinor: null,
     costNote: null,
+    setting: null,
     organizerName: 'Ayşe A',
     status: 'PUBLISHED',
     myStatus: 'ORGANIZER',

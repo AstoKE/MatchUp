@@ -26,6 +26,9 @@ export const EVENT_VISIBILITIES = ['PUBLIC', 'INVITE_ONLY'] as const;
 export type EventVisibility = (typeof EVENT_VISIBILITIES)[number];
 export const LOCATION_VISIBILITIES = ['PUBLIC', 'APPROVED_ONLY'] as const;
 export type LocationVisibility = (typeof LOCATION_VISIBILITIES)[number];
+/** Indoor or outdoor as the organizer states it (optional; a public label of the place). */
+export const EVENT_SETTINGS = ['INDOOR', 'OUTDOOR'] as const;
+export type EventSetting = (typeof EVENT_SETTINGS)[number];
 export const BOOKING_STATUSES = [
   'NOT_REQUIRED',
   'NOT_YET_BOOKED',
@@ -93,6 +96,8 @@ export interface EventDraft {
   waitlistEnabled: boolean;
   /** Approve join requests at once while a spot is free and nobody waits (organizer's choice, default off). */
   autoApprove: boolean;
+  /** Indoor / outdoor; null when the organizer does not say. */
+  setting: EventSetting | null;
   visibility: EventVisibility;
   skillMin: number | null;
   skillMax: number | null;
@@ -311,6 +316,7 @@ export function toEventInput(draft: EventDraft, timeZone: string): EventInputPay
     capacity: draft.capacity,
     waitlist_enabled: draft.waitlistEnabled,
     auto_approve: draft.autoApprove,
+    setting: draft.setting,
     organizer_plays: draft.organizerPlays,
     skill_min: draft.skillMin,
     skill_max: draft.skillMax,
