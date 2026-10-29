@@ -360,3 +360,43 @@ test.describe('Discover for a signed-in player (UI tour)', () => {
     await expectNoBlocking(page);
   });
 });
+
+test.describe('Sport icons and the pinned join action (UI tour)', () => {
+  test('cards and the event page show the sport icon; on a phone the join button stays on screen', async ({
+    page,
+  }) => {
+    const s = requireStack();
+    const hostEmail = uniqueEmail('iconhost');
+    const playerEmail = uniqueEmail('iconplayer');
+    createdIds.push((await createOnboardedUser(s, hostEmail)).id);
+    createdIds.push((await createOnboardedUser(s, playerEmail)).id);
+    const title = `E2E ikon ${hostEmail.slice(9, 17)}`;
+    const eventId = await createPublishedEvent(s, hostEmail, title);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await signIn(page, playerEmail);
+    const main = page.getByRole('main');
+    const card = main.getByRole('link', { name: new RegExp(title) });
+    await expect(card.locator('[data-testid="sport-icon-football"]')).toBeVisible();
+    await expectNoBlocking(page);
+
+    await card.click();
+    await expect(page).toHaveURL(new RegExp(`/e/${eventId}$`));
+    const detail = page.getByRole('main');
+    await expect(detail.locator('[data-testid="sport-icon-football"]').first()).toBeVisible();
+
+    // The action is pinned: it is on the first screen and still there after scrolling to the end.
+    const join = detail.getByRole('button', { name: 'Katılma isteği gönder' });
+    await expect(join).toBeInViewport({ ratio: 1 });
+    await detail.getByText('Çankaya · ODTÜ Halı Saha 2').scrollIntoViewIfNeeded();
+    await page.mouse.wheel(0, 2000);
+    await expect(join).toBeInViewport({ ratio: 1 });
+    await expectNoBlocking(page);
+
+    // The request form opens inside the pinned area and still works.
+    await join.click();
+    await detail.getByLabel('Organizatöre mesaj (isteğe bağlı)').fill('Pinned form');
+    await detail.getByRole('button', { name: 'İsteği gönder' }).click();
+    await expect(detail.getByText('İstek gönderildi', { exact: true })).toBeVisible();
+  });
+});

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Pressable } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import { Pressable, View } from 'react-native';
 import { TOUCH_TARGET } from '../tokens';
 import { useTheme } from '../theme';
 import { Text } from './Text';
@@ -10,11 +10,14 @@ export function ToggleChip({
   selected,
   onPress,
   disabled = false,
+  icon,
 }: {
   label: string;
   selected: boolean;
   onPress: () => void;
   disabled?: boolean;
+  /** Decorative leading glyph, drawn in the chip's own text colour; the label stays the accessible name. */
+  icon?: (color: string) => ReactNode;
 }) {
   const { colors, radius, spacing } = useTheme();
   const [focused, setFocused] = useState(false);
@@ -39,6 +42,8 @@ export function ToggleChip({
         opacity: disabled ? 0.5 : 1,
         alignItems: 'center',
         justifyContent: 'center',
+        flexDirection: 'row',
+        gap: spacing[2],
         ...(focused
           ? {
               outlineColor: colors.focusRing,
@@ -49,6 +54,7 @@ export function ToggleChip({
           : null),
       }}
     >
+      {icon ? <View>{icon(selected ? colors.onActionPrimary : colors.textPrimary)}</View> : null}
       <Text
         variant="label"
         style={{ color: selected ? colors.onActionPrimary : colors.textPrimary }}

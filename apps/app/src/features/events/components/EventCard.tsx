@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, type Catalog } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
-import { Text, TOUCH_TARGET, useTheme } from '@/ui';
+import { SportBadge, Text, TOUCH_TARGET, useTheme } from '@/ui';
 import type { EventListItem } from '../api/search-api';
 import { formatCost, formatEventStart, formatEventTime } from '../format';
 import { Pill, SlotMeter } from './SlotMeter';
@@ -105,14 +105,17 @@ export function EventCard({
           ))}
         </View>
       ) : null}
-      <Text variant="caption" tone="secondary">
-        {[
-          sport && localizedName(sport.names, locale),
-          format && localizedName(format.names, locale),
-        ]
-          .filter(Boolean)
-          .join(' · ')}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+        <SportBadge slug={sport?.slug} size={28} />
+        <Text variant="caption" tone="secondary" style={{ flexShrink: 1 }}>
+          {[
+            sport && localizedName(sport.names, locale),
+            format && localizedName(format.names, locale),
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+        </Text>
+      </View>
       <Text variant="titleSm" heading={2}>
         {event.title}
       </Text>

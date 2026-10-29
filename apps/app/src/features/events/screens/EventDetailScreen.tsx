@@ -1,12 +1,12 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/features/auth';
 import { localizedName, useCatalog, type Catalog } from '@/features/catalog';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
-import { Banner, Button, EmptyState, Screen, Text, useTheme, useToast } from '@/ui';
+import { Banner, Button, EmptyState, Screen, SportBadge, Text, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
 import { JoinPanel } from '../components/JoinPanel';
 import { RequestsPanel } from '../components/RequestsPanel';
@@ -98,7 +98,7 @@ function Card({ children }: { children: ReactNode }) {
 
 function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
   const { t } = useTranslation(['events', 'common']);
-  const { spacing } = useTheme();
+  const { spacing, breakpoint } = useTheme();
   const router = useRouter();
   const toast = useToast();
   const session = useSession();
@@ -123,6 +123,19 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
   const fail = (failure: unknown) => setError(errorText(failure));
   // Time pressure only matters for an event people can still join (design.md §4.2 rule 4).
   const joinable = event.status === 'PUBLISHED' && !started;
+  // On a phone the join action is pinned under the content (design.md §8: the thumb zone); the request
+  // form that opens from it scrolls inside the pinned area so it never covers the whole page.
+  const stickyJoin = breakpoint === 'compact';
+  const joinPanel =
+    !isOrganizer && joinable ? (
+      stickyJoin ? (
+        <ScrollView style={{ maxHeight: 360 }} keyboardShouldPersistTaps="handled">
+          <JoinPanel event={event} catalog={catalog} />
+        </ScrollView>
+      ) : (
+        <JoinPanel event={event} catalog={catalog} />
+      )
+    ) : null;
   const openSlots = event.capacity - event.approvedCount;
   const urgency = !joinable
     ? null
@@ -133,7 +146,7 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
         : null;
 
   return (
-    <Screen maxWidth={640}>
+    <Screen maxWidth={640} footer={joinPanel && stickyJoin ? joinPanel : undefined}>
       <View style={{ alignItems: 'flex-start' }}>
         <Button
           variant="tertiary"
@@ -144,6 +157,7 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
       <View style={{ gap: spacing[3] }}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
           <Pill
+            icon={<SportBadge slug={sport?.slug} size={24} />}
             label={[
               sport && localizedName(sport.names, locale),
               format && localizedName(format.names, locale),
@@ -267,7 +281,7 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
         </Text>
       ) : null}
 
-      {!isOrganizer && joinable ? <JoinPanel event={event} catalog={catalog} /> : null}
+      {joinPanel && !stickyJoin ? joinPanel : null}
       {isOrganizer && event.status === 'PUBLISHED' ? <RequestsPanel event={event} /> : null}
 
       {isOrganizer ? (

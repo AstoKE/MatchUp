@@ -11,6 +11,9 @@ import {
   type IconName,
   Screen,
   Skeleton,
+  SPORT_TINTS,
+  SportBadge,
+  SportIcon,
   Text,
   TextField,
   ThemeProvider,
@@ -182,6 +185,58 @@ describe('Icon', () => {
     expect(icon.props.accessibilityElementsHidden).toBe(true);
     expect(icon.props.importantForAccessibility).toBe('no-hide-descendants');
     expect(icon.props['aria-hidden']).toBe(true);
+  });
+});
+
+describe('SportIcon and SportBadge', () => {
+  const slugs = [
+    'football',
+    'futsal',
+    'basketball',
+    'volleyball',
+    'tennis',
+    'padel',
+    'badminton',
+    'table-tennis',
+    'running',
+    'walking',
+  ];
+
+  it.each(slugs)('%s has its own glyph at the requested size', async (slug) => {
+    await renderThemed(<SportIcon slug={slug} color="#000" size={20} />);
+    const icon = screen.getByTestId(`sport-icon-${slug}`, { includeHiddenElements: true });
+    expect(icon.props.style).toEqual({ width: 20, height: 20 });
+  });
+
+  it('every catalog sport has a tint, so a badge is never untinted by accident', () => {
+    for (const slug of slugs) expect(SPORT_TINTS[slug]).toMatch(/^#[0-9A-F]{6}$/i);
+  });
+
+  it('draws a neutral ball for a sport added later instead of nothing', async () => {
+    await renderThemed(<SportIcon slug="curling" color="#000" />);
+    expect(screen.getByTestId('sport-icon-curling', { includeHiddenElements: true })).toBeTruthy();
+    await renderThemed(<SportIcon slug={undefined} color="#000" />);
+    expect(screen.getByTestId('sport-icon-unknown', { includeHiddenElements: true })).toBeTruthy();
+  });
+
+  it('is decorative: hidden from assistive technology', async () => {
+    await renderThemed(<SportBadge slug="football" />);
+    const icon = screen.getByTestId('sport-icon-football', { includeHiddenElements: true });
+    expect(icon.props.accessibilityElementsHidden).toBe(true);
+    expect(icon.props['aria-hidden']).toBe(true);
+    expect(screen.queryByTestId('sport-icon-football')).toBeNull();
+  });
+});
+
+describe('Screen footer', () => {
+  it('pins the footer below the scrolling content', async () => {
+    await renderThemed(
+      <Screen footer={<RNText>Pinned action</RNText>}>
+        <RNText>Content</RNText>
+      </Screen>,
+    );
+    expect(screen.getByText('Content')).toBeTruthy();
+    expect(screen.getByText('Pinned action')).toBeTruthy();
   });
 });
 
