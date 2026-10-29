@@ -7,7 +7,7 @@ MatchUp (working name) is a multi-platform (iOS, Android, Web) sports community 
 
 ## Status
 
-**Phase 1 — Foundation: complete** (2026-10-24; see [docs/PHASE1_REPORT.md](docs/PHASE1_REPORT.md)). Web is verified end to end; **Android and iOS have never been launched** (bundles compile only). Phase 2 has not started.
+**Status 2026-10-29: Phases 1–3 are built** (foundation, identity and onboarding, the list-based event engine; reports: [Phase 1](docs/PHASE1_REPORT.md), [Phase 2](docs/PHASE2_REPORT.md), [Phase 3](docs/PHASE3_REPORT.md)). Web is verified end to end in Chromium. Android was validated on an emulator in Phase 2 (22 device checks); **nothing of Phase 3 has run on a device yet** and iOS has never been launched. Phase 4 has not started.
 
 Quick start (details and troubleshooting: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)):
 
