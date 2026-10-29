@@ -138,7 +138,7 @@ export async function createPublishedEvent(
   stack: LocalStack,
   email: string,
   title: string,
-  options: { publish?: boolean; autoApprove?: boolean } = {},
+  options: { publish?: boolean; autoApprove?: boolean; inviteOnly?: boolean } = {},
 ): Promise<string> {
   const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
   const tokenResponse = await fetch(`${stack.apiUrl}/auth/v1/token?grant_type=password`, {
@@ -175,6 +175,7 @@ export async function createPublishedEvent(
         location_label: 'ODTÜ Halı Saha 2',
         capacity: 12,
         auto_approve: options.autoApprove ?? false,
+        visibility: options.inviteOnly ? 'INVITE_ONLY' : 'PUBLIC',
       },
     }),
   });

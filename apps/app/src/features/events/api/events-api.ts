@@ -19,9 +19,10 @@ const privateRow = z.object({
   participant_notes: z.nullable(z.string()),
 });
 
+const participantRow = z.object({ display_name: z.nullable(z.string()) });
+
 const eventRow = z.object({
   id: z.uuid(),
-  organizer_id: z.uuid(),
   status: z.enum(EVENT_STATUSES),
   title: z.string(),
   description: z.nullable(z.string()),
@@ -49,19 +50,22 @@ const eventRow = z.object({
   equipment_note: z.nullable(z.string()),
   cancel_reason: z.nullable(z.enum(EVENT_CANCEL_REASONS)),
   cancel_message: z.nullable(z.string()),
+  // What `get_event` adds for this viewer; the server decides every one of them.
+  is_organizer: z.boolean(),
+  organizer_name: z.nullable(z.string()),
+  invite_token: z.nullable(z.string()),
+  private: z.nullable(privateRow),
+  participants_visible: z.boolean(),
+  participants: z.nullable(z.array(participantRow)),
 });
-
-const EVENT_COLUMNS =
-  'id, organizer_id, status, title, description, sport_id, sport_format_id, visibility, starts_at, ' +
-  'duration_minutes, ends_at, city_id, district_id, location_visibility, public_location_label, capacity, ' +
-  'approved_count, waitlist_enabled, auto_approve, setting, organizer_plays, skill_min, skill_max, booking_status, ' +
-  'cost_amount_minor, cost_note, equipment_note, cancel_reason, cancel_message';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface EventDetails {
   id: string;
-  organizerId: string;
+  /** Decided by the server for this viewer; the organizer's user id is never sent. */
+  isOrganizer: boolean;
+  organizerName: string | null;
   status: z.infer<typeof eventRow>['status'];
   title: string;
   description: string | null;
@@ -91,43 +95,39 @@ export interface EventDetails {
   equipmentNote: string | null;
   cancelReason: EventCancelReason | null;
   cancelMessage: string | null;
-  /** Organizer and approved participants only (RLS); null for everyone else. */
+  /** The secret of an invite-only event: only its organizer receives it, to build the link to share. */
+  inviteToken: string | null;
+  /** Organizer and approved participants only; null for everyone else. */
   private: {
     placeLabel: string;
     addressText: string | null;
     participantNotes: string | null;
   } | null;
+  /** Approved players (display names), for the organizer and approved players; null when not visible. */
+  participants: { displayName: string | null }[] | null;
 }
 
 /**
  * One event as the viewer may see it (guests included, D-09), or null when it does not exist for them.
- * Private details are a second query, only with a session: guests have no grant on that table at all,
- * and RLS returns no row to signed-in users who are neither organizer nor approved.
+ * `get_event` decides everything on the server: visibility (an invite-only event needs its token), the
+ * private details and the roster.
  */
-export async function fetchEvent(id: string): Promise<EventDetails | null> {
+export async function fetchEvent(
+  id: string,
+  inviteToken?: string | null,
+): Promise<EventDetails | null> {
   if (!UUID_RE.test(id)) return null;
-  const { data, error } = await supabase
-    .from('events')
-    .select(EVENT_COLUMNS)
-    .eq('id', id)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc('get_event', {
+    p_event_id: id,
+    p_invite_token: inviteToken ?? undefined,
+  });
   if (error) throw mapRpcError(error);
-  if (!data) return null;
+  if (data === null) return null;
   const row = eventRow.parse(data);
-  let p: z.infer<typeof privateRow> | null = null;
-  const { data: session } = await supabase.auth.getSession();
-  if (session.session) {
-    const details = await supabase
-      .from('event_private_details')
-      .select('location_label, address_text, participant_notes')
-      .eq('event_id', id)
-      .maybeSingle();
-    if (details.error) throw mapRpcError(details.error);
-    p = details.data ? privateRow.parse(details.data) : null;
-  }
   return {
     id: row.id,
-    organizerId: row.organizer_id,
+    isOrganizer: row.is_organizer,
+    organizerName: row.organizer_name,
     status: row.status,
     title: row.title,
     description: row.description,
@@ -155,12 +155,16 @@ export async function fetchEvent(id: string): Promise<EventDetails | null> {
     equipmentNote: row.equipment_note,
     cancelReason: row.cancel_reason,
     cancelMessage: row.cancel_message,
-    private: p
+    inviteToken: row.invite_token,
+    private: row.private
       ? {
-          placeLabel: p.location_label,
-          addressText: p.address_text,
-          participantNotes: p.participant_notes,
+          placeLabel: row.private.location_label,
+          addressText: row.private.address_text,
+          participantNotes: row.private.participant_notes,
         }
+      : null,
+    participants: row.participants_visible
+      ? (row.participants ?? []).map((p) => ({ displayName: p.display_name }))
       : null,
   };
 }

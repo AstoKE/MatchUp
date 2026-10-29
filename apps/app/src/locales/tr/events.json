@@ -115,7 +115,12 @@
     "spotsLeft_other": "{{count}} yer kaldı",
     "full": "Dolu",
     "durationValue": "{{count}} dk",
-    "setting": "Mekan türü"
+    "setting": "Mekan türü",
+    "organizer": "Düzenleyen",
+    "participants_one": "Katılanlar ({{count}})",
+    "participants_other": "Katılanlar ({{count}})",
+    "participantsNone": "Henüz onaylanmış başka oyuncu yok.",
+    "participantsHidden": "Katılımcı listesi onaylanan oyunculara gösterilir."
   },
   "edit": {
     "title": "Etkinliği düzenle",
@@ -315,5 +320,13 @@
   "setting": {
     "INDOOR": "Kapalı salon",
     "OUTDOOR": "Açık hava"
+  },
+  "invite": {
+    "title": "Davet bağlantısı",
+    "body": "Bu etkinlik yalnızca davetle görünür. Bağlantıya sahip herkes etkinliği görür ve katılma isteği gönderebilir; yalnızca seçtiğin kişilerle paylaş.",
+    "linkLabel": "Davet bağlantısı",
+    "share": "Bağlantıyı kopyala ya da paylaş",
+    "copied": "Bağlantı kopyalandı.",
+    "failed": "Bağlantı kopyalanamadı."
   }
 }

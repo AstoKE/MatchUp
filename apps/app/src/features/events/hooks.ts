@@ -21,8 +21,12 @@ import {
 
 export const eventQueryKey = (id: string) => ['event', id] as const;
 
-export function useEvent(id: string) {
-  return useQuery({ queryKey: eventQueryKey(id), queryFn: () => fetchEvent(id) });
+export function useEvent(id: string, inviteToken?: string | null) {
+  return useQuery({
+    // The token is part of the key: it changes what the server answers.
+    queryKey: [...eventQueryKey(id), inviteToken ?? null],
+    queryFn: () => fetchEvent(id, inviteToken),
+  });
 }
 
 /** Discover list under the ['events'] prefix, so every organizer action refreshes it too. */

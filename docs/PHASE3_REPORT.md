@@ -1,6 +1,6 @@
 # Phase 3 report: the event engine
 
-Status 2026-10-29. Scope: ROADMAP backlog items 6–18 and 23 (discovery, filters, event pages, creation, organizer permissions, participation requests, approval, capacity, cancellation, waitlist, manual location, My Events, basic notifications), list-based, no map. **Not started on purpose:** Phase 4 (map, venues), Phase 5 (attendance, reviews, progression) and anything commercial.
+Status 2026-10-30 (completed; first written 2026-10-29). Scope: ROADMAP backlog items 6–18 and 23 (discovery, filters, event pages, creation, organizer permissions, participation requests, approval, capacity, cancellation, waitlist, manual location, My Events, basic notifications), list-based, no map. **Not started on purpose:** Phase 4 (map, venues), Phase 5 (attendance, reviews, progression) and anything commercial.
 
 ## 1. What was built
 
@@ -13,21 +13,22 @@ Status 2026-10-29. Scope: ROADMAP backlog items 6–18 and 23 (discovery, filter
 | M4 participation | request, withdraw, approve, decline, waitlist, remove, the organizer's queue; **optional auto-approve** | `20261029100000_participation.sql`, ADR-0020 |
 | Notifications | inbox, bell with unread count, polled every 60 s | `features/notifications` |
 | UI review (GoodRec as a usability benchmark, not a visual one) | day groups, profile sports as the default filter, filters behind a button on phones, urgency labels, ten in-house sport icons, pinned join action, indoor/outdoor label | `20261030100000_event_setting.sql` |
+| Completion: event page and invites | `get_event` (per-viewer page: organizer name, roster, private details, invite token), invite-only events usable end to end through capability links, invite link panel for the organizer | `20261030110000_get_event_and_invites.sql`, ADR-0021 |
 | Performance | Sentry replay/feedback and Supabase Realtime/Storage left out of the **web** bundle | `docs/PERFORMANCE.md` §3.6, §3.7 |
 
 Decisions recorded: ADR-0019 (location without coordinates, quotas in config, jsonb event input, polling, analytics later) and ADR-0020 (auto-approve and the participation rules). The PRD, DATABASE, USER_FLOWS and PERFORMANCE documents were updated in the same changes.
 
-## 2. What was actually tested (local stack, 2026-10-29)
+## 2. What was actually tested (local stack, 2026-10-30)
 
 | Level | Result |
 |---|---|
-| pgTAP (all phases) | **472 pass** in 10 files; Phase 3 files: event core, discovery, My Events, participation (90 assertions: every transition, strangers, guests, not-onboarded users, drafts, closed registration, terminal states, quotas, started events, auto-approve never jumping the queue) |
-| API integration (real PostgREST + Auth) | **115 pass**, including **real parallel connections** for capacity: 14 approvals for 11 free spots give exactly 11 winners; 8 players racing for one auto-approved spot give one APPROVED and seven WAITLISTED with no errors; a withdrawal racing a promotion; ten identical requests. The auto-approve race was checked against a mutation that removes the event lock: it fails, and passes again with the lock restored |
-| Component (jest-expo + RNTL) | **378 pass** |
+| pgTAP (all phases) | **531 pass** in 11 files; Phase 3 files: event core, discovery, My Events, participation, `get_event` (59 assertions: every viewer kind, the exact field list, the invite token) and participation (90 assertions: every transition, strangers, guests, not-onboarded users, drafts, closed registration, terminal states, quotas, started events, auto-approve never jumping the queue) |
+| API integration (real PostgREST + Auth) | **123 pass**, including **real parallel connections** for capacity: 14 approvals for 11 free spots give exactly 11 winners; 8 players racing for one auto-approved spot give one APPROVED and seven WAITLISTED with no errors; a withdrawal racing a promotion; ten identical requests. The auto-approve race was checked against a mutation that removes the event lock: it fails, and passes again with the lock restored |
+| Component (jest-expo + RNTL) | **383 pass** |
 | Domain (Vitest) / config | **97** / **4** pass |
-| Web E2E (Playwright, Chromium, axe WCAG 2.2 AA tags) | **50 pass**: organizing, discovering, joining and approving across two browsers, withdrawing, auto-approve, My Events, notifications, a phone-width run (filters, pinned action, icons) |
+| Web E2E (Playwright, Chromium, axe WCAG 2.2 AA tags) | **51 pass**, including an invite-only flow across three browser contexts (guest without and with the link, organizer, player): organizing, discovering, joining and approving across two browsers, withdrawing, auto-approve, My Events, notifications, a phone-width run (filters, pinned action, icons) |
 | Gates | `pnpm check`, `db:test`, `test:integration`, `test:e2e`, `export:web` + `check:bundle` + `check:bundle-size` all exit 0 |
-| Web bundle | total 866 kB gzip (ratchet 885), initial 544 kB (ratchet 555) |
+| Web bundle | total 867 kB gzip (ratchet 885), initial 544 kB (ratchet 555) |
 
 Each commit of the Phase 3 pull requests was built and gated on its own tree, not only the final one.
 
@@ -45,12 +46,12 @@ Schema pushed on 2026-10-29 for the first three migrations above (dry-run first,
 
 ## 5. Not done, and limitations
 
-- **Invite-only events cannot be joined** (the invite flow and `get_event_by_invite` are not built; requests answer `NOT_FOUND`).
-- Players see **counts, not the list of approved participants** (the participants view of USER_FLOWS FL-2 step 3), and the event page has **no organizer card**; both need a participant-facing read RPC (`get_event`), which does not exist yet: the page still reads `events` through RLS.
+- **Invite links cannot be rotated or revoked** (ADR-0021 decision 4): a leaked link stays valid until the event ends or is canceled; a `rotate_invite_token` RPC is the next step if links spread. Links are capability URLs in the address: analytics (Phase 7) must strip the query string.
+- The roster shows display names only (no avatars or badges: Phase 5); it is limited to 100 names.
 - No distance sort and no map (Phase 4); no blocked-pair filtering (Phase 6); `analytics_events` and funnels are Phase 7 (ADR-0019), so there are no pilot numbers yet.
 - **Notifications are polled** (up to 60 s late), there is no push.
 - District is not preselected in Discover on purpose (one district would hide most of a small pilot's events).
-- **Nothing in Phase 3 was run on a device.** Web in Chromium only: no Firefox or Safari, no iOS, and the Android device suite (22 checks, Windows emulator) was **not** re-run for Phase 3, so native behaviour of the new screens, the pinned action with the on-screen keyboard, and TalkBack/VoiceOver reading order are **unverified**. The web-only bundle changes are deliberately not applied to native.
+- **Nothing in Phase 3 was run on a device.** A manual checklist is in `docs/NATIVE_VALIDATION.md` ("Phase 3 on the device"); no Maestro flow covers it yet. Web in Chromium only: no Firefox or Safari, no iOS, and the Android device suite (22 checks, Windows emulator) was **not** re-run for Phase 3, so native behaviour of the new screens, the pinned action with the on-screen keyboard, and TalkBack/VoiceOver reading order are **unverified**. The web-only bundle changes are deliberately not applied to native.
 - The local edge-runtime container stops after a reboot and `pnpm db:start` does not bring it back (the `health` integration tests then answer 503); see `docs/DEVELOPMENT.md`.
 - Supabase's leaked-password protection is off on hosted (a plan feature): LAUNCH_CHECKLIST.
 
@@ -63,4 +64,4 @@ Schema pushed on 2026-10-29 for the first three migrations above (dry-run first,
 
 ## 7. Recommended next step
 
-Not started, awaiting explicit instruction (CLAUDE.md): either **close Phase 3's gaps** (the `get_event` read RPC with participants and organizer card, the invite flow, an Android device run of the new screens) or **Phase 4** (venues, map, distance). My suggestion is a short Android validation run plus `get_event` first, because they change what a player sees before the pilot.
+Phase 3's code gaps are closed. The one open item before calling it fully done is the **Android run of the checklist** (it needs the Windows bench). After that, Phase 4 (venues, map, distance) starts only on explicit instruction (CLAUDE.md). Also pending: the pull request for the UI/indoor-outdoor/`get_event` branch, then pushing its two migrations (`20261030100000_event_setting`, `20261030110000_get_event_and_invites`) to the hosted project.

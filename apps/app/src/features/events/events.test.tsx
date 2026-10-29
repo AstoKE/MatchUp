@@ -117,7 +117,10 @@ const signedIn: SessionState = {
 function event(over: Partial<EventDetails> = {}): EventDetails {
   return {
     id: EVENT,
-    organizerId: ME,
+    isOrganizer: true,
+    organizerName: 'Ayşe A',
+    inviteToken: null,
+    participants: null,
     status: 'PUBLISHED',
     title: 'Perşembe maçı',
     description: null,
@@ -362,7 +365,7 @@ describe('EventDetailScreen', () => {
     mockParams = { id: EVENT };
     mockApi.fetchEvent.mockResolvedValue(
       event({
-        organizerId: '00000000-0000-4000-8000-0000000000bb',
+        isOrganizer: false,
         locationVisibility: 'APPROVED_ONLY',
         publicPlaceLabel: null,
         private: null,

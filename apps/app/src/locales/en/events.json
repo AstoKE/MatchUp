@@ -115,7 +115,12 @@
     "spotsLeft_other": "{{count}} spots left",
     "full": "Full",
     "durationValue": "{{count}} min",
-    "setting": "Indoor or outdoor"
+    "setting": "Indoor or outdoor",
+    "organizer": "Organizer",
+    "participants_one": "Going ({{count}})",
+    "participants_other": "Going ({{count}})",
+    "participantsNone": "No other approved players yet.",
+    "participantsHidden": "The list of players is shown to approved players."
   },
   "edit": {
     "title": "Edit event",
@@ -315,5 +320,13 @@
   "setting": {
     "INDOOR": "Indoor",
     "OUTDOOR": "Outdoor"
+  },
+  "invite": {
+    "title": "Invite link",
+    "body": "This event is visible by invitation only. Anyone who has the link can see the event and ask to join, so share it only with the people you choose.",
+    "linkLabel": "Invite link",
+    "share": "Copy or share the link",
+    "copied": "Link copied.",
+    "failed": "Couldn't copy the link."
   }
 }

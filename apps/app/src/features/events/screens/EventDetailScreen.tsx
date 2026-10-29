@@ -2,12 +2,12 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useSession } from '@/features/auth';
 import { localizedName, useCatalog, type Catalog } from '@/features/catalog';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { Banner, Button, EmptyState, Screen, SportBadge, Text, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
+import { InvitePanel } from '../components/InvitePanel';
 import { JoinPanel } from '../components/JoinPanel';
 import { RequestsPanel } from '../components/RequestsPanel';
 import { Pill, SlotMeter } from '../components/SlotMeter';
@@ -22,9 +22,11 @@ export function EventDetailScreen() {
   const { t } = useTranslation(['events', 'common', 'errors', 'nav']);
   const { colors } = useTheme();
   const router = useRouter();
-  const params = useLocalSearchParams<{ id: string }>();
+  const params = useLocalSearchParams<{ id: string; invite?: string }>();
   const id = typeof params.id === 'string' ? params.id : '';
-  const event = useEvent(id);
+  // The secret of an invite-only event rides on the shared link (?invite=...).
+  const inviteToken = typeof params.invite === 'string' ? params.invite : null;
+  const event = useEvent(id, inviteToken);
   const catalog = useCatalog();
 
   if (event.isPending || catalog.isPending) {
@@ -62,7 +64,7 @@ export function EventDetailScreen() {
       </Screen>
     );
   }
-  return <Detail event={event.data} catalog={catalog.data} />;
+  return <Detail event={event.data} catalog={catalog.data} inviteToken={inviteToken} />;
 }
 
 function Row({ label, value, large }: { label: string; value: string; large?: boolean }) {
@@ -96,12 +98,19 @@ function Card({ children }: { children: ReactNode }) {
   );
 }
 
-function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
+function Detail({
+  event,
+  catalog,
+  inviteToken,
+}: {
+  event: EventDetails;
+  catalog: Catalog;
+  inviteToken: string | null;
+}) {
   const { t } = useTranslation(['events', 'common']);
   const { spacing, breakpoint } = useTheme();
   const router = useRouter();
   const toast = useToast();
-  const session = useSession();
   const locale = currentLocale();
   const publish = usePublishEvent();
   const complete = useCompleteEvent();
@@ -117,7 +126,7 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
   const district = city?.districts.find((d) => d.id === event.districtId);
   const timeZone = city?.timeZone ?? 'Europe/Istanbul';
   const districtName = district ? localizedName(district.names, locale) : '';
-  const isOrganizer = session.status === 'authenticated' && session.userId === event.organizerId;
+  const isOrganizer = event.isOrganizer;
   const started = openedAt >= Date.parse(event.startsAt);
   const place = event.private?.placeLabel ?? event.publicPlaceLabel;
   const fail = (failure: unknown) => setError(errorText(failure));
@@ -130,10 +139,10 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
     !isOrganizer && joinable ? (
       stickyJoin ? (
         <ScrollView style={{ maxHeight: 360 }} keyboardShouldPersistTaps="handled">
-          <JoinPanel event={event} catalog={catalog} />
+          <JoinPanel event={event} catalog={catalog} inviteToken={inviteToken} />
         </ScrollView>
       ) : (
-        <JoinPanel event={event} catalog={catalog} />
+        <JoinPanel event={event} catalog={catalog} inviteToken={inviteToken} />
       )
     ) : null;
   const openSlots = event.capacity - event.approvedCount;
@@ -240,6 +249,9 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
       </Card>
 
       <Card>
+        {event.organizerName ? (
+          <Row label={t('events:detail.organizer')} value={event.organizerName} />
+        ) : null}
         <Row
           label={t('events:detail.skill')}
           value={
@@ -277,6 +289,31 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
         ) : null}
       </Card>
 
+      {event.participants ? (
+        <Card>
+          <Text variant="title" heading={2}>
+            {t('events:detail.participants', { count: event.participants.length })}
+          </Text>
+          {event.participants.length === 0 ? (
+            <Text tone="secondary">{t('events:detail.participantsNone')}</Text>
+          ) : (
+            <View role="list" style={{ gap: spacing[2] }}>
+              {event.participants.map((p, index) => (
+                <View key={index} role="listitem">
+                  <Text>{p.displayName ?? t('events:requests.unnamed')}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </Card>
+      ) : event.approvedCount > 1 ? (
+        <Text variant="caption" tone="secondary">
+          {t('events:detail.participantsHidden')}
+        </Text>
+      ) : null}
+      {isOrganizer && event.inviteToken ? (
+        <InvitePanel eventId={event.id} token={event.inviteToken} />
+      ) : null}
       {event.description ? <Text>{event.description}</Text> : null}
       {event.visibility === 'INVITE_ONLY' ? (
         <Text variant="caption" tone="secondary">
