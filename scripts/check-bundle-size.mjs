@@ -5,7 +5,7 @@
 // recorded baseline + headroom. Lower them as optimizations land; never raise one without writing down
 // why. This is a regression guard, not a claim that the budget is met.
 //
-//   TOTAL   all web JS chunks (gzip)                       measured  882 kB on 2026-10-29
+//   TOTAL   all web JS chunks (gzip)                       measured  863 kB on 2026-10-29
 //   INITIAL scripts referenced by index.html (gzip)        measured  537 kB on 2026-10-25 (first paint cost,
 //           before any route chunk; lazily loaded chunks such as Sentry are not in it)
 //
@@ -16,6 +16,9 @@
 // TOTAL lowered 940 -> 900 (2026-10-29): Sentry session replay and the feedback widget no longer ship on
 // web (docs/PERFORMANCE.md §3.6); 939 -> 882 kB.
 //
+// Both lowered again (2026-10-29): TOTAL 900 -> 885, INITIAL 570 -> 555. Supabase Realtime and Storage no longer ship
+// on web (docs/PERFORMANCE.md §3.7); INITIAL 565 -> 541 kB.
+//
 // INITIAL raised again 555 -> 570 (2026-10-27, Phase 3 / M2): the event screens share their form, API
 // and hooks across four routes, and Metro's web splitting puts code used by more than one route into
 // __common, which index.html always loads (app code in __common 102 -> 158 kB minified, +14 kB gzip).
@@ -24,8 +27,8 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 900;
-const INITIAL_RATCHET_KB = 570;
+const TOTAL_RATCHET_KB = 885;
+const INITIAL_RATCHET_KB = 555;
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';
 
 if (!existsSync(dir)) {
