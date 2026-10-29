@@ -6,6 +6,10 @@ cd "$ROOT"
 source scripts/android/env.sh
 export MSYS_NO_PATHCONV=1
 adb emu kill >/dev/null 2>&1 || true
-powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8081,4173 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id \$_.OwningProcess -Force }" 2>/dev/null || true
+if command -v powershell >/dev/null 2>&1; then
+  powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8081,4173 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id \$_.OwningProcess -Force }" 2>/dev/null || true
+else
+  fuser -k 8081/tcp 4173/tcp >/dev/null 2>&1 || true
+fi
 pnpm db:stop >/dev/null 2>&1 || true
 echo "Stopped Metro, emulator and the local Supabase stack."

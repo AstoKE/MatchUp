@@ -59,9 +59,13 @@ METRO_STAMP=apps/app/.android-build/metro-lock.sha256
 metro_running() { [[ "$(curl -s localhost:8081/status 2>/dev/null || true)" == *running* ]]; }
 if metro_running && [ "$(cat "$METRO_STAMP" 2>/dev/null)" != "$LOCK_SUM" ]; then
   echo "Dependencies or backend changed since Metro started: restarting it with a clean cache"
-  for pid in $(netstat -ano | grep -E ':8081 .*LISTENING' | awk '{print $NF}' | sort -u); do
-    taskkill //PID "$pid" //T //F >/dev/null 2>&1 || true
-  done
+  if command -v taskkill >/dev/null 2>&1; then
+    for pid in $(netstat -ano | grep -E ':8081 .*LISTENING' | awk '{print $NF}' | sort -u); do
+      taskkill //PID "$pid" //T //F >/dev/null 2>&1 || true
+    done
+  else
+    fuser -k 8081/tcp >/dev/null 2>&1 || true
+  fi
   sleep 2
 fi
 if ! metro_running; then
