@@ -47,6 +47,8 @@
     "increase": "Kontenjanı artır",
     "organizerPlays": "Ben de oynayacağım (bir kişilik yer tutar)",
     "waitlist": "Doluysa bekleme listesi açık olsun",
+    "autoApprove": "Yer varken istekleri otomatik onayla",
+    "autoApproveHint": "Yer boşken ve bekleyen yokken oyuncular hemen onaylanır. Aksi halde her isteğe sen karar verirsin.",
     "visibility": "Kimler bulabilsin?",
     "visibilityPublic": "Herkes (keşfette görünür)",
     "visibilityInvite": "Sadece davet bağlantısıyla",
@@ -104,6 +106,12 @@
     "deleted": "Taslak silindi.",
     "publishedToast": "Etkinliğin yayında.",
     "completedToast": "Etkinlik tamamlandı olarak işaretlendi.",
+    "backToDiscover": "Geri",
+    "lastSpot": "Son yer!",
+    "startsSoon": "2 saat içinde başlıyor",
+    "spotsLeft_one": "{{count}} yer kaldı",
+    "spotsLeft_other": "{{count}} yer kaldı",
+    "full": "Dolu",
     "durationValue": "{{count}} dk"
   },
   "edit": {
@@ -127,6 +135,152 @@
     "NOT_ENOUGH_PLAYERS": "Yeterli oyuncu yok",
     "ORGANIZER_UNAVAILABLE": "Organizatör katılamıyor",
     "OTHER": "Diğer"
+  },
+  "discover": {
+    "filtersTitle": "Filtreler",
+    "datePreset": "Ne zaman",
+    "date": {
+      "ANY": "Fark etmez",
+      "TODAY": "Bugün",
+      "TOMORROW": "Yarın",
+      "WEEK": "Bu hafta"
+    },
+    "timeOfDayTitle": "Günün saati",
+    "timeOfDay": {
+      "MORNING": "Sabah",
+      "AFTERNOON": "Öğleden sonra",
+      "EVENING": "Akşam"
+    },
+    "sportsTitle": "Spor",
+    "district": "İlçe",
+    "districtAny": "Tüm ilçeler",
+    "districtPlaceholder": "Tüm ilçeler",
+    "onlyOpen": "Yalnızca yeri olan etkinlikler",
+    "clear": "Filtreleri temizle",
+    "resultCount_one": "{{count}} etkinlik",
+    "resultCount_other": "{{count}} etkinlik",
+    "loadMore": "Daha fazla göster",
+    "loadMoreLoading": "Daha fazla etkinlik yükleniyor…",
+    "loadFailed": "Etkinlikler yüklenemedi",
+    "emptyTitle": "Henüz etkinlik yok",
+    "emptyBody": "İlk etkinliği sen düzenle.",
+    "emptyCreate": "Etkinlik oluştur",
+    "noMatchTitle": "Bu filtrelere uyan etkinlik yok",
+    "noMatchBody": "Başka bir gün dene ya da bir filtreyi kaldır.",
+    "card": {
+      "slots": "{{approved}}/{{capacity}} kişi",
+      "full": "Dolu",
+      "fullWaitlist": "Dolu · bekleme listesi açık",
+      "closed": "Kayıt kapandı",
+      "organizer": "{{name}} düzenliyor",
+      "placeHidden": "{{district}} · tam yer onaylananlara gösterilir"
+    },
+    "day": {
+      "TODAY": "Bugün",
+      "TOMORROW": "Yarın"
+    },
+    "fromProfile": "Profilindeki sporlar gösteriliyor. Daha fazlası için filtreleri değiştir ya da temizle.",
+    "filtersWithCount": "Filtreler ({{count}})"
+  },
+  "join": {
+    "signInToJoin": "Giriş yap ve katıl",
+    "request": "Katılma isteği gönder",
+    "joinWaitlist": "Etkinlik dolu, bekleme listesine katıl",
+    "send": "İsteği gönder",
+    "withdraw": "İsteği geri çek",
+    "leave": "Etkinlikten ayrıl",
+    "withdrawn": "İsteğin geri çekildi.",
+    "state": {
+      "REQUESTED": "İstek gönderildi",
+      "WAITLISTED": "Bekleme listesindesin",
+      "APPROVED": "Onaylandın"
+    },
+    "stateHint": {
+      "REQUESTED": "Organizatör onaylayınca haber vereceğiz.",
+      "WAITLISTED": "Yer açılırsa organizatör karar verir; sana haber vereceğiz.",
+      "APPROVED": "Tam yer bilgisi bu sayfada görünür. Gelemeyeceksen erkenden haber ver."
+    },
+    "unavailable": "Bu etkinliğe katılamazsın.",
+    "limitReached": "Bu etkinlik için istek hakkın doldu.",
+    "fullNoWaitlist": "Etkinlik dolu.",
+    "disclosure": "Organizatör görünen adını ve seviyeni görecek.",
+    "autoApproveNote": "Bu etkinlikte yer varsa isteğin hemen onaylanır.",
+    "message": "Organizatöre mesaj (isteğe bağlı)",
+    "messageHint": "En fazla {{max}} karakter.",
+    "position": "Tercih ettiğin pozisyon (isteğe bağlı)",
+    "positionPlaceholder": "Seçmek istemiyorum",
+    "positionNone": "Seçmek istemiyorum",
+    "result": {
+      "REQUESTED": "İstek gönderildi. Organizatör onaylayınca haber vereceğiz.",
+      "APPROVED": "Katılımın onaylandı.",
+      "WAITLISTED": "Etkinlik dolu. Bekleme listesine eklendin."
+    }
+  },
+  "requests": {
+    "title": "İstekler",
+    "pending_one": "Bekleyen istek ({{count}})",
+    "pending_other": "Bekleyen istekler ({{count}})",
+    "waitlist_one": "Bekleme listesi ({{count}})",
+    "waitlist_other": "Bekleme listesi ({{count}})",
+    "approved_one": "Onaylı oyuncu ({{count}})",
+    "approved_other": "Onaylı oyuncular ({{count}})",
+    "empty": "Henüz istek yok.",
+    "loadFailed": "İstekler yüklenemedi",
+    "unnamed": "Oyuncu",
+    "level": "Seviye {{level}}",
+    "attempt": "{{count}}. istek",
+    "fullHint": "Etkinlik dolu: onaylamak için önce bir yer açılmalı.",
+    "approve": "Onayla",
+    "toWaitlist": "Bekleme listesine al",
+    "reject": "Reddet",
+    "remove": "Etkinlikten çıkar",
+    "confirmRemove": "{{name}} etkinlikten çıkarılsın mı? Bu işlem geri alınamaz.",
+    "removeYes": "Evet, çıkar"
+  },
+  "mine": {
+    "bucketLabel": "Etkinlik grubu",
+    "bucket": {
+      "ORGANIZING": "Düzenlediklerim",
+      "PENDING": "Bekleyen",
+      "APPROVED": "Onaylı",
+      "WAITLISTED": "Yedek",
+      "PAST": "Geçmiş"
+    },
+    "status": {
+      "REQUESTED": "İstek gönderildi",
+      "APPROVED": "Onaylandın",
+      "REJECTED": "Reddedildi",
+      "WAITLISTED": "Bekleme listesinde",
+      "CANCELED": "İstek geri çekildi",
+      "REMOVED": "Etkinlikten çıkarıldın"
+    },
+    "pendingRequests_one": "{{count}} bekleyen istek",
+    "pendingRequests_other": "{{count}} bekleyen istek",
+    "loadFailed": "Etkinliklerin yüklenemedi",
+    "createFirst": "Etkinlik oluştur",
+    "browse": "Etkinliklere göz at",
+    "empty": {
+      "ORGANIZING": {
+        "title": "Düzenlediğin etkinlik yok",
+        "body": "Oluşturduğun taslaklar ve yaklaşan etkinlikler burada görünür."
+      },
+      "PENDING": {
+        "title": "Bekleyen isteğin yok",
+        "body": "Katılma isteği gönderdiğin etkinlikler, organizatör karar verene kadar burada durur."
+      },
+      "APPROVED": {
+        "title": "Onaylandığın etkinlik yok",
+        "body": "Katılımın onaylanan yaklaşan etkinlikler burada listelenir."
+      },
+      "WAITLISTED": {
+        "title": "Bekleme listesinde değilsin",
+        "body": "Dolu etkinliklerde beklediğin yerler burada görünür."
+      },
+      "PAST": {
+        "title": "Geçmiş etkinlik yok",
+        "body": "Biten, iptal edilen ve tamamlanan etkinliklerin burada kalır."
+      }
+    }
   },
   "validation": {
     "SPORT_REQUIRED": "Bir spor seç.",

@@ -32,6 +32,7 @@ const draft = (over: Partial<EventDraft> = {}): EventDraft => ({
   capacity: 12,
   organizerPlays: true,
   waitlistEnabled: true,
+  autoApprove: false,
   visibility: 'PUBLIC',
   skillMin: null,
   skillMax: null,
@@ -233,6 +234,7 @@ describe('toEventInput', () => {
       participant_notes: null,
       capacity: 12,
       waitlist_enabled: true,
+      auto_approve: false,
       organizer_plays: true,
       skill_min: null,
       skill_max: null,
@@ -241,6 +243,11 @@ describe('toEventInput', () => {
       cost_note: null,
       equipment_note: null,
     });
+  });
+
+  it('sends the auto-approve choice, off unless chosen', () => {
+    expect(toEventInput(draft(), IST).auto_approve).toBe(false);
+    expect(toEventInput(draft({ autoApprove: true }), IST).auto_approve).toBe(true);
   });
 });
 

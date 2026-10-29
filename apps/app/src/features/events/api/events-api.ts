@@ -36,6 +36,7 @@ const eventRow = z.object({
   capacity: z.number(),
   approved_count: z.number(),
   waitlist_enabled: z.boolean(),
+  auto_approve: z.boolean(),
   organizer_plays: z.boolean(),
   skill_min: z.nullable(z.number()),
   skill_max: z.nullable(z.number()),
@@ -50,7 +51,7 @@ const eventRow = z.object({
 const EVENT_COLUMNS =
   'id, organizer_id, status, title, description, sport_id, sport_format_id, visibility, starts_at, ' +
   'duration_minutes, ends_at, city_id, district_id, location_visibility, public_location_label, capacity, ' +
-  'approved_count, waitlist_enabled, organizer_plays, skill_min, skill_max, booking_status, ' +
+  'approved_count, waitlist_enabled, auto_approve, organizer_plays, skill_min, skill_max, booking_status, ' +
   'cost_amount_minor, cost_note, equipment_note, cancel_reason, cancel_message';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -75,6 +76,7 @@ export interface EventDetails {
   capacity: number;
   approvedCount: number;
   waitlistEnabled: boolean;
+  autoApprove: boolean;
   organizerPlays: boolean;
   skillMin: number | null;
   skillMax: number | null;
@@ -137,6 +139,7 @@ export async function fetchEvent(id: string): Promise<EventDetails | null> {
     capacity: row.capacity,
     approvedCount: row.approved_count,
     waitlistEnabled: row.waitlist_enabled,
+    autoApprove: row.auto_approve,
     organizerPlays: row.organizer_plays,
     skillMin: row.skill_min,
     skillMax: row.skill_max,

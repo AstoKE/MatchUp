@@ -319,6 +319,14 @@ function ParticipationStep({ catalog, draft, onChange, errors, locked }: EventFo
         checked={draft.waitlistEnabled}
         onChange={(waitlistEnabled) => onChange({ waitlistEnabled })}
       />
+      <Checkbox
+        label={t('fields.autoApprove')}
+        checked={draft.autoApprove}
+        onChange={(autoApprove) => onChange({ autoApprove })}
+      />
+      <Text variant="caption" tone="secondary">
+        {t('fields.autoApproveHint')}
+      </Text>
       <SegmentedChoice
         label={t('fields.visibility')}
         value={draft.visibility}

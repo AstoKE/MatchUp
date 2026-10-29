@@ -1,0 +1,25 @@
+{
+  "title": "Notifications",
+  "bell": "Notifications",
+  "bellUnread_one": "Notifications, {{count}} unread",
+  "bellUnread_other": "Notifications, {{count}} unread",
+  "markAllRead": "Mark all as read",
+  "new": "New",
+  "open": "Open event",
+  "loadFailed": "Couldn't load notifications",
+  "emptyTitle": "No notifications",
+  "emptyBody": "Requests, approvals and event changes show up here.",
+  "eventFallback": "an event",
+  "type": {
+    "JOIN_REQUESTED": "There's a new request to join {{event}}.",
+    "REQUEST_APPROVED": "Your request for {{event}} was approved.",
+    "REQUEST_REJECTED": "Your request for {{event}} wasn't accepted.",
+    "REQUEST_WAITLISTED": "You're on the waitlist for {{event}}.",
+    "PARTICIPANT_REMOVED": "You were removed from {{event}}.",
+    "PARTICIPANT_CANCELED": "A player left {{event}}.",
+    "SPOT_OPENED": "A spot opened in {{event}}; players are waiting.",
+    "EVENT_CANCELED": "{{event}} was canceled.",
+    "EVENT_CHANGED": "The time or place of {{event}} changed."
+  },
+  "unknown": "You have a new notification."
+}

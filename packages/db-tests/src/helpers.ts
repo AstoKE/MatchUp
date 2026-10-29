@@ -53,7 +53,13 @@ export async function createUser(options: { confirmed?: boolean } = {}): Promise
 
 export async function deleteCreatedUsers(): Promise<void> {
   const admin = adminClient();
-  await Promise.all(created.splice(0).map((id) => admin.auth.admin.deleteUser(id)));
+  const ids = created.splice(0);
+  // Deleting the Auth user leaves its public rows behind (no FK, ADR-0003): without this a test
+  // organizer's published events would stay listed in Discover and leak into later runs.
+  if (ids.length > 0) {
+    await db().query('delete from public.events where organizer_id = any($1::uuid[])', [ids]);
+  }
+  await Promise.all(ids.map((id) => admin.auth.admin.deleteUser(id)));
 }
 
 export function trackUser(id: string): void {
