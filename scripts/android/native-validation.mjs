@@ -11,6 +11,7 @@ import { execFileSync, spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { phase3Fixtures } from './phase3-fixtures.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const appDir = join(root, 'apps/app');
@@ -368,6 +369,128 @@ if (!ONLY.length || ONLY.includes('N08')) {
     r9.ok ? 'PASS' : 'FAIL',
     r9.ok ? '' : r9.out,
   );
+}
+
+// ---- Phase 3 on the device: discovery, requesting with the keyboard open, approval and inbox, auto-approve and
+// invite-only events. The player is the account of the flows above (signed in by N09, football + tennis);
+// the organizer and the events are created through the real RPCs, and every UI result is checked against the
+// server's own record.
+if (!ONLY.length || ONLY.some((id) => /^N(1[7-9]|2[0-2])/.test(id))) {
+  const fixtures = phase3Fixtures(stack);
+  const tag = randomUUID().slice(0, 6);
+  const title = `Native Mac ${tag}`;
+  const autoTitle = `Native Otomatik ${tag}`;
+  const inviteTitle = `Native Davetli ${tag}`;
+  const message = 'Orta saha oynarim';
+  let host = null;
+  try {
+    host = await fixtures.createOrganizer('Native Duzenleyen');
+    const eventId = await host.publish(title);
+    const autoId = await host.publish(autoTitle, { autoApprove: true });
+    const inviteId = await host.publish(inviteTitle, { inviteOnly: true });
+    const playerId = `(select id from auth.users where email = '${email}')`;
+    const row = (id) =>
+      dbScalar(
+        `select coalesce((select status || '|' || coalesce(request_message, '') from public.event_participations where event_id = '${id}' and user_id = ${playerId}), 'none')`,
+      );
+
+    const discovered = await flow(
+      'N17',
+      'Discover on the device: opens on the profile sports, filters behind a button, join action on the first screen',
+      '17-discover-phase3.yaml',
+      { TITLE: title },
+    );
+    const requested = discovered
+      ? await flow(
+          'N18',
+          'Request to join with the on-screen keyboard open (pinned form stays usable)',
+          '18-request-to-join.yaml',
+          { MSG: message },
+        )
+      : false;
+    if (requested) {
+      const r = row(eventId);
+      record(
+        'N18b',
+        'Server state matches: the request exists, REQUESTED, with the typed message',
+        r === `REQUESTED|${message}` ? 'PASS' : 'FAIL',
+        r === `REQUESTED|${message}` ? '' : `expected REQUESTED|${message} but database has ${r}`,
+      );
+      const pid = dbScalar(
+        `select id from public.event_participations where event_id = '${eventId}' and user_id = ${playerId}`,
+      );
+      await host.approve(pid);
+      await flow(
+        'N19',
+        'After approval: My Events → Approved, bell and inbox carry it, the event page shows the roster',
+        '19-approved-and-inbox.yaml',
+        { TITLE: title },
+      );
+    } else {
+      record('N19', 'depends on N18', 'SKIP', 'no request');
+    }
+
+    await flow(
+      'N20',
+      'Auto-approve event admits the player at once',
+      '20-auto-approve.yaml',
+      { TITLE: autoTitle },
+      async () => {
+        forceStop();
+        openDeepLink(`${SCHEME}://e/${autoId}`);
+        await sleep(6000);
+      },
+    );
+    const autoRow = row(autoId);
+    record(
+      'N20b',
+      'Server state matches: APPROVED without the organizer doing anything',
+      autoRow.startsWith('APPROVED') ? 'PASS' : 'FAIL',
+      autoRow.startsWith('APPROVED') ? '' : `database has ${autoRow}`,
+    );
+
+    const token = dbScalar(`select invite_token from public.events where id = '${inviteId}'`);
+    await flow(
+      'N21',
+      'Invite-only event without its token: does not exist for the player (deep link)',
+      '21-invite-without-token.yaml',
+      {},
+      async () => {
+        forceStop();
+        openDeepLink(`${SCHEME}://e/${inviteId}`);
+        await sleep(6000);
+      },
+    );
+    await flow(
+      'N22',
+      'Invite-only event with the link token: visible and requestable',
+      '22-invite-with-token.yaml',
+      { TITLE: inviteTitle },
+      async () => {
+        forceStop();
+        openDeepLink(`${SCHEME}://e/${inviteId}?invite=${token}`);
+        await sleep(6000);
+      },
+    );
+    const inviteRow = row(inviteId);
+    record(
+      'N22b',
+      'Server state matches: the invite request exists (REQUESTED)',
+      inviteRow.startsWith('REQUESTED') ? 'PASS' : 'FAIL',
+      inviteRow.startsWith('REQUESTED') ? '' : `database has ${inviteRow}`,
+    );
+  } catch (error) {
+    record('N17', 'Phase 3 fixtures', 'FAIL', String(error.message ?? error));
+  } finally {
+    if (host) {
+      try {
+        dbScalar(`delete from public.events where organizer_id = '${host.id}' returning 1`);
+      } catch {
+        /* test data on the local stack only */
+      }
+      await fixtures.deleteUser(host.id);
+    }
+  }
 }
 
 // Deep links: COLD start (process dead) for each

@@ -1,0 +1,19 @@
+appId: com.example.matchup.dev
+# 19 After the organizer approved (Phase 3) — requires -e TITLE. My Events shows the event under Approved, the bell
+# and the inbox carry the approval, and the event page now shows the roster.
+---
+- launchApp
+- tapOn: 'My Events'
+- tapOn: 'Approved'
+- assertVisible: ${TITLE}
+- takeScreenshot: 19-my-events-approved
+- tapOn: 'Notifications.*'
+- assertVisible: 'Your request for .* was approved.'
+- takeScreenshot: 19-inbox
+- tapOn: 'Your request for .* was approved.'
+- assertVisible: "You're in"
+# The roster sits below the facts: scroll to it (the pinned status stays on screen)
+- scrollUntilVisible:
+    element: 'Going \(1\)'
+    direction: DOWN
+- takeScreenshot: 19-event-roster
