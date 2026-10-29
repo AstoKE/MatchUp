@@ -301,3 +301,62 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     await host.context.close();
   });
 });
+
+test.describe('Discover for a signed-in player (UI tour)', () => {
+  test('opens on the profile sports, groups by day, and clearing shows everything', async ({
+    page,
+  }) => {
+    const s = requireStack();
+    const hostEmail = uniqueEmail('dayhost');
+    const playerEmail = uniqueEmail('dayplayer');
+    createdIds.push((await createOnboardedUser(s, hostEmail)).id);
+    createdIds.push((await createOnboardedUser(s, playerEmail)).id);
+    const title = `E2E gün ${hostEmail.slice(8, 16)}`;
+    await createPublishedEvent(s, hostEmail, title);
+
+    // createOnboardedUser gives every user football, so the football event is on their own sports.
+    await signIn(page, playerEmail);
+    const main = page.getByRole('main');
+    await expect(main.getByText(/Profilindeki sporlar gösteriliyor/)).toBeVisible();
+    await expect(main.getByRole('checkbox', { name: 'Futbol', exact: true })).toBeChecked();
+    const card = main.getByRole('link', { name: new RegExp(title) });
+    await expect(card).toBeVisible();
+    // The card sits under a day heading and shows only the time and the length.
+    await expect(main.getByRole('heading', { level: 2 }).first()).toBeVisible();
+    await expect(card).toContainText(/\d{2}:\d{2} · 90 dk/);
+    await expectNoBlocking(page);
+
+    await main.getByRole('button', { name: 'Filtreleri temizle' }).first().click();
+    await expect(main.getByText(/Profilindeki sporlar gösteriliyor/)).toHaveCount(0);
+    await expect(main.getByRole('checkbox', { name: 'Futbol', exact: true })).not.toBeChecked();
+    await expect(card).toBeVisible();
+  });
+
+  test('on a phone the events come first and the filters open on request', async ({ page }) => {
+    const s = requireStack();
+    const hostEmail = uniqueEmail('phonehost');
+    createdIds.push((await createOnboardedUser(s, hostEmail)).id);
+    const title = `E2E telefon ${hostEmail.slice(10, 18)}`;
+    await createPublishedEvent(s, hostEmail, title);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    const main = page.getByRole('main');
+    const card = main.getByRole('link', { name: new RegExp(title) });
+    await expect(card).toBeVisible();
+    // The first event card is on the first screen, not pushed below a wall of filter chips.
+    // (Other tests publish events too, so check the first card of the list, whoever's it is.)
+    const box = await main.getByRole('listitem').first().boundingBox();
+    expect(box?.y ?? Infinity).toBeLessThan(844);
+    await expect(main.getByRole('checkbox', { name: 'Tenis', exact: true })).toHaveCount(0);
+
+    const toggle = main.getByRole('button', { name: 'Filtreler', exact: true });
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(main.getByRole('checkbox', { name: 'Tenis', exact: true })).toBeVisible();
+    await main.getByRole('checkbox', { name: 'Tenis', exact: true }).click();
+    await expect(main.getByRole('button', { name: 'Filtreler (1)', exact: true })).toBeVisible();
+    await expectNoBlocking(page);
+  });
+});

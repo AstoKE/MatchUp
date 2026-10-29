@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   activeFilterCount,
+  groupByLocalDay,
+  relativeDay,
   buildSearchPayload,
   EMPTY_DISCOVER_FILTERS,
   SEARCH_PAGE_SIZE,
@@ -101,5 +103,58 @@ describe('activeFilterCount', () => {
         }),
       ),
     ).toBe(5);
+  });
+});
+
+describe('groupByLocalDay', () => {
+  const at = (iso: string) => ({ startsAt: iso });
+
+  it('keeps the order and starts a new group per local day', () => {
+    const groups = groupByLocalDay(
+      [
+        at('2026-10-27T15:00:00.000Z'),
+        at('2026-10-27T17:30:00.000Z'),
+        at('2026-10-28T06:00:00.000Z'),
+        at('2026-10-30T16:00:00.000Z'),
+      ],
+      IST,
+    );
+    expect(groups.map((g) => [g.date, g.items.length])).toEqual([
+      ['2026-10-27', 2],
+      ['2026-10-28', 1],
+      ['2026-10-30', 1],
+    ]);
+  });
+
+  it('uses the city day, not the UTC day: 22:30Z is already tomorrow in Istanbul', () => {
+    const groups = groupByLocalDay(
+      [at('2026-10-27T20:59:00.000Z'), at('2026-10-27T21:00:00.000Z')],
+      IST,
+    );
+    expect(groups.map((g) => g.date)).toEqual(['2026-10-27', '2026-10-28']);
+  });
+
+  it('returns nothing for nothing', () => {
+    expect(groupByLocalDay([], IST)).toEqual([]);
+  });
+});
+
+describe('relativeDay', () => {
+  it('names today and tomorrow in the city time zone only', () => {
+    expect(relativeDay('2026-10-27', NOW, IST)).toBe('TODAY');
+    expect(relativeDay('2026-10-28', NOW, IST)).toBe('TOMORROW');
+    expect(relativeDay('2026-10-29', NOW, IST)).toBeNull();
+    expect(relativeDay('2026-10-26', NOW, IST)).toBeNull();
+  });
+
+  it('follows the city day when UTC is still the previous one', () => {
+    const late = new Date('2026-10-27T22:30:00.000Z'); // 01:30 on the 28th in Istanbul
+    expect(relativeDay('2026-10-28', late, IST)).toBe('TODAY');
+    expect(relativeDay('2026-10-29', late, IST)).toBe('TOMORROW');
+  });
+
+  it('crosses a month end', () => {
+    const now = new Date('2026-10-31T10:00:00.000Z');
+    expect(relativeDay('2026-11-01', now, IST)).toBe('TOMORROW');
   });
 });

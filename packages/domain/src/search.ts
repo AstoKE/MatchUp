@@ -95,3 +95,39 @@ export function buildSearchPayload(
   }
   return payload;
 }
+
+export interface DayGroup<T> {
+  /** The local calendar day, `YYYY-MM-DD`, in the city's time zone. */
+  date: string;
+  items: T[];
+}
+
+/**
+ * Splits an already ordered list into runs of the same local day, keeping the order. The day is the city's
+ * (a 00:30 start belongs to the new day for the players there, whatever UTC says).
+ */
+export function groupByLocalDay<T extends { startsAt: string }>(
+  items: readonly T[],
+  timeZone: string,
+): DayGroup<T>[] {
+  const groups: DayGroup<T>[] = [];
+  for (const item of items) {
+    const date = utcToZonedParts(item.startsAt, timeZone).date;
+    const last = groups.at(-1);
+    if (last && last.date === date) last.items.push(item);
+    else groups.push({ date, items: [item] });
+  }
+  return groups;
+}
+
+/** "TODAY" / "TOMORROW" for the two days people say by name, otherwise null (the UI then names the weekday). */
+export function relativeDay(
+  date: string,
+  now: Date,
+  timeZone: string,
+): 'TODAY' | 'TOMORROW' | null {
+  const today = utcToZonedParts(now.toISOString(), timeZone).date;
+  if (date === today) return 'TODAY';
+  if (date === addDays(today, 1)) return 'TOMORROW';
+  return null;
+}

@@ -18,6 +18,23 @@ export function formatEventStart(iso: string, timeZone: string, locale: string):
   }).format(new Date(iso));
 }
 
+/** "19:30" in the event city's time zone (the day is named by the list heading around it). */
+export function formatEventTime(iso: string, timeZone: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, { timeZone, hour: '2-digit', minute: '2-digit' }).format(
+    new Date(iso),
+  );
+}
+
+/** "Cumartesi, 31 Ekim" for a local calendar day (`YYYY-MM-DD`); noon UTC keeps every zone on that day. */
+export function formatDayHeading(date: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: 'UTC',
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(new Date(`${date}T12:00:00Z`));
+}
+
 /** kuruş → "150" or "150,50" (TL, locale formatting). */
 export function formatCost(minor: number, locale: string): string {
   return new Intl.NumberFormat(locale, {

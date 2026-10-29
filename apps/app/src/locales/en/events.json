@@ -174,7 +174,13 @@
       "closed": "Registration closed",
       "organizer": "by {{name}}",
       "placeHidden": "{{district}} · exact place shown to approved players"
-    }
+    },
+    "day": {
+      "TODAY": "Today",
+      "TOMORROW": "Tomorrow"
+    },
+    "fromProfile": "Showing the sports on your profile. Change or clear the filters to see more.",
+    "filtersWithCount": "Filters ({{count}})"
   },
   "join": {
     "signInToJoin": "Sign in to join",

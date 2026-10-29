@@ -3,6 +3,8 @@ import {
   activeFilterCount,
   buildSearchPayload,
   EMPTY_DISCOVER_FILTERS,
+  groupByLocalDay,
+  relativeDay,
   type DiscoverFilters as Filters,
 } from '@matchup/domain';
 import { Image } from 'expo-image';
@@ -12,11 +14,13 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useCatalog } from '@/features/catalog';
 import { NotificationBell } from '@/features/notifications';
+import { useMyProfile } from '@/features/profile';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { Button, EmptyState, Screen, Skeleton, Text, useTheme } from '@/ui';
 import { DiscoverFilters } from '../components/DiscoverFilters';
 import { EventCard } from '../components/EventCard';
+import { formatDayHeading } from '../format';
 import { useEventSearch } from '../hooks';
 
 const logo = require('../../../../assets/brand/logo-provisional-512.png') as number;
@@ -28,10 +32,28 @@ const logo = require('../../../../assets/brand/logo-provisional-512.png') as num
  */
 export function DiscoverScreen() {
   const { t } = useTranslation(['events', 'common', 'nav']);
-  const { spacing } = useTheme();
+  const { spacing, breakpoint } = useTheme();
   const router = useRouter();
   const catalog = useCatalog();
-  const [filters, setFilters] = useState<Filters>(EMPTY_DISCOVER_FILTERS);
+  // On a phone the filter panel would fill the first screen and push the events below the fold: it sits
+  // behind a button there (with the number of active filters); wider screens keep it open.
+  const compact = breakpoint === 'compact';
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const profile = useMyProfile();
+  // Signed-in players open Discover on their own sports (USER_FLOWS FL-2); `chosen` is set the moment they
+  // touch a filter or clear them, and from then on it wins. Guests and people without sports see everything.
+  const [chosen, setChosen] = useState<Filters | null>(null);
+  const profileSports = useMemo(
+    () => profile.data?.sports.map((s) => s.sportId) ?? [],
+    [profile.data],
+  );
+  const filters = useMemo<Filters>(
+    () => chosen ?? { ...EMPTY_DISCOVER_FILTERS, sportIds: profileSports },
+    [chosen, profileSports],
+  );
+  const fromProfile = chosen === null && profileSports.length > 0;
+  // The first search waits for the profile, so a signed-in player never sees an unfiltered flash.
+  const ready = !profile.isPending || profile.fetchStatus === 'idle';
   // Read the clock once per visit (render must stay pure); "today" is resolved server-side bounds only.
   const [openedAt] = useState(Date.now);
   // The pilot has one city; with several, a city picker would choose it here.
@@ -44,9 +66,15 @@ export function DiscoverScreen() {
       }),
     [filters, openedAt, city?.timeZone],
   );
-  const search = useEventSearch(payload);
-  const items = search.data?.pages.flatMap((page) => page.items) ?? [];
+  const search = useEventSearch(payload, ready);
+  const items = useMemo(
+    () => search.data?.pages.flatMap((page) => page.items) ?? [],
+    [search.data],
+  );
   const filtered = activeFilterCount(filters) > 0;
+  const timeZone = city?.timeZone ?? 'Europe/Istanbul';
+  const groups = useMemo(() => groupByLocalDay(items, timeZone), [items, timeZone]);
+  const locale = currentLocale();
 
   return (
     <Screen>
@@ -65,13 +93,31 @@ export function DiscoverScreen() {
         <NotificationBell />
       </View>
 
-      {catalog.data ? (
+      {compact ? (
+        <Button
+          variant="secondary"
+          label={
+            activeFilterCount(filters) > 0
+              ? t('events:discover.filtersWithCount', { count: activeFilterCount(filters) })
+              : t('events:discover.filtersTitle')
+          }
+          aria-expanded={filtersOpen}
+          onPress={() => setFiltersOpen((open) => !open)}
+        />
+      ) : null}
+      {catalog.data && (!compact || filtersOpen) ? (
         <DiscoverFilters
           filters={filters}
-          onChange={setFilters}
+          onChange={setChosen}
           sports={catalog.data.sports}
           city={city}
         />
+      ) : null}
+
+      {fromProfile ? (
+        <Text variant="caption" tone="secondary">
+          {t('events:discover.fromProfile')}
+        </Text>
       ) : null}
 
       {catalog.isError || search.isError ? (
@@ -84,7 +130,7 @@ export function DiscoverScreen() {
             if (search.isError) void search.refetch();
           }}
         />
-      ) : search.isPending || !catalog.data ? (
+      ) : search.isPending || !catalog.data || !ready ? (
         <View
           accessible
           accessibilityRole="progressbar"
@@ -101,7 +147,7 @@ export function DiscoverScreen() {
             title={t('events:discover.noMatchTitle')}
             body={t('events:discover.noMatchBody')}
             actionLabel={t('events:discover.clear')}
-            onAction={() => setFilters(EMPTY_DISCOVER_FILTERS)}
+            onAction={() => setChosen(EMPTY_DISCOVER_FILTERS)}
           />
         ) : (
           <EmptyState
@@ -116,13 +162,23 @@ export function DiscoverScreen() {
           <Text variant="caption" tone="secondary" accessibilityLiveRegion="polite">
             {t('events:discover.resultCount', { count: items.length })}
           </Text>
-          <View role="list" style={{ gap: spacing[3] }}>
-            {items.map((event) => (
-              <View key={event.id} role="listitem">
-                <EventCard event={event} catalog={catalog.data} />
+          {groups.map((group) => {
+            const named = relativeDay(group.date, new Date(openedAt), timeZone);
+            return (
+              <View key={group.date} style={{ gap: spacing[3] }}>
+                <Text variant="title" heading={2}>
+                  {named ? t(`events:discover.day.${named}`) : formatDayHeading(group.date, locale)}
+                </Text>
+                <View role="list" style={{ gap: spacing[3] }}>
+                  {group.items.map((event) => (
+                    <View key={event.id} role="listitem">
+                      <EventCard event={event} catalog={catalog.data} showDate={false} />
+                    </View>
+                  ))}
+                </View>
               </View>
-            ))}
-          </View>
+            );
+          })}
           {search.hasNextPage ? (
             <Button
               label={t('events:discover.loadMore')}

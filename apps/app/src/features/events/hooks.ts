@@ -26,12 +26,13 @@ export function useEvent(id: string) {
 }
 
 /** Discover list under the ['events'] prefix, so every organizer action refreshes it too. */
-export function useEventSearch(payload: SearchPayload) {
+export function useEventSearch(payload: SearchPayload, enabled = true) {
   return useInfiniteQuery({
     queryKey: ['events', 'search', payload],
     queryFn: ({ pageParam }) => searchEvents(payload, pageParam),
     initialPageParam: null as SearchCursor | null,
     getNextPageParam: (last) => last.nextCursor,
+    enabled,
   });
 }
 

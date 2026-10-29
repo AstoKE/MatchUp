@@ -6,7 +6,7 @@ import { localizedName, type Catalog } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
 import { Text, TOUCH_TARGET, useTheme } from '@/ui';
 import type { EventListItem } from '../api/search-api';
-import { formatCost, formatEventStart } from '../format';
+import { formatCost, formatEventStart, formatEventTime } from '../format';
 import { Pill, SlotMeter } from './SlotMeter';
 
 /**
@@ -22,9 +22,12 @@ export function EventCard({
   event,
   catalog,
   badges = [],
+  showDate = true,
 }: {
   event: EventListItem;
   catalog: Catalog;
+  /** Inside a day group the heading already names the day: show only the time. */
+  showDate?: boolean;
   /** Extra state labels (e.g. "Draft", "Request sent"), shown above the sport line. */
   badges?: readonly CardBadge[];
 }) {
@@ -33,19 +36,35 @@ export function EventCard({
   const router = useRouter();
   const [focused, setFocused] = useState(false);
   const locale = currentLocale();
+  // Read the clock once per card (render must stay pure); the server decides what is still joinable.
+  const [shownAt] = useState(Date.now);
 
   const sport = catalog.sports.find((s) => s.id === event.sportId);
   const format = sport?.formats.find((f) => f.id === event.formatId);
   const city = catalog.cities.find((c) => c.id === event.cityId);
   const district = city?.districts.find((d) => d.id === event.districtId);
   const districtName = district ? localizedName(district.names, locale) : '';
-  const when = formatEventStart(event.startsAt, city?.timeZone ?? 'Europe/Istanbul', locale);
+  const timeZone = city?.timeZone ?? 'Europe/Istanbul';
+  const when = showDate
+    ? formatEventStart(event.startsAt, timeZone, locale)
+    : `${formatEventTime(event.startsAt, timeZone, locale)} · ${t('detail.durationValue', { count: event.durationMinutes })}`;
   const full = event.openSlots <= 0;
   const status = full
     ? t(event.waitlistEnabled ? 'discover.card.fullWaitlist' : 'discover.card.full')
     : !event.registrationOpen
       ? t('discover.card.closed')
       : null;
+  // Time pressure only for events that can still be joined (design.md §4.2 rule 4).
+  const msToStart = Date.parse(event.startsAt) - shownAt;
+  const urgency: CardBadge[] =
+    full || !event.registrationOpen || msToStart <= 0
+      ? []
+      : event.openSlots === 1
+        ? [{ label: t('detail.lastSpot'), tone: 'warning' }]
+        : msToStart < 2 * 3_600_000
+          ? [{ label: t('detail.startsSoon'), tone: 'warning' }]
+          : [];
+  const allBadges = [...badges, ...urgency];
   const where = event.placeLabel
     ? [districtName, event.placeLabel].filter(Boolean).join(' · ')
     : t('discover.card.placeHidden', { district: districtName });
@@ -79,9 +98,9 @@ export function EventCard({
           : null),
       })}
     >
-      {badges.length > 0 ? (
+      {allBadges.length > 0 ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
-          {badges.map((badge) => (
+          {allBadges.map((badge) => (
             <Pill key={badge.label} label={badge.label} tone={badge.tone} />
           ))}
         </View>

@@ -174,7 +174,13 @@
       "closed": "Kayıt kapandı",
       "organizer": "{{name}} düzenliyor",
       "placeHidden": "{{district}} · tam yer onaylananlara gösterilir"
-    }
+    },
+    "day": {
+      "TODAY": "Bugün",
+      "TOMORROW": "Yarın"
+    },
+    "fromProfile": "Profilindeki sporlar gösteriliyor. Daha fazlası için filtreleri değiştir ya da temizle.",
+    "filtersWithCount": "Filtreler ({{count}})"
   },
   "join": {
     "signInToJoin": "Giriş yap ve katıl",
