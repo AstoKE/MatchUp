@@ -1,5 +1,11 @@
 import type { ReactNode } from 'react';
-import { ScrollView, View, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme';
 
@@ -64,27 +70,39 @@ export function Screen({
         paddingRight: insets.right,
       }}
     >
-      {scroll ? (
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
-          {inner}
-        </ScrollView>
-      ) : (
-        inner
-      )}
-      {footer ? (
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: colors.borderSubtle,
-            backgroundColor: colors.surfaceRaised,
-            paddingHorizontal: gutter,
-            paddingVertical: spacing[3],
-            alignItems: 'center',
-          }}
-        >
-          <View style={{ width: '100%', maxWidth }}>{footer}</View>
-        </View>
-      ) : null}
+      {/*
+        With a pinned footer the on-screen keyboard must lift it. Since Android 15 apps draw edge to edge and the
+        window is no longer resized for the keyboard, so the pinned form ended up UNDER it (found on the
+        emulator, docs/NATIVE_VALIDATION.md): the padding is applied by hand. Screens without a footer keep
+        the behaviour that was validated, and on web there is no keyboard event, so nothing changes there.
+      */}
+      <KeyboardAvoidingView enabled={Boolean(footer)} behavior="padding" style={{ flex: 1 }}>
+        {scroll ? (
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ flexGrow: 1 }}
+            style={{ flex: 1 }}
+          >
+            {inner}
+          </ScrollView>
+        ) : (
+          inner
+        )}
+        {footer ? (
+          <View
+            style={{
+              borderTopWidth: 1,
+              borderTopColor: colors.borderSubtle,
+              backgroundColor: colors.surfaceRaised,
+              paddingHorizontal: gutter,
+              paddingVertical: spacing[3],
+              alignItems: 'center',
+            }}
+          >
+            <View style={{ width: '100%', maxWidth }}>{footer}</View>
+          </View>
+        ) : null}
+      </KeyboardAvoidingView>
     </View>
   );
 }

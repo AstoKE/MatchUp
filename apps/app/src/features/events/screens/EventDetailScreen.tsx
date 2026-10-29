@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, useCatalog, type Catalog } from '@/features/catalog';
 import { errorText } from '@/lib/error-text';
@@ -109,6 +109,7 @@ function Detail({
 }) {
   const { t } = useTranslation(['events', 'common']);
   const { spacing, breakpoint } = useTheme();
+  const { height: windowHeight } = useWindowDimensions();
   const router = useRouter();
   const toast = useToast();
   const locale = currentLocale();
@@ -138,7 +139,10 @@ function Detail({
   const joinPanel =
     !isOrganizer && joinable ? (
       stickyJoin ? (
-        <ScrollView style={{ maxHeight: 360 }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          style={{ maxHeight: Math.min(360, windowHeight * 0.45) }}
+          keyboardShouldPersistTaps="handled"
+        >
           <JoinPanel event={event} catalog={catalog} inviteToken={inviteToken} />
         </ScrollView>
       ) : (
