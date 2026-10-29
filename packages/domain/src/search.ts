@@ -1,4 +1,4 @@
-import { utcToZonedParts, zonedTimeToUtc } from './event';
+import { utcToZonedParts, zonedTimeToUtc, type EventSetting } from './event';
 
 /**
  * Discovery filters as the Discover screen holds them, and their translation to the `search_events`
@@ -28,6 +28,7 @@ export interface DiscoverFilters {
   timeOfDay: readonly TimeOfDay[];
   sportIds: readonly string[];
   districtId: string | null;
+  setting: EventSetting | null;
   onlyOpen: boolean;
 }
 
@@ -36,6 +37,7 @@ export const EMPTY_DISCOVER_FILTERS: DiscoverFilters = {
   timeOfDay: [],
   sportIds: [],
   districtId: null,
+  setting: null,
   onlyOpen: false,
 };
 
@@ -46,6 +48,7 @@ export type SearchPayload = {
   district_ids?: string[];
   sport_ids?: string[];
   time_of_day?: TimeOfDay[];
+  setting?: EventSetting;
   only_open?: true;
   from?: string;
   to?: string;
@@ -59,6 +62,7 @@ export function activeFilterCount(filters: DiscoverFilters): number {
     (filters.timeOfDay.length > 0 ? 1 : 0) +
     (filters.sportIds.length > 0 ? 1 : 0) +
     (filters.districtId === null ? 0 : 1) +
+    (filters.setting === null ? 0 : 1) +
     (filters.onlyOpen ? 1 : 0)
   );
 }
@@ -78,6 +82,7 @@ export function buildSearchPayload(
   if (filters.districtId) payload.district_ids = [filters.districtId];
   if (filters.sportIds.length > 0) payload.sport_ids = [...filters.sportIds];
   if (filters.timeOfDay.length > 0) payload.time_of_day = [...filters.timeOfDay];
+  if (filters.setting) payload.setting = filters.setting;
   if (filters.onlyOpen) payload.only_open = true;
 
   if (filters.datePreset !== 'ANY') {

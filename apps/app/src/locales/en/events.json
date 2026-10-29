@@ -63,7 +63,9 @@
     "equipment": "Equipment note (optional)",
     "participantNotes": "Note for participants (optional)",
     "participantNotesHint": "Only players you approve can see it (e.g. meeting point).",
-    "immutableHint": "After publishing, sport, format and whether you play cannot change."
+    "immutableHint": "After publishing, sport, format and whether you play cannot change.",
+    "setting": "Indoor or outdoor",
+    "settingNone": "Not stated"
   },
   "booking": {
     "NOT_REQUIRED": "Not needed",
@@ -112,7 +114,8 @@
     "spotsLeft_one": "{{count}} spot left",
     "spotsLeft_other": "{{count}} spots left",
     "full": "Full",
-    "durationValue": "{{count}} min"
+    "durationValue": "{{count}} min",
+    "setting": "Indoor or outdoor"
   },
   "edit": {
     "title": "Edit event",
@@ -180,7 +183,9 @@
       "TOMORROW": "Tomorrow"
     },
     "fromProfile": "Showing the sports on your profile. Change or clear the filters to see more.",
-    "filtersWithCount": "Filters ({{count}})"
+    "filtersWithCount": "Filters ({{count}})",
+    "setting": "Indoor or outdoor",
+    "settingAny": "Any"
   },
   "join": {
     "signInToJoin": "Sign in to join",
@@ -306,5 +311,9 @@
     "EQUIPMENT_TOO_LONG": "The equipment note can have at most 500 characters.",
     "CANCEL_REASON_REQUIRED": "Choose a reason.",
     "CANCEL_MESSAGE_TOO_LONG": "The message can have at most 500 characters."
+  },
+  "setting": {
+    "INDOOR": "Indoor",
+    "OUTDOOR": "Outdoor"
   }
 }

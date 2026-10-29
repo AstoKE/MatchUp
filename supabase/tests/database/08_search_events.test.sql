@@ -2,7 +2,7 @@
 -- hidden places and closed accounts must never be listed; malformed filters are VALIDATION_FAILED.
 -- Assertions are scoped to this file's fixtures (titles start with "S8 ") so leftover rows do not matter.
 begin;
-select plan(39);
+select plan(45);
 
 create function pg_temp.act_as(p_uid uuid)
 returns void language plpgsql as $$
@@ -98,7 +98,7 @@ select ok((select p.prosecdef and p.proconfig @> array['search_path=""', 'statem
 
 -- ---- fixtures ------------------------------------------------------------------------------------------------
 select pg_temp.act_as('00000000-0000-4000-8000-000000000801');
-insert into ids values ('evening', public.create_event(gen_random_uuid(), pg_temp.input('S8 Akşam futbol', 3, '19:30'), true));
+insert into ids values ('evening', public.create_event(gen_random_uuid(), pg_temp.input('S8 Akşam futbol', 3, '19:30', '{"setting": "OUTDOOR"}'), true));
 insert into ids values ('afternoon', public.create_event(gen_random_uuid(),
   pg_temp.input('S8 Öğle futbol', 5, '14:00',
     jsonb_build_object('district_id', (select id from public.districts where slug = 'yenimahalle'))), true));
@@ -146,7 +146,7 @@ select is((select array_agg(k order by k) from (
       from jsonb_array_elements(public.search_events(pg_temp.win()) -> 'items') i) s),
   array['approved_count', 'booking_status', 'capacity', 'city_id', 'cost_amount_minor', 'cost_note', 'district_id',
         'duration_minutes', 'ends_at', 'id', 'open_slots', 'organizer_name', 'place_label', 'registration_open',
-        'skill_max', 'skill_min', 'sport_format_id', 'sport_id', 'starts_at', 'title', 'waitlist_enabled'],
+        'setting', 'skill_max', 'skill_min', 'sport_format_id', 'sport_id', 'starts_at', 'title', 'waitlist_enabled'],
   'items carry exactly the public field list (no invite token, address, notes, organizer id)');
 select is((select i -> 'place_label' from jsonb_array_elements(public.search_events(pg_temp.win()) -> 'items') i
             where i ->> 'title' = 'S8 Sabah tenis'), 'null'::jsonb, 'a hidden place has no label');
@@ -191,6 +191,19 @@ select is(pg_temp.titles(jsonb_build_object('from', pg_temp.local_ts(4, '00:00')
   array['S8 Sabah tenis'], 'date window');
 select is(pg_temp.titles(pg_temp.win('{"unknown_filter": 1}')),
   array['S8 Akşam futbol', 'S8 Sabah tenis', 'S8 Öğle futbol', 'S8 Dolu tenis'], 'unknown filter keys are ignored (forward compatible)');
+
+-- ---- indoor / outdoor -------------------------------------------------------------------------------------------------
+select is(pg_temp.titles(pg_temp.win('{"setting": "OUTDOOR"}')), array['S8 Akşam futbol'], 'the outdoor filter');
+select is(pg_temp.titles(pg_temp.win('{"setting": "INDOOR"}')), array[]::text[], 'the indoor filter (nothing is stated indoor)');
+select is((select i ->> 'setting' from jsonb_array_elements(public.search_events(pg_temp.win()) -> 'items') i
+            where i ->> 'title' = 'S8 Akşam futbol'), 'OUTDOOR', 'the stated setting is in the item');
+select is((select i -> 'setting' from jsonb_array_elements(public.search_events(pg_temp.win()) -> 'items') i
+            where i ->> 'title' = 'S8 Sabah tenis'), 'null'::jsonb, '... and null when the organizer said nothing');
+select throws_ok($$select public.search_events('{"setting": "ROOFTOP"}')$$, 'P0001', 'VALIDATION_FAILED', 'an unknown setting filter');
+select pg_temp.act_as('00000000-0000-4000-8000-000000000801');
+select throws_ok($$select public.create_event(gen_random_uuid(), pg_temp.input('S8 Çatı', 3, '22:00', '{"setting": "ROOFTOP"}'))$$,
+  'P0001', 'VALIDATION_FAILED', 'an unknown setting on an event');
+select pg_temp.act_as_anon();
 
 -- ---- keyset pagination -----------------------------------------------------------------------------------------------
 select is((public.search_events(pg_temp.win('{"limit": 2}')) -> 'items') -> 0 ->> 'title', 'S8 Akşam futbol',

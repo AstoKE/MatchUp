@@ -77,6 +77,7 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
     await expect(page.getByRole('heading', { name: 'Kimler, kaç kişi?' })).toBeVisible();
     await page.getByRole('button', { name: 'Kontenjanı artır' }).click();
     await expect(page.getByText('11 kişi', { exact: true })).toBeVisible();
+    await page.getByRole('radio', { name: 'Açık hava', exact: true }).click();
     await expectNoBlocking(page);
     await page.getByRole('button', { name: 'Yayınla' }).click();
 
@@ -92,6 +93,7 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
     }
     await expect(page.getByRole('tab')).toHaveCount(4);
     await expect(main.getByText('1/11 kişi')).toBeVisible();
+    await expect(main.getByText('Açık hava', { exact: true })).toBeVisible();
     await expect(main.getByText('Çankaya · ODTÜ Halı Saha 2 · Üniversiteler Mh. 1')).toBeVisible();
     await expectNoBlocking(page);
 

@@ -84,6 +84,17 @@ export function DiscoverFilters({
         </View>
       </View>
 
+      <SegmentedChoice
+        label={t('discover.setting')}
+        value={filters.setting ?? 'ANY'}
+        onChange={(value) => set({ setting: value === 'ANY' ? null : value })}
+        options={[
+          { value: 'ANY', label: t('discover.settingAny') },
+          { value: 'INDOOR', label: t('setting.INDOOR') },
+          { value: 'OUTDOOR', label: t('setting.OUTDOOR') },
+        ]}
+      />
+
       {city ? (
         <Select
           label={t('discover.district')}

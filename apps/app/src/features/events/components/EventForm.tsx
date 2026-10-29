@@ -328,6 +328,16 @@ function ParticipationStep({ catalog, draft, onChange, errors, locked }: EventFo
         {t('fields.autoApproveHint')}
       </Text>
       <SegmentedChoice
+        label={t('fields.setting')}
+        value={draft.setting ?? 'NONE'}
+        onChange={(value) => onChange({ setting: value === 'NONE' ? null : value })}
+        options={[
+          { value: 'NONE', label: t('fields.settingNone') },
+          { value: 'INDOOR', label: t('setting.INDOOR') },
+          { value: 'OUTDOOR', label: t('setting.OUTDOOR') },
+        ]}
+      />
+      <SegmentedChoice
         label={t('fields.visibility')}
         value={draft.visibility}
         onChange={(visibility) => onChange({ visibility })}

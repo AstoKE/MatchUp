@@ -111,6 +111,7 @@ export function EventCard({
           {[
             sport && localizedName(sport.names, locale),
             format && localizedName(format.names, locale),
+            event.setting && t(`setting.${event.setting}`),
           ]
             .filter(Boolean)
             .join(' · ')}

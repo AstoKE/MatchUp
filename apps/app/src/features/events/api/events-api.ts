@@ -1,11 +1,13 @@
 import {
   BOOKING_STATUSES,
   EVENT_CANCEL_REASONS,
+  EVENT_SETTINGS,
   EVENT_STATUSES,
   EVENT_VISIBILITIES,
   LOCATION_VISIBILITIES,
   mapRpcError,
   type EventCancelReason,
+  type EventSetting,
   type EventInputPayload,
 } from '@matchup/domain';
 import * as z from 'zod/mini';
@@ -37,6 +39,7 @@ const eventRow = z.object({
   approved_count: z.number(),
   waitlist_enabled: z.boolean(),
   auto_approve: z.boolean(),
+  setting: z.nullable(z.enum(EVENT_SETTINGS)),
   organizer_plays: z.boolean(),
   skill_min: z.nullable(z.number()),
   skill_max: z.nullable(z.number()),
@@ -51,7 +54,7 @@ const eventRow = z.object({
 const EVENT_COLUMNS =
   'id, organizer_id, status, title, description, sport_id, sport_format_id, visibility, starts_at, ' +
   'duration_minutes, ends_at, city_id, district_id, location_visibility, public_location_label, capacity, ' +
-  'approved_count, waitlist_enabled, auto_approve, organizer_plays, skill_min, skill_max, booking_status, ' +
+  'approved_count, waitlist_enabled, auto_approve, setting, organizer_plays, skill_min, skill_max, booking_status, ' +
   'cost_amount_minor, cost_note, equipment_note, cancel_reason, cancel_message';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -77,6 +80,8 @@ export interface EventDetails {
   approvedCount: number;
   waitlistEnabled: boolean;
   autoApprove: boolean;
+  /** Indoor / outdoor as the organizer stated it, or null. */
+  setting: EventSetting | null;
   organizerPlays: boolean;
   skillMin: number | null;
   skillMax: number | null;
@@ -140,6 +145,7 @@ export async function fetchEvent(id: string): Promise<EventDetails | null> {
     approvedCount: row.approved_count,
     waitlistEnabled: row.waitlist_enabled,
     autoApprove: row.auto_approve,
+    setting: row.setting,
     organizerPlays: row.organizer_plays,
     skillMin: row.skill_min,
     skillMax: row.skill_max,

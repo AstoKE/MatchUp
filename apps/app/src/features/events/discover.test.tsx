@@ -92,6 +92,7 @@ function item(over: Partial<EventListItem> = {}): EventListItem {
     skillMax: null,
     costAmountMinor: null,
     costNote: null,
+    setting: null,
     organizerName: 'Ayşe A',
     ...over,
   };
@@ -151,6 +152,29 @@ describe('DiscoverScreen', () => {
     expect(await screen.findByText(/12\/12 kişi · Dolu · bekleme listesi açık/)).toBeTruthy();
     expect(screen.getByText(/Kayıt kapandı/)).toBeTruthy();
     expect(screen.getByText(/· Dolu$/)).toBeTruthy();
+  });
+
+  it('says on the card whether the game is indoors or outdoors, only when the organizer said so', async () => {
+    mockApi.searchEvents.mockResolvedValue(
+      page([
+        item({ id: 'a', title: 'Açıkta', setting: 'OUTDOOR' }),
+        item({ id: 'b', title: 'Belirsiz', setting: null }),
+      ]),
+    );
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Açıkta');
+    expect(screen.getByText('Futbol · 5v5 · Açık hava')).toBeTruthy();
+    expect(screen.getAllByText('Futbol · 5v5')).toHaveLength(1);
+  });
+
+  it('filters by indoor or outdoor', async () => {
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    await openFilters();
+    await fireEvent.press(screen.getByRole('radio', { name: 'Kapalı salon' }));
+    await waitFor(() => expect(lastPayload()).toMatchObject({ setting: 'INDOOR' }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Fark etmez', checked: false }));
+    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20 }));
   });
 
   it('opens the event when its card is pressed', async () => {

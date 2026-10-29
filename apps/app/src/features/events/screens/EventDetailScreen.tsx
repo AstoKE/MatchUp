@@ -262,6 +262,9 @@ function Detail({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
               .join(' · ')}
           />
         ) : null}
+        {event.setting ? (
+          <Row label={t('events:detail.setting')} value={t(`events:setting.${event.setting}`)} />
+        ) : null}
         <Row
           label={t('events:detail.booking')}
           value={t(`events:booking.${event.bookingStatus}`)}

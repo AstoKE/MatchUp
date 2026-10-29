@@ -81,6 +81,11 @@ describe('buildSearchPayload', () => {
     });
   });
 
+  it('sends the indoor / outdoor choice only when it is made', () => {
+    expect(payload().setting).toBeUndefined();
+    expect(payload({ setting: 'OUTDOOR' })).toMatchObject({ setting: 'OUTDOOR' });
+  });
+
   it('does not share arrays with the filter state', () => {
     const state = filters({ sportIds: [SPORT], timeOfDay: ['MORNING'] });
     const result = buildSearchPayload(state, { now: NOW, timeZone: IST });
@@ -99,10 +104,11 @@ describe('activeFilterCount', () => {
           timeOfDay: ['MORNING', 'EVENING'],
           sportIds: [SPORT, SPORT],
           districtId: DISTRICT,
+          setting: 'INDOOR',
           onlyOpen: true,
         }),
       ),
-    ).toBe(5);
+    ).toBe(6);
   });
 });
 

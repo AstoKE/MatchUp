@@ -125,6 +125,7 @@ function event(over: Partial<EventDetails> = {}): EventDetails {
     bookingStatus: 'NOT_REQUIRED',
     costAmountMinor: null,
     costNote: null,
+    setting: null,
     equipmentNote: null,
     cancelReason: null,
     cancelMessage: null,
@@ -169,6 +170,12 @@ const pressReady = async (name: string) =>
   fireEvent.press(await screen.findByRole('button', { name }));
 
 describe('joining an event', () => {
+  it('shows the indoor / outdoor row on the event page only when it was stated', async () => {
+    mockApi.fetchEvent.mockResolvedValue(event({ setting: 'INDOOR' }));
+    await renderApp(<EventDetailScreen />);
+    expect((await screen.findAllByText('Kapalı salon')).length).toBeGreaterThan(0);
+  });
+
   it('sends a guest to sign in and back to this event', async () => {
     await renderApp(<EventDetailScreen />);
     await pressReady('Giriş yap ve katıl');
