@@ -3,7 +3,7 @@ appId: com.example.matchup.dev
 ---
 - launchApp:
     clearState: true
-- tapOn: 'Profile'
+- tapOn: 'Profile(, tab.*)?'
 - assertVisible: 'Welcome back'
 - tapOn: 'Türkçe'
 - assertVisible: 'Tekrar hoş geldin'
@@ -11,7 +11,7 @@ appId: com.example.matchup.dev
 - assertVisible: 'Hesabın yok mu\? Kayıt ol'
 - stopApp
 - launchApp
-- tapOn: 'Profil'
+- tapOn: 'Profil(, tab.*)?'
 - assertVisible: 'Tekrar hoş geldin'
 - tapOn: 'English'
 - assertVisible: 'Welcome back'
