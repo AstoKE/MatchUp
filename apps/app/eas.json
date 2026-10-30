@@ -18,6 +18,15 @@
         "EXPO_PUBLIC_SUPABASE_ANON_KEY": "placeholder-anon-key-for-simulator-smoke-build",
         "EXPO_PUBLIC_WEB_URL": "http://localhost:8081"
       }
+    },
+    "device": {
+      "distribution": "internal",
+      "node": "24.11.1",
+      "pnpm": "10.33.0",
+      "environment": "preview",
+      "ios": {
+        "buildConfiguration": "Release"
+      }
     }
   }
 }
