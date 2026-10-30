@@ -3,7 +3,7 @@
 # Points the current shell at the portable toolchain installed under C:\dev\tools (no system-wide
 # changes were made: nothing is added to the machine or user PATH/environment permanently).
 # Override TOOLS_DIR if you installed elsewhere (see docs/ANDROID_SETUP.md).
-# Linux: SDK and Maestro under ~/dev/tools and the system JDK 21 (docs/ANDROID_SETUP.md section 7);
+# Linux: SDK and Maestro under ~/dev/tools and the system JDK 21 (docs/ANDROID_SETUP.md section 6);
 # Windows (Git Bash): C:\dev\tools with its own portable JDK.
 if [ "$(uname -s)" = Linux ]; then
   TOOLS_DIR="${TOOLS_DIR:-$HOME/dev/tools}"
