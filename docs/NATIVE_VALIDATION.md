@@ -111,7 +111,12 @@ Why: the simulator smoke cannot reach a backend, and cannot show VoiceOver, the 
    ```
    pnpm env:hosted                      # writes apps/app/.env.local for the hosted project
    grep EXPO_PUBLIC_SUPABASE_URL apps/app/.env.local    # must show https://<ref>.supabase.co, not 127.0.0.1
-   cd apps/app && npx eas-cli@27.2.0 env:push preview --path .env.local
+   cd apps/app
+   umask 077
+   grep -E '^EXPO_PUBLIC_(APP_ENV|SUPABASE_URL|SUPABASE_ANON_KEY|WEB_URL)=' .env.local > /tmp/eas-hosted.env
+   wc -l /tmp/eas-hosted.env            # 4: EAS rejects the empty optional variables (Sentry, Turnstile)
+   SKIP_ENV_VALIDATION=1 npx eas-cli@27.2.0 env:push preview --path /tmp/eas-hosted.env --force
+   rm -f /tmp/eas-hosted.env
    cd ../.. && pnpm env:local           # back to the local stack for development
    ```
 2. **Register the iPhone:** `cd apps/app && SKIP_ENV_VALIDATION=1 npx eas-cli@27.2.0 device:create`, choose the website option, open the link on the iPhone in Safari and install the profile (Settings shows a "Profile Downloaded" entry).
