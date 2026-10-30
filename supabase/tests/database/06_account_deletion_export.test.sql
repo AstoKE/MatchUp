@@ -97,8 +97,10 @@ select is(
         and ccu.table_schema = 'public' and ccu.table_name = 'profiles') x),
   -- events/event_participations: kept as history linked to the tombstone (free text removed);
   -- notifications: deleted; all three exported (private.export_event_data / purge_event_data).
-  array['event_participations', 'events', 'notifications', 'platform_admins', 'user_consents', 'user_settings',
-        'user_sport_positions', 'user_sport_profiles'],
+  -- skill_reviews (Phase 5): exported as reviews_written; kept as history linked to the tombstone (no free text,
+  -- other players' ratings are built on it); attendance_disputes has no user column: its reason is nulled on purge.
+  array['event_participations', 'events', 'notifications', 'platform_admins', 'skill_reviews', 'user_consents',
+        'user_settings', 'user_sport_positions', 'user_sport_profiles'],
   'per-user tables are exactly the ones export_my_data and purge_account handle'
 );
 

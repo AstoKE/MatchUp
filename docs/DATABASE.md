@@ -364,7 +364,7 @@ All RPCs: `SECURITY DEFINER`, `SET search_path = ''`, `REVOKE ALL FROM PUBLIC, a
 | `list_event_requests(event_id)` | 3 — **built (M4)** | organizer | open requests, waitlist (FIFO), approved players; max 200 |
 | `mark_attendance(participation_id, value)`, `finalize_attendance(event_id)`, `dispute_attendance(participation_id, reason)` | 5 — **built (M1)** | organizer / participant | `finalize_attendance` completes a started PUBLISHED event first; marks are PRESENT or ABSENT only; a dispute needs an ABSENT mark and a finalized event, inside 72 h |
 | `admin_resolve_attendance_dispute(participation_id, resolution)` | 5 — **built (M1)** | platform admin with MFA (`aal2`) | audited (`ATTENDANCE_DISPUTE_RESOLVED`); no screen until Phase 6 |
-| `submit_reviews(event_id, reviews[])` | 5 | participant | validates eligibility for each pair atomically |
+| `submit_reviews(event_id, reviews[])` | 5 — **built (M2)** | participant | `reviews` = `[{reviewee_id, skill_score 1–5, fair_play?}]`, at most 60, all or nothing; both people verified present at a finalized event, inside the 72 h window; non-participants get `NOT_FOUND`, otherwise `REVIEW_NOT_ELIGIBLE`, `ALREADY_REVIEWED`, `WINDOW_CLOSED` |
 | `mark_notifications_read(ids)` | 3 | self | |
 | `report(target_type, target_id, reason, details)`, `block_user(id)`, `unblock_user(id)` | 6 | self | |
 | `admin_*` (queue, action, resolve dispute, verify venue, suspend) | 6 | admin | audited |
@@ -412,6 +412,7 @@ Retention numbers are **proposals pending legal review** (SECURITY §8).
 | Audit logs / moderation actions | 2 years (security & legal defense), then purged |
 | Reports | 2 years after resolution |
 | Participation / attendance / event history | Retained (needed for other users' history and ratings); personal link removed at anonymization |
+| Skill reviews (`skill_reviews`) | Retained linked to the anonymous tombstone (no free text; other players' ratings are built on them); the user's own are in the export (`reviews_written`) |
 | Reviews written by a deleted user | Retained anonymously (they were already anonymous to reviewees; aggregate integrity) |
 | Reviews about a deleted user | Deleted |
 | XP/reliability/ratings of a deleted user | Deleted |

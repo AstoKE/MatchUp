@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { fulfilled, rejected, runConcurrently } from './concurrency';
@@ -6,9 +5,9 @@ import {
   actAs,
   catalog,
   codeOf,
-  eventInput,
   onboardedUser,
   rpc,
+  startedEvent,
   type Catalog,
 } from './event-fixtures';
 import { closeDb, db, deleteCreatedUsers } from './helpers';
@@ -29,50 +28,6 @@ afterAll(async () => {
   await deleteCreatedUsers();
   await closeDb();
 });
-
-/** A started event with `count` approved players (the owner role moves its start into the past). */
-async function startedEvent(count: number) {
-  const organizer = await onboardedUser(c, 'Düzenleyen');
-  const made = await rpc(
-    'create_event',
-    {
-      p_client_request_id: randomUUID(),
-      p_input: eventInput(c, {
-        starts_at: new Date(Date.now() + 5 * 86_400_000).toISOString(),
-        capacity: 12,
-      }),
-      p_publish: true,
-    },
-    organizer.token,
-  );
-  expect(made.status).toBe(200);
-  const eventId = made.body as string;
-  const players = [];
-  for (let i = 0; i < count; i++) {
-    const player = await onboardedUser(c, `Oyuncu ${i}`);
-    expect((await rpc('request_join', { p_event_id: eventId }, player.token)).body).toBe(
-      'REQUESTED',
-    );
-    players.push(player);
-  }
-  const { rows } = await db().query<{ id: string; user_id: string }>(
-    `select id, user_id from public.event_participations
-      where event_id = $1 and not is_organizer order by requested_at`,
-    [eventId],
-  );
-  for (const row of rows) {
-    const approved = await rpc(
-      'approve_participation',
-      { p_participation_id: row.id },
-      organizer.token,
-    );
-    expect(approved.status).toBe(204);
-  }
-  await db().query(`update public.events set starts_at = now() - interval '1 hour' where id = $1`, [
-    eventId,
-  ]);
-  return { organizer, players, eventId, participations: rows.map((r) => r.id) };
-}
 
 async function row(eventId: string) {
   const { rows } = await db().query<{
@@ -111,7 +66,7 @@ const stillPending = async (promise: Promise<unknown>, ms = 400) => {
 
 describe('attendance under concurrency', () => {
   it('six marks racing six finalizations: finalized once, every mark is applied or refused, never half-applied', async () => {
-    const { organizer, participations, eventId } = await startedEvent(6);
+    const { organizer, participations, eventId } = await startedEvent(c, 6);
 
     const results = await runConcurrently(12, async ({ client, index, barrier }) => {
       await actAs(client, organizer.user.id);
@@ -148,7 +103,7 @@ describe('attendance under concurrency', () => {
   });
 
   it('a second finalization waits for the first (the event lock), then finds it done', async () => {
-    const { organizer, eventId } = await startedEvent(2);
+    const { organizer, eventId } = await startedEvent(c, 2);
     const a = await openAs(organizer.user.id);
     const b = await openAs(organizer.user.id);
     try {
@@ -168,7 +123,7 @@ describe('attendance under concurrency', () => {
   });
 
   it('a mark waits for a finalization in progress and is then refused', async () => {
-    const { organizer, participations, eventId } = await startedEvent(2);
+    const { organizer, participations, eventId } = await startedEvent(c, 2);
     const a = await openAs(organizer.user.id);
     const b = await openAs(organizer.user.id);
     try {
@@ -195,7 +150,7 @@ describe('attendance under concurrency', () => {
   });
 
   it('the sweeps skip an event another transaction is working on instead of waiting for it', async () => {
-    const { organizer, eventId } = await startedEvent(1);
+    const { organizer, eventId } = await startedEvent(c, 1);
     // Make it due: ended and still PUBLISHED.
     await db().query(
       `update public.events set starts_at = now() - interval '3 hours' where id = $1`,
@@ -218,7 +173,7 @@ describe('attendance under concurrency', () => {
   });
 
   it('two admins resolving the same dispute: one wins, the other is refused, one audit row', async () => {
-    const { organizer, players, eventId, participations } = await startedEvent(2);
+    const { organizer, players, eventId, participations } = await startedEvent(c, 2);
     await rpc(
       'mark_attendance',
       { p_participation_id: participations[0], p_value: 'ABSENT' },

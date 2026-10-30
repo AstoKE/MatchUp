@@ -27,6 +27,8 @@ Not there yet: `events.attendance_finalized_at` and `review_window_closes_at`, `
 
 ### M2: reviews, double blind (F-24)
 
+**Status 2026-10-30: built** in `20261031110000_reviews.sql`: `skill_reviews` (read only by the author), `submit_reviews` (all or nothing, `FOR SHARE` on the event), an I-8 trigger behind it, export of the user's own reviews. pgTAP `13_reviews.test.sql` (52 assertions), `reviews-concurrency.test.ts` (3 tests, the event lock proven by a mutation check). **Decisions taken:** (1) the organizer-player rule (two verified-present others) applies to the organizer as the **reviewer**, as RATING_SYSTEM §2 words it ("review rights"); a player may review the organizer who played; (2) a non-participant gets `NOT_FOUND`, a participant who is not eligible gets `REVIEW_NOT_ELIGIBLE`; (3) **not built yet**: notifications (they come with the app change), the blocked-pair filter and the admin HIDE of a review (Phase 6), the window-closing job (M3, together with the rating recompute). Retention: reviews stay linked to the tombstone on account purge, the user's own are exported; the per-user table inventory test in `06_account_deletion_export` lists `skill_reviews`.
+
 - `skill_reviews` per DATABASE §3.5 (unique per reviewer, reviewee, event; readable only by the reviewer), `submit_reviews(event_id, reviews[])` validating the whole eligibility matrix atomically (RATING_SYSTEM §3, S-8), the 72 h window, duplicates, self-review.
 - **Tests:** eligibility matrix per pair type, window edges, reviewee cannot read, organizer-player rule (at least 2 verified-present non-organizer participants).
 

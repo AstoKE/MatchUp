@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import { expect } from 'vitest';
 import { createUser, db, rest, signedInClient, type TestUser } from './helpers';
@@ -83,4 +84,48 @@ export async function actAs(client: pg.PoolClient, userId: string) {
 /** The stable domain code of a rejected harness task (the RPC raises it as the error message). */
 export function codeOf(error: unknown) {
   return (error as { message?: string }).message;
+}
+
+/** A started event with `count` approved players (the owner role moves its start into the past). */
+export async function startedEvent(c: Catalog, count: number) {
+  const organizer = await onboardedUser(c, 'Düzenleyen');
+  const made = await rpc(
+    'create_event',
+    {
+      p_client_request_id: randomUUID(),
+      p_input: eventInput(c, {
+        starts_at: new Date(Date.now() + 5 * 86_400_000).toISOString(),
+        capacity: 12,
+      }),
+      p_publish: true,
+    },
+    organizer.token,
+  );
+  expect(made.status).toBe(200);
+  const eventId = made.body as string;
+  const players = [];
+  for (let i = 0; i < count; i++) {
+    const player = await onboardedUser(c, `Oyuncu ${i}`);
+    expect((await rpc('request_join', { p_event_id: eventId }, player.token)).body).toBe(
+      'REQUESTED',
+    );
+    players.push(player);
+  }
+  const { rows } = await db().query<{ id: string; user_id: string }>(
+    `select id, user_id from public.event_participations
+      where event_id = $1 and not is_organizer order by requested_at`,
+    [eventId],
+  );
+  for (const row of rows) {
+    const approved = await rpc(
+      'approve_participation',
+      { p_participation_id: row.id },
+      organizer.token,
+    );
+    expect(approved.status).toBe(204);
+  }
+  await db().query(`update public.events set starts_at = now() - interval '1 hour' where id = $1`, [
+    eventId,
+  ]);
+  return { organizer, players, eventId, participations: rows.map((r) => r.id) };
 }
