@@ -11,7 +11,7 @@ appId: com.example.matchup.dev
 - assertVisible: 'Hesabın yok mu\? Kayıt ol'
 - stopApp
 - launchApp
-- tapOn: 'Profil(, tab.*)?'
+- tapOn: 'Profil(, (tab|sekme).*)?'
 - assertVisible: 'Tekrar hoş geldin'
 - tapOn: 'English'
 - assertVisible: 'Welcome back'

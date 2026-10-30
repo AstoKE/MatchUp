@@ -1,29 +1,28 @@
 /**
- * Primitive design tokens (layer 1). PROVISIONAL: values follow docs/UI_DESIGN_SYSTEM.md until the
- * founder's design.md is reconciled. The provisional logo's palette is NOT assumed to be final.
+ * Primitive design tokens (layer 1). Direction A "Gece Maçı" chosen by the founder 2026-10-30
+ * (docs/design.md). The light theme is derived from it, not drawn by the founder.
  * Components never use primitives directly — they use semantic tokens via useTheme().
  */
 export const palette = {
-  navy950: '#0B1220',
-  navy900: '#0E1A2B',
-  navy800: '#141D2E',
-  navy700: '#243049',
-  slate600: '#475467',
-  slate500: '#5B6B82',
-  slate400: '#8793A4',
-  slate300: '#A9B4C4',
-  slate200: '#E4E7EC',
-  slate100: '#F2F5F9',
-  slate50: '#F7F8FA',
+  ink950: '#0A0D12',
+  ink900: '#0E1116',
+  ink800: '#171C23',
+  ink700: '#222B38',
+  ink500: '#6B7888',
+  steel300: '#A9B4C0',
+  steel100: '#F2F5F7',
+  paper50: '#F4F6F8',
+  paper100: '#E9EDF2',
+  paper300: '#D5DCE4',
+  gray600: '#4A5565',
+  gray500: '#7A8696',
   white: '#FFFFFF',
-  green700: '#0A6B4E',
-  green400: '#4FD1A0',
-  green300: '#7BE0B5',
-  lime400: '#C8F135',
+  lime400: '#C6F432',
+  olive700: '#3F6B00',
   red700: '#B42318',
   red300: '#FF8A80',
   amber800: '#8A4B00',
-  amber300: '#FFC266',
+  amber300: '#FFB454',
   success700: '#067647',
   success300: '#6EE7A8',
   blue700: '#1D4ED8',
@@ -45,7 +44,7 @@ export const spacing = {
   18: 72,
 } as const;
 
-export const radius = { sm: 6, md: 10, lg: 16, xl: 24, pill: 999 } as const;
+export const radius = { sm: 6, md: 10, lg: 20, xl: 28, pill: 999 } as const;
 
 export const typography = {
   display: { fontSize: 36, lineHeight: 42, fontWeight: '700' },
