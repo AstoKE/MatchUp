@@ -318,7 +318,7 @@ stateDiagram-v2
 | I-4 | Non-`APPROVED` rows have `attendance = NOT_CONFIRMED` | CK |
 | I-5 | Organizer cannot request to join own event (organizer row is created at publish if `organizer_plays`) | RPC + trigger |
 | I-6 | Capacity cannot drop below `approved_count` | RPC + CK |
-| I-7 | Sport, format and `organizer_plays` immutable after publish; COMPLETED/CANCELED events immutable; the organizer's own participation row cannot be canceled/removed through participant RPCs | trigger + RPC |
+| I-7 | Sport, format and `organizer_plays` immutable after publish; COMPLETED/CANCELED events immutable (one exception, Phase 5: `finalize_attendance` sets `attendance_finalized_at` and `review_window_closes_at` once on a COMPLETED event, nothing else may change); the organizer's own participation row cannot be canceled/removed through participant RPCs | trigger + RPC |
 | I-8 | Reviews only between PRESENT participants of the same finalized event, inside the window, one per ordered pair, not self | RPC + trigger + UQ |
 | I-9 | XP rows are immutable and deduplicated by `dedupe_key` | trigger + UQ |
 | I-10 | Reliability events: ≤ 1 per participation; derived only from finalized events | UQ + RPC |
@@ -362,7 +362,8 @@ All RPCs: `SECURITY DEFINER`, `SET search_path = ''`, `REVOKE ALL FROM PUBLIC, a
 | `approve_participation(id)`, `reject_participation(id)`, `waitlist_participation(id)`, `remove_participant(id, reason)` | 3 — **built (M4)** | organizer | |
 | `list_my_events(bucket, cursor, limit)` | 3 — **built (M3b)**, see §0c | self | buckets `ORGANIZING / PENDING / APPROVED / WAITLISTED / PAST` |
 | `list_event_requests(event_id)` | 3 — **built (M4)** | organizer | open requests, waitlist (FIFO), approved players; max 200 |
-| `mark_attendance(participation_id, value)`, `finalize_attendance(event_id)`, `dispute_attendance(participation_id, reason)` | 5 | organizer / participant | |
+| `mark_attendance(participation_id, value)`, `finalize_attendance(event_id)`, `dispute_attendance(participation_id, reason)` | 5 — **built (M1)** | organizer / participant | `finalize_attendance` completes a started PUBLISHED event first; marks are PRESENT or ABSENT only; a dispute needs an ABSENT mark and a finalized event, inside 72 h |
+| `admin_resolve_attendance_dispute(participation_id, resolution)` | 5 — **built (M1)** | platform admin with MFA (`aal2`) | audited (`ATTENDANCE_DISPUTE_RESOLVED`); no screen until Phase 6 |
 | `submit_reviews(event_id, reviews[])` | 5 | participant | validates eligibility for each pair atomically |
 | `mark_notifications_read(ids)` | 3 | self | |
 | `report(target_type, target_id, reason, details)`, `block_user(id)`, `unblock_user(id)` | 6 | self | |
@@ -370,7 +371,7 @@ All RPCs: `SECURITY DEFINER`, `SET search_path = ''`, `REVOKE ALL FROM PUBLIC, a
 | `request_account_deletion()`, `cancel_account_deletion()` | 6 | self | actual purge by Edge Function after grace |
 | `track_event(name, props)` | 7 | self | allowlist, rate limited |
 
-**System jobs (pg_cron → SQL functions, no Edge hop):** `complete_due_events` (every 10 min), `auto_finalize_attendance` (every 15 min), `close_review_windows` (recompute ratings, every 15 min), `purge_rate_limit_counters` (daily), `process_deletion_queue` (daily; invokes Edge Function for auth deletion), `prune_analytics` (weekly).
+**System jobs (pg_cron → SQL functions, no Edge hop):** `complete_due_events` (every 10 min, **built M1**), `auto_finalize_attendance` (every 15 min, **built M1**; completed + 48 h), `close_review_windows` (recompute ratings, every 15 min), `purge_rate_limit_counters` (daily), `process_deletion_queue` (daily; invokes Edge Function for auth deletion), `prune_analytics` (weekly).
 
 ## 10. Row Level Security matrix (summary)
 
