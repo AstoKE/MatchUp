@@ -4,5 +4,6 @@
   "myEvents": "My Events",
   "create": "Create",
   "profile": "Profile",
-  "community": "Community"
+  "community": "Community",
+  "tabPosition": "{{label}}, tab, {{index}} of {{count}}"
 }

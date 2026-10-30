@@ -4,5 +4,6 @@
   "myEvents": "Etkinliklerim",
   "create": "Oluştur",
   "profile": "Profil",
-  "community": "Topluluk"
+  "community": "Topluluk",
+  "tabPosition": "{{label}}, sekme, {{index}} / {{count}}"
 }
