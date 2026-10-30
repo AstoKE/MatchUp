@@ -7,7 +7,6 @@ import {
   relativeDay,
   type DiscoverFilters as Filters,
 } from '@matchup/domain';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
@@ -22,8 +21,6 @@ import { DiscoverFilters } from '../components/DiscoverFilters';
 import { EventCard } from '../components/EventCard';
 import { formatDayHeading } from '../format';
 import { useEventSearch } from '../hooks';
-
-const logo = require('../../../../assets/brand/logo-provisional-512.png') as number;
 
 /**
  * Discover (FL-2), open to guests (D-09): published public events from `search_events`, soonest first.
@@ -79,11 +76,6 @@ export function DiscoverScreen() {
   return (
     <Screen>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-        <Image
-          source={logo}
-          accessibilityLabel={t('common:logoAlt', { appName: brand.name })}
-          style={{ width: 56, height: 56 }}
-        />
         <View style={{ flexShrink: 1 }}>
           <Text variant="headline" heading={1}>
             {t('nav:discover')}
