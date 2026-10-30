@@ -1,8 +1,34 @@
 # MatchUp Visual Identity — `design.md`
 
-Status: **v0.1, authored in Phase 2 preparation (2026-10-25).** This is the visual source of truth that `UI_DESIGN_SYSTEM.md` §0 said would arrive. It supersedes the provisional values in that document **where they differ**; accessibility minimums (UI_DESIGN_SYSTEM §8) still outrank taste. The product name and logo remain provisional (ADR-0010); nothing here depends on either.
+Status: **v0.2: v0.1 authored in Phase 2 preparation (2026-10-25), direction A added 2026-10-30 (§0).** This is the visual source of truth that `UI_DESIGN_SYSTEM.md` §0 said would arrive. It supersedes the provisional values in that document **where they differ**; accessibility minimums (UI_DESIGN_SYSTEM §8) still outrank taste. The product name and logo remain provisional (ADR-0010); nothing here depends on either.
 
 Process note: this file was written by the engineering assistant at the founder's request, as an *original* specification. It has not been reviewed by a professional brand designer. Treat it as a strong, buildable draft, and expect refinement once real screens and photography exist.
+
+## 0. Direction A, "Gece Maçı" (founder's choice, 2026-10-30): supersedes where it differs
+
+The founder picked one of three drawn directions (A "Gece Maçı", B "Mahalle Maçı", C "Net Sayfa"; the drawings are a private canvas, not in the repo). **Where this section differs from §4.1, §5 and §6, this section wins**; §1 to §3 and §7 to §13 stay as written (personality, voice, logo rules, accessibility, microcopy). The founder drew only the dark theme and two screens (Discover, event page). The **light theme is derived**, not drawn, and needs the founder's review.
+
+- **Character:** dark near-black ground, one vivid lime accent, strong condensed headlines, round shapes.
+- **Color (implemented in `apps/app/src/ui/tokens`; contrast enforced by `tokens.test.ts`):**
+
+| Role | Dark (as drawn) | Light (derived) |
+|---|---|---|
+| App ground | `#0E1116` | `#F4F6F8` |
+| Raised surface (cards) | `#171C23` | `#FFFFFF` |
+| Sunken surface | `#0A0D12` | `#E9EDF2` |
+| Primary / secondary text | `#F2F5F7` / `#A9B4C0` | `#0E1116` / `#4A5565` |
+| Primary action | lime `#C6F432`, label `#0E1116` | ink `#0E1116`, label lime `#C6F432` |
+| Link | lime `#C6F432` | olive `#3F6B00` |
+| Warning (full, waitlist) | `#FFB454` | `#8A4B00` |
+| Danger / success | `#FF8A80` / `#6EE7A8` | `#B42318` / `#067647` |
+| Subtle border | `#222B38` | `#D5DCE4` |
+
+  Lime is never text or a fill on a light ground. Measured (dark): text 15.6:1 on cards, secondary 8.1:1, lime on ground 14.8:1; (light) link 6.3:1, secondary 7.6:1. The pitch-green primary of §4.1 is retired; the other rules of §4.2 (one loud color per screen, never color alone, ember/warning for time pressure) still apply with lime as the loud color.
+- **Shape (replaces the §6 radius list):** `sm 6 · md 10 · lg 20 · xl 28 · pill`; buttons are pills (minimum height 48), cards 20, chips pills, meters 6 px with a round end.
+- **Type (replaces §5's heading family; not implemented yet):** **Barlow Condensed** 600/700 for headlines and numbers (times, spot counts), **Inter** 400/500/600 for body and controls. Same release gate as §5 (Turkish glyph coverage, no `text-transform` for case changes), same two-family limit. Until added (a new dependency, justified and pinned with `expo install`), the app uses the system font.
+- **Screens as drawn (not yet applied):** Discover with a large title, filter button, sport chips, day headings, cards with a large time, title, place, spot meter and label; the event page with a time block and a spots block, the organizer, the roster and a pinned lime action; the tab bar with the Create tab as a round lime button.
+- **Logo:** not in the Discover header any more (founder's request 2026-10-30, consistent with §3).
+- **Applied so far:** color tokens (both themes), the radius scale, pill buttons, the Discover header without the logo. **Not yet:** fonts, card and event page layouts, tab bar details, sport tints (§4.2 item 6, a separate review), a dark/light preference setting (the app follows the system).
 
 ## 1. What we take from GoodRec — and what we do not
 
