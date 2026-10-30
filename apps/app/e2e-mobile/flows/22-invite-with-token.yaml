@@ -1,0 +1,8 @@
+appId: com.example.matchup.dev
+# 22 The same event opened WITH the link's token shows and can be requested (Phase 3) — requires -e TITLE.
+---
+- assertVisible: ${TITLE}
+- tapOn: 'Request to join'
+- tapOn: 'Send request'
+- assertVisible: 'Request sent'
+- takeScreenshot: 22-invite-requested

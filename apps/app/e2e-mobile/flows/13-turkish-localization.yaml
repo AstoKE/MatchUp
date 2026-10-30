@@ -7,7 +7,7 @@ appId: com.example.matchup.dev
 - assertVisible: 'Etkinliklerim'
 - assertVisible: 'Oluştur'
 - assertVisible: 'Profil'
-- assertVisible: 'Henüz etkinlik yok'
+- assertVisible: 'Filtreler'
 - assertVisible: 'Sporunu seç, takımını bul, oyuna katıl.'
 - tapOn: 'Etkinliklerim'
 - assertVisible: 'Tekrar hoş geldin'

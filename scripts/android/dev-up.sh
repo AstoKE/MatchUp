@@ -30,7 +30,19 @@ if ! adb devices >/dev/null 2>&1; then
   adb start-server
 fi
 if ! adb devices | grep -q "emulator-.*device$"; then
-  nohup emulator -avd matchup_api36 -no-boot-anim -no-audio -gpu auto -no-snapshot >/dev/null 2>&1 &
+  if [ "$(uname -s)" = Linux ]; then
+    # Measured on a 15 GB laptop (docs/NATIVE_VALIDATION.md): with software rendering the emulator process
+    # grew past 5 GB within minutes and a whole-machine OOM froze the desktop; on the integrated AMD GPU it
+    # stays near 3 GB. The NVIDIA Vulkan driver crashed the emulator, so the AMD one is chosen when present.
+    # The cgroup cap kills only the emulator if it ever grows again.
+    [ -f /usr/share/vulkan/icd.d/radeon_icd.json ] && export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/radeon_icd.json DRI_PRIME=0
+    CAP=()
+    command -v systemd-run >/dev/null 2>&1 &&
+      CAP=(systemd-run --user --scope -p "MemoryMax=${EMULATOR_MEMORY_MAX:-5G}" -p MemorySwapMax=0 nice -n 10)
+    nohup "${CAP[@]}" emulator -avd matchup_api36 -no-window -no-boot-anim -no-audio -gpu host -cores 2 -memory 2560 -no-snapshot >/dev/null 2>&1 &
+  else
+    nohup emulator -avd matchup_api36 -no-boot-anim -no-audio -gpu auto -no-snapshot >/dev/null 2>&1 &
+  fi
   adb wait-for-device
   until [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1" ]; do sleep 3; done
 fi
@@ -59,9 +71,13 @@ METRO_STAMP=apps/app/.android-build/metro-lock.sha256
 metro_running() { [[ "$(curl -s localhost:8081/status 2>/dev/null || true)" == *running* ]]; }
 if metro_running && [ "$(cat "$METRO_STAMP" 2>/dev/null)" != "$LOCK_SUM" ]; then
   echo "Dependencies or backend changed since Metro started: restarting it with a clean cache"
-  for pid in $(netstat -ano | grep -E ':8081 .*LISTENING' | awk '{print $NF}' | sort -u); do
-    taskkill //PID "$pid" //T //F >/dev/null 2>&1 || true
-  done
+  if command -v taskkill >/dev/null 2>&1; then
+    for pid in $(netstat -ano | grep -E ':8081 .*LISTENING' | awk '{print $NF}' | sort -u); do
+      taskkill //PID "$pid" //T //F >/dev/null 2>&1 || true
+    done
+  else
+    fuser -k 8081/tcp >/dev/null 2>&1 || true
+  fi
   sleep 2
 fi
 if ! metro_running; then

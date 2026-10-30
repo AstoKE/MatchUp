@@ -4,7 +4,7 @@ appId: com.example.matchup.dev
 - tapOn: 'Profile'
 - tapOn: 'Sign out'
 - assertVisible: 'Discover'
-- assertVisible: 'No events yet'
+- assertVisible: 'Filters'
 - stopApp
 - launchApp
 - tapOn: 'My Events'

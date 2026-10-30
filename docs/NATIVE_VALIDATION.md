@@ -1,12 +1,12 @@
 # Native Android validation
 
-Status 2026-10-25. **Android only.** iOS is **pending** — it needs macOS or EAS cloud builds plus an Apple Developer account, none of which are available yet. Nothing in this document says anything about iOS.
+Status 2026-10-30 (Phase 3 device run added; the Phase 2 run below is from 2026-10-25). **Android only.** iOS is **pending** — it needs macOS or EAS cloud builds plus an Apple Developer account, none of which are available yet. Nothing in this document says anything about iOS.
 
 Device: Android Studio emulator `matchup_api36` (Pixel 7 profile, Android 16 / API 36, x86_64, 1080×2400, 420 dpi), debug build produced in the Linux container (ADR-0015), JavaScript served by Metro, local Supabase through `adb reverse`. **An emulator is not a physical device**: no real keyboard/IME variety, no real network transitions, no OEM behaviour, and timing is not representative.
 
 "Automated" = Maestro flow run by `scripts/android/native-validation.mjs` (results in `apps/app/e2e-mobile/results/`, git-ignored). "Manual" = the founder using the emulator by hand.
 
-## Latest full run — 22 / 22 passed (exit code 0)
+## Phase 2 run (2026-10-25) — 22 / 22 passed (exit code 0)
 
 One earlier full run of the same build failed 6 steps in a cascade: the Maestro driver died before running a single step of N03, so everything depending on that state failed too. It was not an app result; the runner now retries once a flow that executed no step (and never retries one that ran a step), and the following full run was green without needing a retry.
 
@@ -57,18 +57,44 @@ Earlier the founder confirmed by hand: sign-up, sign-in, staying signed in after
 
 Metro's first bundle after JavaScript changes can take a minute; the runner now waits for the home screen once before the flows (a blank white screen in the first flow was this, not a defect). Maestro's `hideKeyboard` leaves the app when Android shows only Gboard's floating toolbar (hardware keyboard emulation), so the flows do not use it. Clearing app data also resets the per-app language, so N13 sets the language after the clear. Metro must not run with `CI=1` (no file watching → stale JS). Run from PowerShell via `scripts/android/dev.ps1` (plain `bash` there is WSL).
 
-## Phase 3 on the device: checklist, **not run yet**
+## Phase 3 on the device (2026-10-30) — 31 / 31 passed (exit code 0)
 
-The 22 automated checks above date from Phase 2 and were **not** re-run for Phase 3; nothing here has been verified on a device, and no Maestro flow covers it yet (they would have to be written and run on the Windows bench, which this Linux machine cannot do). Run it by hand and write the result down. Rebuild the APK first (`bash scripts/android/build-apk.sh debug x86_64`): the Expo SDK patch versions changed after the last build. Start with `.\scripts\android\dev.ps1 up`, two accounts (organizer, player) and the Mailpit link for each.
+Full suite on the same emulator profile, this time driven from the **Linux** machine (ANDROID_SETUP.md §6): the 22 Phase 2 checks plus nine Phase 3 checks (flows 17–22, `phase3-fixtures.mjs`). The organizer account and the events are created through the real RPCs on the local stack; after each state change the runner reads the database back (N18b, N20b, N22b).
 
-1. **Discover:** the first event is on the first screen; "Filters" opens and closes the panel; chips with sport icons; today / tomorrow headings; the profile note for a signed-in player and "Clear filters".
-2. **Create an event** with the indoor/outdoor choice and the auto-approve box; publish; it appears under My Events → Organizing and on Discover.
-3. **Event page as the player:** the pinned "Request to join" button stays visible while scrolling; open the request form and type with the **on-screen keyboard**: the form must stay usable (the area is limited to 360 px and scrolls); send; "Request sent" state.
-4. **Organizer:** the bell shows 1 unread; open the inbox, tap the item (it opens the event and marks it read); approve from the queue; the player sees "You're in", the place and the roster; withdraw works.
-5. **Auto-approve:** a second event with auto-approve admits the player at once.
-6. **Invite-only:** create one; copy/share the link from the page (the **system share sheet** opens on native); open it as a guest through a deep link (`adb shell am start -a android.intent.action.VIEW -d "matchup-dev://e/<id>?invite=<token>"`), then without `?invite=`: not found.
-7. **TalkBack:** event page reading order (title, facts, spots, request button last or pinned and announced), the filter button's expanded state, the roster list, the inbox items.
-8. Dark mode and a font scale of 1.6 on Discover and the event page (nothing truncated that matters: time, place, spots).
+| Check | What it proves on the device |
+|---|---|
+| N17 | Discover opens on the profile's sports, the filters sit behind a button, the join action is on the first card |
+| N18 / N18b | Request to join **with the on-screen keyboard open**; the server holds a `REQUESTED` row with the typed message |
+| N19 | After the host approves: My Events → Approved, bell and inbox carry the notice, the event page shows "Going (1)" |
+| N20 / N20b | An auto-approve event admits the player at once (deep link); `APPROVED` with no organizer action |
+| N21 | Invite-only event opened without its token does not exist for the player |
+| N22 / N22b | The same event with `?invite=<token>` is visible and requestable; `REQUESTED` row exists |
+
+**Found and fixed by these checks:** on Android 15+ (edge-to-edge) the window no longer resizes for the keyboard, so the pinned join form was hidden under it (N18). `Screen` now wraps its content in a `KeyboardAvoidingView` when a footer is set. Flows 01, 05 and 13 still asserted the old Discover empty-state text and were updated.
+
+**Run history, so the number is not read as "first try":** an earlier Linux run passed 30 of 31 (N19 asserted the roster without scrolling to it; the flow now scrolls). Another run was cut short when the memory cap below killed the emulator after 9 checks (N05–N07 then failed with "device not connected", which is not an app result). The 31 / 31 run is the one after both were fixed.
+
+**Not covered by an automated check (still to do by hand):** creating an event through the form on the device; approving from the organizer's request queue in the UI (the host approves through the RPC in N19); the system share sheet for the invite link; TalkBack reading order of the event page, the filter button's expanded state, the roster and the inbox; dark mode and a font scale of 1.6 on Discover and the event page. Physical devices and iOS are not covered.
+
+### Emulator memory on the Linux bench
+
+Measured on a 15 GB laptop with two GPUs (AMD Radeon 680M + NVIDIA RTX 4060), no sudo:
+
+- With `-gpu swiftshader_indirect` (software rendering) the emulator's `qemu` process grew past 5 GB within about four minutes (`-memory 2560` limits the guest, not this); earlier unattended sessions reached 9 GB and the kernel OOM killer took the session down twice.
+- With `-gpu host` the emulator picked the NVIDIA Vulkan device and **segfaulted** right after boot. Exposing only the AMD driver (`VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/radeon_icd.json`) boots it and it stayed at **2.9–3.0 GB** for the whole 31-check run (34 samples, ~8.5 min; at least 3.5 GB of RAM stayed free, load average ≤ 3.6).
+- The cause of the growth was only compared, not profiled: software rendering is the likely one, not proven.
+- `dev-up.sh` on Linux now starts the emulator headless, with the AMD driver when present, `-cores 2 -memory 2560`, and inside a `systemd-run --user --scope -p MemoryMax=5G -p MemorySwapMax=0` cgroup (override with `EMULATOR_MEMORY_MAX`), so a regression kills only the emulator.
+- Do not run `tsc`, jest, Docker image builds or a `expo start --web` next to the emulator, and run the suite alone.
+
+## iOS: pipeline prepared, **not run yet** (ADR-0022)
+
+Nothing about iOS has been verified. What exists: `apps/app/eas.json` (profile `simulator`, a Release build with embedded JavaScript and placeholder public configuration) and `.github/workflows/ios-simulator.yml` (manual; installs an EAS simulator build on a GitHub macOS runner and runs flows 01 and 14 with Maestro 2.11.0). The workflow was only syntax-checked (YAML parse, shellcheck of its shell steps); it has never run.
+
+To run it: `cd apps/app && SKIP_ENV_VALIDATION=1 npx eas-cli@27.2.0 build -p ios --profile simulator` from any OS (the variable only stops the local config check from failing, DEPLOYMENT.md §10; the cloud build gets its values from `eas.json`) (Expo login required, no Apple credentials), take the artifact URL of the finished build, then start the workflow with it as `app_url`. A run costs about 100 quota minutes (macOS is billed 10x). The first run records the Xcode version and simulator runtimes of the runner; the Expo SDK 58 minimum Xcode is not confirmed yet.
+
+**EAS build, 2026-10-30:** the first attempt failed before compiling (the builder's Node 22 violates `engines`; fixed by pinning Node and pnpm in `eas.json`). The second finished in about 7 minutes of build time (queue time not included). Inspected on Linux: bundle id `com.example.matchup.dev`, URL scheme `matchup-dev`, minimum iOS 16.4, built with **Xcode 27.1 / iphonesimulator27.1 SDK**, embedded configuration is the placeholder only (no JWT-shaped string in the JavaScript bundle). Still unknown: whether the GitHub runner's Xcode and simulator runtime can run an app built with the iOS 27.1 SDK. The artifact expires on 2026-11-13.
+
+Scope on iOS is deliberately small: only the flows that need no backend (the macOS runner cannot run the local Supabase stack). Data flows stay verified on Android and web.
 
 ## Next
 

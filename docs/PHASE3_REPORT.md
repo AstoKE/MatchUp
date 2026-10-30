@@ -27,6 +27,7 @@ Decisions recorded: ADR-0019 (location without coordinates, quotas in config, js
 | Component (jest-expo + RNTL) | **383 pass** |
 | Domain (Vitest) / config | **97** / **4** pass |
 | Web E2E (Playwright, Chromium, axe WCAG 2.2 AA tags) | **51 pass**, including an invite-only flow across three browser contexts (guest without and with the link, organizer, player): organizing, discovering, joining and approving across two browsers, withdrawing, auto-approve, My Events, notifications, a phone-width run (filters, pinned action, icons) |
+| Android emulator (Maestro + database read-backs) | **31 pass** (22 Phase 2 + 9 Phase 3), 2026-10-30; found and fixed the pinned join form hidden under the keyboard on Android 15+ |
 | Gates | `pnpm check`, `db:test`, `test:integration`, `test:e2e`, `export:web` + `check:bundle` + `check:bundle-size` all exit 0 |
 | Web bundle | total 867 kB gzip (ratchet 885), initial 544 kB (ratchet 555) |
 
@@ -51,7 +52,7 @@ Schema pushed on 2026-10-29 for the first three migrations above (dry-run first,
 - No distance sort and no map (Phase 4); no blocked-pair filtering (Phase 6); `analytics_events` and funnels are Phase 7 (ADR-0019), so there are no pilot numbers yet.
 - **Notifications are polled** (up to 60 s late), there is no push.
 - District is not preselected in Discover on purpose (one district would hide most of a small pilot's events).
-- **Nothing in Phase 3 was run on a device.** A manual checklist is in `docs/NATIVE_VALIDATION.md` ("Phase 3 on the device"); no Maestro flow covers it yet. Web in Chromium only: no Firefox or Safari, no iOS, and the Android device suite (22 checks, Windows emulator) was **not** re-run for Phase 3, so native behaviour of the new screens, the pinned action with the on-screen keyboard, and TalkBack/VoiceOver reading order are **unverified**. The web-only bundle changes are deliberately not applied to native.
+- **Device coverage is partial.** The Android emulator suite was run for Phase 3 on 2026-10-30: 31 of 31 checks passed, nine of them new (Discover, request with the on-screen keyboard, approval, bell and inbox, auto-approve, invite-only with and without the link; `docs/NATIVE_VALIDATION.md`). **Not** checked on a device: creating an event in the form, approving from the organizer's queue in the UI (the checks approve through the RPC), the system share sheet, TalkBack/VoiceOver reading order, dark mode and a 1.6 font scale. Also unverified: physical devices, iOS, Firefox and Safari (web E2E is Chromium only). The web-only bundle changes are deliberately not applied to native.
 - The local edge-runtime container stops after a reboot and `pnpm db:start` does not bring it back (the `health` integration tests then answer 503); see `docs/DEVELOPMENT.md`.
 - Supabase's leaked-password protection is off on hosted (a plan feature): LAUNCH_CHECKLIST.
 
@@ -64,4 +65,4 @@ Schema pushed on 2026-10-29 for the first three migrations above (dry-run first,
 
 ## 7. Recommended next step
 
-Phase 3's code gaps are closed. The one open item before calling it fully done is the **Android run of the checklist** (it needs the Windows bench). After that, Phase 4 (venues, map, distance) starts only on explicit instruction (CLAUDE.md). Also pending: the pull request for the UI/indoor-outdoor/`get_event` branch, then pushing its two migrations (`20261030100000_event_setting`, `20261030110000_get_event_and_invites`) to the hosted project.
+Phase 3's code gaps are closed and the Android device run is done (with the manual leftovers listed in §5). Open before calling it fully done: the manual device items above, a first run of the signed-in paths on the hosted project, and pushing the two pending migrations (`20261030100000_event_setting`, `20261030110000_get_event_and_invites`) to hosted if that has not happened yet. iOS needs a macOS route and an Apple account. Phase 4 (venues, map, distance) starts only on explicit instruction (CLAUDE.md).

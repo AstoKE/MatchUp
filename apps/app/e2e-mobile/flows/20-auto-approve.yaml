@@ -1,0 +1,9 @@
+appId: com.example.matchup.dev
+# 20 An auto-approve event admits the player at once (Phase 3) — opened by deep link; requires -e TITLE.
+---
+- assertVisible: ${TITLE}
+- tapOn: 'Request to join'
+- assertVisible: 'If a spot is free, your request is approved right away.'
+- tapOn: 'Send request'
+- assertVisible: "You're in"
+- takeScreenshot: 20-auto-approved

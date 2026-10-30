@@ -1,0 +1,20 @@
+appId: com.example.matchup.dev
+# 17 Discover on the device (Phase 3) — requires -e TITLE (a published football event). Signed-in player whose
+# profile sports are football and tennis: opens on those sports, says so, the filters sit behind a button, and the
+# event page has its join action on the first screen.
+---
+- launchApp
+- assertVisible: 'Showing the sports on your profile.*'
+- assertVisible: ${TITLE}
+- takeScreenshot: 17-discover-list
+- tapOn: 'Filters.*'
+- assertVisible: 'Football'
+- assertVisible: 'Indoor or outdoor'
+- takeScreenshot: 17-discover-filters-open
+- tapOn: 'Filters.*'
+- tapOn: ${TITLE}
+# The pinned action is on the first screen, and still there after scrolling the page
+- assertVisible: 'Request to join'
+- scroll
+- assertVisible: 'Request to join'
+- takeScreenshot: 17-event-page

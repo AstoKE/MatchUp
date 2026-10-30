@@ -52,3 +52,14 @@ The app is a debug (development) build: native code is in the APK, JavaScript is
 ## 5. Not done / not possible here
 
 iOS (needs macOS or EAS cloud + an Apple Developer account); physical-device tests; release (R8-minified) builds on a device; Play Store signing.
+
+## 6. The same bench on Linux (Ubuntu, 2026-10-30)
+
+`scripts/android/env.sh` and the `dev-*` scripts also run on Linux. Nothing is installed system-wide: the SDK (platform-tools, emulator, cmdline-tools, the API 36 `google_apis` x86_64 image) and Maestro live under `~/dev/tools` (`TOOLS_DIR` overrides it), the JDK is the distribution's OpenJDK 21 (`JAVA_HOME` overrides it), Docker is needed for Supabase and for `build-apk.sh`. The AVD is called `matchup_api36`, as on Windows. Use the same commands as in §3 from a normal shell; `dev-down.sh` frees the Metro and preview ports with `fuser`.
+
+Differences from Windows that matter:
+
+- `dev-up.sh` starts the emulator **headless** (`-no-window`; the screen is reachable with `adb exec-out screencap -p`), on the integrated AMD GPU if there is one, with a 5 GB memory cap. Why, and the measurements: `docs/NATIVE_VALIDATION.md` ("Emulator memory on the Linux bench"). On a machine with a single GPU, check that `-gpu host` boots before relying on it.
+- Run the device suite with `JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8` (Turkish text in Maestro), and nothing heavy in parallel.
+- `pkill -f <pattern>` kills your own shell if the pattern appears in your command line; stop the emulator with `adb emu kill`.
+- After a reboot the local `supabase_edge_runtime_matchup` container may stay stopped (`docker start supabase_edge_runtime_matchup`, see DEVELOPMENT.md).

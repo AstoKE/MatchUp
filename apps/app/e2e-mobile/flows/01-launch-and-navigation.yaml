@@ -4,7 +4,8 @@ appId: com.example.matchup.dev
 - launchApp:
     clearState: true
 - assertVisible: 'Discover'
-- assertVisible: 'No events yet'
+# Phase 3: the list depends on what the database holds, the filters button is always there on a phone
+- assertVisible: 'Filters'
 # The four MVP destinations are present in the tab bar
 - assertVisible: 'My Events'
 - assertVisible: 'Create'
