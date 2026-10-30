@@ -68,7 +68,7 @@ export function Button({
           minWidth: TOUCH_TARGET,
           paddingHorizontal: spacing[5],
           paddingVertical: spacing[3],
-          borderRadius: radius.md,
+          borderRadius: radius.pill,
           alignItems: 'center',
           justifyContent: 'center',
           flexDirection: 'row',
