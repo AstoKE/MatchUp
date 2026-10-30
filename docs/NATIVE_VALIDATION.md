@@ -92,6 +92,8 @@ Nothing about iOS has been verified. What exists: `apps/app/eas.json` (profile `
 
 To run it: `cd apps/app && SKIP_ENV_VALIDATION=1 npx eas-cli@27.2.0 build -p ios --profile simulator` from any OS (the variable only stops the local config check from failing, DEPLOYMENT.md §10; the cloud build gets its values from `eas.json`) (Expo login required, no Apple credentials), take the artifact URL of the finished build, then start the workflow with it as `app_url`. A run costs about 100 quota minutes (macOS is billed 10x). The first run records the Xcode version and simulator runtimes of the runner; the Expo SDK 58 minimum Xcode is not confirmed yet.
 
+**EAS build, 2026-10-30:** the first attempt failed before compiling (the builder's Node 22 violates `engines`; fixed by pinning Node and pnpm in `eas.json`). The second finished in about 7 minutes of build time (queue time not included). Inspected on Linux: bundle id `com.example.matchup.dev`, URL scheme `matchup-dev`, minimum iOS 16.4, built with **Xcode 27.1 / iphonesimulator27.1 SDK**, embedded configuration is the placeholder only (no JWT-shaped string in the JavaScript bundle). Still unknown: whether the GitHub runner's Xcode and simulator runtime can run an app built with the iOS 27.1 SDK. The artifact expires on 2026-11-13.
+
 Scope on iOS is deliberately small: only the flows that need no backend (the macOS runner cannot run the local Supabase stack). Data flows stay verified on Android and web.
 
 ## Next
