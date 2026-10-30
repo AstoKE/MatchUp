@@ -545,6 +545,72 @@ export type Database = {
           },
         ];
       };
+      skill_reviews: {
+        Row: {
+          created_at: string;
+          event_id: string;
+          fair_play: boolean;
+          id: string;
+          reviewee_id: string;
+          reviewer_id: string;
+          skill_score: number;
+          sport_id: string;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          event_id: string;
+          fair_play?: boolean;
+          id?: string;
+          reviewee_id: string;
+          reviewer_id: string;
+          skill_score: number;
+          sport_id: string;
+          status?: string;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string;
+          fair_play?: boolean;
+          id?: string;
+          reviewee_id?: string;
+          reviewer_id?: string;
+          skill_score?: number;
+          sport_id?: string;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'skill_reviews_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'skill_reviews_reviewee_id_fkey';
+            columns: ['reviewee_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'skill_reviews_reviewer_id_fkey';
+            columns: ['reviewer_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'skill_reviews_sport_id_fkey';
+            columns: ['sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sports';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       sport_formats: {
         Row: {
           default_capacity: number;
@@ -926,6 +992,7 @@ export type Database = {
         Args: { p_level: number; p_position_ids: string[]; p_sport_id: string };
         Returns: undefined;
       };
+      submit_reviews: { Args: { p_event_id: string; p_reviews: Json }; Returns: number };
       update_event: { Args: { p_event_id: string; p_input: Json }; Returns: undefined };
       update_my_profile: {
         Args: { p_bio: string; p_city_id: string; p_display_name: string; p_district_id: string };
