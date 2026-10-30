@@ -86,6 +86,14 @@ Measured on a 15 GB laptop with two GPUs (AMD Radeon 680M + NVIDIA RTX 4060), no
 - `dev-up.sh` on Linux now starts the emulator headless, with the AMD driver when present, `-cores 2 -memory 2560`, and inside a `systemd-run --user --scope -p MemoryMax=5G -p MemorySwapMax=0` cgroup (override with `EMULATOR_MEMORY_MAX`), so a regression kills only the emulator.
 - Do not run `tsc`, jest, Docker image builds or a `expo start --web` next to the emulator, and run the suite alone.
 
+## iOS: pipeline prepared, **not run yet** (ADR-0022)
+
+Nothing about iOS has been verified. What exists: `apps/app/eas.json` (profile `simulator`, a Release build with embedded JavaScript and placeholder public configuration) and `.github/workflows/ios-simulator.yml` (manual; installs an EAS simulator build on a GitHub macOS runner and runs flows 01 and 14 with Maestro 2.11.0). The workflow was only syntax-checked (YAML parse, shellcheck of its shell steps); it has never run.
+
+To run it: `cd apps/app && SKIP_ENV_VALIDATION=1 npx eas-cli@27.2.0 build -p ios --profile simulator` from any OS (the variable only stops the local config check from failing, DEPLOYMENT.md §10; the cloud build gets its values from `eas.json`) (Expo login required, no Apple credentials), take the artifact URL of the finished build, then start the workflow with it as `app_url`. A run costs about 100 quota minutes (macOS is billed 10x). The first run records the Xcode version and simulator runtimes of the runner; the Expo SDK 58 minimum Xcode is not confirmed yet.
+
+Scope on iOS is deliberately small: only the flows that need no backend (the macOS runner cannot run the local Supabase stack). Data flows stay verified on Android and web.
+
 ## Next
 
 1. Physical Android device pass; TalkBack walk-through on the real screen reader.

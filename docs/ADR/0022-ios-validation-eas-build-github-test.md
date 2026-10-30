@@ -1,0 +1,14 @@
+# ADR-0022 — Build the iOS simulator app on EAS; run it on a GitHub macOS runner
+
+**Status:** Accepted (2026-10-30), first stage; the result of the first runs is recorded in `docs/NATIVE_VALIDATION.md`.
+
+**Context.** iOS can only be built with Xcode on macOS; the development machines are Windows and Linux. A Simulator needs macOS too. GitHub macOS runners on a private repository on the free plan bill minutes at 10x (about 200 macOS minutes a month for 2000 included), and a cold React Native iOS build takes 25–40 minutes, so debugging a build pipeline there would use the quota in a handful of runs. GitHub macOS runners have no Docker, so the local Supabase stack cannot run next to the simulator. The Expo SDK 58 minimum Xcode could not be confirmed from official sources (the changelog names Xcode 27 for some features only); the first run prints the toolchain.
+
+**Decision.**
+
+1. The **compile** happens on EAS Build (`eas build -p ios --profile simulator` from `apps/app`; profile in `apps/app/eas.json`). A simulator build needs **no Apple credentials and no signing**; it needs an Expo account. It is a `Release` build with the JavaScript embedded, so the test job needs neither Metro nor `pnpm install`.
+2. The **test** happens in `.github/workflows/ios-simulator.yml`, started manually with the EAS artifact URL: boots the newest iPhone simulator, installs the app, runs Maestro 2.11.0 (pinned, checksum-verified) and uploads screenshots, Maestro output and the simulator log. About 10 minutes of macOS (about 100 quota minutes) per run. It never runs on pull requests.
+3. The build has **placeholder public configuration** (no real backend, like the CI smoke builds). Only flows that need no backend run on iOS: 01 (launch, navigation, protected-route redirect) and 14 (in-app language). Data flows (sign-up, join, approval, invites) stay verified on Android and web; they would need the local stack, which cannot run on the macOS runner.
+4. The **Apple Developer membership is not used by this stage.** It becomes necessary for a physical device, TestFlight and the store, which also need final identifiers: the temporary ones in ADR-0010 (`com.example.matchup.dev`) are unpublishable by design and must be replaced first.
+
+**Consequences.** + Cheap, no secrets in GitHub, reproducible toolchain printed in every run. + Native-only iOS risks get a real signal (launch, secure store, tab bar, safe areas, accessibility tree). − iOS has fewer checks than Android (2 flows instead of 31); the data paths on iOS are unverified. − The artifact URL is a capability link to a build with placeholder configuration only; it contains no secret. − Release builds are not debuggable from Metro; a development client would be a separate profile. − A physical iPhone, TalkBack-equivalent VoiceOver use and push notifications remain out of scope.
