@@ -1,6 +1,6 @@
 # Native Android validation
 
-Status 2026-10-30 (Phase 3 device run added; the Phase 2 run below is from 2026-10-25). **Android only.** iOS is **pending** — it needs macOS or EAS cloud builds plus an Apple Developer account, none of which are available yet. Nothing in this document says anything about iOS.
+Status 2026-10-30 (Phase 3 device run added; the Phase 2 run below is from 2026-10-25). **Android is the full suite; iOS is a simulator smoke test only** (two flows, section "iOS" below). Nothing here says anything about a physical iPhone, VoiceOver use or the iOS data flows.
 
 Device: Android Studio emulator `matchup_api36` (Pixel 7 profile, Android 16 / API 36, x86_64, 1080×2400, 420 dpi), debug build produced in the Linux container (ADR-0015), JavaScript served by Metro, local Supabase through `adb reverse`. **An emulator is not a physical device**: no real keyboard/IME variety, no real network transitions, no OEM behaviour, and timing is not representative.
 
@@ -86,18 +86,25 @@ Measured on a 15 GB laptop with two GPUs (AMD Radeon 680M + NVIDIA RTX 4060), no
 - `dev-up.sh` on Linux now starts the emulator headless, with the AMD driver when present, `-cores 2 -memory 2560`, and inside a `systemd-run --user --scope -p MemoryMax=5G -p MemorySwapMax=0` cgroup (override with `EMULATOR_MEMORY_MAX`), so a regression kills only the emulator.
 - Do not run `tsc`, jest, Docker image builds or a `expo start --web` next to the emulator, and run the suite alone.
 
-## iOS: pipeline prepared, **not run yet** (ADR-0022)
+## iOS simulator smoke (2026-10-30) — 2 flows passed, nothing else verified (ADR-0022)
 
-Nothing about iOS has been verified. What exists: `apps/app/eas.json` (profile `simulator`, a Release build with embedded JavaScript and placeholder public configuration) and `.github/workflows/ios-simulator.yml` (manual; installs an EAS simulator build on a GitHub macOS runner and runs flows 01 and 14 with Maestro 2.11.0). The workflow was only syntax-checked (YAML parse, shellcheck of its shell steps); it has never run.
+Pipeline: the app is compiled by EAS (`apps/app/eas.json`, profile `simulator`, a Release build with embedded JavaScript and placeholder public configuration, no Apple credentials), then `.github/workflows/ios-simulator.yml` (manual) installs it on a GitHub macOS runner and runs Maestro 2.11.0.
 
-To run it: `cd apps/app && SKIP_ENV_VALIDATION=1 npx eas-cli@27.2.0 build -p ios --profile simulator` from any OS (the variable only stops the local config check from failing, DEPLOYMENT.md §10; the cloud build gets its values from `eas.json`) (Expo login required, no Apple credentials), take the artifact URL of the finished build, then start the workflow with it as `app_url`. A run costs about 100 quota minutes (macOS is billed 10x). The first run records the Xcode version and simulator runtimes of the runner; the Expo SDK 58 minimum Xcode is not confirmed yet.
+**What the runs showed**
 
-**EAS build, 2026-10-30:** the first attempt failed before compiling (the builder's Node 22 violates `engines`; fixed by pinning Node and pnpm in `eas.json`). The second finished in about 7 minutes of build time (queue time not included). Inspected on Linux: bundle id `com.example.matchup.dev`, URL scheme `matchup-dev`, minimum iOS 16.4, built with **Xcode 27.1 / iphonesimulator27.1 SDK**, embedded configuration is the placeholder only (no JWT-shaped string in the JavaScript bundle). Still unknown: whether the GitHub runner's Xcode and simulator runtime can run an app built with the iOS 27.1 SDK. The artifact expires on 2026-11-13.
+- Build: `react-native` 0.88.1, built on EAS with **Xcode 27.1 / iphonesimulator27.1 SDK**, minimum iOS 16.4, bundle id `com.example.matchup.dev`, about 7.5 minutes. The first EAS attempt failed before compiling (builder Node 22 vs `engines`; fixed by pinning Node and pnpm in `eas.json`).
+- Runner: `macos-26`, **Xcode 26.6 (17F113)**, simulator **iPhone 17, iOS 26.5**. An app built with the 27.1 SDK installs and launches there.
+- Run 1 (`41030987834`): the app started and showed Discover, Filters, the error state (no backend) and four tabs; both flows failed on a selector. iOS names the tabs `"My Events, tab, 2 of 8"`, Android `"My Events"`, and Maestro matches the whole label.
+- Run 2 (`41031873780`, selectors `'My Events(, tab.*)?'`): **flow 01** (cold start, guest Discover, tab bar, protected-route redirect to sign-in) 10 of 10 steps and **flow 14** (in-app language switch, survives a restart) 12 of 12 steps. A run takes about 5 minutes (about 50 quota minutes at the 10x macOS rate); the screenshots and Maestro output are kept as the `ios-results` artifact for 14 days.
 
-Scope on iOS is deliberately small: only the flows that need no backend (the macOS runner cannot run the local Supabase stack). Data flows stay verified on Android and web.
+**Found by the iOS run:** VoiceOver announces the tabs as "Discover, tab, 1 of **8**" although four are visible, because the four hidden routes (`tabBarButton: () => null`) are counted. Fix: a `tabBarAccessibilityLabel` with the right count on iOS (separate change).
+
+**Not verified on iOS:** everything that needs the backend (sign-up, sign-in, Discover data, join, approval, invites), deep links, the keyboard behaviour, secure-store persistence of a session, VoiceOver, dark mode and font scaling, physical devices, and release (signed) builds. The runner cannot run the local Supabase stack, so the build points at a placeholder URL and Discover shows its error state.
+
+To repeat: `cd apps/app && SKIP_ENV_VALIDATION=1 npx eas-cli@27.2.0 build -p ios --profile simulator` (Expo login, no Apple credentials), then run the workflow with the build's artifact URL as `app_url` (`gh workflow run ios-simulator.yml -f app_url=<url>`). EAS artifacts expire after two weeks.
 
 ## Next
 
 1. Physical Android device pass; TalkBack walk-through on the real screen reader.
-2. iOS validation once a macOS / EAS route and Apple account exist.
+2. iOS: the data flows (needs a backend the macOS runner can reach), VoiceOver, a physical iPhone (Apple Developer account is in place; final identifiers are needed first, ADR-0010).
 3. Re-run this suite against the hosted Supabase project before any public launch.

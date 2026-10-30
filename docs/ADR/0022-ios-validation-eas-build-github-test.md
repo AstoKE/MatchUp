@@ -1,6 +1,6 @@
 # ADR-0022 — Build the iOS simulator app on EAS; run it on a GitHub macOS runner
 
-**Status:** Accepted (2026-10-30), first stage; the result of the first runs is recorded in `docs/NATIVE_VALIDATION.md`.
+**Status:** Accepted (2026-10-30), first stage, **working**: two flows passed on the simulator; results in `docs/NATIVE_VALIDATION.md`.
 
 **Context.** iOS can only be built with Xcode on macOS; the development machines are Windows and Linux. A Simulator needs macOS too. GitHub macOS runners on a private repository on the free plan bill minutes at 10x (about 200 macOS minutes a month for 2000 included), and a cold React Native iOS build takes 25–40 minutes, so debugging a build pipeline there would use the quota in a handful of runs. GitHub macOS runners have no Docker, so the local Supabase stack cannot run next to the simulator. The Expo SDK 58 minimum Xcode could not be confirmed from official sources (the changelog names Xcode 27 for some features only); the first run prints the toolchain.
 
