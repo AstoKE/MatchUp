@@ -1,7 +1,9 @@
 import { Tabs } from 'expo-router';
+import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { navItems } from '@/navigation/config';
+import { tabAccessibilityLabel } from '@/navigation/tab-label';
 import { Icon, useTheme } from '@/ui';
 
 /** Fixed-width rail (React Navigation otherwise sizes the left bar to its container). */
@@ -52,12 +54,19 @@ export default function TabsLayout() {
         tabBarInactiveBackgroundColor: 'transparent',
       }}
     >
-      {navItems.map((item) => (
+      {navItems.map((item, position) => (
         <Tabs.Screen
           key={item.name}
           name={item.name}
           options={{
             title: t(item.labelKey),
+            tabBarAccessibilityLabel: tabAccessibilityLabel(
+              t,
+              t(item.labelKey),
+              position + 1,
+              navItems.length,
+              Platform.OS,
+            ),
             tabBarIcon: ({ color, size, focused }) => (
               <Icon
                 name={item.icon}
