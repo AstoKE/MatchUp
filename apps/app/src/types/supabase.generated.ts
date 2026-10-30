@@ -22,6 +22,45 @@ export type Database = {
         };
         Relationships: [];
       };
+      attendance_disputes: {
+        Row: {
+          created_at: string;
+          participation_id: string;
+          reason: string | null;
+          resolution: Database['public']['Enums']['attendance_status'] | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          participation_id: string;
+          reason?: string | null;
+          resolution?: Database['public']['Enums']['attendance_status'] | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          status?: string;
+        };
+        Update: {
+          created_at?: string;
+          participation_id?: string;
+          reason?: string | null;
+          resolution?: Database['public']['Enums']['attendance_status'] | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'attendance_disputes_participation_id_fkey';
+            columns: ['participation_id'];
+            isOneToOne: true;
+            referencedRelation: 'event_participations';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       cities: {
         Row: {
           country_code: string;
@@ -87,6 +126,8 @@ export type Database = {
         Row: {
           approved_at: string | null;
           attendance: Database['public']['Enums']['attendance_status'];
+          attendance_marked_at: string | null;
+          attendance_marked_by: string | null;
           canceled_at: string | null;
           cancellation_excused: boolean;
           created_at: string;
@@ -109,6 +150,8 @@ export type Database = {
         Insert: {
           approved_at?: string | null;
           attendance?: Database['public']['Enums']['attendance_status'];
+          attendance_marked_at?: string | null;
+          attendance_marked_by?: string | null;
           canceled_at?: string | null;
           cancellation_excused?: boolean;
           created_at?: string;
@@ -130,6 +173,8 @@ export type Database = {
         Update: {
           approved_at?: string | null;
           attendance?: Database['public']['Enums']['attendance_status'];
+          attendance_marked_at?: string | null;
+          attendance_marked_by?: string | null;
           canceled_at?: string | null;
           cancellation_excused?: boolean;
           created_at?: string;
@@ -208,6 +253,7 @@ export type Database = {
       events: {
         Row: {
           approved_count: number;
+          attendance_finalized_at: string | null;
           auto_approve: boolean;
           booking_status: Database['public']['Enums']['booking_status'];
           cancel_message: string | null;
@@ -236,6 +282,7 @@ export type Database = {
           public_location_label: string | null;
           published_at: string | null;
           registration_closes_at: string | null;
+          review_window_closes_at: string | null;
           setting: Database['public']['Enums']['event_setting'] | null;
           skill_max: number | null;
           skill_min: number | null;
@@ -251,6 +298,7 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           approved_count?: number;
+          attendance_finalized_at?: string | null;
           auto_approve?: boolean;
           booking_status?: Database['public']['Enums']['booking_status'];
           cancel_message?: string | null;
@@ -279,6 +327,7 @@ export type Database = {
           public_location_label?: string | null;
           published_at?: string | null;
           registration_closes_at?: string | null;
+          review_window_closes_at?: string | null;
           setting?: Database['public']['Enums']['event_setting'] | null;
           skill_max?: number | null;
           skill_min?: number | null;
@@ -293,6 +342,7 @@ export type Database = {
         };
         Update: {
           approved_count?: number;
+          attendance_finalized_at?: string | null;
           auto_approve?: boolean;
           booking_status?: Database['public']['Enums']['booking_status'];
           cancel_message?: string | null;
@@ -321,6 +371,7 @@ export type Database = {
           public_location_label?: string | null;
           published_at?: string | null;
           registration_closes_at?: string | null;
+          review_window_closes_at?: string | null;
           setting?: Database['public']['Enums']['event_setting'] | null;
           skill_max?: number | null;
           skill_min?: number | null;
@@ -785,6 +836,13 @@ export type Database = {
         Args: { p_privacy_version: string; p_terms_version: string };
         Returns: undefined;
       };
+      admin_resolve_attendance_dispute: {
+        Args: {
+          p_participation_id: string;
+          p_resolution: Database['public']['Enums']['attendance_status'];
+        };
+        Returns: undefined;
+      };
       approve_participation: { Args: { p_participation_id: string }; Returns: undefined };
       cancel_account_deletion: { Args: Record<PropertyKey, never>; Returns: undefined };
       cancel_event: {
@@ -811,7 +869,12 @@ export type Database = {
         Returns: string;
       };
       delete_draft: { Args: { p_event_id: string }; Returns: undefined };
+      dispute_attendance: {
+        Args: { p_participation_id: string; p_reason: string };
+        Returns: undefined;
+      };
       export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
+      finalize_attendance: { Args: { p_event_id: string }; Returns: undefined };
       get_event: { Args: { p_event_id: string; p_invite_token?: string }; Returns: Json };
       get_my_account: {
         Args: Record<PropertyKey, never>;
@@ -830,6 +893,13 @@ export type Database = {
       list_my_events: {
         Args: { p_bucket: string; p_cursor?: Json; p_limit?: number };
         Returns: Json;
+      };
+      mark_attendance: {
+        Args: {
+          p_participation_id: string;
+          p_value: Database['public']['Enums']['attendance_status'];
+        };
+        Returns: undefined;
       };
       mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number };
       publish_event: { Args: { p_event_id: string }; Returns: undefined };
