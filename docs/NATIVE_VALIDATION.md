@@ -76,6 +76,8 @@ Full suite on the same emulator profile, this time driven from the **Linux** mac
 
 **Not covered by an automated check (still to do by hand):** creating an event through the form on the device; approving from the organizer's request queue in the UI (the host approves through the RPC in N19); the system share sheet for the invite link; TalkBack reading order of the event page, the filter button's expanded state, the roster and the inbox; dark mode and a font scale of 1.6 on Discover and the event page. Physical devices and iOS are not covered.
 
+**Re-run on react-native 0.88.1 (2026-10-30, after #21):** the APK was rebuilt in the container (Gradle `BUILD SUCCESSFUL`, 3 min warm, compiled against `react-native@0.88.1`) and the whole suite passed again: **31 / 31, exit 0**, run alone on the capped emulator (emulator process 3.0 GB at most; load average peaked at 10 once, minimum free memory 3.1 GB). This run used the flows with the optional `(, tab.*)?` tab suffix from #22.
+
 ### Emulator memory on the Linux bench
 
 Measured on a 15 GB laptop with two GPUs (AMD Radeon 680M + NVIDIA RTX 4060), no sudo:
@@ -95,9 +97,11 @@ Pipeline: the app is compiled by EAS (`apps/app/eas.json`, profile `simulator`, 
 - Build: `react-native` 0.88.1, built on EAS with **Xcode 27.1 / iphonesimulator27.1 SDK**, minimum iOS 16.4, bundle id `com.example.matchup.dev`, about 7.5 minutes. The first EAS attempt failed before compiling (builder Node 22 vs `engines`; fixed by pinning Node and pnpm in `eas.json`).
 - Runner: `macos-26`, **Xcode 26.6 (17F113)**, simulator **iPhone 17, iOS 26.5**. An app built with the 27.1 SDK installs and launches there.
 - Run 1 (`41030987834`): the app started and showed Discover, Filters, the error state (no backend) and four tabs; both flows failed on a selector. iOS names the tabs `"My Events, tab, 2 of 8"`, Android `"My Events"`, and Maestro matches the whole label.
-- Run 2 (`41031873780`, selectors `'My Events(, tab.*)?'`): **flow 01** (cold start, guest Discover, tab bar, protected-route redirect to sign-in) 10 of 10 steps and **flow 14** (in-app language switch, survives a restart) 12 of 12 steps. A run takes about 5 minutes (about 50 quota minutes at the 10x macOS rate); the screenshots and Maestro output are kept as the `ios-results` artifact for 14 days.
+- Run 2 (`41031873780`, selectors `'My Events(, tab.*)?'`): **flow 01** (cold start, guest Discover, tab bar, protected-route redirect to sign-in) 10 of 10 steps and **flow 14** (in-app language switch, survives a restart) 12 of 12 steps. A run takes about 5 minutes (about 50 quota minutes at the 10x macOS rate; three runs so far, about 150 of the roughly 200 macOS minutes a free plan includes if nothing else used the pool); the screenshots and Maestro output are kept as the `ios-results` artifact for 14 days.
 
-**Found by the iOS run:** VoiceOver announces the tabs as "Discover, tab, 1 of **8**" although four are visible, because the four hidden routes (`tabBarButton: () => null`) are counted. Fix: a `tabBarAccessibilityLabel` with the right count on iOS (separate change).
+**Run 3 (`41063465239`, build `568fe022` from `main` with #23):** the accessibility tree now says `Keşfet, sekme, 1 / 4`, `Etkinliklerim, sekme, 2 / 4`, `Oluştur, sekme, 3 / 4`, `Profil, sekme, 4 / 4` (it said "of 8" before), so the VoiceOver fix works on iOS. Flow 01 passed (10 of 10). Flow 14 failed at its last tab tap: its selector knew only the English suffix `, tab`, and the Turkish label is `, sekme`. The selector now accepts both (`(, (tab|sekme).*)?`); that fix has **not** been re-run on iOS yet. The English label was not read from a tree (Maestro keeps the hierarchy only for the failing step), only matched by the passing English steps.
+
+**Found by the iOS run (fixed in #23):** VoiceOver announced the tabs as "Discover, tab, 1 of **8**" although four are visible, because the four hidden routes (`tabBarButton: () => null`) are counted. Fix: a `tabBarAccessibilityLabel` with the right count on iOS.
 
 **Not verified on iOS:** everything that needs the backend (sign-up, sign-in, Discover data, join, approval, invites), deep links, the keyboard behaviour, secure-store persistence of a session, VoiceOver, dark mode and font scaling, physical devices, and release (signed) builds. The runner cannot run the local Supabase stack, so the build points at a placeholder URL and Discover shows its error state.
 
