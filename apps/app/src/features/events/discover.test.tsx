@@ -108,7 +108,7 @@ beforeEach(() => {
   mockApi.searchEvents.mockResolvedValue(page([item()]));
 });
 
-/** On a phone-sized window the filters sit behind a button; tests that touch them open it first. */
+/** The less frequent filters (time of day, setting, district) are in a sheet. */
 const openFilters = async () =>
   fireEvent.press(await screen.findByRole('button', { name: /^(Filtreler|Filters)( \(\d+\))?$/ }));
 
@@ -116,14 +116,13 @@ const openFilters = async () =>
 const lastPayload = () => mockApi.searchEvents.mock.calls.at(-1)?.[0] as Record<string, unknown>;
 
 describe('DiscoverScreen', () => {
-  it('lists events for a guest: sport, title, when, where, slots and organizer', async () => {
+  it('lists events for a guest: sport, title, when, where and open spots', async () => {
     await renderApp(<DiscoverScreen />);
     expect(await screen.findByText('Perşembe maçı')).toBeTruthy();
     expect(screen.getByText('Futbol · 5v5')).toBeTruthy();
     expect(screen.getByText(/19:30/)).toBeTruthy();
     expect(screen.getByText('Çankaya · ODTÜ Halı Saha 2')).toBeTruthy();
-    expect(screen.getByText('4/12 kişi')).toBeTruthy();
-    expect(screen.getByText(/Ayşe A düzenliyor/)).toBeTruthy();
+    expect(screen.getByText('8 yer kaldı')).toBeTruthy();
     expect(screen.getByText('1 etkinlik')).toBeTruthy();
   });
 
@@ -149,9 +148,9 @@ describe('DiscoverScreen', () => {
       ]),
     );
     await renderApp(<DiscoverScreen />);
-    expect(await screen.findByText(/12\/12 kişi · Dolu · bekleme listesi açık/)).toBeTruthy();
-    expect(screen.getByText(/Kayıt kapandı/)).toBeTruthy();
-    expect(screen.getByText(/· Dolu$/)).toBeTruthy();
+    expect(await screen.findByText('Dolu · yedek liste açık')).toBeTruthy();
+    expect(screen.getByText('Kayıt kapandı')).toBeTruthy();
+    expect(screen.getByText('Dolu')).toBeTruthy();
   });
 
   it('says on the card whether the game is indoors or outdoors, only when the organizer said so', async () => {
@@ -191,13 +190,13 @@ describe('DiscoverScreen', () => {
     await screen.findByText('Perşembe maçı');
     expect(lastPayload()).toEqual({ limit: 20 });
 
-    await openFilters();
     await fireEvent.press(screen.getByRole('checkbox', { name: 'Tenis' }));
     await waitFor(() => expect(lastPayload()).toMatchObject({ sport_ids: [TENNIS] }));
 
-    await fireEvent.press(screen.getByRole('checkbox', { name: 'Akşam' }));
     await fireEvent.press(screen.getByRole('checkbox', { name: 'Yalnızca yeri olan etkinlikler' }));
-    await fireEvent.press(screen.getByRole('radio', { name: 'Bugün' }));
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Bugün' }));
+    await openFilters();
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Akşam' }));
     await waitFor(() =>
       expect(lastPayload()).toMatchObject({
         sport_ids: [TENNIS],
@@ -217,15 +216,24 @@ describe('DiscoverScreen', () => {
     await waitFor(() => expect(lastPayload()).toMatchObject({ district_ids: [CANKAYA] }));
   });
 
-  it('keeps the filters out of the way on a phone until they are asked for', async () => {
+  it('keeps the frequent filters on one line and the rest in a sheet until asked for', async () => {
     await renderApp(<DiscoverScreen />);
     await screen.findByText('Perşembe maçı');
-    expect(screen.queryByRole('checkbox', { name: 'Tenis' })).toBeNull();
-    const toggle = screen.getByRole('button', { name: 'Filtreler' });
-    await fireEvent.press(toggle);
     expect(screen.getByRole('checkbox', { name: 'Tenis' })).toBeTruthy();
+    expect(screen.queryByRole('checkbox', { name: 'Akşam' })).toBeNull();
     await fireEvent.press(screen.getByRole('button', { name: 'Filtreler' }));
-    expect(screen.queryByRole('checkbox', { name: 'Tenis' })).toBeNull();
+    expect(screen.getByRole('checkbox', { name: 'Akşam' })).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Sonuçları göster' }));
+    expect(screen.queryByRole('checkbox', { name: 'Akşam' })).toBeNull();
+  });
+
+  it('a day chip chosen again goes back to any day', async () => {
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Bugün' }));
+    await waitFor(() => expect(lastPayload()).toMatchObject({ to: expect.any(String) }));
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Bugün' }));
+    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20 }));
   });
 
   it('says so when nothing exists yet and offers to create the first event', async () => {
@@ -240,7 +248,6 @@ describe('DiscoverScreen', () => {
     mockApi.searchEvents.mockResolvedValue(page([]));
     await renderApp(<DiscoverScreen />);
     await screen.findByText('Henüz etkinlik yok');
-    await openFilters();
     await fireEvent.press(screen.getByRole('checkbox', { name: 'Tenis' }));
     expect(screen.getByRole('button', { name: 'Filtreler (1)' })).toBeTruthy();
     expect(await screen.findByText('Bu filtrelere uyan etkinlik yok')).toBeTruthy();
@@ -284,9 +291,7 @@ describe('DiscoverScreen', () => {
   it('is available in English', async () => {
     await renderApp(<DiscoverScreen />, { locale: 'en' });
     expect(await screen.findByText('Perşembe maçı')).toBeTruthy();
-    expect(screen.getByText('4/12 players')).toBeTruthy();
-    await openFilters();
-    expect(screen.getByRole('radio', { name: 'Tomorrow' })).toBeTruthy();
+    expect(screen.getByRole('checkbox', { name: 'Tomorrow' })).toBeTruthy();
   });
 });
 
@@ -312,7 +317,7 @@ describe('DiscoverScreen: days, urgency and the profile default', () => {
     expect(await screen.findByRole('heading', { name: 'Bugün' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Yarın' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: '31 Ekim Cumartesi' })).toBeTruthy();
-    expect(screen.getByText('18:00 · 90 dk')).toBeTruthy();
+    expect(screen.getByText('18:00')).toBeTruthy();
     expect(screen.queryByText(/Salı/)).toBeNull();
   });
 
@@ -322,7 +327,7 @@ describe('DiscoverScreen: days, urgency and the profile default', () => {
     );
     await renderApp(<DiscoverScreen />);
     expect(await screen.findByRole('heading', { name: 'Yarın' })).toBeTruthy();
-    expect(screen.getByText('00:30 · 90 dk')).toBeTruthy();
+    expect(screen.getByText('00:30')).toBeTruthy();
   });
 
   it('marks the last spot and a game that starts within two hours, never a full one', async () => {

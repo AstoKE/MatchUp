@@ -7,9 +7,9 @@ test.describe('guest browsing (D-09)', () => {
   test('opens Discover without an account and shows the Turkish-first UI', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
-    await expect(page.getByText('Sporunu seç, takımını bul, oyuna katıl.')).toBeVisible();
+    await expect(page.getByText('Ankara', { exact: true })).toBeVisible();
     // The list depends on what the database holds; the filters appear once Discover has loaded.
-    await expect(page.getByRole('radio', { name: 'Bugün' })).toBeVisible();
+    await expect(page.getByRole('checkbox', { name: 'Bugün' })).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('lang', 'tr');
   });
 

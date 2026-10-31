@@ -176,12 +176,11 @@
     "noMatchTitle": "Bu filtrelere uyan etkinlik yok",
     "noMatchBody": "Başka bir gün dene ya da bir filtreyi kaldır.",
     "card": {
-      "slots": "{{approved}}/{{capacity}} kişi",
       "full": "Dolu",
-      "fullWaitlist": "Dolu · bekleme listesi açık",
+      "fullWaitlist": "Dolu · yedek liste açık",
       "closed": "Kayıt kapandı",
-      "organizer": "{{name}} düzenliyor",
-      "placeHidden": "{{district}} · tam yer onaylananlara gösterilir"
+      "placeHidden": "{{district}} · tam yer onaylananlara gösterilir",
+      "paid": "Ücretli"
     },
     "day": {
       "TODAY": "Bugün",
@@ -190,7 +189,9 @@
     "fromProfile": "Profilindeki sporlar gösteriliyor. Daha fazlası için filtreleri değiştir ya da temizle.",
     "filtersWithCount": "Filtreler ({{count}})",
     "setting": "Mekan türü",
-    "settingAny": "Fark etmez"
+    "settingAny": "Fark etmez",
+    "filtersDone": "Sonuçları göster",
+    "filtersClose": "Filtreleri kapat"
   },
   "join": {
     "signInToJoin": "Giriş yap ve katıl",

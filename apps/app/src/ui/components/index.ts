@@ -5,6 +5,7 @@ export * from './EmptyState';
 export * from './Screen';
 export * from './SegmentedChoice';
 export * from './Select';
+export * from './Sheet';
 export * from './Skeleton';
 export * from './SkipLink';
 export * from './Text';

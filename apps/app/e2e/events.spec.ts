@@ -148,8 +148,7 @@ test.describe('discovering events (Phase 3 / M3)', () => {
     const card = page.getByRole('link', { name: new RegExp(title) });
     await expect(card).toBeVisible();
     await expect(card).toContainText('Çankaya · ODTÜ Halı Saha 2');
-    await expect(card).toContainText('1/12 kişi');
-    await expect(card).toContainText('Ayşe Düzenleyen düzenliyor');
+    await expect(card).toContainText('11 yer kaldı');
     await expectNoBlocking(page);
 
     // A sport the event is not in hides it and says why; clearing the filter brings it back.
@@ -163,6 +162,7 @@ test.describe('discovering events (Phase 3 / M3)', () => {
     await expect(page).toHaveURL(new RegExp(`/e/${eventId}$`));
     await expect(page.getByRole('heading', { name: title, level: 1 })).toBeVisible();
     const detail = page.getByRole('main');
+    await expect(detail.getByText('Ayşe Düzenleyen')).toBeVisible();
     await expect(detail.getByText('1/12 kişi', { exact: true })).toBeVisible();
     await expect(detail.getByText('11 yer kaldı')).toBeVisible();
     await expectNoBlocking(page);
@@ -327,9 +327,9 @@ test.describe('Discover for a signed-in player (UI tour)', () => {
     await expect(main.getByRole('checkbox', { name: 'Futbol', exact: true })).toBeChecked();
     const card = main.getByRole('link', { name: new RegExp(title) });
     await expect(card).toBeVisible();
-    // The card sits under a day heading and shows only the time and the length.
+    // The row sits under a day heading and shows only the time.
     await expect(main.getByRole('heading', { level: 2 }).first()).toBeVisible();
-    await expect(card).toContainText(/\d{2}:\d{2} · 90 dk/);
+    await expect(card).toContainText(/\d{2}:\d{2}/);
     await expectNoBlocking(page);
 
     await main.getByRole('button', { name: 'Filtreleri temizle' }).first().click();
@@ -354,14 +354,21 @@ test.describe('Discover for a signed-in player (UI tour)', () => {
     // (Other tests publish events too, so check the first card of the list, whoever's it is.)
     const box = await main.getByRole('listitem').first().boundingBox();
     expect(box?.y ?? Infinity).toBeLessThan(844);
-    await expect(main.getByRole('checkbox', { name: 'Tenis', exact: true })).toHaveCount(0);
+    // The frequent filters stay on one line; the rest open in a dialog.
+    const chip = main.getByRole('checkbox', { name: 'Tenis', exact: true });
+    await chip.scrollIntoViewIfNeeded();
+    await chip.click();
+    await expect(main.getByRole('button', { name: 'Filtreler (1)', exact: true })).toBeVisible();
+    await main.getByRole('button', { name: 'Filtreleri temizle' }).first().click();
 
-    const toggle = main.getByRole('button', { name: 'Filtreler', exact: true });
-    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    await toggle.click();
-    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    await expect(main.getByRole('checkbox', { name: 'Tenis', exact: true })).toBeVisible();
-    await main.getByRole('checkbox', { name: 'Tenis', exact: true }).click();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await main.getByRole('button', { name: 'Filtreler', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'Filtreler' });
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('checkbox', { name: 'Akşam', exact: true }).click();
+    await expectNoBlocking(page);
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
     await expect(main.getByRole('button', { name: 'Filtreler (1)', exact: true })).toBeVisible();
     await expectNoBlocking(page);
   });

@@ -176,12 +176,11 @@
     "noMatchTitle": "No events match these filters",
     "noMatchBody": "Try a different day or clear a filter.",
     "card": {
-      "slots": "{{approved}}/{{capacity}} players",
       "full": "Full",
       "fullWaitlist": "Full · waitlist open",
       "closed": "Registration closed",
-      "organizer": "by {{name}}",
-      "placeHidden": "{{district}} · exact place shown to approved players"
+      "placeHidden": "{{district}} · exact place shown to approved players",
+      "paid": "Paid"
     },
     "day": {
       "TODAY": "Today",
@@ -190,7 +189,9 @@
     "fromProfile": "Showing the sports on your profile. Change or clear the filters to see more.",
     "filtersWithCount": "Filters ({{count}})",
     "setting": "Indoor or outdoor",
-    "settingAny": "Any"
+    "settingAny": "Any",
+    "filtersDone": "Show results",
+    "filtersClose": "Close filters"
   },
   "join": {
     "signInToJoin": "Sign in to join",
