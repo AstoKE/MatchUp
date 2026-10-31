@@ -136,7 +136,7 @@ function Row({
         backgroundColor: selected ? colors.surfaceSunken : 'transparent',
       }}
     >
-      <Text tone={muted ? 'secondary' : 'primary'} style={selected ? { fontWeight: '600' } : null}>
+      <Text variant={selected ? 'label' : 'body'} tone={muted ? 'secondary' : 'primary'}>
         {label}
       </Text>
     </Pressable>

@@ -37,18 +37,13 @@ export function Button({
   const [focused, setFocused] = useState(false);
   const inactive = Boolean(disabled) || loading;
 
-  const fill =
-    variant === 'primary'
-      ? colors.actionPrimary
-      : variant === 'destructive'
-        ? colors.danger
-        : 'transparent';
+  const fill = variant === 'primary' ? colors.actionPrimary : 'transparent';
   const labelColor = inactive
     ? colors.textSecondary
     : variant === 'primary'
       ? colors.onActionPrimary
       : variant === 'destructive'
-        ? colors.onDanger
+        ? colors.danger
         : variant === 'tertiary'
           ? colors.link
           : colors.textPrimary;
@@ -73,10 +68,16 @@ export function Button({
           justifyContent: 'center',
           flexDirection: 'row',
           gap: spacing[2],
-          backgroundColor: inactive && fill !== 'transparent' ? colors.surfaceSunken : fill,
-          borderWidth: variant === 'secondary' ? 1 : 0,
-          borderColor: colors.borderStrong,
-          opacity: pressed ? 0.85 : 1,
+          backgroundColor:
+            inactive && fill !== 'transparent'
+              ? colors.surfaceSunken
+              : pressed && variant === 'primary'
+                ? colors.actionPrimaryPressed
+                : fill,
+          // Destructive is outlined: a filled danger red would read like the primary action (docs/design.md §11).
+          borderWidth: variant === 'secondary' || variant === 'destructive' ? 1 : 0,
+          borderColor: variant === 'destructive' && !inactive ? colors.danger : colors.borderStrong,
+          opacity: pressed && variant !== 'primary' ? 0.85 : 1,
           alignSelf: fullWidth ? 'stretch' : 'flex-start',
           ...(focused
             ? {
