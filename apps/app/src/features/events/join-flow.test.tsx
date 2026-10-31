@@ -138,7 +138,9 @@ describe('the request form', () => {
     expect(screen.getByText('Perşembe maçı')).toBeTruthy();
     expect(screen.getByText('Çankaya · ODTÜ Halı Saha 2')).toBeTruthy();
     expect(screen.getByText('Organizatör onaylayana kadar yerin kesinleşmez.')).toBeTruthy();
-    expect(screen.getByText('Organizatör görünen adını ve seviyeni görecek.')).toBeTruthy();
+    expect(
+      screen.getByText('Organizatör görünen adını, seviyeni, puanını ve güvenilirliğini görecek.'),
+    ).toBeTruthy();
     expect(screen.queryByRole('checkbox')).toBeNull();
   });
 

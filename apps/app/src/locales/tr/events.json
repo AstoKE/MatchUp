@@ -215,7 +215,7 @@
     "unavailable": "Bu etkinliğe katılamazsın.",
     "limitReached": "Bu etkinlik için istek hakkın doldu.",
     "fullNoWaitlist": "Etkinlik dolu.",
-    "disclosure": "Organizatör görünen adını ve seviyeni görecek.",
+    "disclosure": "Organizatör görünen adını, seviyeni, puanını ve güvenilirliğini görecek.",
     "autoApproveNote": "Bu etkinlikte yer varsa isteğin hemen onaylanır.",
     "message": "Organizatöre mesaj (isteğe bağlı)",
     "messageHint": "En fazla {{max}} karakter.",
@@ -246,7 +246,12 @@
     "reject": "Reddet",
     "remove": "Etkinlikten çıkar",
     "confirmRemove": "{{name}} etkinlikten çıkarılsın mı? Bu işlem geri alınamaz.",
-    "removeYes": "Evet, çıkar"
+    "removeYes": "Evet, çıkar",
+    "rating": "Puan {{rating}}",
+    "reliability": "Güvenilirlik {{value}}",
+    "newPlayer": "Yeni oyuncu",
+    "confirmReject": "{{name}} reddedilsin mi? Bu etkinlik için kesindir.",
+    "rejectYes": "Evet, reddet"
   },
   "mine": {
     "bucketLabel": "Etkinlik grubu",
@@ -393,5 +398,11 @@
       "WAITLISTED": "Yer açılırsa organizatör karar verir; sana bildireceğiz.",
       "APPROVED": "Tam yer bilgisi etkinlik sayfasında. Gelemeyeceksen erkenden haber ver."
     }
+  },
+  "manage": {
+    "title": "Etkinliği yönet",
+    "open": "Etkinliği yönet",
+    "pending": "Bekleyen istek",
+    "spotsLeft": "Kalan yer"
   }
 }

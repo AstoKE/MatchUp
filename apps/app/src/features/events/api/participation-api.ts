@@ -88,6 +88,9 @@ const requestRow = z.object({
   position_id: z.nullable(z.uuid()),
   requested_at: z.string(),
   request_count: z.number(),
+  // Optional: a hosted database without this migration simply does not send them.
+  rating: z.optional(z.nullable(z.number())),
+  reliability: z.optional(z.nullable(z.number())),
 });
 
 export interface EventRequest {
@@ -99,6 +102,10 @@ export interface EventRequest {
   message: string | null;
   requestedAt: string;
   requestCount: number;
+  /** Peer rating in the event's sport, when reviews exist. */
+  rating: number | null;
+  /** 0..1, only once enough signals exist for it to mean something (the server decides). */
+  reliability: number | null;
 }
 
 /** Organizer only: open requests (oldest first), then the waitlist (FIFO), then approved players. */
@@ -114,5 +121,7 @@ export async function fetchEventRequests(eventId: string): Promise<EventRequest[
     message: row.message,
     requestedAt: row.requested_at,
     requestCount: row.request_count,
+    rating: row.rating ?? null,
+    reliability: row.reliability ?? null,
   }));
 }

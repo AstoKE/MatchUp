@@ -100,7 +100,12 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
     await expect(main.getByText('Açık hava', { exact: true })).toBeVisible();
     await expect(main.getByText('Çankaya · ODTÜ Halı Saha 2 · Üniversiteler Mh. 1')).toBeVisible();
     await expectNoBlocking(page);
+    await expect(page.getByRole('button', { name: 'Düzenle' })).toHaveCount(0);
 
+    // The organizer's tools are one tap away.
+    await page.getByRole('button', { name: 'Etkinliği yönet' }).click();
+    await expect(page.getByRole('heading', { name: 'Etkinliği yönet', level: 1 })).toBeVisible();
+    await expectNoBlocking(page);
     await page.getByRole('button', { name: 'Düzenle' }).click();
     await expect(
       page.getByText('Yayınlandıktan sonra spor, format ve oynama durumu değiştirilemez.'),
@@ -109,7 +114,7 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
     await page.getByRole('button', { name: 'İleri' }).click();
     await page.getByRole('button', { name: 'İleri' }).click();
     await page.getByRole('button', { name: 'Değişiklikleri kaydet' }).click();
-    await expect(page.getByRole('heading', { name: 'E2E cuma maçı', level: 1 })).toBeVisible();
+    await expect(page.getByText(/^E2E cuma maçı · Yayında/)).toBeVisible();
 
     // A guest sees the public event, but not the private street address.
     const guest = await page.context().browser()!.newContext();
@@ -133,6 +138,7 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
     await page.getByRole('button', { name: 'Etkinliği iptal et' }).click();
     await expect(page.getByText('İptal sebebi: Hava durumu — Yağmur bekleniyor')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Düzenle' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Etkinliği yönet' })).toHaveCount(0);
   });
 });
 
@@ -266,7 +272,7 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     await host.page.getByRole('tab', { name: 'Etkinliklerim' }).click();
     const hostMain = host.page.getByRole('main');
     await expect(hostMain.getByRole('button', { name: 'Bildirimler, 1 okunmamış' })).toBeVisible();
-    await host.page.goto(`/e/${eventId}`);
+    await host.page.goto(`/e/${eventId}/manage`);
     await expect(hostMain.getByText('Deniz Oyuncu')).toBeVisible();
     await expect(hostMain.getByText('Orta saha oynarım')).toBeVisible();
     await expect(hostMain.getByRole('button', { name: 'Katılım isteği gönder' })).toHaveCount(0);
@@ -456,6 +462,7 @@ test.describe('invite-only events and the page for other viewers (Phase 3 comple
     await page.goto(`/e/${eventId}`);
     const hostMain = page.getByRole('main');
     await expect(hostMain.getByRole('heading', { name: title, level: 1 })).toBeVisible();
+    await hostMain.getByRole('button', { name: 'Etkinliği yönet' }).click();
     await expect(hostMain.getByRole('heading', { name: 'Davet bağlantısı' })).toBeVisible();
     const link = (
       await hostMain
@@ -506,6 +513,7 @@ test.describe('attendance (Phase 5 / M5a)', () => {
   test('organizer marks and finalizes; a marked-absent player disputes; a stranger sees nothing', async ({
     browser,
   }) => {
+    test.setTimeout(90_000); // several signed-in browsers through one event
     const s = requireStack();
     const organizerEmail = uniqueEmail('att-org');
     const presentEmail = uniqueEmail('att-present');
@@ -533,7 +541,10 @@ test.describe('attendance (Phase 5 / M5a)', () => {
 
     // Before the start there is no attendance section at all.
     const early = await open(organizerEmail);
-    await expect(early.page.getByRole('heading', { name: 'Yoklama maçı', level: 1 })).toBeVisible();
+    await early.page.getByRole('button', { name: 'Etkinliği yönet' }).click();
+    await expect(
+      early.page.getByRole('heading', { name: 'Etkinliği yönet', level: 1 }),
+    ).toBeVisible();
     await expect(early.page.getByRole('heading', { name: 'Yoklama', level: 2 })).toHaveCount(0);
     await early.context.close();
 
@@ -541,6 +552,7 @@ test.describe('attendance (Phase 5 / M5a)', () => {
 
     const organizer = await open(organizerEmail);
     const page = organizer.page;
+    await page.getByRole('button', { name: 'Etkinliği yönet' }).click();
     await expect(page.getByRole('heading', { name: 'Yoklama', level: 2 })).toBeVisible();
     const present = page.getByRole('radiogroup', { name: 'Gelen Oyuncu' });
     const absent = page.getByRole('radiogroup', { name: 'Gelmeyen Oyuncu' });
@@ -704,7 +716,7 @@ test.describe('the whole lifecycle (F-35)', () => {
       await player.main.getByRole('button', { name: 'Etkinliği görüntüle' }).click();
       await expect(player.main.getByText('Onay bekleniyor', { exact: true })).toBeVisible();
     }
-    await host.page.reload();
+    await host.page.goto(`/e/${eventId}/manage`);
     await host.main.getByRole('button', { name: 'Onayla' }).first().click();
     await expect(host.main.getByText('2/3 kişi', { exact: true })).toBeVisible();
     await host.main.getByRole('button', { name: 'Onayla' }).first().click();

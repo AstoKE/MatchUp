@@ -215,7 +215,7 @@
     "unavailable": "You can't join this event.",
     "limitReached": "You've used all your requests for this event.",
     "fullNoWaitlist": "This event is full.",
-    "disclosure": "The organizer will see your display name and level.",
+    "disclosure": "The organizer will see your display name, level, rating and reliability.",
     "autoApproveNote": "If a spot is free, your request is approved right away.",
     "message": "Message to the organizer (optional)",
     "messageHint": "Up to {{max}} characters.",
@@ -246,7 +246,12 @@
     "reject": "Decline",
     "remove": "Remove from event",
     "confirmRemove": "Remove {{name}} from the event? This can't be undone.",
-    "removeYes": "Yes, remove"
+    "removeYes": "Yes, remove",
+    "rating": "Rating {{rating}}",
+    "reliability": "Reliability {{value}}",
+    "newPlayer": "New player",
+    "confirmReject": "Decline {{name}}? This is final for this event.",
+    "rejectYes": "Yes, decline"
   },
   "mine": {
     "bucketLabel": "Event group",
@@ -393,5 +398,11 @@
       "WAITLISTED": "If a spot opens, the organizer decides; we'll tell you.",
       "APPROVED": "The exact place is on the event page. If you can't make it, let the organizer know early."
     }
+  },
+  "manage": {
+    "title": "Manage event",
+    "open": "Manage event",
+    "pending": "Pending requests",
+    "spotsLeft": "Spots left"
   }
 }

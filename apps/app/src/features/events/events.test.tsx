@@ -8,6 +8,7 @@ import { CancelEventScreen } from './screens/CancelEventScreen';
 import { CreateEventScreen } from './screens/CreateEventScreen';
 import { EditEventScreen } from './screens/EditEventScreen';
 import { EventDetailScreen } from './screens/EventDetailScreen';
+import { EventManageScreen } from './screens/EventManageScreen';
 
 const SPORT = '00000000-0000-4000-8000-0000000000f1';
 const F5 = '00000000-0000-4000-8000-0000000000f5';
@@ -332,8 +333,8 @@ describe('EventDetailScreen', () => {
     mockApi.fetchEvent.mockResolvedValue(event({ status: 'DRAFT' }));
     mockApi.publishEvent.mockResolvedValue(undefined);
     mockApi.deleteDraft.mockResolvedValue(undefined);
-    await renderApp(<EventDetailScreen />, { session: signedIn });
-    await screen.findByText('Perşembe maçı');
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    await screen.findByRole('heading', { name: 'Etkinliği yönet' });
     await press('Yayınla');
     await waitFor(() => expect(mockApi.publishEvent.mock.calls[0]?.[0]).toBe(EVENT));
     expect(screen.getByRole('button', { name: 'Düzenle' })).toBeTruthy();
@@ -345,20 +346,60 @@ describe('EventDetailScreen', () => {
     expect(mockRouter.replace).toHaveBeenCalledWith('/create');
   });
 
-  it('a published, upcoming event offers edit and cancel (no publish) and shows its details', async () => {
+  it('a published, upcoming event is managed with edit and cancel, no publish', async () => {
     mockParams = { id: EVENT };
     mockApi.fetchEvent.mockResolvedValue(event());
-    await renderApp(<EventDetailScreen />, { session: signedIn });
-    await screen.findByText('Perşembe maçı');
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    await screen.findByRole('heading', { name: 'Etkinliği yönet' });
     expect(screen.queryByRole('button', { name: 'Yayınla' })).toBeNull();
-    expect(screen.getByText('Çankaya · ODTÜ Halı Saha 2 · Üniversiteler Mh.')).toBeTruthy();
-    expect(screen.getByText('1/12 kişi')).toBeTruthy();
-    expect(screen.getByText('~150 ₺ · bilgilendirme')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Düzenle' })).toBeTruthy();
     await press('Etkinliği iptal et');
     expect(mockRouter.push).toHaveBeenCalledWith({
       pathname: '/e/[id]/cancel',
       params: { id: EVENT },
     });
+  });
+
+  it('the event page gives its organizer the details and one way to manage', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event());
+    await renderApp(<EventDetailScreen />, { session: signedIn });
+    await screen.findByText('Perşembe maçı');
+    expect(screen.getByText('Çankaya · ODTÜ Halı Saha 2 · Üniversiteler Mh.')).toBeTruthy();
+    expect(screen.getByText('1/12 kişi')).toBeTruthy();
+    expect(screen.getByText('~150 ₺ · bilgilendirme')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Düzenle' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Etkinliği iptal et' })).toBeNull();
+    await press('Etkinliği yönet');
+    expect(mockRouter.push).toHaveBeenCalledWith({
+      pathname: '/e/[id]/manage',
+      params: { id: EVENT },
+    });
+  });
+
+  it('the manage page sends anyone but the organizer back, showing no tools', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event({ isOrganizer: false }));
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    await waitFor(() =>
+      expect(mockRouter.replace).toHaveBeenCalledWith({
+        pathname: '/e/[id]',
+        params: { id: EVENT },
+      }),
+    );
+    expect(screen.queryByRole('button', { name: 'Düzenle' })).toBeNull();
+  });
+
+  it('a canceled event has nothing to manage', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event({ status: 'CANCELED', cancelReason: 'WEATHER' }));
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    await waitFor(() =>
+      expect(mockRouter.replace).toHaveBeenCalledWith({
+        pathname: '/e/[id]',
+        params: { id: EVENT },
+      }),
+    );
   });
 
   it('someone else sees no organizer actions, and a hidden place only as its district', async () => {
@@ -395,6 +436,7 @@ describe('EventDetailScreen', () => {
     await renderApp(<EventDetailScreen />, { session: signedIn });
     expect(await screen.findByText('İptal sebebi: Hava durumu — Yağmur')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Düzenle' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Etkinliği yönet' })).toBeNull();
   });
 });
 

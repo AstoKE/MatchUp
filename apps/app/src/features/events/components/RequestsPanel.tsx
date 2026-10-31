@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { errorText } from '@/lib/error-text';
+import { currentLocale } from '@/lib/i18n';
 import { Banner, Button, EmptyState, Skeleton, Text, useTheme } from '@/ui';
 import type { EventDetails } from '../api/events-api';
 import type { EventRequest, OrganizerDecision } from '../api/participation-api';
@@ -24,7 +25,9 @@ export function RequestsPanel({ event }: { event: EventDetails }) {
   const requests = useEventRequests(event.id, true);
   const decide = useDecideParticipation(event.id);
   const [error, setError] = useState<string | null>(null);
-  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
+  const [confirm, setConfirm] = useState<{ id: string; decision: 'remove' | 'reject' } | null>(
+    null,
+  );
   const full = event.approvedCount >= event.capacity;
 
   if (requests.isPending) {
@@ -50,7 +53,7 @@ export function RequestsPanel({ event }: { event: EventDetails }) {
     decide.mutate(
       { participationId: request.id, decision },
       {
-        onSuccess: () => setConfirmRemove(null),
+        onSuccess: () => setConfirm(null),
         onError: (failure) => setError(errorText(failure)),
       },
     );
@@ -62,6 +65,16 @@ export function RequestsPanel({ event }: { event: EventDetails }) {
       <Text variant="title" heading={2}>
         {t('events:requests.title')}
       </Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+        <Stat
+          label={t('events:manage.pending')}
+          value={String(items.filter((r) => r.status === 'REQUESTED').length)}
+        />
+        <Stat
+          label={t('events:manage.spotsLeft')}
+          value={String(Math.max(0, event.capacity - event.approvedCount))}
+        />
+      </View>
       {error ? <Banner kind="danger" message={error} /> : null}
       {items.length === 0 ? <Text tone="secondary">{t('events:requests.empty')}</Text> : null}
       {GROUPS.map(({ status, title }) => {
@@ -79,9 +92,9 @@ export function RequestsPanel({ event }: { event: EventDetails }) {
                   full={full}
                   waitlistEnabled={event.waitlistEnabled}
                   busy={decide.isPending}
-                  confirming={confirmRemove === request.id}
-                  onAsk={() => setConfirmRemove(request.id)}
-                  onKeep={() => setConfirmRemove(null)}
+                  confirming={confirm?.id === request.id ? confirm.decision : null}
+                  onAsk={(decision) => setConfirm({ id: request.id, decision })}
+                  onKeep={() => setConfirm(null)}
                   onDecide={(decision) => act(request, decision)}
                 />
               </View>
@@ -89,6 +102,29 @@ export function RequestsPanel({ event }: { event: EventDetails }) {
           </View>
         );
       })}
+    </View>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  const { colors, radius, spacing } = useTheme();
+  return (
+    <View
+      accessible
+      style={{
+        flexGrow: 1,
+        flexBasis: '40%',
+        padding: spacing[3],
+        borderRadius: radius.lg,
+        borderWidth: 1,
+        borderColor: colors.borderSubtle,
+        backgroundColor: colors.surfaceRaised,
+      }}
+    >
+      <Text variant="title">{value}</Text>
+      <Text variant="caption" tone="secondary">
+        {label}
+      </Text>
     </View>
   );
 }
@@ -107,14 +143,20 @@ function RequestRow({
   full: boolean;
   waitlistEnabled: boolean;
   busy: boolean;
-  confirming: boolean;
-  onAsk: () => void;
+  confirming: 'remove' | 'reject' | null;
+  onAsk: (decision: 'remove' | 'reject') => void;
   onKeep: () => void;
   onDecide: (decision: OrganizerDecision) => void;
 }) {
   const { t } = useTranslation(['events', 'common']);
   const { colors, radius, spacing } = useTheme();
   const name = request.displayName ?? t('events:requests.unnamed');
+  const locale = currentLocale();
+  const decimal = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  const percent = new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 0 });
   return (
     <View
       style={{
@@ -130,6 +172,12 @@ function RequestRow({
       <Text variant="caption" tone="secondary">
         {[
           request.level !== null ? t('events:requests.level', { level: request.level }) : null,
+          request.rating !== null
+            ? t('events:requests.rating', { rating: decimal.format(request.rating) })
+            : null,
+          request.reliability !== null
+            ? t('events:requests.reliability', { value: percent.format(request.reliability) })
+            : t('events:requests.newPlayer'),
           request.requestCount > 1
             ? t('events:requests.attempt', { count: request.requestCount })
             : null,
@@ -138,7 +186,29 @@ function RequestRow({
           .join(' · ')}
       </Text>
       {request.message ? <Text>{request.message}</Text> : null}
-      {request.status !== 'APPROVED' ? (
+      {confirming ? (
+        <View style={{ gap: spacing[2] }}>
+          <Text role="alert">
+            {t(
+              confirming === 'reject'
+                ? 'events:requests.confirmReject'
+                : 'events:requests.confirmRemove',
+              { name },
+            )}
+          </Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+            <Button
+              variant="destructive"
+              label={t(
+                confirming === 'reject' ? 'events:requests.rejectYes' : 'events:requests.removeYes',
+              )}
+              disabled={busy}
+              onPress={() => onDecide(confirming)}
+            />
+            <Button variant="secondary" label={t('events:detail.keep')} onPress={onKeep} />
+          </View>
+        </View>
+      ) : request.status !== 'APPROVED' ? (
         <View style={{ gap: spacing[2] }}>
           {full ? (
             <Text variant="caption" tone="secondary">
@@ -163,26 +233,17 @@ function RequestRow({
               variant="secondary"
               label={t('events:requests.reject')}
               disabled={busy}
-              onPress={() => onDecide('reject')}
+              onPress={() => onAsk('reject')}
             />
-          </View>
-        </View>
-      ) : confirming ? (
-        <View style={{ gap: spacing[2] }}>
-          <Text role="alert">{t('events:requests.confirmRemove', { name })}</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
-            <Button
-              variant="destructive"
-              label={t('events:requests.removeYes')}
-              disabled={busy}
-              onPress={() => onDecide('remove')}
-            />
-            <Button variant="secondary" label={t('events:detail.keep')} onPress={onKeep} />
           </View>
         </View>
       ) : (
         <View style={{ alignItems: 'flex-start' }}>
-          <Button variant="tertiary" label={t('events:requests.remove')} onPress={onAsk} />
+          <Button
+            variant="tertiary"
+            label={t('events:requests.remove')}
+            onPress={() => onAsk('remove')}
+          />
         </View>
       )}
     </View>
