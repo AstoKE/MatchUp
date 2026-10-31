@@ -360,5 +360,20 @@
     "disputeSend": "İtirazı gönder",
     "disputedToast": "İtirazın alındı",
     "row": "{{name}}: {{status}}"
+  },
+  "reviews": {
+    "title": "Değerlendirme",
+    "loadFailed": "Değerlendirme yüklenemedi",
+    "blind": "Birlikte oynadıklarını değerlendir. Puanını kimse göremez; oyuncular yalnızca süre dolunca toplam sonucu görür.",
+    "until": "Son tarih: {{date}}",
+    "anchor": "{{score}}: {{text}}",
+    "done": "{{name}}: değerlendirildi",
+    "fairPlay": "{{name}} centilmendi",
+    "final": "Gönderdiğin değerlendirmeyi değiştiremezsin. Kalanları sonra da değerlendirebilirsin.",
+    "send_one": "Değerlendirmeleri gönder ({{count}})",
+    "send_other": "Değerlendirmeleri gönder ({{count}})",
+    "sentToast": "Değerlendirmelerin alındı",
+    "allDone": "Herkesi değerlendirdin. Teşekkürler!",
+    "closed": "Değerlendirme süresi doldu."
   }
 }

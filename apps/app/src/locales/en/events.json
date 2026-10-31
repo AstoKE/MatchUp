@@ -360,5 +360,20 @@
     "disputeSend": "Send dispute",
     "disputedToast": "Your dispute was received",
     "row": "{{name}}: {{status}}"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "loadFailed": "Could not load reviews",
+    "blind": "Review the people you played with. Nobody can see your score; players only see the overall result when the time is up.",
+    "until": "Until: {{date}}",
+    "anchor": "{{score}}: {{text}}",
+    "done": "{{name}}: reviewed",
+    "fairPlay": "{{name}} played fair",
+    "final": "You cannot change a review after sending it. You can review the others later.",
+    "send_one": "Send reviews ({{count}})",
+    "send_other": "Send reviews ({{count}})",
+    "sentToast": "Your reviews were received",
+    "allDone": "You reviewed everyone. Thank you!",
+    "closed": "The review period has ended."
   }
 }

@@ -5,6 +5,7 @@ import {
   createPublishedEvent,
   deleteEventsOf,
   deleteUser,
+  finalizeAllPresent,
   getLocalStack,
   joinApproved,
   PASSWORD,
@@ -548,5 +549,49 @@ test.describe('attendance (Phase 5 / M5a)', () => {
     await expect(stranger.page.getByText('Aradığın içerik bulunamadı.')).toBeVisible();
     await expect(stranger.page.getByText('Katılımın')).toHaveCount(0);
     await stranger.context.close();
+  });
+});
+
+test.describe('reviews (Phase 5 / M5b)', () => {
+  test('a player reviews someone, sees it done, and the reviewee sees no sign of it', async ({
+    page,
+    browser,
+  }) => {
+    const s = requireStack();
+    const organizerEmail = uniqueEmail('rev-org');
+    const reviewerEmail = uniqueEmail('rev-a');
+    const revieweeEmail = uniqueEmail('rev-b');
+    createdIds.push(
+      (await createOnboardedUser(s, organizerEmail, { displayName: 'Düzenleyen' })).id,
+    );
+    createdIds.push((await createOnboardedUser(s, reviewerEmail, { displayName: 'Yorumcu' })).id);
+    createdIds.push(
+      (await createOnboardedUser(s, revieweeEmail, { displayName: 'Yorumlanan' })).id,
+    );
+    const eventId = await createPublishedEvent(s, organizerEmail, 'Değerlendirme maçı');
+    await joinApproved(s, eventId, reviewerEmail, organizerEmail);
+    await joinApproved(s, eventId, revieweeEmail, organizerEmail);
+    await finalizeAllPresent(s, eventId, organizerEmail);
+
+    await signIn(page, reviewerEmail);
+    await page.goto(`/e/${eventId}`);
+    await expect(page.getByRole('heading', { name: 'Değerlendirme', level: 2 })).toBeVisible();
+    const send = page.getByRole('button', { name: /Değerlendirmeleri gönder/ });
+    await expect(send).toBeDisabled();
+    const group = page.getByRole('radiogroup', { name: 'Yorumlanan' });
+    await group.getByRole('radio', { name: '4' }).click();
+    await page.getByRole('checkbox', { name: 'Yorumlanan centilmendi' }).click();
+    await expectNoBlocking(page);
+    await send.click();
+    await expect(page.getByText('Yorumlanan: değerlendirildi')).toBeVisible();
+    await expect(page.getByRole('radiogroup', { name: 'Düzenleyen' })).toBeVisible();
+
+    const other = await browser.newContext();
+    const otherPage = await other.newPage();
+    await signIn(otherPage, revieweeEmail);
+    await otherPage.goto(`/e/${eventId}`);
+    await expect(otherPage.getByRole('radiogroup', { name: 'Yorumcu' })).toBeVisible();
+    await expect(otherPage.getByText(/değerlendirildi/)).toHaveCount(0);
+    await other.close();
   });
 });

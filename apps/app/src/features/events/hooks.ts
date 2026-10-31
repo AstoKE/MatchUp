@@ -14,6 +14,7 @@ import {
   fetchMyParticipation,
   requestJoin,
 } from './api/participation-api';
+import { fetchEventReviews, submitReviews } from './api/reviews-api';
 import { searchEvents, type SearchCursor } from './api/search-api';
 import {
   cancelEvent,
@@ -173,6 +174,25 @@ export const useFinalizeAttendance = (eventId: string) =>
   useAttendanceMutation(eventId, finalizeAttendance);
 export const useDisputeAttendance = (eventId: string) =>
   useAttendanceMutation(eventId, disputeAttendance);
+
+const reviewsKey = (eventId: string) => ['reviews', eventId] as const;
+
+/** Who the viewer may review; the server answers NOT_FOUND to people outside the event. */
+export function useEventReviews(eventId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: reviewsKey(eventId),
+    queryFn: () => fetchEventReviews(eventId),
+    enabled,
+  });
+}
+
+export function useSubmitReviews(eventId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (args: Parameters<typeof submitReviews>[0]) => submitReviews(args),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: reviewsKey(eventId) }),
+  });
+}
 
 /** Organizer only; the server answers NOT_FOUND to anybody else. */
 export function useEventRequests(eventId: string, enabled: boolean) {
