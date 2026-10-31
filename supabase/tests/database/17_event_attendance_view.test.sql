@@ -1,6 +1,6 @@
 -- Phase 5 / M5a: who may read what through get_event_attendance.
 begin;
-select plan(14);
+select plan(18);
 
 create function pg_temp.act_as(p_uid uuid)
 returns void language plpgsql as $$
@@ -76,6 +76,20 @@ select public.finalize_attendance(pg_temp.ev());
 select ok(public.get_event_attendance(pg_temp.ev()) ->> 'finalized_at' is not null, 'finalized');
 select is((public.get_event_attendance(pg_temp.ev()) ->> 'dispute_closes_at')::timestamptz,
           (public.get_event_attendance(pg_temp.ev()) ->> 'finalized_at')::timestamptz + interval '72 hours', 'disputes close 72 hours later');
+-- The notification: to approved players, also the absent one, not to the organizer or a pending request; ids only.
+reset role;
+create function pg_temp.notes(n int) returns int language sql as $$
+  select count(*)::int from public.notifications where user_id = pg_temp.u(n) and type = 'ATTENDANCE_FINALIZED';
+$$;
+select is(array[pg_temp.notes(2), pg_temp.notes(3)], array[1, 1], 'approved players are told, the absent one too');
+select is(array[pg_temp.notes(1), pg_temp.notes(4)], array[0, 0], 'not the organizer, not a pending request');
+select is((select payload from public.notifications where user_id = pg_temp.u(2) and type = 'ATTENDANCE_FINALIZED'),
+          jsonb_build_object('event_id', pg_temp.ev()), 'the payload is the event id only');
+select pg_temp.act_as(pg_temp.u(1));
+select public.finalize_attendance(pg_temp.ev());
+reset role;
+select is(pg_temp.notes(2), 1, 'finalizing again does not tell them again');
+
 select pg_temp.act_as(pg_temp.u(3));
 select public.dispute_attendance(pg_temp.part(3), 'Oradaydım');
 select is(public.get_event_attendance(pg_temp.ev()) -> 'my' ->> 'attendance', 'DISPUTED', 'a dispute shows on the player''s own row');

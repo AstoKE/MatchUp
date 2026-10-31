@@ -12,6 +12,7 @@ const NOTIFICATION_TYPES = [
   'SPOT_OPENED',
   'EVENT_CANCELED',
   'EVENT_CHANGED',
+  'ATTENDANCE_FINALIZED',
 ] as const;
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 

@@ -19,7 +19,8 @@
     "PARTICIPANT_CANCELED": "A player left {{event}}.",
     "SPOT_OPENED": "A spot opened in {{event}}; players are waiting.",
     "EVENT_CANCELED": "{{event}} was canceled.",
-    "EVENT_CHANGED": "The time or place of {{event}} changed."
+    "EVENT_CHANGED": "The time or place of {{event}} changed.",
+    "ATTENDANCE_FINALIZED": "Attendance for {{event}} is final. Check your attendance and review the people you played with."
   },
   "unknown": "You have a new notification."
 }
