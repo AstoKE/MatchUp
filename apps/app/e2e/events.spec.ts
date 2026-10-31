@@ -249,7 +249,15 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     await detail.getByRole('button', { name: 'Katılım isteği gönder' }).click();
     await detail.getByLabel('Organizatöre mesaj (isteğe bağlı)').fill('Orta saha oynarım');
     await expectNoBlocking(player.page);
-    await detail.getByRole('button', { name: 'İsteği gönder' }).click();
+    await detail.getByRole('button', { name: 'İstek gönder' }).click();
+    // Pending, in words and without a green check; the summary says what the request was for.
+    await expect(
+      detail.getByRole('heading', { name: 'İsteğin gönderildi', level: 1 }),
+    ).toBeVisible();
+    await expect(detail.getByText('Organizatör onayladığında sana bildireceğiz.')).toBeVisible();
+    await expect(detail.getByText(title)).toBeVisible();
+    await expectNoBlocking(player.page);
+    await detail.getByRole('button', { name: 'Etkinliği görüntüle' }).click();
     await expect(detail.getByText('Onay bekleniyor', { exact: true })).toBeVisible();
     await expect(detail.getByRole('button', { name: 'İsteği geri çek' })).toBeVisible();
 
@@ -300,7 +308,8 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     await player.page.goto(`/e/${autoId}`);
     const auto = player.page.getByRole('main');
     await auto.getByRole('button', { name: 'Katılım isteği gönder' }).click();
-    await auto.getByRole('button', { name: 'İsteği gönder' }).click();
+    await auto.getByRole('button', { name: 'İstek gönder' }).click();
+    await auto.getByRole('button', { name: 'Etkinliği görüntüle' }).click();
     await expect(auto.getByText('Katılım onaylandı', { exact: true })).toBeVisible();
 
     await player.context.close();
@@ -413,7 +422,8 @@ test.describe('Sport icons and the pinned join action (UI tour)', () => {
     // The request form opens inside the pinned area and still works.
     await join.click();
     await detail.getByLabel('Organizatöre mesaj (isteğe bağlı)').fill('Pinned form');
-    await detail.getByRole('button', { name: 'İsteği gönder' }).click();
+    await detail.getByRole('button', { name: 'İstek gönder' }).click();
+    await detail.getByRole('button', { name: 'Etkinliği görüntüle' }).click();
     await expect(detail.getByText('Onay bekleniyor', { exact: true })).toBeVisible();
   });
 });
@@ -474,7 +484,8 @@ test.describe('invite-only events and the page for other viewers (Phase 3 comple
     await playerPage.goto(path);
     const playerMain = playerPage.getByRole('main');
     await playerMain.getByRole('button', { name: 'Katılım isteği gönder' }).click();
-    await playerMain.getByRole('button', { name: 'İsteği gönder' }).click();
+    await playerMain.getByRole('button', { name: 'İstek gönder' }).click();
+    await playerMain.getByRole('button', { name: 'Etkinliği görüntüle' }).click();
     await expect(playerMain.getByText('Onay bekleniyor', { exact: true })).toBeVisible();
     await expect(playerMain.getByText(/^Katılanlar/)).toHaveCount(0);
 
@@ -689,7 +700,8 @@ test.describe('the whole lifecycle (F-35)', () => {
     // Two requests, two approvals: the event is full.
     for (const player of [ada, bora]) {
       await player.main.getByRole('button', { name: 'Katılım isteği gönder' }).click();
-      await player.main.getByRole('button', { name: 'İsteği gönder' }).click();
+      await player.main.getByRole('button', { name: 'İstek gönder' }).click();
+      await player.main.getByRole('button', { name: 'Etkinliği görüntüle' }).click();
       await expect(player.main.getByText('Onay bekleniyor', { exact: true })).toBeVisible();
     }
     await host.page.reload();
@@ -704,6 +716,10 @@ test.describe('the whole lifecycle (F-35)', () => {
     await cem.main.getByRole('button', { name: 'Yedek listeye başvur' }).click();
     await cem.main.getByLabel('Organizatöre mesaj (isteğe bağlı)').fill('Yer açılırsa gelirim');
     await cem.main.getByRole('button', { name: 'Yedek listeye başvur' }).click();
+    await expect(
+      cem.main.getByRole('heading', { name: 'Yedek listeye başvurdun', level: 1 }),
+    ).toBeVisible();
+    await cem.main.getByRole('button', { name: 'Etkinliği görüntüle' }).click();
     await expect(cem.main.getByText('Yedek listedesin', { exact: true })).toBeVisible();
 
     // A player leaves; the organizer promotes the waitlisted one by an explicit tap.

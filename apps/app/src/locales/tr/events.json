@@ -198,7 +198,7 @@
     "signInToJoin": "Giriş yap ve katılım iste",
     "request": "Katılım isteği gönder",
     "joinWaitlist": "Yedek listeye başvur",
-    "send": "İsteği gönder",
+    "send": "İstek gönder",
     "withdraw": "İsteği geri çek",
     "leave": "Etkinlikten ayrıl",
     "withdrawn": "İsteğin geri çekildi.",
@@ -222,11 +222,10 @@
     "position": "Tercih ettiğin pozisyon (isteğe bağlı)",
     "positionPlaceholder": "Seçmek istemiyorum",
     "positionNone": "Seçmek istemiyorum",
-    "result": {
-      "REQUESTED": "İstek gönderildi. Organizatör onaylayınca haber vereceğiz.",
-      "APPROVED": "Katılımın onaylandı.",
-      "WAITLISTED": "Etkinlik dolu. Yedek listeye eklendin."
-    }
+    "confirmTitle": "Katılım isteğini onayla",
+    "approvalNote": "Organizatör onaylayana kadar yerin kesinleşmez.",
+    "waitlistNote": "Etkinlik dolu. Yer açılırsa organizatör karar verir.",
+    "costNote": "Tahmini {{amount}} ₺. {{appName}} üzerinden ödeme alınmaz."
   },
   "requests": {
     "title": "İstekler",
@@ -377,5 +376,22 @@
     "sentToast": "Değerlendirmelerin alındı",
     "allDone": "Herkesi değerlendirdin. Teşekkürler!",
     "closed": "Değerlendirme süresi doldu."
+  },
+  "submitted": {
+    "sport": "Spor",
+    "event": "Etkinlik",
+    "status": "Durum",
+    "goMine": "Etkinliklerime git",
+    "viewEvent": "Etkinliği görüntüle",
+    "title": {
+      "REQUESTED": "İsteğin gönderildi",
+      "WAITLISTED": "Yedek listeye başvurdun",
+      "APPROVED": "Katılımın onaylandı"
+    },
+    "body": {
+      "REQUESTED": "Organizatör onayladığında sana bildireceğiz.",
+      "WAITLISTED": "Yer açılırsa organizatör karar verir; sana bildireceğiz.",
+      "APPROVED": "Tam yer bilgisi etkinlik sayfasında. Gelemeyeceksen erkenden haber ver."
+    }
   }
 }

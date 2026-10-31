@@ -3,4 +3,6 @@ export { CreateEventScreen } from './screens/CreateEventScreen';
 export { DiscoverScreen } from './screens/DiscoverScreen';
 export { EditEventScreen } from './screens/EditEventScreen';
 export { EventDetailScreen } from './screens/EventDetailScreen';
+export { JoinRequestScreen } from './screens/JoinRequestScreen';
 export { MyEventsScreen } from './screens/MyEventsScreen';
+export { RequestStatusScreen } from './screens/RequestStatusScreen';

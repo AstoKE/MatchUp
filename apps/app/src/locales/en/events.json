@@ -222,11 +222,10 @@
     "position": "Preferred position (optional)",
     "positionPlaceholder": "No preference",
     "positionNone": "No preference",
-    "result": {
-      "REQUESTED": "Request sent. We'll tell you when the organizer approves.",
-      "APPROVED": "Your spot is confirmed.",
-      "WAITLISTED": "The event is full. You were added to the waitlist."
-    }
+    "confirmTitle": "Confirm your request",
+    "approvalNote": "Your spot is not confirmed until the organizer approves.",
+    "waitlistNote": "The event is full. If a spot opens, the organizer decides.",
+    "costNote": "About {{amount}} ₺. {{appName}} takes no payment."
   },
   "requests": {
     "title": "Requests",
@@ -377,5 +376,22 @@
     "sentToast": "Your reviews were received",
     "allDone": "You reviewed everyone. Thank you!",
     "closed": "The review period has ended."
+  },
+  "submitted": {
+    "sport": "Sport",
+    "event": "Event",
+    "status": "Status",
+    "goMine": "Go to My Events",
+    "viewEvent": "View event",
+    "title": {
+      "REQUESTED": "Your request was sent",
+      "WAITLISTED": "You applied for the waitlist",
+      "APPROVED": "Your spot is confirmed"
+    },
+    "body": {
+      "REQUESTED": "We'll tell you when the organizer approves.",
+      "WAITLISTED": "If a spot opens, the organizer decides; we'll tell you.",
+      "APPROVED": "The exact place is on the event page. If you can't make it, let the organizer know early."
+    }
   }
 }

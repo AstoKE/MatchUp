@@ -87,7 +87,16 @@ export default function TabsLayout() {
       {/* Event routes (/e/<id>, edit, cancel) and the inbox live in this group so the navigation stays visible, but
           they are not destinations of their own: no bar/rail button, and `display: none` so they take no width (they squeezed the four real tabs into the left half and truncated the labels). `href: null` is not an option,
           it marks the tab hidden and navigating to a hidden tab redirects away (expo-router 58). */}
-      {(['e/[id]/index', 'e/[id]/edit', 'e/[id]/cancel', 'notifications'] as const).map((name) => (
+      {(
+        [
+          'e/[id]/index',
+          'e/[id]/edit',
+          'e/[id]/cancel',
+          'e/[id]/join',
+          'e/[id]/requested',
+          'notifications',
+        ] as const
+      ).map((name) => (
         <Tabs.Screen
           key={name}
           name={name}

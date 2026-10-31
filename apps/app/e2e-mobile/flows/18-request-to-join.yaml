@@ -2,7 +2,7 @@ appId: com.example.matchup.dev
 # 18 Request to join with the on-screen keyboard open (Phase 3) — continues on the event page of flow 17;
 # requires -e MSG. The pinned request form must stay usable while the keyboard is up.
 ---
-- tapOn: 'Request to join'
+- tapOn: 'Send join request'
 - assertVisible: 'The organizer will see your display name and level.'
 - tapOn: 'Message to the organizer (optional)'
 - inputText: ${MSG}
@@ -12,5 +12,5 @@ appId: com.example.matchup.dev
 # Emulator/Maestro quirk (see flow 15): release focus before tapping a button after injected text
 - tapOn: 'The organizer will see your display name and level.'
 - tapOn: 'Send request'
-- assertVisible: 'Request sent'
+- assertVisible: 'Your request was sent'
 - takeScreenshot: 18-request-sent

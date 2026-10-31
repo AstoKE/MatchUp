@@ -11,7 +11,7 @@ appId: com.example.matchup.dev
 - assertVisible: 'Your request for .* was approved.'
 - takeScreenshot: 19-inbox
 - tapOn: 'Your request for .* was approved.'
-- assertVisible: "You're in"
+- assertVisible: 'Your spot is confirmed'
 # The roster sits below the facts: scroll to it (the pinned status stays on screen)
 - scrollUntilVisible:
     element: 'Going \(1\)'

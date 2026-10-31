@@ -8,13 +8,37 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
  * glyph reads on any surface without a second color. Inline SVG instead of an icon font keeps the
  * bundle to what we use (docs/PERFORMANCE.md).
  */
-export type IconName = 'compass' | 'calendar' | 'add-circle' | 'person' | 'chevron-left';
+export type IconName =
+  'compass' | 'calendar' | 'add-circle' | 'person' | 'chevron-left' | 'check' | 'clock';
 
 const STROKE = 1.75;
 
 type Glyph = (color: string) => ReactElement;
 
 const outline: Record<IconName, Glyph> = {
+  check: (c) => (
+    <Path
+      d="M5 12.5l4.5 4.5L19 7.5"
+      stroke={c}
+      strokeWidth={STROKE}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  ),
+  clock: (c) => (
+    <>
+      <Circle cx={12} cy={12} r={9} stroke={c} strokeWidth={STROKE} fill="none" />
+      <Path
+        d="M12 7v5l3.5 2"
+        stroke={c}
+        strokeWidth={STROKE}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </>
+  ),
   'chevron-left': (c) => (
     <Path
       d="M15 5l-7 7 7 7"
@@ -73,6 +97,29 @@ const outline: Record<IconName, Glyph> = {
 };
 
 const filled: Record<IconName, Glyph> = {
+  check: (c) => (
+    <Path
+      d="M5 12.5l4.5 4.5L19 7.5"
+      stroke={c}
+      strokeWidth={STROKE}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  ),
+  clock: (c) => (
+    <>
+      <Circle cx={12} cy={12} r={9} stroke={c} strokeWidth={STROKE} fill="none" />
+      <Path
+        d="M12 7v5l3.5 2"
+        stroke={c}
+        strokeWidth={STROKE}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </>
+  ),
   'chevron-left': (c) => (
     <Path
       d="M15 5l-7 7 7 7"

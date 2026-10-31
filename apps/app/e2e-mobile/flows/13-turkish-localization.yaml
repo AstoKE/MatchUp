@@ -8,7 +8,7 @@ appId: com.example.matchup.dev
 - assertVisible: 'Oluştur'
 - assertVisible: 'Profil'
 - assertVisible: 'Filtreler'
-- assertVisible: 'Sporunu seç, takımını bul, oyuna katıl.'
+- assertVisible: 'Ankara'
 - tapOn: 'Etkinliklerim'
 - assertVisible: 'Tekrar hoş geldin'
 - takeScreenshot: 13-turkish-sign-in

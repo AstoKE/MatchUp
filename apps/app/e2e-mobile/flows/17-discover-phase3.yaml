@@ -7,14 +7,14 @@ appId: com.example.matchup.dev
 - assertVisible: 'Showing the sports on your profile.*'
 - assertVisible: ${TITLE}
 - takeScreenshot: 17-discover-list
-- tapOn: 'Filters.*'
 - assertVisible: 'Football'
+- tapOn: 'Filters.*'
 - assertVisible: 'Indoor or outdoor'
 - takeScreenshot: 17-discover-filters-open
-- tapOn: 'Filters.*'
+- tapOn: 'Show results'
 - tapOn: ${TITLE}
 # The pinned action is on the first screen, and still there after scrolling the page
-- assertVisible: 'Request to join'
+- assertVisible: 'Send join request'
 - scroll
-- assertVisible: 'Request to join'
+- assertVisible: 'Send join request'
 - takeScreenshot: 17-event-page
