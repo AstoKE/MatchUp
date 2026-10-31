@@ -7,6 +7,7 @@ import { localizedName, type Catalog } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
 import { Button, Screen, Text, useTheme } from '@/ui';
 import type { MyProfile } from '../api/profile-api';
+import { ProgressSection } from '../components/ProgressSection';
 import { WithProfile } from '../components/WithProfile';
 
 /** The signed-in user's own profile (Phase 2). Others' view of it follows the visibility setting. */
@@ -44,6 +45,8 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
       </View>
 
       <Text>{profile.bio ?? t('profile:noBio')}</Text>
+
+      <ProgressSection profile={profile} catalog={catalog} />
 
       <View style={{ gap: spacing[3] }}>
         <Text variant="title" heading={2}>

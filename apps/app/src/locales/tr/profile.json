@@ -60,5 +60,26 @@
     "ADULT_REQUIRED": "{{appName}} kullanmak için 18 yaşından büyük olmalısın.",
     "TERMS_REQUIRED": "Devam etmek için Kullanım Koşulları ve Gizlilik Bildirimi'ni kabul etmelisin.",
     "DISTRICT_NEEDS_CITY": "Önce bir şehir seç."
+  },
+  "progress": {
+    "title": "İlerlemen",
+    "loadFailed": "İlerlemen yüklenemedi",
+    "level": "Seviye {{level}}",
+    "xp": "{{xp}} XP · sonraki seviyeye {{next}} XP",
+    "reliability": "Güvenilirlik",
+    "newPlayer": "Yeni oyuncu",
+    "confidence": {
+      "LOW": "Henüz az veri var",
+      "MEDIUM": "Orta güven",
+      "HIGH": "Yüksek güven"
+    },
+    "skillTitle": "Beceri puanı",
+    "skillNote": "Bu seviye, oyuncu geri bildirimlerine dayanır; bir ölçüm değildir.",
+    "noRatings": "Henüz puanın yok. Birlikte oynadığın oyuncular değerlendirince burada görünür.",
+    "rating": "{{sport}}: {{rating}}",
+    "provisional": "Geçici: henüz az değerlendirme var.",
+    "provisionalWithOwn": "Geçici: henüz az değerlendirme var. Kendi tahminin: {{own}}",
+    "badgesTitle": "Rozetler",
+    "noBadges": "Henüz rozetin yok. Maçlara katıldıkça kazanırsın."
   }
 }
