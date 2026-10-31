@@ -101,9 +101,10 @@ select is(
   -- other players' ratings are built on it); attendance_disputes has no user column: its reason is nulled on purge.
   -- reliability_events, xp_transactions, user_progress (Phase 5): exported; kept as anonymous history linked to the
   -- tombstone (no free text, no identifier left once the profile is anonymized; counsel to confirm, SECURITY §8).
+  -- user_sport_ratings (Phase 5): exported; deleted on purge (derived, recomputable, no use without the account).
   array['event_participations', 'events', 'notifications', 'platform_admins', 'reliability_events', 'skill_reviews',
         'user_consents', 'user_progress', 'user_settings', 'user_sport_positions', 'user_sport_profiles',
-        'xp_transactions'],
+        'user_sport_ratings', 'xp_transactions'],
   'per-user tables are exactly the ones export_my_data and purge_account handle'
 );
 

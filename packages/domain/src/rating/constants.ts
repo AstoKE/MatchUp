@@ -23,12 +23,29 @@ export const RATING_CONSTANTS = {
     confidenceLowBelow: 0.4,
     confidenceHighAbove: 0.7,
   },
+  skill: {
+    /** k: the self-assessment counts as two fully weighted events. */
+    priorWeight: 2,
+    /** The prior for a user with no self-assessment in the sport. */
+    defaultPrior: 3,
+    halfLifeDays: 180,
+    /** An event counts only with this many distinct reviewers: one person alone cannot move a rating. */
+    minReviewersPerEvent: 2,
+    /** From this many reviewers on, the single lowest and highest scores are dropped. */
+    trimFromReviewers: 5,
+    /** An event reaches full weight at this many reviewers. */
+    fullWeightReviewers: 3,
+    /** A reviewer's first events about the same person inside the pair window keep full weight. */
+    pairFreeEvents: 2,
+    pairWindowDays: 90,
+  },
   xp: {
     attendedEvent: 50,
     organizedEvent: 40,
     firstInSport: 30,
     reviewsSubmitted: 10,
     fairPlayReceived: 10,
+    fairPlayMinReviewers: 2,
     /** Verified-present NON-organizer participants an event needs before it gives any XP (the organizer's own
      * row is self-attested and never counts toward a threshold). */
     minPresentOthers: 2,

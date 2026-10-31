@@ -180,3 +180,16 @@ Where the text above left room, the code does this (the TypeScript reference and
 5. **A dispute removes the signal until it is resolved** (the old row is voided with reason `DISPUTED`), then the resolution creates the correct one; the first resolution to `PRESENT` also pays the attendance XP the player never received.
 6. **Account purge keeps the ledger and the signals, linked to the anonymous tombstone** (no free text, no identifier left); the user's own are in the export. Counsel to confirm (SECURITY §8).
 7. **Per-user advisory lock** around every XP decision, taken in user-id order, so two events finalized at once for the same player cannot both pass a cap.
+
+## 11. Decisions made while building M3b (2026-10-31)
+
+1. **Only reviews of closed windows and `ACTIVE` status enter the formula**, both the scores and the pair count `c`. An open window stays double-blind and cannot influence anything. Closed events are recorded in `private.closed_review_windows`, because finalized events are frozen (I-7).
+2. **The 90 days of `c(r,u)` end at the event's start** (`e' ∈ (starts_at(e) − 90 d, starts_at(e)]`), so an event's reviewer weights do not change with time, and they **count across sports** as the formula has no sport in `c`. Only reviews in the sport being rated enter `o_e`.
+3. **Trimming with equal scores** drops the lowest reviewer id among the lowest scores and the highest among the highest, so the result is deterministic. `n_e` in `w_e` is the count before trimming.
+4. **The age of an event is measured from its start**, like reliability signals. The stored snapshot decays from its next recompute; the exact value is always derivable from the reviews. A changed self-assessment also takes effect at the next recompute.
+5. **No row means no counted event** and the self-assessment stands. A lone reviewer therefore leaves no trace that the user could read. A recompute that finds nothing to count removes the row.
+6. **Stored with two decimals** (`numeric(3,2)`), as §3.4 says.
+7. **`REVIEWS_SUBMITTED` and `FAIR_PLAY_RECEIVED` are not capped** (§5.2 caps attendance and organizer XP) and count `ACTIVE` reviews only.
+8. **Account purge deletes the snapshot**; it is derived and useless without the account. Reviews of a deleted account keep counting for the others (anonymous, §10.6). The tombstone earns nothing and gets no rating.
+9. **Other people cannot read a rating yet**: `user_sport_ratings` is select-own, like `user_progress`. Showing it on a profile (visibility flags, DATABASE RLS table) comes with the screens milestone, through an RPC.
+10. **Not built yet:** the mutual-5 and review-bombing flags and hiding a review from a screen (§3.5, moderation queue, Phase 6). Recompute already skips `HIDDEN` reviews.

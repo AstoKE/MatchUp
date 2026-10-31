@@ -151,7 +151,7 @@ Seeded via `supabase/seed/` (idempotent upserts keyed by slug). Catalog edits in
 | Table | Purpose | Notes |
 |---|---|---|
 | `skill_reviews` | Peer skill review | **id**, `event_id`, `reviewer_id`, `reviewee_id`, `sport_id`, `skill_score` smallint CK 1–5, `fair_play` bool, `status` `ACTIVE/HIDDEN`, `created_at`; **UQ(event_id, reviewer_id, reviewee_id)**; CK reviewer ≠ reviewee. Readable **only** by the reviewer (double-blind, anonymous aggregate) |
-| `user_sport_ratings` | Derived snapshot per user per sport | **(user_id, sport_id)**, `rating` numeric(2,1), `confidence` numeric, `sample_events` int, `algorithm_version` int, `computed_at` — recomputed, never edited |
+| `user_sport_ratings` | Derived snapshot per user per sport | **(user_id, sport_id)**, `rating` numeric(3,2), `confidence` numeric(6,5), `sample_events` int > 0, `algorithm_version` smallint, `computed_at` — recomputed, never edited; no row = no counted event (the self-assessment stands). Readable by its owner only so far (others: with the screens milestone) |
 | `reliability_events` | Append-only reliability signals | `user_id`, `participation_id`, `kind` `ATTENDED/LATE_CANCEL/NO_SHOW`, `weight`, `occurred_at`, `voided_at`, `void_reason`; UQ(participation_id); only `voided_at/void_reason` may change |
 | `user_progress` | Derived cache | **user_id**, `reliability_score`, `reliability_samples`, `reliability_confidence`, `xp_total`, `algorithm_version`, `computed_at` — level is derived in code from `xp_total` (formula centralized in `packages/domain`) |
 | `xp_transactions` | **Immutable XP ledger** | `id`, `user_id`, `amount` int ≠ 0, `reason_code`, `source_type`, `source_id`, `rule_version`, **`dedupe_key` UQ NOT NULL**, `created_at`. No UPDATE/DELETE (trigger). Corrections are compensating negative rows |
@@ -371,7 +371,7 @@ All RPCs: `SECURITY DEFINER`, `SET search_path = ''`, `REVOKE ALL FROM PUBLIC, a
 | `request_account_deletion()`, `cancel_account_deletion()` | 6 | self | actual purge by Edge Function after grace |
 | `track_event(name, props)` | 7 | self | allowlist, rate limited |
 
-**System jobs (pg_cron → SQL functions, no Edge hop):** `complete_due_events` (every 10 min, **built M1**), `auto_finalize_attendance` (every 15 min, **built M1**; completed + 48 h), `close_review_windows` (recompute ratings, every 15 min), `purge_rate_limit_counters` (daily), `process_deletion_queue` (daily; invokes Edge Function for auth deletion), `prune_analytics` (weekly).
+**System jobs (pg_cron → SQL functions, no Edge hop):** `complete_due_events` (every 10 min, **built M1**), `auto_finalize_attendance` (every 15 min, **built M1**; completed + 48 h), `close_review_windows` (every 15 min, **built M3b**: skill ratings, review and fair-play XP; `private.closed_review_windows` marks what is done), `purge_rate_limit_counters` (daily), `process_deletion_queue` (daily; invokes Edge Function for auth deletion), `prune_analytics` (weekly).
 
 ## 10. Row Level Security matrix (summary)
 
