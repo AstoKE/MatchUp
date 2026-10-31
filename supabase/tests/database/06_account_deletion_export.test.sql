@@ -99,8 +99,11 @@ select is(
   -- notifications: deleted; all three exported (private.export_event_data / purge_event_data).
   -- skill_reviews (Phase 5): exported as reviews_written; kept as history linked to the tombstone (no free text,
   -- other players' ratings are built on it); attendance_disputes has no user column: its reason is nulled on purge.
-  array['event_participations', 'events', 'notifications', 'platform_admins', 'skill_reviews', 'user_consents',
-        'user_settings', 'user_sport_positions', 'user_sport_profiles'],
+  -- reliability_events, xp_transactions, user_progress (Phase 5): exported; kept as anonymous history linked to the
+  -- tombstone (no free text, no identifier left once the profile is anonymized; counsel to confirm, SECURITY §8).
+  array['event_participations', 'events', 'notifications', 'platform_admins', 'reliability_events', 'skill_reviews',
+        'user_consents', 'user_progress', 'user_settings', 'user_sport_positions', 'user_sport_profiles',
+        'xp_transactions'],
   'per-user tables are exactly the ones export_my_data and purge_account handle'
 );
 

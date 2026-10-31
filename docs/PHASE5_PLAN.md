@@ -34,6 +34,8 @@ Not there yet: `events.attendance_finalized_at` and `review_window_closes_at`, `
 
 ### M3: rating engine (F-25)
 
+**Split into M3a and M3b.** **M3a, status 2026-10-31: built** in `20261031120000_rating_reliability_xp.sql`: `private.rating_config` (generated from `packages/domain/src/rating/constants.ts`), `reliability_events`, `xp_transactions` (immutable), `user_progress`, the pure math functions, the finalization consequences (`private.apply_finalization`: signals, XP with caps, caches), dispute hooks (void on dispute, correct signal on resolution), export. TypeScript reference in `packages/domain/src/rating`. Tests: pgTAP `14_rating_reliability_xp` (90), domain unit tests (24), `rating-equivalence` (SQL = TypeScript on random input, constants drift), `rating-concurrency` (the daily cap under a real race; the advisory lock proven by a mutation check). Decisions: RATING_SYSTEM §10. **M3b, not started:** the skill rating formula, `close_review_windows` (every 15 minutes), `REVIEWS_SUBMITTED` and `FAIR_PLAY_RECEIVED` XP, `user_sport_ratings`.
+
 - `reliability_events` (append-only), `xp_transactions` (immutable ledger, dedupe key, trigger against UPDATE/DELETE), `user_sport_ratings`, `user_progress`, SQL functions for skill, reliability and XP, `close_review_windows` job (every 15 minutes), versioning (`algorithm_version`, `rule_version`).
 - **TypeScript reference** in `packages/domain` with golden vectors, plus an integration test comparing SQL and TypeScript on randomized fixtures (ADR-0004). Independence tests (RATING_SYSTEM §7): skill, reliability and XP never influence each other.
 - Extends account export and purge (ADR-0017 requires every new per-user table to do so).

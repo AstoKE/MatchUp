@@ -321,7 +321,7 @@ stateDiagram-v2
 | I-7 | Sport, format and `organizer_plays` immutable after publish; COMPLETED/CANCELED events immutable (one exception, Phase 5: `finalize_attendance` sets `attendance_finalized_at` and `review_window_closes_at` once on a COMPLETED event, nothing else may change); the organizer's own participation row cannot be canceled/removed through participant RPCs | trigger + RPC |
 | I-8 | Reviews only between PRESENT participants of the same finalized event, inside the window, one per ordered pair, not self | RPC + trigger + UQ |
 | I-9 | XP rows are immutable and deduplicated by `dedupe_key` | trigger + UQ |
-| I-10 | Reliability events: ≤ 1 per participation; derived only from finalized events | UQ + RPC |
+| I-10 | Reliability events: ≤ 1 **active** per participation (a dispute voids the old row and creates the correct one: partial UQ on `voided_at IS NULL`); derived only from finalized events | partial UQ + RPC |
 | I-11 | `event_type = COMMUNITY` in MVP | CK |
 | I-12 | Blocked pairs cannot request, review, or see each other's events | RPC + RLS |
 | I-13 | Client roles cannot write core tables; admin status only via `platform_admins` | no grants/policies; test |
