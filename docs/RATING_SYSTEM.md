@@ -205,3 +205,7 @@ Where the text above left room, the code does this (the TypeScript reference and
 7. **The catalog is for signed-in users**; guests see no badges, so ADR-0013's guest allow-list is unchanged. Others' badges (`show_badges`) come with the screens milestone, through an RPC.
 8. **Badge names and descriptions are draft copy**, stored in the catalog as DATABASE §3.5 specifies; the founder should review them.
 
+## 13. What an organizer sees about a request (2026-11-01)
+
+`list_event_requests` returns, besides the self-assessed level, the rating in the event's sport and the reliability score, as §9 allows, whatever the player's `show_reliability` says; the request form tells the player before they send. Reliability is `null` below `min_signals_to_show` (§4.2), decided on the server, so an organizer cannot see a score the player's own profile would not show. Confidence, XP and badges are not included.
+

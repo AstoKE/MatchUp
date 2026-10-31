@@ -157,7 +157,7 @@ select is(public.list_event_requests(pg_temp.ev('main')) -> 'items' -> 0 ->> 'di
 select is((public.list_event_requests(pg_temp.ev('main')) -> 'items' -> 0 ->> 'level')::numeric, 3.5, '... and the self-assessed level');
 select is((select array_agg(k order by k) from (select distinct jsonb_object_keys(i) k
     from jsonb_array_elements(public.list_event_requests(pg_temp.ev('main')) -> 'items') i) s),
-  array['display_name', 'id', 'level', 'message', 'position_id', 'request_count', 'requested_at', 'status'],
+  array['display_name', 'id', 'level', 'message', 'position_id', 'rating', 'reliability', 'request_count', 'requested_at', 'status'],
   'the queue exposes only these fields (no user id, no email)');
 select pg_temp.act_as(pg_temp.u(9));
 select throws_ok($$select public.list_event_requests(pg_temp.ev('main'))$$, 'P0001', 'NOT_FOUND', 'another organizer cannot read it either');
