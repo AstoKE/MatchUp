@@ -13,10 +13,5 @@ overrides:
   '@expo/cli>zod': ^4.6.7
   # GHSA for compression <1.8.2 (DoS via memory leak): `serve` (dev-only, serves the web export for E2E) pins 1.8.1.
   'serve>compression': ^1.8.2
-
-auditConfig:
-  ignoreGhsas:
-    # GHSA-86w9-cpqp-85rv (node-forge <=1.4.0): reached only via @expo/cli (local dev-server tooling),
-    # never bundled into the app or run in production; no patched release exists at 2026-10-24.
-    # Re-evaluate on every Expo SDK/CLI bump (tracked in docs/PHASE1_REPORT.md known limitations).
-    - GHSA-86w9-cpqp-85rv
+  # node-forge <=1.4.0 advisories (PKCS#12, TLS DoS, PEM ReDoS, X.509 basicConstraints): Expo CLI (dev tooling) pins 1.4.0; 1.4.2 is the patched release.
+  '@expo/cli>node-forge': ^1.4.2
