@@ -200,7 +200,7 @@ select is(pg_temp.xp_ev(1, 'ORGANIZED_EVENT', 'main'), 1, '... and ORGANIZED_EVE
 select is(pg_temp.xp(1, 'ORGANIZED_EVENT'), 40, '... 40 XP');
 
 -- The cache follows.
-select is((select xp_total from public.user_progress where user_id = pg_temp.u(2)), 80, 'user_progress.xp_total is the ledger sum');
+select is((select xp_total from public.user_progress where user_id = pg_temp.u(2)), 130, 'user_progress.xp_total is the ledger sum (50 + 30 + the FIRST_MATCH badge''s 50)');
 select is((select reliability_samples from public.user_progress where user_id = pg_temp.u(2)), 1, '... with the counted signals');
 select is((select reliability_score from public.user_progress where user_id = pg_temp.u(2)),
   (select round(score::numeric, 5) from private.reliability_score(array[1.0]::double precision[], array[2.0]::double precision[])),
@@ -276,7 +276,7 @@ select is(pg_temp.sig('main', 4, 'ATTENDED'), 1, 'resolved PRESENT: an ATTENDED 
 select is(pg_temp.sig('main', 4, 'NO_SHOW'), 0, '... and the NO_SHOW stays void');
 select is(pg_temp.xp_ev(4, 'ATTENDED_EVENT', 'main'), 1, '... with the attendance XP it never received');
 select is(pg_temp.xp(4, 'FIRST_IN_SPORT'), 30, '... and the first-in-sport bonus');
-select is((select xp_total from public.user_progress where user_id = pg_temp.u(4)), 80, '... in the cache');
+select is((select xp_total from public.user_progress where user_id = pg_temp.u(4)), 130, '... in the cache, with the badge that followed');
 select is((select count(*)::int from public.reliability_events where participation_id = pg_temp.part('main', 4)), 2,
   'the old row is kept, voided: history is never rewritten');
 select pg_temp.act_as(pg_temp.u(10), 'aal2');
@@ -320,9 +320,9 @@ select throws_ok($$select count(*) from public.reliability_events$$, '42501', nu
 
 -- ---- export ---------------------------------------------------------------------------------------------------------------------
 reset role;
-select is((select jsonb_array_length(private.export_event_data(pg_temp.u(2)) -> 'xp_transactions')), 3, 'the export lists the user''s ledger');
+select is((select jsonb_array_length(private.export_event_data(pg_temp.u(2)) -> 'xp_transactions')), 4, 'the export lists the user''s ledger');
 select is((select jsonb_array_length(private.export_event_data(pg_temp.u(4)) -> 'reliability_events')), 2, '... their signals, voided ones included');
-select is(private.export_event_data(pg_temp.u(2)) -> 'progress' ->> 'xp_total', '130', '... and their progress');
+select is(private.export_event_data(pg_temp.u(2)) -> 'progress' ->> 'xp_total', '180', '... and their progress');
 
 select * from finish();
 rollback;

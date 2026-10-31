@@ -193,3 +193,15 @@ Where the text above left room, the code does this (the TypeScript reference and
 8. **Account purge deletes the snapshot**; it is derived and useless without the account. Reviews of a deleted account keep counting for the others (anonymous, §10.6). The tombstone earns nothing and gets no rating.
 9. **Other people cannot read a rating yet**: `user_sport_ratings` is select-own, like `user_progress`. Showing it on a profile (visibility flags, DATABASE RLS table) comes with the screens milestone, through an RPC.
 10. **Not built yet:** the mutual-5 and review-bombing flags and hiding a review from a screen (§3.5, moderation queue, Phase 6). Recompute already skips `HIDDEN` reviews.
+
+## 12. Decisions made while building M4 (2026-10-31)
+
+1. **Evaluated where the facts change:** finalization (everyone involved), a dispute resolution (that player) and a review window closing (those who received fair play). `RELIABLE_PLAYER` is checked at the player's next finalization, so a no-show ageing past 60 days does not award it by itself.
+2. **Verified attendance is taken literally** (§2): any approved, present participant of a finalized event, with the organizer's own row counting only with two verified-present others. **Unlike XP (§10.1), an event with one player besides the organizer still counts for that player's badges.** A colluding organizer and friend could reach `FIRST_MATCH` and `TEN_GAMES` this way; the founder may tighten it (one line in `private.verified_attendances_by_sport`).
+3. **`FAIR_PLAY` reads closed windows only**, like the formula: open windows are double-blind. "5 distinct reviewers across 3 events" are two separate counts over all the user's commendations.
+4. **`COMMUNITY_ORGANIZER` counts finalized events by attendance only**; it has no account-age or daily limit, unlike `ORGANIZED_EVENT` XP.
+5. **Bonus XP is paid once and is not capped.** A revoked badge keeps its row, so it is never awarded again; taking back its XP (a compensating row) is a moderation decision (Phase 6).
+6. **Account purge deletes the awards** (derived, no use without the account); the ledger rows stay anonymous (§10.6).
+7. **The catalog is for signed-in users**; guests see no badges, so ADR-0013's guest allow-list is unchanged. Others' badges (`show_badges`) come with the screens milestone, through an RPC.
+8. **Badge names and descriptions are draft copy**, stored in the catalog as DATABASE §3.5 specifies; the founder should review them.
+

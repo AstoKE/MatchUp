@@ -1,12 +1,15 @@
 import { randomUUID } from 'node:crypto';
 import {
+  ACHIEVEMENTS,
   RATING_CONSTANTS,
+  achievementRuleMet,
   isLateCancel,
   istanbulDay,
   istanbulWeek,
   ratingConfigRows,
   reliabilityStats,
   skillStats,
+  type AchievementFacts,
   type SkillReview,
 } from '@matchup/domain';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -152,6 +155,62 @@ describe('skill math', () => {
     expect(five.confidence).toBeCloseTo(5 / 7, 10);
     const none = await sql(2.5, sport, []);
     expect(none).toEqual({ rating: 2.5, confidence: 0, sample_events: 0 });
+  });
+});
+
+describe('badges', () => {
+  it('achievement_definitions holds exactly the TypeScript definitions (no drift)', async () => {
+    const { rows } = await db().query<{
+      code: string;
+      scope: string;
+      xp_bonus: number;
+      names: unknown;
+      descriptions: unknown;
+      rule: unknown;
+    }>(
+      'select code, scope, xp_bonus, names, descriptions, rule from public.achievement_definitions order by code',
+    );
+    const expected = [...ACHIEVEMENTS]
+      .sort((a, b) => (a.code < b.code ? -1 : 1))
+      .map((a) => ({
+        code: a.code,
+        scope: a.scope,
+        xp_bonus: a.xpBonus,
+        names: a.names,
+        descriptions: a.descriptions,
+        rule: a.rule,
+      }));
+    expect(rows).toEqual(expected);
+  });
+
+  it('the SQL rule equals the TypeScript reference on 500 random fact sets', async () => {
+    const next = random(1616);
+    const n = (max: number) => Math.floor(next() * (max + 1));
+    let met = 0;
+    for (let trial = 0; trial < 500; trial += 1) {
+      const facts: AchievementFacts = {
+        attendances: n(14),
+        sport_attendances: n(14),
+        distinct_sports: n(5),
+        reliability_score: 0.85 + n(10) / 100,
+        reliability_confidence: 0.65 + n(10) / 100,
+        reliability_samples: n(14),
+        days_since_no_show: next() < 0.4 ? null : n(120),
+        organized_events: n(8),
+        fair_play_reviewers: n(8),
+        fair_play_events: n(5),
+      };
+      for (const a of ACHIEVEMENTS) {
+        const { rows } = await db().query<{ met: boolean }>(
+          'select private.achievement_rule_met($1::jsonb, $2::jsonb) as met',
+          [JSON.stringify(a.rule), JSON.stringify(facts)],
+        );
+        const reference = achievementRuleMet(a.rule, facts);
+        expect(rows[0]!.met).toBe(reference);
+        if (reference) met += 1;
+      }
+    }
+    expect(met).toBeGreaterThan(300); // not all "no"
   });
 });
 

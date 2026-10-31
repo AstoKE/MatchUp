@@ -42,6 +42,8 @@ Not there yet: `events.attendance_finalized_at` and `review_window_closes_at`, `
 
 ### M4: achievements (F-26)
 
+**Status 2026-10-31: built** in `20261031140000_achievements.sql`: `achievement_definitions`, `user_achievements`, `private.achievement_rule_met`, `private.achievement_facts`, `private.evaluate_achievements`, hooks in finalization, dispute resolution and the window-close job, export and purge. TypeScript reference `packages/domain/src/rating/achievements.ts`. Tests: pgTAP `16_achievements` (56), each badge with positive and negative fixtures on real events; `rating-equivalence` (catalog drift, the rule on 500 random fact sets). Decisions: RATING_SYSTEM §12.
+
 - `achievement_definitions`, `user_achievements`, the seven badges with positive and negative fixtures each, idempotent awards.
 
 ### M5: screens (after `design.md`)
