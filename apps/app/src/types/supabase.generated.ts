@@ -545,6 +545,68 @@ export type Database = {
           },
         ];
       };
+      reliability_events: {
+        Row: {
+          created_at: string;
+          event_id: string;
+          id: string;
+          kind: string;
+          occurred_at: string;
+          participation_id: string;
+          user_id: string;
+          void_reason: string | null;
+          voided_at: string | null;
+          weight: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          event_id: string;
+          id?: string;
+          kind: string;
+          occurred_at: string;
+          participation_id: string;
+          user_id: string;
+          void_reason?: string | null;
+          voided_at?: string | null;
+          weight: number;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string;
+          id?: string;
+          kind?: string;
+          occurred_at?: string;
+          participation_id?: string;
+          user_id?: string;
+          void_reason?: string | null;
+          voided_at?: string | null;
+          weight?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'reliability_events_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reliability_events_participation_id_fkey';
+            columns: ['participation_id'];
+            isOneToOne: false;
+            referencedRelation: 'event_participations';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reliability_events_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       skill_reviews: {
         Row: {
           created_at: string;
@@ -774,6 +836,45 @@ export type Database = {
           },
         ];
       };
+      user_progress: {
+        Row: {
+          algorithm_version: number;
+          computed_at: string;
+          reliability_confidence: number;
+          reliability_samples: number;
+          reliability_score: number;
+          user_id: string;
+          xp_total: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          algorithm_version?: number;
+          computed_at?: string;
+          reliability_confidence: number;
+          reliability_samples: number;
+          reliability_score: number;
+          user_id: string;
+          xp_total?: number;
+        };
+        Update: {
+          algorithm_version?: number;
+          computed_at?: string;
+          reliability_confidence?: number;
+          reliability_samples?: number;
+          reliability_score?: number;
+          user_id?: string;
+          xp_total?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_progress_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: true;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       user_settings: {
         Row: {
           created_at: string;
@@ -886,6 +987,51 @@ export type Database = {
           },
           {
             foreignKeyName: 'user_sport_profiles_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      xp_transactions: {
+        Row: {
+          amount: number;
+          created_at: string;
+          dedupe_key: string;
+          id: string;
+          reason_code: string;
+          rule_version: number;
+          source_id: string | null;
+          source_type: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          created_at?: string;
+          dedupe_key: string;
+          id?: string;
+          reason_code: string;
+          rule_version?: number;
+          source_id?: string | null;
+          source_type: string;
+          user_id: string;
+        };
+        Update: {
+          amount?: number;
+          created_at?: string;
+          dedupe_key?: string;
+          id?: string;
+          reason_code?: string;
+          rule_version?: number;
+          source_id?: string | null;
+          source_type?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'xp_transactions_user_id_fkey';
             columns: ['user_id'];
             isOneToOne: false;
             referencedRelation: 'profiles';

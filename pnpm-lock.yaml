@@ -203,6 +203,9 @@ importers:
         specifier: ^8.23.1
         version: 8.23.1
     devDependencies:
+      '@matchup/domain':
+        specifier: workspace:*
+        version: link:../domain
       '@types/node':
         specifier: ^24.0.0
         version: 24.19.2
@@ -7852,7 +7855,9 @@ snapshots:
       metro-runtime: 0.87.1
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-colors@0.74.89': {}
 
