@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { ActivityIndicator, ScrollView, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, useCatalog, type Catalog } from '@/features/catalog';
 import { errorText } from '@/lib/error-text';
@@ -146,7 +146,6 @@ function Detail({
   const { t } = useTranslation(['events', 'common']);
   const { spacing, breakpoint } = useTheme();
   const compact = breakpoint === 'compact';
-  const { height: windowHeight } = useWindowDimensions();
   const router = useRouter();
   const toast = useToast();
   const locale = currentLocale();
@@ -170,20 +169,14 @@ function Detail({
   const fail = (failure: unknown) => setError(errorText(failure));
   // Time pressure only matters for an event people can still join (design.md §4.2 rule 4).
   const joinable = event.status === 'PUBLISHED' && !started;
-  // On a phone the join action is pinned under the content (design.md §8: the thumb zone); the request
-  // form that opens from it scrolls inside the pinned area so it never covers the whole page.
+  // On a phone the join action is pinned under the content (design.md §8: the thumb zone).
   const stickyJoin = compact;
   const joinPanel =
     !isOrganizer && joinable ? (
       stickyJoin ? (
-        <ScrollView
-          style={{ maxHeight: Math.min(360, windowHeight * 0.45) }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <JoinPanel event={event} catalog={catalog} inviteToken={inviteToken} />
-        </ScrollView>
+        <JoinPanel event={event} inviteToken={inviteToken} />
       ) : (
-        <JoinPanel event={event} catalog={catalog} inviteToken={inviteToken} />
+        <JoinPanel event={event} inviteToken={inviteToken} />
       )
     ) : null;
   const openSlots = event.capacity - event.approvedCount;

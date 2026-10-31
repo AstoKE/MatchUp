@@ -190,35 +190,14 @@ describe('joining an event', () => {
     expect(mockApi.fetchMyParticipation).not.toHaveBeenCalled();
   });
 
-  it('sends the request with the message and shows what happens next', async () => {
+  it('opens the request form on its own screen', async () => {
     await renderApp(<EventDetailScreen />, { session: player });
     await pressReady('Katılım isteği gönder');
-    expect(screen.getByText('Organizatör görünen adını ve seviyeni görecek.')).toBeTruthy();
-    await fireEvent.changeText(
-      screen.getByLabelText('Organizatöre mesaj (isteğe bağlı)'),
-      '  Orta saha oynarım ',
-    );
-    await press('İsteği gönder');
-    expect(mockApi.requestJoin).toHaveBeenCalledWith({
-      eventId: EVENT,
-      message: 'Orta saha oynarım',
-      positionId: null,
-      inviteToken: null,
+    expect(mockApi.requestJoin).not.toHaveBeenCalled();
+    expect(mockRouter.push).toHaveBeenCalledWith({
+      pathname: '/e/[id]/join',
+      params: { id: EVENT },
     });
-    expect(
-      await screen.findByText('İstek gönderildi. Organizatör onaylayınca haber vereceğiz.'),
-    ).toBeTruthy();
-  });
-
-  it('passes the chosen position along', async () => {
-    await renderApp(<EventDetailScreen />, { session: player });
-    await pressReady('Katılım isteği gönder');
-    await press(/^Tercih ettiğin pozisyon/);
-    await fireEvent.press(screen.getByRole('radio', { name: 'Kaleci' }));
-    await press('İsteği gönder');
-    expect(mockApi.requestJoin).toHaveBeenCalledWith(
-      expect.objectContaining({ positionId: POSITION }),
-    );
   });
 
   it('a published event that has begun says it started, not that it is open', async () => {
@@ -234,11 +213,11 @@ describe('joining an event', () => {
 
   it('says so when the event is full and offers the waitlist', async () => {
     mockApi.fetchEvent.mockResolvedValue(event({ approvedCount: 12 }));
-    mockApi.requestJoin.mockResolvedValue('WAITLISTED');
     await renderApp(<EventDetailScreen />, { session: player });
     await pressReady('Yedek listeye başvur');
-    await press('Yedek listeye başvur');
-    expect(await screen.findByText('Etkinlik dolu. Yedek listeye eklendin.')).toBeTruthy();
+    expect(mockRouter.push).toHaveBeenCalledWith(
+      expect.objectContaining({ pathname: '/e/[id]/join' }),
+    );
   });
 
   it('offers nothing when the event is full and has no waitlist', async () => {
@@ -246,24 +225,6 @@ describe('joining an event', () => {
     await renderApp(<EventDetailScreen />, { session: player });
     expect(await screen.findAllByText('Etkinlik dolu.')).not.toHaveLength(0);
     expect(screen.queryByRole('button', { name: /Katılma isteği|yedek listeye/ })).toBeNull();
-  });
-
-  it('tells the player when a request is approved at once', async () => {
-    mockApi.fetchEvent.mockResolvedValue(event({ autoApprove: true }));
-    mockApi.requestJoin.mockResolvedValue('APPROVED');
-    await renderApp(<EventDetailScreen />, { session: player });
-    await pressReady('Katılım isteği gönder');
-    expect(screen.getByText('Bu etkinlikte yer varsa isteğin hemen onaylanır.')).toBeTruthy();
-    await press('İsteği gönder');
-    expect(await screen.findByText('Katılımın onaylandı.')).toBeTruthy();
-  });
-
-  it('shows the server refusal in plain words', async () => {
-    mockApi.requestJoin.mockRejectedValue(new AppError('REGISTRATION_CLOSED'));
-    await renderApp(<EventDetailScreen />, { session: player });
-    await pressReady('Katılım isteği gönder');
-    await press('İsteği gönder');
-    expect(await screen.findByText('Bu etkinliğin katılım kaydı kapandı.')).toBeTruthy();
   });
 
   it.each([
@@ -349,14 +310,16 @@ describe('the event page for different viewers', () => {
     expect(screen.queryByText(/invite=/)).toBeNull();
   });
 
-  it('asks for the event with the token from the link and sends it with the request', async () => {
+  it('asks for the event with the token from the link and carries it to the form', async () => {
     mockInvite = 'tok-from-link';
     mockApi.fetchEvent.mockResolvedValue(event({ visibility: 'INVITE_ONLY' }));
     await renderApp(<EventDetailScreen />, { session: player });
     await pressReady('Katılım isteği gönder');
-    await press('İsteği gönder');
     expect(mockApi.fetchEvent.mock.calls[0]).toEqual([EVENT, 'tok-from-link']);
-    expect(mockApi.requestJoin.mock.calls[0]?.[0]).toMatchObject({ inviteToken: 'tok-from-link' });
+    expect(mockRouter.push).toHaveBeenCalledWith({
+      pathname: '/e/[id]/join',
+      params: { id: EVENT, invite: 'tok-from-link' },
+    });
     mockInvite = undefined;
   });
 });

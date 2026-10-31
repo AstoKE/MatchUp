@@ -2,5 +2,5 @@ appId: com.example.matchup.dev
 # 21 An invite-only event opened WITHOUT its token does not exist for the player (Phase 3) — opened by deep link.
 ---
 - assertVisible: "We couldn't find what you were looking for."
-- assertNotVisible: 'Request to join'
+- assertNotVisible: 'Send join request'
 - takeScreenshot: 21-invite-without-token
