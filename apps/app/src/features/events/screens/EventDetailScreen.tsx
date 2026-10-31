@@ -11,6 +11,7 @@ import { AttendancePanel } from '../components/AttendancePanel';
 import { InvitePanel } from '../components/InvitePanel';
 import { JoinPanel } from '../components/JoinPanel';
 import { RequestsPanel } from '../components/RequestsPanel';
+import { ReviewPanel } from '../components/ReviewPanel';
 import { Pill, SlotMeter } from '../components/SlotMeter';
 import { formatCost, formatEventStart } from '../format';
 import { useCompleteEvent, useDeleteDraft, useEvent, usePublishEvent } from '../hooks';
@@ -332,6 +333,13 @@ function Detail({
       (event.status === 'PUBLISHED' || event.status === 'COMPLETED') &&
       (isOrganizer || event.participants !== null) ? (
         <AttendancePanel eventId={event.id} isOrganizer={isOrganizer} />
+      ) : null}
+      {event.status === 'COMPLETED' && (isOrganizer || event.participants !== null) ? (
+        <ReviewPanel
+          eventId={event.id}
+          timeZone={timeZone}
+          descriptors={sport?.skillDescriptors ?? {}}
+        />
       ) : null}
 
       {isOrganizer ? (

@@ -236,6 +236,39 @@ export async function joinApproved(
   }
 }
 
+/** TEST-ONLY: starts the event, marks every approved player present and finalizes, through the real RPCs. */
+export async function finalizeAllPresent(
+  stack: LocalStack,
+  eventId: string,
+  organizerEmail: string,
+) {
+  startEvent(eventId);
+  const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
+  const tokenResponse = await fetch(`${stack.apiUrl}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: base,
+    body: JSON.stringify({ email: organizerEmail, password: PASSWORD }),
+  });
+  const { access_token: token } = (await tokenResponse.json()) as { access_token: string };
+  const call = async (name: string, body: unknown) => {
+    const response = await fetch(`${stack.apiUrl}/rest/v1/rpc/${name}`, {
+      method: 'POST',
+      headers: { ...base, Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok)
+      throw new Error(`${name} failed: ${response.status} ${await response.text()}`);
+    return response;
+  };
+  const view = (await (await call('get_event_attendance', { p_event_id: eventId })).json()) as {
+    roster: { participation_id: string; is_organizer: boolean }[];
+  };
+  for (const row of view.roster.filter((r) => !r.is_organizer)) {
+    await call('mark_attendance', { p_participation_id: row.participation_id, p_value: 'PRESENT' });
+  }
+  await call('finalize_attendance', { p_event_id: eventId });
+}
+
 /** TEST-ONLY: moves an event's start into the past; no API can do that, hence psql in the DB container. */
 export function startEvent(eventId: string) {
   if (!/^[0-9a-f-]{36}$/.test(eventId)) throw new Error('not a uuid');

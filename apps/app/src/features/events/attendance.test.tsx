@@ -62,7 +62,7 @@ describe('the organizer', () => {
     expect(present).toHaveLength(2);
     expect(screen.getByText('Deniz', { includeHiddenElements: true })).toBeTruthy();
     expect(screen.queryByText('Ben', { includeHiddenElements: true })).toBeNull();
-    fireEvent.press(present[0]!);
+    await fireEvent.press(present[0]!);
     await waitFor(() => expect(mockApi.markAttendance).toHaveBeenCalledTimes(1));
     expect(mockApi.markAttendance.mock.calls[0]![0]).toEqual({
       participationId: P1,
@@ -73,13 +73,13 @@ describe('the organizer', () => {
   it('must confirm finalizing, is told about unmarked players, and can step back', async () => {
     mockApi.fetchEventAttendance.mockResolvedValue(roster());
     await renderApp(<AttendancePanel eventId={EVENT} isOrganizer />);
-    fireEvent.press(await screen.findByRole('button', { name: 'Yoklamayı kesinleştir' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Yoklamayı kesinleştir' }));
     expect(mockApi.finalizeAttendance).not.toHaveBeenCalled();
     expect(await screen.findByText(/1 oyuncu işaretlenmedi/)).toBeTruthy();
-    fireEvent.press(screen.getByRole('button', { name: 'Vazgeç' }));
-    fireEvent.press(await screen.findByRole('button', { name: 'Yoklamayı kesinleştir' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Vazgeç' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Yoklamayı kesinleştir' }));
     expect(mockApi.finalizeAttendance).not.toHaveBeenCalled();
-    fireEvent.press(await screen.findByRole('button', { name: 'Evet, kesinleştir' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Evet, kesinleştir' }));
     expect(await screen.findByText('Yoklama kesinleşti')).toBeTruthy();
     expect(mockApi.finalizeAttendance.mock.calls[0]![0]).toBe(EVENT);
   });
@@ -97,7 +97,7 @@ describe('the organizer', () => {
     mockApi.fetchEventAttendance.mockResolvedValue(roster());
     mockApi.markAttendance.mockRejectedValue(new AppError('INVALID_TRANSITION'));
     await renderApp(<AttendancePanel eventId={EVENT} isOrganizer />);
-    fireEvent.press((await screen.findAllByRole('radio', { name: 'Gelmedi' }))[0]!);
+    await fireEvent.press((await screen.findAllByRole('radio', { name: 'Gelmedi' }))[0]!);
     expect(await screen.findByText('Bu işlem şu an yapılamıyor.')).toBeTruthy();
   });
 });
@@ -122,12 +122,12 @@ describe('a player', () => {
   it('disputes an absent mark with a trimmed reason; an empty one is not sent', async () => {
     mockApi.fetchEventAttendance.mockResolvedValue(own('ABSENT'));
     await renderApp(<AttendancePanel eventId={EVENT} isOrganizer={false} />);
-    fireEvent.press(await screen.findByRole('button', { name: 'İtiraz et' }));
-    fireEvent.press(await screen.findByText('İtirazı gönder'));
+    await fireEvent.press(await screen.findByRole('button', { name: 'İtiraz et' }));
+    await fireEvent.press(await screen.findByText('İtirazı gönder'));
     expect(mockApi.disputeAttendance).not.toHaveBeenCalled();
-    fireEvent.changeText(screen.getByLabelText('Neden yanlış?'), '  Oradaydım  ');
+    await fireEvent.changeText(screen.getByLabelText('Neden yanlış?'), '  Oradaydım  ');
     await screen.findByDisplayValue('  Oradaydım  ');
-    fireEvent.press(screen.getByText('İtirazı gönder'));
+    await fireEvent.press(screen.getByText('İtirazı gönder'));
     expect(await screen.findByText('İtirazın alındı')).toBeTruthy();
     expect(mockApi.disputeAttendance.mock.calls[0]![0]).toEqual({
       participationId: P1,
@@ -154,7 +154,7 @@ describe('a player', () => {
     mockApi.fetchEventAttendance.mockRejectedValueOnce(new AppError('NETWORK'));
     mockApi.fetchEventAttendance.mockResolvedValue(own('PRESENT'));
     await renderApp(<AttendancePanel eventId={EVENT} isOrganizer={false} />);
-    fireEvent.press(await screen.findByRole('button', { name: 'Tekrar dene' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Tekrar dene' }));
     expect(await screen.findByText('Geldin olarak işaretlendin.')).toBeTruthy();
   });
 });
