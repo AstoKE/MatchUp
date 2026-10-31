@@ -168,3 +168,15 @@ Display of badges respects `show_badges`.
 - Reliability penalties can feel harsh in early life; the prior (A = 3, p0 = 0.9) and the "New player" state soften first impressions. Parameters are tuned after pilot data.
 - Rating/reliability visibility is user-controllable (`show_reliability`), but organizers evaluating a join request always see the game-relevant subset (disclosed at request time).
 - KVKK: scores are personal data (right of access/erasure applies); profiling/automated-decision implications of reliability need legal review (SECURITY §8).
+
+## 10. Decisions made while building M3a (2026-10-31)
+
+Where the text above left room, the code does this (the TypeScript reference and the SQL agree; `packages/db-tests` compares them on random input):
+
+1. **Thresholds count verified-present participants besides the organizer.** §5.2 says "≥ 2 verified-present participants"; the organizer's own row is self-attested, so it never counts toward a threshold. One organizer plus one friend pays nobody.
+2. **Caps apply to `ATTENDED_EVENT` (2 a day, 6 a week) and `ORGANIZED_EVENT` (2 a day).** `FIRST_IN_SPORT` is paid once per sport and is not capped. The Istanbul calendar is a fixed UTC+3 (no daylight saving since 2016), weeks run Monday to Sunday, and the day of an event is the day it starts.
+3. **A new account (< 24 h at finalization) earns no `ORGANIZED_EVENT` XP, but still earns attendance XP** if it plays.
+4. **Signals are dated by the event's start** (`occurred_at`), and age is measured from it to the moment of computing. The cached `user_progress` is recomputed when something changes (finalization, a dispute); decay therefore shows from the next recompute, and the exact value is always derivable from `reliability_events`.
+5. **A dispute removes the signal until it is resolved** (the old row is voided with reason `DISPUTED`), then the resolution creates the correct one; the first resolution to `PRESENT` also pays the attendance XP the player never received.
+6. **Account purge keeps the ledger and the signals, linked to the anonymous tombstone** (no free text, no identifier left); the user's own are in the export. Counsel to confirm (SECURITY §8).
+7. **Per-user advisory lock** around every XP decision, taken in user-id order, so two events finalized at once for the same player cannot both pass a cap.
