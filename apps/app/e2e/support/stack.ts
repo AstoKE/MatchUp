@@ -269,6 +269,23 @@ export async function finalizeAllPresent(
   await call('finalize_attendance', { p_event_id: eventId });
 }
 
+/** TEST-ONLY: a skill snapshot for one user: the job that writes it would close every due window in the shared database. */
+export function setFootballRating(userId: string, rating: number, confidence: number) {
+  if (!/^[0-9a-f-]{36}$/.test(userId)) throw new Error('not a uuid');
+  execFileSync('docker', [
+    'exec',
+    'supabase_db_matchup',
+    'psql',
+    '-U',
+    'postgres',
+    '-v',
+    'ON_ERROR_STOP=1',
+    '-c',
+    `insert into public.user_sport_ratings (user_id, sport_id, rating, confidence, sample_events)
+     select '${userId}', id, ${rating}, ${confidence}, 1 from public.sports where slug = 'football'`,
+  ]);
+}
+
 /** TEST-ONLY: moves an event's start into the past; no API can do that, hence psql in the DB container. */
 export function startEvent(eventId: string) {
   if (!/^[0-9a-f-]{36}$/.test(eventId)) throw new Error('not a uuid');

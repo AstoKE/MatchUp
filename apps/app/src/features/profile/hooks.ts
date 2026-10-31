@@ -7,6 +7,7 @@ import {
   updateMyProfile,
   updateMySettings,
 } from './api/profile-api';
+import { fetchMyProgress } from './api/progress-api';
 
 const profileKey = (userId: string) => ['profile', userId] as const;
 
@@ -18,6 +19,19 @@ export function useMyProfile() {
     queryKey: userId ? profileKey(userId) : ['profile', 'guest'],
     queryFn: () => fetchMyProfile(userId as string),
     enabled: userId !== null,
+  });
+}
+
+/** Skill, reliability, XP and badges; server-side jobs change them, so this refetches on each visit. */
+export function useMyProgress() {
+  const session = useSession();
+  const userId = session.status === 'authenticated' ? session.userId : null;
+  return useQuery({
+    queryKey: ['progress', userId],
+    queryFn: () => fetchMyProgress(userId as string),
+    enabled: userId !== null,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 }
 

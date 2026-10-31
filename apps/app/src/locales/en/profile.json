@@ -60,5 +60,26 @@
     "ADULT_REQUIRED": "You must be 18 or older to use {{appName}}.",
     "TERMS_REQUIRED": "Please accept the Terms of Use and Privacy Notice to continue.",
     "DISTRICT_NEEDS_CITY": "Choose a city first."
+  },
+  "progress": {
+    "title": "Your progress",
+    "loadFailed": "Could not load your progress",
+    "level": "Level {{level}}",
+    "xp": "{{xp}} XP · {{next}} XP to the next level",
+    "reliability": "Reliability",
+    "newPlayer": "New player",
+    "confidence": {
+      "LOW": "Little data so far",
+      "MEDIUM": "Medium confidence",
+      "HIGH": "High confidence"
+    },
+    "skillTitle": "Skill rating",
+    "skillNote": "Based on player feedback; it is not a measurement.",
+    "noRatings": "No rating yet. It appears here once people you played with review you.",
+    "rating": "{{sport}}: {{rating}}",
+    "provisional": "Provisional: few reviews so far.",
+    "provisionalWithOwn": "Provisional: few reviews so far. Your own estimate: {{own}}",
+    "badgesTitle": "Badges",
+    "noBadges": "No badges yet. You earn them by playing."
   }
 }

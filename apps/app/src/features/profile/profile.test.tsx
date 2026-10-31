@@ -62,6 +62,11 @@ const baseProfile = {
   sports: [{ sportId: FOOTBALL, level: 3.5, positionIds: [KEEPER] }],
 };
 
+jest.mock('./api/progress-api', () => ({
+  fetchMyProgress: () =>
+    Promise.resolve({ xpTotal: 0, reliability: null, ratings: [], badges: [] }),
+}));
+
 const mockApi = {
   fetchMyProfile: jest.fn(),
   updateMyProfile: jest.fn(),

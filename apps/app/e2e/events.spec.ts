@@ -9,6 +9,7 @@ import {
   getLocalStack,
   joinApproved,
   PASSWORD,
+  setFootballRating,
   startEvent,
   uniqueEmail,
   type LocalStack,
@@ -593,5 +594,44 @@ test.describe('reviews (Phase 5 / M5b)', () => {
     await expect(otherPage.getByRole('radiogroup', { name: 'Yorumcu' })).toBeVisible();
     await expect(otherPage.getByText(/değerlendirildi/)).toHaveCount(0);
     await other.close();
+  });
+});
+
+test.describe('progress on the profile (Phase 5 / M5c)', () => {
+  test('a new player sees the empty states; after a game: level, badge and a provisional rating', async ({
+    page,
+  }) => {
+    const s = requireStack();
+    const organizerEmail = uniqueEmail('prog-org');
+    const playerEmail = uniqueEmail('prog-a');
+    const otherEmail = uniqueEmail('prog-b');
+    createdIds.push((await createOnboardedUser(s, organizerEmail)).id);
+    const player = await createOnboardedUser(s, playerEmail);
+    createdIds.push(player.id);
+    createdIds.push((await createOnboardedUser(s, otherEmail)).id);
+
+    await signIn(page, playerEmail);
+    await page.goto('/profile');
+    await expect(page.getByText('Seviye 1', { exact: true })).toBeVisible();
+    await expect(page.getByText('Yeni oyuncu')).toBeVisible();
+    await expect(page.getByText(/Henüz puanın yok/)).toBeVisible();
+    await expect(page.getByText(/Henüz rozetin yok/)).toBeVisible();
+    await expectNoBlocking(page);
+
+    const eventId = await createPublishedEvent(s, organizerEmail, 'İlerleme maçı');
+    await joinApproved(s, eventId, playerEmail, organizerEmail);
+    await joinApproved(s, eventId, otherEmail, organizerEmail);
+    await finalizeAllPresent(s, eventId, organizerEmail);
+    setFootballRating(player.id, 3.33, 0.33333);
+
+    await page.reload();
+    // 50 attended + 30 first in sport + 50 FIRST_MATCH = 130 XP.
+    await expect(page.getByText('Seviye 2', { exact: true })).toBeVisible();
+    await expect(page.getByText(/130 XP/)).toBeVisible();
+    await expect(page.getByText('İlk Maç', { exact: true })).toBeVisible();
+    await expect(page.getByText('Futbol: 3,3')).toBeVisible();
+    await expect(page.getByText(/Geçici: .*Kendi tahminin: 3,0/)).toBeVisible();
+    await expect(page.getByText('Yeni oyuncu')).toBeVisible(); // one signal, below the three to show a percentage
+    await expectNoBlocking(page);
   });
 });
