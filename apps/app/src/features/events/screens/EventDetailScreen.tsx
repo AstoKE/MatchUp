@@ -7,6 +7,7 @@ import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { Banner, Button, EmptyState, Screen, SportBadge, Text, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
+import { AttendancePanel } from '../components/AttendancePanel';
 import { InvitePanel } from '../components/InvitePanel';
 import { JoinPanel } from '../components/JoinPanel';
 import { RequestsPanel } from '../components/RequestsPanel';
@@ -327,6 +328,11 @@ function Detail({
 
       {joinPanel && !stickyJoin ? joinPanel : null}
       {isOrganizer && event.status === 'PUBLISHED' ? <RequestsPanel event={event} /> : null}
+      {started &&
+      (event.status === 'PUBLISHED' || event.status === 'COMPLETED') &&
+      (isOrganizer || event.participants !== null) ? (
+        <AttendancePanel eventId={event.id} isOrganizer={isOrganizer} />
+      ) : null}
 
       {isOrganizer ? (
         <View style={{ gap: spacing[3] }}>

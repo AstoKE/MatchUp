@@ -1,5 +1,11 @@
 import type { MyEventBucket, SearchPayload } from '@matchup/domain';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  disputeAttendance,
+  fetchEventAttendance,
+  finalizeAttendance,
+  markAttendance,
+} from './api/attendance-api';
 import { fetchMyEvents } from './api/my-events-api';
 import {
   cancelParticipation,
@@ -135,6 +141,38 @@ export function useDecideParticipation(eventId: string) {
     () => eventId,
   );
 }
+
+const attendanceKey = (eventId: string) => ['attendance', eventId] as const;
+
+/** Organizer and approved players; the server answers NOT_FOUND to anybody else. */
+export function useEventAttendance(eventId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: attendanceKey(eventId),
+    queryFn: () => fetchEventAttendance(eventId),
+    enabled,
+  });
+}
+
+function useAttendanceMutation<TArgs>(eventId: string, run: (args: TArgs) => Promise<void>) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (args: TArgs) => run(args),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: attendanceKey(eventId) }),
+        queryClient.invalidateQueries({ queryKey: eventQueryKey(eventId) }),
+        queryClient.invalidateQueries({ queryKey: ['events'] }),
+      ]);
+    },
+  });
+}
+
+export const useMarkAttendance = (eventId: string) =>
+  useAttendanceMutation(eventId, markAttendance);
+export const useFinalizeAttendance = (eventId: string) =>
+  useAttendanceMutation(eventId, finalizeAttendance);
+export const useDisputeAttendance = (eventId: string) =>
+  useAttendanceMutation(eventId, disputeAttendance);
 
 /** Organizer only; the server answers NOT_FOUND to anybody else. */
 export function useEventRequests(eventId: string, enabled: boolean) {

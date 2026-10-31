@@ -6,7 +6,9 @@ import {
   deleteEventsOf,
   deleteUser,
   getLocalStack,
+  joinApproved,
   PASSWORD,
+  startEvent,
   uniqueEmail,
   type LocalStack,
 } from './support/stack';
@@ -471,5 +473,80 @@ test.describe('invite-only events and the page for other viewers (Phase 3 comple
     await expect(playerMain.getByText('Deniz Oyuncu', { exact: true })).toBeVisible();
     await expectNoBlocking(playerPage);
     await player.close();
+  });
+});
+
+test.describe('attendance (Phase 5 / M5a)', () => {
+  test('organizer marks and finalizes; a marked-absent player disputes; a stranger sees nothing', async ({
+    browser,
+  }) => {
+    const s = requireStack();
+    const organizerEmail = uniqueEmail('att-org');
+    const presentEmail = uniqueEmail('att-present');
+    const absentEmail = uniqueEmail('att-absent');
+    const strangerEmail = uniqueEmail('att-stranger');
+    createdIds.push((await createOnboardedUser(s, organizerEmail)).id);
+    for (const [email, displayName] of [
+      [presentEmail, 'Gelen Oyuncu'],
+      [absentEmail, 'Gelmeyen Oyuncu'],
+      [strangerEmail, 'Yabancı'],
+    ] as const) {
+      createdIds.push((await createOnboardedUser(s, email, { displayName })).id);
+    }
+    const eventId = await createPublishedEvent(s, organizerEmail, 'Yoklama maçı');
+    await joinApproved(s, eventId, presentEmail, organizerEmail);
+    await joinApproved(s, eventId, absentEmail, organizerEmail);
+
+    const open = async (email: string) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      await signIn(page, email);
+      await page.goto(`/e/${eventId}`);
+      return { context, page };
+    };
+
+    // Before the start there is no attendance section at all.
+    const early = await open(organizerEmail);
+    await expect(early.page.getByRole('heading', { name: 'Yoklama maçı', level: 1 })).toBeVisible();
+    await expect(early.page.getByRole('heading', { name: 'Yoklama', level: 2 })).toHaveCount(0);
+    await early.context.close();
+
+    startEvent(eventId);
+
+    const organizer = await open(organizerEmail);
+    const page = organizer.page;
+    await expect(page.getByRole('heading', { name: 'Yoklama', level: 2 })).toBeVisible();
+    const present = page.getByRole('radiogroup', { name: 'Gelen Oyuncu' });
+    const absent = page.getByRole('radiogroup', { name: 'Gelmeyen Oyuncu' });
+    await present.getByRole('radio', { name: 'Geldi' }).click();
+    await expect(present.getByRole('radio', { name: 'Geldi' })).toBeChecked();
+    await absent.getByRole('radio', { name: 'Gelmedi' }).click();
+    await expect(absent.getByRole('radio', { name: 'Gelmedi' })).toBeChecked();
+    await expectNoBlocking(page);
+    await page.getByRole('button', { name: 'Yoklamayı kesinleştir' }).click();
+    await page.getByRole('button', { name: 'Evet, kesinleştir' }).click();
+    await expect(page.getByText('Gelmeyen Oyuncu: Gelmedi')).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'Geldi' })).toHaveCount(0);
+    await organizer.context.close();
+
+    const good = await open(presentEmail);
+    await expect(good.page.getByText('Geldin olarak işaretlendin.')).toBeVisible();
+    await expect(good.page.getByRole('button', { name: 'İtiraz et' })).toHaveCount(0);
+    await good.context.close();
+
+    const disputing = await open(absentEmail);
+    await expect(disputing.page.getByText('Gelmedin olarak işaretlendin.')).toBeVisible();
+    await disputing.page.getByRole('button', { name: 'İtiraz et' }).click();
+    await disputing.page.getByLabel('Neden yanlış?').fill('Oradaydım, kaleciydim');
+    await expectNoBlocking(disputing.page);
+    await disputing.page.getByRole('button', { name: 'İtirazı gönder' }).click();
+    await expect(disputing.page.getByText(/İtirazın inceleniyor/)).toBeVisible();
+    await disputing.context.close();
+
+    // A completed event does not exist for a stranger at all.
+    const stranger = await open(strangerEmail);
+    await expect(stranger.page.getByText('Aradığın içerik bulunamadı.')).toBeVisible();
+    await expect(stranger.page.getByText('Katılımın')).toHaveCount(0);
+    await stranger.context.close();
   });
 });
