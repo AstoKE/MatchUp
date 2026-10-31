@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import {
   RATING_CONSTANTS,
   isLateCancel,
@@ -5,6 +6,8 @@ import {
   istanbulWeek,
   ratingConfigRows,
   reliabilityStats,
+  skillStats,
+  type SkillReview,
 } from '@matchup/domain';
 import { afterAll, describe, expect, it } from 'vitest';
 import { closeDb, db } from './helpers';
@@ -70,6 +73,85 @@ describe('reliability math', () => {
     expect(await score([1, 1, 0])).toBeCloseTo(0.783333, 5);
     expect(await score([0, 0, 0])).toBeCloseTo(0.45, 10);
     expect(await score([])).toBeCloseTo(0.9, 10);
+  });
+});
+
+describe('skill math', () => {
+  const at = new Date('2026-11-01T12:00:00Z');
+  const sql = async (prior: number, sport: string, reviews: readonly SkillReview[]) => {
+    const { rows } = await db().query<{
+      rating: number;
+      confidence: number;
+      sample_events: number;
+    }>(
+      `select rating, confidence, sample_events from private.skill_stats(
+         $1::float8, $2::uuid, $3::uuid[], $4::uuid[], $5::uuid[], $6::float8[], $7::timestamptz[], $8::timestamptz)`,
+      [
+        prior,
+        sport,
+        reviews.map((r) => r.eventId),
+        reviews.map((r) => r.sportId),
+        reviews.map((r) => r.reviewerId),
+        reviews.map((r) => r.score),
+        reviews.map((r) => r.startsAt),
+        at,
+      ],
+    );
+    return rows[0]!;
+  };
+
+  it('the SQL function equals the TypeScript reference on 300 random review histories', async () => {
+    const next = random(315);
+    const pick = <T>(items: readonly T[]) => items[Math.floor(next() * items.length)]!;
+    const sports = [randomUUID(), randomUUID()];
+    const pool = Array.from({ length: 9 }, () => randomUUID());
+    let trimmed = 0;
+    let decayed = 0;
+    for (let trial = 0; trial < 300; trial += 1) {
+      const reviews: SkillReview[] = [];
+      const eventCount = Math.floor(next() * 9);
+      for (let e = 0; e < eventCount; e += 1) {
+        const eventId = randomUUID();
+        const sportId = pick(sports);
+        // Often close together, so the pair window matters; sometimes the same instant.
+        const startsAt = new Date(at.getTime() - Math.floor(next() * 200) * 86_400_000);
+        const reviewers = pool.filter(() => next() < 0.5);
+        if (reviewers.length >= 5) trimmed += 1;
+        for (const reviewerId of reviewers) {
+          // Few distinct scores, so ties at the trimming edge are common.
+          reviews.push({ eventId, sportId, reviewerId, score: pick([1, 3, 3, 5]), startsAt });
+        }
+      }
+      if (new Set(reviews.map((r) => r.reviewerId)).size < reviews.length) decayed += 1;
+      const prior = pick([1, 2, 2.5, 3, 4.5, 5]);
+      const row = await sql(prior, sports[0]!, reviews);
+      const reference = skillStats({ prior, sportId: sports[0]!, reviews, at });
+      expect(row.sample_events).toBe(reference.sampleEvents);
+      expect(row.rating).toBeCloseTo(reference.rating, 10);
+      expect(row.confidence).toBeCloseTo(reference.confidence, 10);
+    }
+    // The random input really exercises the branches that matter.
+    expect(trimmed).toBeGreaterThan(50);
+    expect(decayed).toBeGreaterThan(50);
+  });
+
+  it('matches the worked examples of the spec', async () => {
+    const sport = randomUUID();
+    const reviewers = Array.from({ length: 15 }, () => randomUUID());
+    const oneEvent = (index: number): SkillReview[] => {
+      const eventId = randomUUID();
+      return reviewers
+        .slice(index * 3, index * 3 + 3)
+        .map((reviewerId) => ({ eventId, sportId: sport, reviewerId, score: 4, startsAt: at }));
+    };
+    const one = await sql(3, sport, oneEvent(0));
+    expect(one.rating).toBeCloseTo(10 / 3, 10);
+    expect(one.confidence).toBeCloseTo(1 / 3, 10);
+    const five = await sql(3, sport, [0, 1, 2, 3, 4].flatMap(oneEvent));
+    expect(five.rating).toBeCloseTo(26 / 7, 10);
+    expect(five.confidence).toBeCloseTo(5 / 7, 10);
+    const none = await sql(2.5, sport, []);
+    expect(none).toEqual({ rating: 2.5, confidence: 0, sample_events: 0 });
   });
 });
 

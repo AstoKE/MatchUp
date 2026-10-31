@@ -994,6 +994,52 @@ export type Database = {
           },
         ];
       };
+      user_sport_ratings: {
+        Row: {
+          algorithm_version: number;
+          computed_at: string;
+          confidence: number;
+          rating: number;
+          sample_events: number;
+          sport_id: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          algorithm_version?: number;
+          computed_at?: string;
+          confidence: number;
+          rating: number;
+          sample_events: number;
+          sport_id: string;
+          user_id: string;
+        };
+        Update: {
+          algorithm_version?: number;
+          computed_at?: string;
+          confidence?: number;
+          rating?: number;
+          sample_events?: number;
+          sport_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_sport_ratings_sport_id_fkey';
+            columns: ['sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sports';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_sport_ratings_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       xp_transactions: {
         Row: {
           amount: number;
