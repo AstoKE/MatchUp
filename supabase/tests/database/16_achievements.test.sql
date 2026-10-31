@@ -1,7 +1,7 @@
 -- Phase 5 / M4: every badge with a positive and a negative fixture on real events. RATING_SYSTEM §6, §12. The rule function
 -- and the definitions are compared with the TypeScript reference in packages/db-tests (rating-equivalence).
 begin;
-select plan(56);
+select plan(58);
 
 create function pg_temp.act_as(p_uid uuid, p_aal text default 'aal1')
 returns void language plpgsql as $$
@@ -155,12 +155,14 @@ select ok(pg_temp.has(14, 'MULTI_SPORT'), 'MULTI_SPORT at three sports');
 select is(pg_temp.bonus(14, 'MULTI_SPORT'), 75, 'with its +75');
 select ok(not pg_temp.has(15, 'MULTI_SPORT'), 'two sports are not enough');
 
--- ---- thin events: the organizer's own row needs two verified-present others (§2) --------------------------------------------
+-- ---- thin events: attendance counts only with two verified-present players besides the organizer (§12.2) --------------------------------------------
 select pg_temp.played('thin', 16, array[17]);
 select ok(not pg_temp.has(16, 'FIRST_MATCH'), 'an organizer with one other player earns no attendance badge');
-select ok(pg_temp.has(17, 'FIRST_MATCH'), 'the verified player does');
+select ok(not pg_temp.has(17, 'FIRST_MATCH'), 'neither does that one player: no badge for an organizer and a friend');
 select ok(pg_temp.has(13, 'FIRST_MATCH'), 'an organizer with enough others does too');
 select pg_temp.played('thin2', 20, array[21, 22]);
+select ok(pg_temp.has(21, 'FIRST_MATCH'), 'with two players besides the organizer, a player earns it');
+select ok(pg_temp.has(20, 'FIRST_MATCH'), 'and so does the organizer who played');
 select ok(not pg_temp.has(20, 'COMMUNITY_ORGANIZER'), 'an event of two others does not count as organized');
 
 -- ---- FAIR_PLAY: distinct reviewers across events, closed windows only ---------------------------------------------------------
