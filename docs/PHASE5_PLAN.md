@@ -48,6 +48,8 @@ Not there yet: `events.attendance_finalized_at` and `review_window_closes_at`, `
 
 ### M5: screens (after `design.md`)
 
+Split into slices. **M5a, status 2026-10-31: built:** the attendance section of the event page (`AttendancePanel`): the organizer marks and finalizes, a player sees their final mark and disputes an ABSENT. New additive read RPC `get_event_attendance` (organizer: roster; approved player: their own row; anyone else `NOT_FOUND`), pgTAP `17_event_attendance_view`, component tests, a Playwright flow with axe. Plain design-system components; the fonts and card layouts of direction A are not applied. **Next:** M5b the review flow, M5c profile (rating, reliability, badges; visibility to others through an RPC), then the full lifecycle E2E (F-35) and notifications.
+
 - Organizer attendance marking, review flow, profile display of rating, reliability and badges, i18n tr/en, accessibility, the Playwright lifecycle test (F-35). Not started until the visual direction is chosen.
 
 ## Decisions taken in this plan (change them if you disagree)

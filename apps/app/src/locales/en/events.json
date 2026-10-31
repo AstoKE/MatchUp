@@ -328,5 +328,37 @@
     "share": "Copy or share the link",
     "copied": "Link copied.",
     "failed": "Couldn't copy the link."
+  },
+  "attendance": {
+    "title": "Attendance",
+    "loadFailed": "Could not load attendance",
+    "noPlayers": "No approved players.",
+    "status": {
+      "NOT_CONFIRMED": "Not marked",
+      "PRESENT": "Present",
+      "ABSENT": "Absent",
+      "DISPUTED": "Dispute under review"
+    },
+    "finalize": "Finalize attendance",
+    "finalizeYes": "Yes, finalize",
+    "confirm": "You cannot change the marks after finalizing. Continue?",
+    "confirmUnmarked_one": "{{count}} player is not marked: this counts neither for nor against them. You cannot change the marks after finalizing. Continue?",
+    "confirmUnmarked_other": "{{count}} players are not marked: this counts neither for nor against them. You cannot change the marks after finalizing. Continue?",
+    "finalized": "Attendance is final. For 72 hours players can leave reviews and dispute an absent mark.",
+    "finalizedToast": "Attendance finalized",
+    "waiting": "The organizer has not finalized attendance yet.",
+    "mineTitle": "Your attendance",
+    "mine": {
+      "NOT_CONFIRMED": "The organizer did not mark you. This counts neither for nor against you.",
+      "PRESENT": "You were marked present.",
+      "ABSENT": "You were marked absent.",
+      "DISPUTED": "Your dispute is under review. Until it is resolved, this event does not affect your reliability."
+    },
+    "dispute": "Dispute",
+    "disputeReason": "Why is it wrong?",
+    "disputeHint": "Read by administrators. At most 500 characters.",
+    "disputeSend": "Send dispute",
+    "disputedToast": "Your dispute was received",
+    "row": "{{name}}: {{status}}"
   }
 }

@@ -328,5 +328,37 @@
     "share": "Bağlantıyı kopyala ya da paylaş",
     "copied": "Bağlantı kopyalandı.",
     "failed": "Bağlantı kopyalanamadı."
+  },
+  "attendance": {
+    "title": "Yoklama",
+    "loadFailed": "Yoklama yüklenemedi",
+    "noPlayers": "Onaylı oyuncu yok.",
+    "status": {
+      "NOT_CONFIRMED": "İşaretlenmedi",
+      "PRESENT": "Geldi",
+      "ABSENT": "Gelmedi",
+      "DISPUTED": "İtiraz incelemede"
+    },
+    "finalize": "Yoklamayı kesinleştir",
+    "finalizeYes": "Evet, kesinleştir",
+    "confirm": "Kesinleştirince işaretleri değiştiremezsin. Devam edilsin mi?",
+    "confirmUnmarked_one": "{{count}} oyuncu işaretlenmedi: lehine ya da aleyhine sayılmaz. Kesinleştirince işaretleri değiştiremezsin. Devam edilsin mi?",
+    "confirmUnmarked_other": "{{count}} oyuncu işaretlenmedi: lehlerine ya da aleyhlerine sayılmaz. Kesinleştirince işaretleri değiştiremezsin. Devam edilsin mi?",
+    "finalized": "Yoklama kesinleşti. Oyuncular 72 saat içinde değerlendirme yapabilir, gelmedi işaretine itiraz edebilir.",
+    "finalizedToast": "Yoklama kesinleşti",
+    "waiting": "Organizatör yoklamayı henüz kesinleştirmedi.",
+    "mineTitle": "Katılımın",
+    "mine": {
+      "NOT_CONFIRMED": "Organizatör seni işaretlemedi. Bu, lehine ya da aleyhine sayılmaz.",
+      "PRESENT": "Geldin olarak işaretlendin.",
+      "ABSENT": "Gelmedin olarak işaretlendin.",
+      "DISPUTED": "İtirazın inceleniyor. Sonuçlanana kadar bu etkinlik güvenilirliğini etkilemez."
+    },
+    "dispute": "İtiraz et",
+    "disputeReason": "Neden yanlış?",
+    "disputeHint": "Yöneticiler okur. En fazla 500 karakter.",
+    "disputeSend": "İtirazı gönder",
+    "disputedToast": "İtirazın alındı",
+    "row": "{{name}}: {{status}}"
   }
 }
