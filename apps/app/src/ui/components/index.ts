@@ -4,6 +4,7 @@ export * from './Checkbox';
 export * from './EmptyState';
 export * from './Screen';
 export * from './SegmentedChoice';
+export * from './IconButton';
 export * from './Select';
 export * from './Sheet';
 export * from './Skeleton';

@@ -246,11 +246,11 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     const player = await userPage(browser, playerEmail);
     await player.page.goto(`/e/${eventId}`);
     const detail = player.page.getByRole('main');
-    await detail.getByRole('button', { name: 'Katılma isteği gönder' }).click();
+    await detail.getByRole('button', { name: 'Katılım isteği gönder' }).click();
     await detail.getByLabel('Organizatöre mesaj (isteğe bağlı)').fill('Orta saha oynarım');
     await expectNoBlocking(player.page);
     await detail.getByRole('button', { name: 'İsteği gönder' }).click();
-    await expect(detail.getByText('İstek gönderildi', { exact: true })).toBeVisible();
+    await expect(detail.getByText('Onay bekleniyor', { exact: true })).toBeVisible();
     await expect(detail.getByRole('button', { name: 'İsteği geri çek' })).toBeVisible();
 
     // The organizer sees the unread notification, the request, and approves it.
@@ -261,7 +261,7 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     await host.page.goto(`/e/${eventId}`);
     await expect(hostMain.getByText('Deniz Oyuncu')).toBeVisible();
     await expect(hostMain.getByText('Orta saha oynarım')).toBeVisible();
-    await expect(hostMain.getByRole('button', { name: 'Katılma isteği gönder' })).toHaveCount(0);
+    await expect(hostMain.getByRole('button', { name: 'Katılım isteği gönder' })).toHaveCount(0);
     await expectNoBlocking(host.page);
     await hostMain.getByRole('button', { name: 'Onayla' }).click();
     await expect(hostMain.getByText('Onaylı oyuncu (1)')).toBeVisible();
@@ -270,7 +270,7 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     // The player is in, sees it in My Events, and has a notification.
     await player.page.reload();
     await expect(
-      player.page.getByRole('main').getByText('Onaylandın', { exact: true }),
+      player.page.getByRole('main').getByText('Katılım onaylandı', { exact: true }),
     ).toBeVisible();
     await player.page.getByRole('tab', { name: 'Etkinliklerim' }).click();
     await player.page.getByRole('main').getByRole('radio', { name: 'Onaylı' }).click();
@@ -291,7 +291,7 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     await player.page.goto(`/e/${eventId}`);
     await player.page.getByRole('main').getByRole('button', { name: 'Etkinlikten ayrıl' }).click();
     await expect(
-      player.page.getByRole('main').getByRole('button', { name: 'Katılma isteği gönder' }),
+      player.page.getByRole('main').getByRole('button', { name: 'Katılım isteği gönder' }),
     ).toBeVisible();
 
     // An auto-approve event admits the player at once.
@@ -299,9 +299,9 @@ test.describe('joining an event (Phase 3 / M4)', () => {
     const autoId = await createPublishedEvent(s, organizerEmail, autoTitle, { autoApprove: true });
     await player.page.goto(`/e/${autoId}`);
     const auto = player.page.getByRole('main');
-    await auto.getByRole('button', { name: 'Katılma isteği gönder' }).click();
+    await auto.getByRole('button', { name: 'Katılım isteği gönder' }).click();
     await auto.getByRole('button', { name: 'İsteği gönder' }).click();
-    await expect(auto.getByText('Onaylandın', { exact: true })).toBeVisible();
+    await expect(auto.getByText('Katılım onaylandı', { exact: true })).toBeVisible();
 
     await player.context.close();
     await host.context.close();
@@ -403,7 +403,7 @@ test.describe('Sport icons and the pinned join action (UI tour)', () => {
     await expect(detail.locator('[data-testid="sport-icon-football"]').first()).toBeVisible();
 
     // The action is pinned: it is on the first screen and still there after scrolling to the end.
-    const join = detail.getByRole('button', { name: 'Katılma isteği gönder' });
+    const join = detail.getByRole('button', { name: 'Katılım isteği gönder' });
     await expect(join).toBeInViewport({ ratio: 1 });
     await detail.getByText('Çankaya · ODTÜ Halı Saha 2').scrollIntoViewIfNeeded();
     await page.mouse.wheel(0, 2000);
@@ -414,7 +414,7 @@ test.describe('Sport icons and the pinned join action (UI tour)', () => {
     await join.click();
     await detail.getByLabel('Organizatöre mesaj (isteğe bağlı)').fill('Pinned form');
     await detail.getByRole('button', { name: 'İsteği gönder' }).click();
-    await expect(detail.getByText('İstek gönderildi', { exact: true })).toBeVisible();
+    await expect(detail.getByText('Onay bekleniyor', { exact: true })).toBeVisible();
   });
 });
 
@@ -462,7 +462,9 @@ test.describe('invite-only events and the page for other viewers (Phase 3 comple
     const guestMain = guestPage.getByRole('main');
     await expect(guestMain.getByRole('heading', { name: title, level: 1 })).toBeVisible();
     await expect(guestMain.getByText('Ayşe Düzenleyen')).toBeVisible();
-    await expect(guestMain.getByRole('button', { name: 'Giriş yap ve katıl' })).toBeVisible();
+    await expect(
+      guestMain.getByRole('button', { name: 'Giriş yap ve katılım iste' }),
+    ).toBeVisible();
     await guest.close();
 
     // A player with the link asks; the organizer approves; the player then sees the roster.
@@ -471,9 +473,9 @@ test.describe('invite-only events and the page for other viewers (Phase 3 comple
     await signIn(playerPage, playerEmail);
     await playerPage.goto(path);
     const playerMain = playerPage.getByRole('main');
-    await playerMain.getByRole('button', { name: 'Katılma isteği gönder' }).click();
+    await playerMain.getByRole('button', { name: 'Katılım isteği gönder' }).click();
     await playerMain.getByRole('button', { name: 'İsteği gönder' }).click();
-    await expect(playerMain.getByText('İstek gönderildi', { exact: true })).toBeVisible();
+    await expect(playerMain.getByText('Onay bekleniyor', { exact: true })).toBeVisible();
     await expect(playerMain.getByText(/^Katılanlar/)).toHaveCount(0);
 
     await page.reload();
@@ -481,7 +483,7 @@ test.describe('invite-only events and the page for other viewers (Phase 3 comple
     await expect(hostMain.getByText('Onaylı oyuncu (1)')).toBeVisible();
 
     await playerPage.goto(`/e/${eventId}`);
-    await expect(playerMain.getByText('Onaylandın', { exact: true })).toBeVisible();
+    await expect(playerMain.getByText('Katılım onaylandı', { exact: true })).toBeVisible();
     await expect(playerMain.getByText('Katılanlar (1)')).toBeVisible();
     await expect(playerMain.getByText('Deniz Oyuncu', { exact: true })).toBeVisible();
     await expectNoBlocking(playerPage);
@@ -686,9 +688,9 @@ test.describe('the whole lifecycle (F-35)', () => {
 
     // Two requests, two approvals: the event is full.
     for (const player of [ada, bora]) {
-      await player.main.getByRole('button', { name: 'Katılma isteği gönder' }).click();
+      await player.main.getByRole('button', { name: 'Katılım isteği gönder' }).click();
       await player.main.getByRole('button', { name: 'İsteği gönder' }).click();
-      await expect(player.main.getByText('İstek gönderildi', { exact: true })).toBeVisible();
+      await expect(player.main.getByText('Onay bekleniyor', { exact: true })).toBeVisible();
     }
     await host.page.reload();
     await host.main.getByRole('button', { name: 'Onayla' }).first().click();
@@ -699,15 +701,15 @@ test.describe('the whole lifecycle (F-35)', () => {
     // The third player can only join the waitlist.
     await cem.page.reload();
     // The form's send button keeps the waitlist wording.
-    await cem.main.getByRole('button', { name: 'Etkinlik dolu, bekleme listesine katıl' }).click();
+    await cem.main.getByRole('button', { name: 'Yedek listeye başvur' }).click();
     await cem.main.getByLabel('Organizatöre mesaj (isteğe bağlı)').fill('Yer açılırsa gelirim');
-    await cem.main.getByRole('button', { name: 'Etkinlik dolu, bekleme listesine katıl' }).click();
-    await expect(cem.main.getByText('Bekleme listesindesin', { exact: true })).toBeVisible();
+    await cem.main.getByRole('button', { name: 'Yedek listeye başvur' }).click();
+    await expect(cem.main.getByText('Yedek listedesin', { exact: true })).toBeVisible();
 
     // A player leaves; the organizer promotes the waitlisted one by an explicit tap.
     await bora.page.reload();
     await bora.main.getByRole('button', { name: 'Etkinlikten ayrıl' }).click();
-    await expect(bora.main.getByRole('button', { name: 'Katılma isteği gönder' })).toBeVisible();
+    await expect(bora.main.getByRole('button', { name: 'Katılım isteği gönder' })).toBeVisible();
     await host.page.reload();
     await expect(host.main.getByText('2/3 kişi', { exact: true })).toBeVisible();
     await host.main.getByRole('button', { name: 'Onayla' }).click();

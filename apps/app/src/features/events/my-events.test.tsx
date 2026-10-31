@@ -152,7 +152,7 @@ describe('MyEventsScreen', () => {
     await fireEvent.press(screen.getByRole('radio', { name: 'Bekleyen' }));
     expect(await screen.findByText('İstek attığım maç')).toBeTruthy();
     expect(mockApi.fetchMyEvents).toHaveBeenLastCalledWith('PENDING', null);
-    expect(screen.getByText('İstek gönderildi')).toBeTruthy();
+    expect(screen.getByText('Onay bekleniyor')).toBeTruthy();
     expect(screen.queryByText('Perşembe maçı')).toBeNull();
   });
 
@@ -180,7 +180,7 @@ describe('MyEventsScreen', () => {
     await renderApp(<MyEventsScreen />, { session: signedIn });
     await screen.findByText('Düzenlediğin etkinlik yok');
     await fireEvent.press(screen.getByRole('radio', { name: 'Yedek' }));
-    expect(await screen.findByText('Bekleme listesinde değilsin')).toBeTruthy();
+    expect(await screen.findByText('Yedek listede değilsin')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Etkinliklere göz at' }));
     expect(mockRouter.push).toHaveBeenCalledWith('/');
   });

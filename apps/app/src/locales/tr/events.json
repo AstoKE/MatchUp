@@ -46,7 +46,7 @@
     "decrease": "Kontenjanı azalt",
     "increase": "Kontenjanı artır",
     "organizerPlays": "Ben de oynayacağım (bir kişilik yer tutar)",
-    "waitlist": "Doluysa bekleme listesi açık olsun",
+    "waitlist": "Doluysa yedek liste açık olsun",
     "autoApprove": "Yer varken istekleri otomatik onayla",
     "autoApproveHint": "Yer boşken ve bekleyen yokken oyuncular hemen onaylanır. Aksi halde her isteğe sen karar verirsin.",
     "visibility": "Kimler bulabilsin?",
@@ -120,7 +120,8 @@
     "participants_one": "Katılanlar ({{count}})",
     "participants_other": "Katılanlar ({{count}})",
     "participantsNone": "Henüz onaylanmış başka oyuncu yok.",
-    "participantsHidden": "Katılımcı listesi onaylanan oyunculara gösterilir."
+    "participantsHidden": "Katılımcı listesi onaylanan oyunculara gösterilir.",
+    "started": "Başladı"
   },
   "edit": {
     "title": "Etkinliği düzenle",
@@ -194,17 +195,17 @@
     "filtersClose": "Filtreleri kapat"
   },
   "join": {
-    "signInToJoin": "Giriş yap ve katıl",
-    "request": "Katılma isteği gönder",
-    "joinWaitlist": "Etkinlik dolu, bekleme listesine katıl",
+    "signInToJoin": "Giriş yap ve katılım iste",
+    "request": "Katılım isteği gönder",
+    "joinWaitlist": "Yedek listeye başvur",
     "send": "İsteği gönder",
     "withdraw": "İsteği geri çek",
     "leave": "Etkinlikten ayrıl",
     "withdrawn": "İsteğin geri çekildi.",
     "state": {
-      "REQUESTED": "İstek gönderildi",
-      "WAITLISTED": "Bekleme listesindesin",
-      "APPROVED": "Onaylandın"
+      "REQUESTED": "Onay bekleniyor",
+      "WAITLISTED": "Yedek listedesin",
+      "APPROVED": "Katılım onaylandı"
     },
     "stateHint": {
       "REQUESTED": "Organizatör onaylayınca haber vereceğiz.",
@@ -224,15 +225,15 @@
     "result": {
       "REQUESTED": "İstek gönderildi. Organizatör onaylayınca haber vereceğiz.",
       "APPROVED": "Katılımın onaylandı.",
-      "WAITLISTED": "Etkinlik dolu. Bekleme listesine eklendin."
+      "WAITLISTED": "Etkinlik dolu. Yedek listeye eklendin."
     }
   },
   "requests": {
     "title": "İstekler",
     "pending_one": "Bekleyen istek ({{count}})",
     "pending_other": "Bekleyen istekler ({{count}})",
-    "waitlist_one": "Bekleme listesi ({{count}})",
-    "waitlist_other": "Bekleme listesi ({{count}})",
+    "waitlist_one": "Yedek liste ({{count}})",
+    "waitlist_other": "Yedek liste ({{count}})",
     "approved_one": "Onaylı oyuncu ({{count}})",
     "approved_other": "Onaylı oyuncular ({{count}})",
     "empty": "Henüz istek yok.",
@@ -242,7 +243,7 @@
     "attempt": "{{count}}. istek",
     "fullHint": "Etkinlik dolu: onaylamak için önce bir yer açılmalı.",
     "approve": "Onayla",
-    "toWaitlist": "Bekleme listesine al",
+    "toWaitlist": "Yedek listeye al",
     "reject": "Reddet",
     "remove": "Etkinlikten çıkar",
     "confirmRemove": "{{name}} etkinlikten çıkarılsın mı? Bu işlem geri alınamaz.",
@@ -258,10 +259,10 @@
       "PAST": "Geçmiş"
     },
     "status": {
-      "REQUESTED": "İstek gönderildi",
-      "APPROVED": "Onaylandın",
+      "REQUESTED": "Onay bekleniyor",
+      "APPROVED": "Katılım onaylandı",
       "REJECTED": "Reddedildi",
-      "WAITLISTED": "Bekleme listesinde",
+      "WAITLISTED": "Yedek listede",
       "CANCELED": "İstek geri çekildi",
       "REMOVED": "Etkinlikten çıkarıldın"
     },
@@ -284,7 +285,7 @@
         "body": "Katılımın onaylanan yaklaşan etkinlikler burada listelenir."
       },
       "WAITLISTED": {
-        "title": "Bekleme listesinde değilsin",
+        "title": "Yedek listede değilsin",
         "body": "Dolu etkinliklerde beklediğin yerler burada görünür."
       },
       "PAST": {

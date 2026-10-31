@@ -14,10 +14,10 @@
     "JOIN_REQUESTED": "{{event}} için yeni bir katılma isteği var.",
     "REQUEST_APPROVED": "{{event}} için isteğin onaylandı.",
     "REQUEST_REJECTED": "{{event}} için isteğin kabul edilmedi.",
-    "REQUEST_WAITLISTED": "{{event}} için bekleme listesine alındın.",
+    "REQUEST_WAITLISTED": "{{event}} için yedek listeye alındın.",
     "PARTICIPANT_REMOVED": "{{event}} etkinliğinden çıkarıldın.",
     "PARTICIPANT_CANCELED": "Bir oyuncu {{event}} etkinliğinden ayrıldı.",
-    "SPOT_OPENED": "{{event}} için bir yer açıldı; bekleme listesinde oyuncu var.",
+    "SPOT_OPENED": "{{event}} için bir yer açıldı; yedek listede oyuncu var.",
     "EVENT_CANCELED": "{{event}} iptal edildi.",
     "EVENT_CHANGED": "{{event}} etkinliğinin zamanı veya yeri değişti.",
     "ATTENDANCE_FINALIZED": "{{event}} için yoklama kesinleşti. Katılımını kontrol et, birlikte oynadıklarını değerlendir."
