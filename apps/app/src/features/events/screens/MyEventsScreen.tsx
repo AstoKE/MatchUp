@@ -11,7 +11,7 @@ import { errorText } from '@/lib/error-text';
 import { i18n } from '@/lib/i18n';
 import { Button, EmptyState, Screen, SegmentedChoice, Skeleton, Text, useTheme } from '@/ui';
 import type { MyEventItem } from '../api/my-events-api';
-import { EventCard, type CardBadge } from '../components/EventCard';
+import { EventListRow, type CardBadge } from '../components/EventListRow';
 import { useMyEvents } from '../hooks';
 
 /** What the caller should know at a glance, besides what the card already says: state + own request. */
@@ -131,7 +131,7 @@ function MyEventsContent() {
             <View role="list" style={{ gap: spacing[3] }}>
               {items.map((event) => (
                 <View key={event.id} role="listitem">
-                  <EventCard event={event} catalog={catalog.data} badges={badgesFor(event)} />
+                  <EventListRow event={event} catalog={catalog.data} badges={badgesFor(event)} />
                 </View>
               ))}
             </View>

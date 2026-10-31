@@ -56,8 +56,8 @@ export function Pill({
     <View
       style={{
         alignSelf: 'flex-start',
-        paddingHorizontal: spacing[3],
-        paddingVertical: spacing[1],
+        paddingHorizontal: spacing[2],
+        paddingVertical: 2,
         borderRadius: radius.pill,
         borderWidth: 1,
         borderColor: accent,
@@ -68,7 +68,7 @@ export function Pill({
       }}
     >
       {icon}
-      <Text variant="label">{label}</Text>
+      <Text variant="micro">{label}</Text>
     </View>
   );
 }

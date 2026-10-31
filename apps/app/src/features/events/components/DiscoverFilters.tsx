@@ -6,15 +6,16 @@ import {
   type DiscoverFilters as Filters,
   type TimeOfDay,
 } from '@matchup/domain';
-import { View } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, type CatalogCity, type CatalogSport } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
 import {
   Button,
-  Checkbox,
   SegmentedChoice,
   Select,
+  Sheet,
   SportIcon,
   Text,
   ToggleChip,
@@ -25,7 +26,10 @@ function toggle<T>(list: readonly T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
-/** The Discover filter panel: single-choice day, multi-choice parts of the day and sports, district, open slots. */
+/**
+ * Discover's filters (docs/design.md §5.1): the frequent ones on one scrollable line (day, open spots, sports), the rest
+ * in a sheet behind a button that shows how many filters are active. Same filters as before, on every screen size.
+ */
 export function DiscoverFilters({
   filters,
   onChange,
@@ -39,89 +43,108 @@ export function DiscoverFilters({
 }) {
   const { t } = useTranslation('events');
   const { spacing } = useTheme();
+  const [open, setOpen] = useState(false);
   const locale = currentLocale();
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch });
+  const count = activeFilterCount(filters);
 
   return (
-    <View role="group" accessibilityLabel={t('discover.filtersTitle')} style={{ gap: spacing[4] }}>
-      <SegmentedChoice
-        label={t('discover.datePreset')}
-        options={DATE_PRESETS.map((value) => ({ value, label: t(`discover.date.${value}`) }))}
-        value={filters.datePreset}
-        onChange={(datePreset) => set({ datePreset })}
-      />
-
-      <View style={{ gap: spacing[2] }}>
-        <Text variant="label" tone="secondary">
-          {t('discover.timeOfDayTitle')}
-        </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
-          {TIME_OF_DAY_PARTS.map((part: TimeOfDay) => (
-            <ToggleChip
-              key={part}
-              label={t(`discover.timeOfDay.${part}`)}
-              selected={filters.timeOfDay.includes(part)}
-              onPress={() => set({ timeOfDay: toggle(filters.timeOfDay, part) })}
-            />
-          ))}
-        </View>
-      </View>
-
-      <View style={{ gap: spacing[2] }}>
-        <Text variant="label" tone="secondary">
-          {t('discover.sportsTitle')}
-        </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
-          {sports.map((sport) => (
-            <ToggleChip
-              key={sport.id}
-              label={localizedName(sport.names, locale)}
-              icon={(color) => <SportIcon slug={sport.slug} color={color} size={20} />}
-              selected={filters.sportIds.includes(sport.id)}
-              onPress={() => set({ sportIds: toggle(filters.sportIds, sport.id) })}
-            />
-          ))}
-        </View>
-      </View>
-
-      <SegmentedChoice
-        label={t('discover.setting')}
-        value={filters.setting ?? 'ANY'}
-        onChange={(value) => set({ setting: value === 'ANY' ? null : value })}
-        options={[
-          { value: 'ANY', label: t('discover.settingAny') },
-          { value: 'INDOOR', label: t('setting.INDOOR') },
-          { value: 'OUTDOOR', label: t('setting.OUTDOOR') },
-        ]}
-      />
-
-      {city ? (
-        <Select
-          label={t('discover.district')}
-          placeholder={t('discover.districtPlaceholder')}
-          noneLabel={t('discover.districtAny')}
-          options={city.districts.map((d) => ({
-            value: d.id,
-            label: localizedName(d.names, locale),
-          }))}
-          value={filters.districtId}
-          onChange={(districtId) => set({ districtId })}
-        />
-      ) : null}
-
-      <Checkbox
-        label={t('discover.onlyOpen')}
-        checked={filters.onlyOpen}
-        onChange={(onlyOpen) => set({ onlyOpen })}
-      />
-
-      {activeFilterCount(filters) > 0 ? (
+    <View role="group" accessibilityLabel={t('discover.filtersTitle')} style={{ gap: spacing[2] }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: spacing[2], alignItems: 'center' }}
+      >
         <Button
-          label={t('discover.clear')}
-          variant="tertiary"
-          onPress={() => onChange(EMPTY_DISCOVER_FILTERS)}
+          variant="secondary"
+          label={count > 0 ? t('discover.filtersWithCount', { count }) : t('discover.filtersTitle')}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          onPress={() => setOpen(true)}
         />
+        {DATE_PRESETS.filter((value) => value !== 'ANY').map((value) => (
+          <ToggleChip
+            key={value}
+            label={t(`discover.date.${value}`)}
+            selected={filters.datePreset === value}
+            onPress={() => set({ datePreset: filters.datePreset === value ? 'ANY' : value })}
+          />
+        ))}
+        <ToggleChip
+          label={t('discover.onlyOpen')}
+          selected={filters.onlyOpen}
+          onPress={() => set({ onlyOpen: !filters.onlyOpen })}
+        />
+        {sports.map((sport) => (
+          <ToggleChip
+            key={sport.id}
+            label={localizedName(sport.names, locale)}
+            icon={(color) => <SportIcon slug={sport.slug} color={color} size={20} />}
+            selected={filters.sportIds.includes(sport.id)}
+            onPress={() => set({ sportIds: toggle(filters.sportIds, sport.id) })}
+          />
+        ))}
+      </ScrollView>
+      {count > 0 ? (
+        <View style={{ alignItems: 'flex-start' }}>
+          <Button
+            label={t('discover.clear')}
+            variant="tertiary"
+            onPress={() => onChange(EMPTY_DISCOVER_FILTERS)}
+          />
+        </View>
       ) : null}
+
+      <Sheet
+        visible={open}
+        title={t('discover.filtersTitle')}
+        onClose={() => setOpen(false)}
+        closeLabel={t('discover.filtersClose')}
+        footer={
+          <Button label={t('discover.filtersDone')} onPress={() => setOpen(false)} fullWidth />
+        }
+      >
+        <View style={{ gap: spacing[4] }}>
+          <View style={{ gap: spacing[2] }}>
+            <Text variant="label" tone="secondary">
+              {t('discover.timeOfDayTitle')}
+            </Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+              {TIME_OF_DAY_PARTS.map((part: TimeOfDay) => (
+                <ToggleChip
+                  key={part}
+                  label={t(`discover.timeOfDay.${part}`)}
+                  selected={filters.timeOfDay.includes(part)}
+                  onPress={() => set({ timeOfDay: toggle(filters.timeOfDay, part) })}
+                />
+              ))}
+            </View>
+          </View>
+          <SegmentedChoice
+            label={t('discover.setting')}
+            value={filters.setting ?? 'ANY'}
+            onChange={(value) => set({ setting: value === 'ANY' ? null : value })}
+            options={[
+              { value: 'ANY', label: t('discover.settingAny') },
+              { value: 'INDOOR', label: t('setting.INDOOR') },
+              { value: 'OUTDOOR', label: t('setting.OUTDOOR') },
+            ]}
+          />
+          {city ? (
+            <Select
+              label={t('discover.district')}
+              placeholder={t('discover.districtPlaceholder')}
+              noneLabel={t('discover.districtAny')}
+              options={city.districts.map((d) => ({
+                value: d.id,
+                label: localizedName(d.names, locale),
+              }))}
+              value={filters.districtId}
+              onChange={(districtId) => set({ districtId })}
+            />
+          ) : null}
+        </View>
+      </Sheet>
     </View>
   );
 }
