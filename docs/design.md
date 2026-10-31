@@ -1,189 +1,227 @@
-# MatchUp Visual Identity — `design.md`
+MatchUp — Product Design System & UI/UX Specification
+Status: Approved visual direction; detailed values are implementation targets, subject to platform/accessibility validation.
+Version: 1.0 · 2026-10-31
+Owner: MatchUp
+Applies to: Expo / React Native / Expo Web, iOS, Android, and responsive web.
+Primary audience: Adults in Turkey; Turkish-first interface, English-ready.
+1. Design mission and hierarchy
+MatchUp helps people discover sports activities, find players, and join events with minimal friction. Design for a fast, premium, quiet, sports-oriented experience. Prioritize legibility, clarity, trust, and swift navigation over decorative complexity.
 
-Status: **v0.2: v0.1 authored in Phase 2 preparation (2026-10-25), direction A added 2026-10-30 (§0).** This is the visual source of truth that `UI_DESIGN_SYSTEM.md` §0 said would arrive. It supersedes the provisional values in that document **where they differ**; accessibility minimums (UI_DESIGN_SYSTEM §8) still outrank taste. The product name and logo remain provisional (ADR-0010); nothing here depends on either.
+This document is the authoritative VISUAL AND INTERACTION design direction. The existing PRD, architecture, domain rules, security requirements and accessibility standards remain authoritative for product behavior, data and implementation. When there is a conflict, never override business logic or security merely to match a screenshot. Document significant design tradeoffs.
 
-Process note: this file was written by the engineering assistant at the founder's request, as an *original* specification. It has not been reviewed by a professional brand designer. Treat it as a strong, buildable draft, and expect refinement once real screens and photography exist.
+The four supplied references are inspiration, not assets to reproduce or screens to trace. Do not copy the GoodRec name, logo, distinctive illustrations, photo content, wording, or pixel-perfect proprietary layouts. Build an original MatchUp interface using comparable patterns: dark surfaces, compact sport listings, big venue imagery, clear hierarchy, minimal booking steps, and confident calls to action.
+Provided image references
+- [`references/discover.png`](references/discover.png): browse/list with compact rows, sport filters and bottom navigation.
+- [`references/event-detail.png`](references/event-detail.png): immersive venue hero, information overlay, bottom action.
+- [`references/join-confirm.png`](references/join-confirm.png): distraction-free review/confirmation with sticky bottom button.
+- [`references/join-success.png`](references/join-success.png): restrained success state and concise event recap.
+These are illustrative screen examples, not a complete page inventory. Extend the same system coherently to onboarding, profile, create event, organizer approvals, notifications, settings and responsive web.
+2. Core principles
+1. Content first: Show available activities and actionable details immediately; avoid marketing-heavy chrome.
+2. Fast comprehension: A user should identify sport, date/time, place, format, availability and participation state at a glance.
+3. Single dominant action: Each screen has one primary CTA. Secondary actions should be visibly subordinate.
+4. Minimal but not sparse: Dense event lists can be compact; forms and detail screens need breathing room.
+5. Trustworthy states: Pending approval, confirmed participation, full capacity, waitlist, cancellation, location disclosure and booking status must be explicit.
+6. Mobile-first, platform-aware: Respect iOS/Android behavior, safe areas, keyboard handling, and native back navigation; create deliberate desktop layouts.
+7. Accessible by default: Text scaling, focus states, contrast, 44x44pt minimum practical tap areas, screen-reader announcements, clear form errors and reduced-motion support.
+8. Original branding: Preserve the visual mood while making MatchUp recognizably its own product.
+3. Visual language
+3.1 Color palette
+Adopt charcoal/black + warm red/coral as the main direction inspired by the provided screenshots. The previous bright-lime visual language should not remain randomly mixed into the UI. Treat lime as a legacy/provisional palette until a deliberate brand decision. The logo may be revisited separately; do not force a multicolor logo to dictate the entire product palette.
 
-## 0. Direction A, "Gece Maçı" (founder's choice, 2026-10-30): supersedes where it differs
+Recommended starting design tokens (verify AA contrast, especially small text and disabled states):
+Token	Hex	Usage
+color.bg.canvas	#0B0B0C	Main dark background
+color.bg.surface	#18191B	Event cards, fields, panels
+color.bg.surfaceRaised	#222326	Active layers and modal surfaces
+color.border.subtle	#323438	Delicate card/input boundaries
+color.text.primary	#F5F5F6	Titles and body copy
+color.text.secondary	#AAAEB5	Metadata
+color.text.tertiary	#8D929A	Secondary details, with contrast checks
+color.brand.primary	#E13C47	Main CTA, active states
+color.brand.pressed	#BF2936	Pressed button
+color.success	#32996F	Confirmed participation
+color.warning	#E6AB4A	Pending approval / warning
+color.danger	#EC6262	Error/destructive actions
 
-The founder picked one of three drawn directions (A "Gece Maçı", B "Mahalle Maçı", C "Net Sayfa"; the drawings are a private canvas, not in the repo). **Where this section differs from §4.1, §5 and §6, this section wins**; §1 to §3 and §7 to §13 stay as written (personality, voice, logo rules, accessibility, microcopy). The founder drew only the dark theme and two screens (Discover, event page). The **light theme is derived**, not drawn, and needs the founder's review.
 
-- **Character:** dark near-black ground, one vivid lime accent, strong condensed headlines, round shapes.
-- **Color (implemented in `apps/app/src/ui/tokens`; contrast enforced by `tokens.test.ts`):**
+Use semantic tokens, not hardcoded color literals across screens. Introduce accessible light-mode tokens if light mode is supported; do not auto-invert brand colors. Color must never be the sole carrier of status.
+3.2 Typography
+Use a legible sans-serif font with strong Turkish support (including ğ, ü, ş, ı, ö, ç, İ). Prefer a well-supported font such as Inter, or a compatible system font when platform footprint/performance warrants it. Avoid copying an external brand's signature typography.
 
-| Role | Dark (as drawn) | Light (derived) |
-|---|---|---|
-| App ground | `#0E1116` | `#F4F6F8` |
-| Raised surface (cards) | `#171C23` | `#FFFFFF` |
-| Sunken surface | `#0A0D12` | `#E9EDF2` |
-| Primary / secondary text | `#F2F5F7` / `#A9B4C0` | `#0E1116` / `#4A5565` |
-| Primary action | lime `#C6F432`, label `#0E1116` | ink `#0E1116`, label lime `#C6F432` |
-| Link | lime `#C6F432` | olive `#3F6B00` |
-| Warning (full, waitlist) | `#FFB454` | `#8A4B00` |
-| Danger / success | `#FF8A80` / `#6EE7A8` | `#B42318` / `#067647` |
-| Subtle border | `#222B38` | `#D5DCE4` |
+Base styles, responsive to dynamic text settings:
+Style	Starting size	Weight	Usage
+Screen title	24–28	700	Page heading
+Section title	19–22	700	Day headers / grouped listings
+Card title	16–17	650–700	Event name
+Body	14–16	400–500	Event details and descriptions
+Metadata	12–13	400–500	Time, sport, distance
+Micro label	11–12	600	Chips and status
+Button	15–16	650–700	CTA
 
-  Lime is never text or a fill on a light ground. Measured (dark): text 15.6:1 on cards, secondary 8.1:1, lime on ground 14.8:1; (light) link 6.3:1, secondary 7.6:1. The pitch-green primary of §4.1 is retired; the other rules of §4.2 (one loud color per screen, never color alone, ember/warning for time pressure) still apply with lime as the loud color.
-- **Shape (replaces the §6 radius list):** `sm 6 · md 10 · lg 20 · xl 28 · pill`; buttons are pills (minimum height 48), cards 20, chips pills, meters 6 px with a round end.
-- **Type (replaces §5's heading family; not implemented yet):** **Barlow Condensed** 600/700 for headlines and numbers (times, spot counts), **Inter** 400/500/600 for body and controls. Same release gate as §5 (Turkish glyph coverage, no `text-transform` for case changes), same two-family limit. Until added (a new dependency, justified and pinned with `expo install`), the app uses the system font.
-- **Screens as drawn (not yet applied):** Discover with a large title, filter button, sport chips, day headings, cards with a large time, title, place, spot meter and label; the event page with a time block and a spots block, the organizer, the roster and a pinned lime action; the tab bar with the Create tab as a round lime button.
-- **Logo:** not in the Discover header or on the account screens any more (founder's request 2026-10-30, consistent with §3); the new mark is the app and web icon only.
-- **Applied so far:** color tokens (both themes), the radius scale, pill buttons, the Discover header without the logo. **Not yet:** fonts, card and event page layouts, tab bar details, sport tints (§4.2 item 6, a separate review), a dark/light preference setting (the app follows the system).
 
-### Founder's notes for the general design pass (2026-10-31, not applied yet)
+Do not shrink essential information to reproduce the reference image's pixel density. Support 200% text scaling as far as practical; layouts must reflow gracefully.
+3.3 Shape, spacing and motion
+- 4pt spacing foundation; recommended scale: 4, 8, 12, 16, 20, 24, 32, 40, 48.
+- Cards: ~16–20px radius; chips: fully rounded; buttons: ~12–16px or pill where appropriate.
+- Cards should mostly use subtle borders and contrasting surfaces, not heavy drop shadows.
+- Primary mobile padding: 16px, adapted for tablet/desktop.
+- List row image: rounded thumbnail (~52–64px) if the screen uses compact listing.
+- Animations: restrained 140–220ms transitions; no distracting bounce loops. Respect reduced motion.
+- Loading: skeleton placeholders for lists/details, clear retry/empty/error states.
+4. Core components
+Build reusable and accessible components rather than one-off styling:
+- Screen, ScreenHeader, PageContainer, BottomTabBar, StickyActionBar
+- EventListRow, EventCard, EventHero, EventStatusBadge, CapacityIndicator
+- SportFilterChip, DateFilterChip, FilterSheet, EmptyState, SkeletonRow
+- PrimaryButton, SecondaryButton, TextButton, IconButton
+- Avatar, SportLevelPill, ReliabilityPill, BadgePill
+- InfoRow, KeyValuePanel, FormField, Select, DateTimeField, InlineError
+- LocationPreview, VenuePhoto, RequestStateTimeline, ConfirmationState
+Every interactive component should define: default, pressed, focused, disabled, loading, error (where applicable), and selected states, plus accessibility role/label. Avoid excessive nested containers and redundant shadows.
+5. Screen specifications
+5.1 Discover / Explore — reference: discover.png
+Goal: Quickly browse upcoming local activities, with sport/date filters and obvious availability.
 
-From testing the Phase 5 screens. Apply them when the general design pass starts; the behaviour is already correct.
+Layout:
+- Dark background, clear app title / city selector at top.
+- One-line or horizontally scrollable filter chips: sport, date, time of day, available spots; show active-filter indicator and reset option.
+- Group events under localized day headings: Bugün, Yarın, 4 Kasım Çarşamba.
+- Use compact rounded rectangular rows/cards with a small venue image, event name or venue, sport/format, time, availability/status chip.
+- Offer list/map toggle when a map screen exists; map is not required to block the list experience.
+- Sticky bottom navigation: Keşfet, Etkinliklerim, Oluştur, Profil for MVP; center create action may be visually emphasized, but not at the expense of hierarchy.
+- Avoid unnecessary progress bars on every compact list row; display clear 3 yer kaldı or 12/14 kişi text. Capacity bar may be used in event detail or expanded cards.
+Interaction: Tapping a row opens detail; filters remain discoverable; sign-in is not required for public event discovery. Do not expose private participants, hidden location details, or sensitive user data to guests.
+5.2 Event detail — reference: event-detail.png
+Goal: Make a user confident enough to request a spot.
 
-- **Badges are round icons**, not the text cards the profile shows today.
-- **XP and level are a progress bar**, as in games: current level, filled share toward the next level. Today it is text only. Keep the numbers available to screen readers.
-- **Negative states stand out**, with a warning icon or a red or orange color: an expired window (reviews, disputes), being marked absent, and similar. Today they are plain text. Use the `danger` and `warning` tokens; never color alone (§ accessibility minimums): the text or icon must say it too. This does not change the rule that a neutral state (not marked, under review) is not presented as a penalty.
+Layout:
+- Tall, edge-to-edge venue/event hero image (responsive height and graceful fallback if no photo).
+- Dark lower overlay/gradient for readable title and concise badges; no text over poorly contrasted image regions.
+- Sport/format, event title, approximate location, date, time, duration and spots near the top.
+- Further details: skill requirements, organizer summary, remaining capacity, attendance expectations, venue/booking information and any disclosed participation costs.
+- Sticky CTA area at bottom with safe-area padding.
+CTA states:
+- Guest: Giriş yap ve katılım iste.
+- Eligible authenticated user: Katılım isteği gönder.
+- Already requested: Onay bekleniyor (non-duplicate action; allow cancellation).
+- Approved: Katılım onaylandı.
+- Full with waiting list available: Yedek listeye başvur.
+- Organizer: Etkinliği yönet.
+- Canceled/past/unavailable: clear disabled or contextual state.
+Business rule: Event participation requires organizer approval. Never claim the user is accepted immediately after submitting a request.
+5.3 Join request confirmation — reference: join-confirm.png
+Goal: Review the event and submit a request with minimal friction.
 
-## 1. What we take from GoodRec — and what we do not
+Layout:
+- Minimal title: Katılım isteğini onayla.
+- Compact event-summary panel with venue thumbnail, sport/format, date/time, approximate location and any price/cost disclosures.
+- Present essential participation conditions without adding redundant mandatory consent checkboxes each time.
+- Distinguish mandatory platform legal consent (captured at onboarding) from event-specific rules requiring an explicit acknowledgment, if applicable.
+- Sticky full-width CTA: İstek gönder.
+- Prevent repeated taps/double requests with a loading state and server-side idempotency.
+Do not add a Confirm & pay step until actual payments exist and are properly authorized. External venue costs must be labeled as informational and not a MatchUp charge.
+5.4 Request-submitted state — reference: join-success.png
+Goal: Communicate the result accurately and reassure the user.
 
-GoodRec (public marketing pages, reviewed 2026-10-24; app not seen) is our **usability benchmark**: a player can answer, within a second of seeing a game, *what / when / where / how many spots / can I trust it?* — and has one obvious action.
+Layout:
+- Calm, centered status icon and short title.
+- For a new request, show İsteğin gönderildi with amber/pending icon, not a green check that implies a confirmed slot.
+- Supportive copy: Organizatör onayladığında sana bildireceğiz.
+- Compact key/value summary: sport, event, date, time, location visibility and current status.
+- Actions: Etkinliklerime git or Etkinliği görüntüle.
+Create a separate green Katılımın onaylandı success state only when server-verified approval exists. Preserve consistent pending, rejected, waitlisted, canceled and approved designs.
+5.5 Create event
+Use a readable step-based form, not an excessively long one-page wall of inputs:
+1. Sport and format.
+2. Date/time and participant count.
+3. Location/venue and externally arranged booking status.
+4. Title, description, skill range and event rules.
+5. Review and publish.
+Give persistent save/error feedback; show form-level and field-level errors. Make clear that organizers must approve join requests. Display participation cost information accurately; MVP does not collect payment.
+5.6 My Events
+Tabs/filters: Yaklaşan, Başvurularım, Düzenlediklerim, Geçmiş. Distinguish pending requests, confirmed events and waitlist status with both text and subtle color.
+5.7 Organizer management
+Emphasize pending requests and remaining capacity. Show candidate's sport-specific level, reliability indicator (when meaningful sample exists), and essential profile info. Actions: approve, reject, remove with safeguards and confirmation for destructive actions. Do not show unnecessary personal data.
+5.8 Profile and onboarding
+Use the same dark surfaces and restrained cards. Showcase identity, selected sports, sport-specific skill, reliability, XP and achievements as distinct metrics. Do not conflate skill and experience. Provide profile privacy choices, 18+ gate and clear consent copy. Avoid gamification clutter.
+5.9 Notifications / settings / empty states
+Use consistent list rows, section dividers, explicit status labels, and obvious empty state actions. Create useful empty states such as Henüz katıldığın etkinlik yok with Etkinlikleri keşfet action.
+6. Responsive web behavior
+- Mobile: single column; sticky bottom tabs and CTAs; platform safe areas.
+- Tablet: wider gutters, potentially two-column list/detail patterns.
+- Desktop: max-width content container, top/side navigation instead of stretched bottom mobile bar; filters in an accessible horizontal toolbar or panel; list/map split view if useful.
+- Avoid giant full-bleed mobile hero images on desktop; constrain image aspect ratio and text widths.
+- Support keyboard, hover, focus-visible and accessible dialogs on web.
+7. Photos, icons and content
+- Images should feature authentic sports spaces and situations; prefer supplied or properly licensed content.
+- Use venue thumbnails in lists and larger images in details. Provide dependable gradient/illustrated fallbacks when images are unavailable.
+- Keep image treatments consistent: predictable crop, gentle corner radius, lightweight dark gradient for white text overlays.
+- Do not use screenshots or photos from the supplied GoodRec references as production assets.
+- Use a coherent icon set, consistent stroke width; don't mix emoji as primary UI icons with line icons.
+- All microcopy must be natural Turkish, concise and accurate. Use internationalization keys; do not hardcode UX copy into domain logic.
+8. Accessibility and trust requirements
+- WCAG 2.2 AA target for web, with platform-specific mobile accessibility best practices.
+- Validate colors in both dark/light contexts and across every component state. Do not assume sample token colors automatically pass contrast.
+- Navigation and CTAs must be reachable with screen readers and keyboard; preserve visible focus indicators.
+- Make dates/time explicit and localized (Europe/Istanbul), show cost currency (TRY), and distinguish estimated venue payments from in-app payments.
+- Do not hide critical event limitations in microtext or color-coded badges alone.
+- For public events, protect location privacy by revealing only allowed approximate details until approval.
+- Never show false You're in confirmation, booked venue, player verified badge or payment success state.
+9. Implementation and acceptance rules for Claude Code
+1. Read this file together with docs/PRD.md, docs/ARCHITECTURE.md, and relevant domain/security documents before making UI changes.
+2. Audit the existing UI and inventory reusable components before replacing anything.
+3. Add tokens in shared theme/config; avoid hardcoded component colors and one-off spacing.
+4. Build/refine one vertical UI slice at a time. Start with Discover → Event Detail → Join Request → Pending Confirmation, while respecting the actual current feature implementation phase.
+5. Do not implement non-existent backend functionality just to make screenshots look complete. Use clearly isolated preview fixtures or existing test seeds only for visual previews.
+6. Preserve organizer approval, auth boundaries, real event states and localization.
+7. Test on small Android screens, iPhone-sized layouts, web desktop/tablet, high-text-scale mode, and keyboard/screen-reader where available; clearly identify environments not actually tested.
+8. Add screenshot/visual regression tests where practical and behavioral tests for status-specific CTAs.
+9. Avoid pixel-perfect copying. Similar information hierarchy and minimalist feel are desired; brand identity must be original.
+10. Document deliberate deviations and verify contrast/performance before accepting a design change.
+Definition of done for UI implementation
+- Looks coherent with this style in every implemented screen.
+- No placeholder or dead-end buttons in production flows.
+- Correct loading, error, empty, pending, approved, waitlisted and canceled states.
+- Primary CTA never conflicts with authoritative server state.
+- Guest and signed-in flows behave correctly.
+- Design tokens, localization and accessibility checks are covered.
+- Actual mobile/web validation is recorded; build success alone is not treated as runtime verification.
+10. Suggested first UI redesign task
+Do not execute this task solely because this document exists; wait for an explicit implementation instruction.
 
-| We adopt the *principle* | We do **not** copy |
-|---|---|
-| Glanceable game card: sport + format, time, place, spots left | Any GoodRec color, typeface, layout, icon, illustration, photography, screenshots or copy |
-| One dominant action per screen (request / manage) | Their card/page composition or navigation arrangement |
-| Cancellation rules visible *before* committing | Their wording or policy structure |
-| Honest availability ("spots left" is shown, never implied) | A platform-managed/paid model (ours is community-led, no payments in MVP) |
+When requested:
+1. Review the existing MatchUp screens and shared tokens.
+2. Produce a visual gap analysis relative to this specification and the four reference images.
+3. Propose a minimal component/theme refactor plan.
+4. Implement the Discover screen first, preserving existing functionality and passing tests.
+5. Then style Event Detail and participation states once those features exist.
+6. Report changed files, screenshot comparisons, test results and any remaining issues.
 
-Everything below was designed from MatchUp's own requirements. Originality guardrail for reviews: if a design choice can be traced to a specific competitor asset, it is rejected.
+11. Recorded decisions and deviations (2026-11-01)
+The founder's decisions after the audit, and where measurement moved a value. The spec above is otherwise unchanged. Older code comments citing "design.md §n" refer to docs/design-v0.2-archive.md.
 
-## 2. Personality
+Decisions:
+- Light theme stays (it is a setting today); dark is primary, light is derived with its own tokens.
+- Font: Inter, weights 400, 600 and 700. Weights 500 and 650 from §3.2 map to the nearest loaded one. Package @expo-google-fonts/inter, about 340 kB per weight, loaded at runtime on web and native.
+- Discover rows keep a small "paid" label; the amount and note are on the event page.
+- Term: "yedek liste" (waitlist) everywhere.
+- Badges are round icons and XP is a progress bar (founder's notes of 2026-10-31, see below), inside a calm profile section, which is how "avoid gamification clutter" is honored.
+- Auto-approve events stay. "Participation requires organizer approval" holds for all others; the green approved state appears only when the server answers APPROVED.
+- docs/references/ is git-ignored: third-party screenshots, never production assets. Local copies only.
 
-**Energetic · fair · local · welcoming · trustworthy.** A neighbourhood pitch at 19:00 on a weeknight, not a stadium broadcast. Confident but never aggressive; competitive spirit with fair-play values (our reputation system is a design theme, not an add-on).
+Measured deviations from the §3.1 sample tokens (AA, enforced by tokens.test.ts):
+Token	Spec	Used	Why
+action primary	#E13C47	#D73641	White label was 4.25:1; now 4.67:1
+action pressed	#BF2936	#B82633	Stays clearly darker than the new primary
+link / active text	#E13C47	#FF8A8F	Red text was 4.14 on surface and 3.70 on raised; now 7.78 and 6.95
+success	#32996F	#45B58A	Was 4.43 on raised; now 6.16
+control border	#323438	#7A7F87	Inputs need 3:1 (WCAG 1.4.11); #323438 stays for decorative card borders
 
-Voice (Turkish first): second person informal ("sen"), short, concrete, warm. *"Bir yer açıldı — katılmak ister misin?"*, not *"Katılım talebinizin değerlendirilmesi beklenmektedir."* Never shame ("Güvenilirlik puanın düştü" is stated factually with a way forward).
+Primary red and danger are close, so: destructive buttons are outlined, and a negative state always carries an icon or text as well as color.
 
-## 3. Logo and brand assets
+Founder's notes from testing Phase 5:
+- Badges are round icons, not text cards.
+- XP and level are a progress bar, as in games: current level, filled share toward the next. Numbers stay available to screen readers.
+- Negative states stand out with a warning icon or a red or orange color: an expired window, being marked absent and similar. A neutral state (not marked, under review) is not presented as a penalty.
 
-- **Update 2026-10-30:** the founder supplied a new mark (`apps/app/assets/brand/logo-v2-1254.png`: three figures around a tennis ball, lime and navy, transparent background). It is used **only** as the app icon (iOS, Android adaptive and themed, splash asset) and the web favicon, on the light ground `#F4F6F8` because its navy shapes vanish on a dark ground; it is **not shown inside the app**. The icons are generated by `scripts/brand/make-app-icons.py`. It is still a raster, so the SVG master and one-color requirements below stand. The older mark described next is retired:
-- The earlier mark (`image.png`: three abstract figures forming a circle, orange / green / blue) stays **provisional**. This system is deliberately **independent** of its colors, so adopting, changing or replacing it requires no palette change.
-- Requirements for a final mark: SVG master (single-path, no embedded raster), **transparent** background, a one-color version (for dark UI and tiny sizes), safe-area rules for Android adaptive icons (66 % safe zone) and iOS, readable at 16 px, license/ownership documented. Wordmark TBD with the final name.
-- Where the logo may appear: auth screens, empty states, app icon/splash. **Not** in the event card or tab bar.
-
-## 4. Color
-
-Design intent: a deep **ink** base, a fresh **pitch green** for primary actions, a **volt lime** highlight that says "game on", and a warm **ember** for urgency. Neutrals are cool and slightly blue so green and lime read clean. All values below are tokens (§12); contrast figures are computed (WCAG 2.x relative luminance).
-
-### 4.1 Core ramps
-
-| Role | Token | Light | Dark | Notes |
-|---|---|---|---|---|
-| Ink (text, structure) | `ink.900` | `#0E1A2B` | `#F2F5F9` (as text) | 16.5:1 on app bg (light) |
-| Pitch (primary) | `pitch.700` / `pitch.400` / `pitch.300` | `#0A6B4E` | `#4FD1A0` fills, `#7BE0B5` text | white-on-fill 6.5:1; dark ink-on-fill 9.8:1 |
-| Volt (highlight) | `volt.400` | `#C8F135` | `#C8F135` | **only with `ink.900` text/icon on it (13.4:1)**; never as text color on light surfaces |
-| Ember (urgency/secondary) | `ember.700` / `ember.300` | `#B54708` | `#FDB022` | text on white 5.4:1; white on fill 5.4:1; dark: 10.2:1 |
-| Info / focus | `blue.700` / `blue.300` | `#1D4ED8` | `#93B4FF` | 6.7:1 / 9.1:1 |
-| Danger | `red.700` / `red.300` | `#B42318` | `#FF8A80` | 6.6:1 / 8.2:1 |
-| Success | `green.700` / `green.300` | `#067647` | `#6EE7A8` | 5.7:1 / 12.2:1 |
-| Surfaces | `bg` / `surface` / `sunken` | `#F7F8FA` / `#FFFFFF` / `#F2F5F9` | `#0B1220` / `#141D2E` / `#0F182A` | |
-| Borders | `border.subtle` / `border.strong` | `#E4E7EC` / `#8793A4` | `#243049` / `#5B6B82` | `border.strong` ≥ 3:1 on surface (3.1:1) |
-
-### 4.2 Usage rules
-
-1. **One loud color per screen.** The primary action is pitch green. Volt marks *state* (live/just-opened/selected sport chip), ember marks *time pressure* (starting soon, last spot), never decoration.
-2. **Color never carries meaning alone** — status = color + icon + word. Slot meters always print numbers ("8/14 · 6 yer").
-3. **Capacity meter:** fill `pitch.700`/`pitch.400`; the empty track is *not* the meaningful part (the number is), but it must still be perceivable: draw it as a 1 px `border.strong` outline with `sunken` fill (the lighter `#A9B4C4` track measured only 2.1:1 and is **rejected**).
-4. **Last spot / starts < 2 h:** ember pill with clock/alert icon + text. Full: neutral "Dolu" pill (not red — full is a success state for organizers).
-5. **Dark mode** is a first-class theme, not an inversion: surfaces get lighter with elevation; green and lime keep their meaning.
-6. **Sport tints** (decorative only, always paired with the sport icon and name): football `#2E9E5B`, futsal `#1FA38A`, basketball `#E0701F`, volleyball `#D9A400`, tennis `#9AB800`, padel `#2A8FD6`, badminton `#6B5BD6`, table tennis `#D6457A`, running `#C2410C`, walking `#5B6B82`. Use at 12–16 % opacity as chip backgrounds; text stays `ink`.
-
-## 5. Typography
-
-| Use | Family | Weights | Why |
-|---|---|---|---|
-| Display / headings / big numerals | **Plus Jakarta Sans** (OFL) | 700, 800 | Geometric, athletic, friendly; strong numerals for times and slot counts |
-| Body / UI | **Inter** (OFL), variable | 400, 500, 600 | Exceptional small-size legibility; full Turkish coverage |
-| Numerals in meters/times | either, `tabular-nums` | | Counts and clocks must not jitter |
-
-Rules: **Turkish glyph coverage is a release gate** — render `İ ı Ş ş Ğ ğ Ç ç Ö ö Ü ü` (and `İSTANBUL`/`ıspanak` casing via `tr` locale) in a visual test before adopting any font. Self-host subsetted WOFF2 (Latin + Latin-Extended-A only, ≈ 25–40 kB per weight) loaded with `expo-font`; system font is the fallback and the default until fonts are added (see PERF plan, `docs/PERFORMANCE.md`). No more than two families, no italics for UI text.
-
-Scale (sp/line-height): display 36/42, headline 28/34, title 22/28, title-sm 18/26, body 16/24, body-sm 14/20, label 14/20 (600), caption 12/16. Never below 12. Text scales with OS settings up to 1.6× on native, 200 % zoom on web, with wrapping (no truncation of essential content such as time and place).
-
-## 6. Shape, depth, spacing, motion
-
-- **Radius:** `sm 6 · md 10 · lg 16 · xl 24 · pill`. Cards `lg`; buttons `md`; chips/pills `pill`; sheets `xl` top corners. The "pitch corner" motif: event cards have one asymmetric `xl` corner on the top-left, echoing a court corner arc — used **only** on event cards so it stays distinctive.
-- **Spacing:** 4-pt grid (`2 4 8 12 16 20 24 32 40 56 72`); gutters 16/24/32 by breakpoint; touch targets ≥ 48.
-- **Elevation:** light — 1 px `border.subtle` + very soft shadow on cards, stronger on sheets/menus; dark — elevation by surface lightness + border, no shadows.
-- **Motion:** 120–240 ms ease-out; sheets 300 ms. Meaningful motion only: a joined spot "fills" in the meter; a freed spot pulses once. **Reduced motion** replaces movement with fades and disables the pulse. No auto-playing animation loops except skeletons (which also stop under reduced motion).
-- **Haptics (native):** light tap on primary success (request sent), warning on destructive confirm; never on scroll or hover.
-
-## 7. Iconography and imagery
-
-- **Icons:** one outline family, 24 px grid, 1.75 px stroke, rounded joins. Use **inline SVG for only the icons we ship** (≈ 40 in MVP) rather than a full icon-font package — see PERFORMANCE.md (the icon font is a measurable cost). Sport icons: custom, simple, consistent silhouette (ball + one distinguishing mark), designed in-house or commissioned; no stock sport-icon packs without license review.
-- **Pattern language ("court lines"):** subtle line patterns (center circle, halfway line, three-point arc) at 4–6 % opacity on empty states and onboarding backgrounds. Purely geometric → no licensing risk and no resemblance to any competitor.
-- **Photography (later):** real local players and venues, licensed or founder-owned, adults only, diverse in age/gender/ability, never staged "stock" handshakes; every photo needs written consent. No photos of minors. Images are decorative-by-default with alt text only when informative.
-- **Illustration:** none in MVP beyond court-line patterns.
-
-## 8. Layout and navigation
-
-- Mobile first: bottom bar < 768 px; **left rail 184 px at 768–1199**, **248 px ≥ 1200** (verified in Phase 1); content max-width 720/960/1200. Discover is list + detail two-pane on wide screens.
-- Navigation is data-driven (`src/navigation/config.ts`); Create is visually emphasized (filled pitch icon), not floating over content. Community slot reserved.
-- Page anatomy: one `h1`, primary action in the thumb zone on mobile (sticky bottom action bar on event detail), secondary actions in a menu. Headers stay quiet; the content is the star.
-
-## 9. Components — design specifications
-
-Each component ships with states: default, hover (web), focus-visible (2 px `focus` ring, 2 px offset), pressed, disabled (never conveyed by opacity alone), loading, error. Minimum target 48 px.
-
-**Event card (the hero component)** — anatomy top→bottom:
-1. Sport chip (icon + name, sport tint) · format ("7v7") · distance if known.
-2. **Title** (title-sm, max 2 lines).
-3. **When/where line:** "Per 19:30 · Çankaya, Kuğulu Park" — time in `tabular-nums`; relative hint ("bugün", "yarın") before the exact time.
-4. **Capacity block:** meter + "8/14 · 6 yer" (+ ember pill "Son yer!" when ≤ 1, or "2 saat içinde başlıyor").
-5. **Meta row:** skill range ("Seviye 2.5–4"), cost note if any ("Ücret: ~150 ₺ · bilgilendirme"), booking label ("Saha rezervasyonu organizatör tarafından beyan edilmiştir" — shortened on card, full on detail).
-6. Organizer micro-line: name + at most two trust chips (only what their privacy settings allow).
-The whole card is one link/target; no nested buttons.
-
-**Primary action (event detail):** "Katılma isteği gönder" (pitch fill). States change the *label and meaning*, not just color: "İstek gönderildi" (secondary, with "Geri çek"), "Bekleme listesindesin", "Onaylandın ✓", "Etkinlik dolu — bekleme listesine katıl".
-
-**Trust indicators (progression):** *Skill* shows value + confidence ("3.7 · geçici" when low confidence, with the self-assessed level beside it); *Reliability* shows "%94 · yüksek güven" or "Yeni oyuncu"; *Level/XP* is a quiet progress ring in profile — never in feed cards. Badges are 40 px medallions with text labels; locked badges show their unlock rule, not a sad icon.
-
-**Forms:** visible labels, helper text under the field, inline errors tied to the field (role=alert), sticky primary action on long forms (event creation stepper), autofill attributes correct, date/time with typed alternative.
-
-**Feedback:** toasts bottom-center (mobile) / bottom-left (wide), 5 s (errors 10 s), always dismissible; banners for persistent states (offline, unverified email); skeletons for lists, never full-screen spinners except auth callbacks.
-
-**Empty states:** court-line pattern + one sentence + one action ("Henüz etkinlik yok — ilk etkinliği sen oluştur"). Never blame the user.
-
-**Safety surfaces** (report, block, location privacy): calm neutral styling, plain language, no alarming red except destructive confirmation.
-
-## 10. Accessibility (design-level commitments)
-
-WCAG 2.2 AA; contrast tokens enforced by test (`requiredContrast`); focus never removed; all status has text; motion respects reduce-motion; dynamic type to 1.6×; touch targets 48 px; screen-reader order matches visual; Turkish pronunciation checked with TalkBack/VoiceOver (dotted/dotless I); no color-only encodings; captions for any future video. Dark mode must pass the same tests as light.
-
-## 11. Content patterns (Turkish microcopy)
-
-| Situation | Copy |
-|---|---|
-| Request sent | "İstek gönderildi. Organizatör onaylayınca haber vereceğiz." |
-| Full | "Etkinlik dolu. Bekleme listesine katılırsan yer açıldığında organizatöre haber veririz." |
-| Late cancel warning | "Başlangıca az kaldı; şimdi iptal edersen güvenilirlik puanın etkilenebilir." |
-| Booking label | "Rezervasyon durumu organizatör tarafından beyan edilmiştir; MatchUp doğrulamaz." *(name from brand config)* |
-| Cost | "Ücret bilgisi bilgilendirme amaçlıdır; ödeme uygulama dışında yapılır." |
-| Skill disclaimer | "Bu seviye, oyuncu geri bildirimlerine dayanır." |
-| Error generic | "Bir şeyler ters gitti. Tekrar dener misin?" |
-
-Rules: no exclamation-mark inflation, no emoji in system messages (allowed in user content), plurals via ICU, no concatenated sentences, brand name only via `{{appName}}` without Turkish suffixes.
-
-## 12. Token mapping (engineering contract)
-
-| Design token | Code (`apps/app/src/ui/tokens`) | Status |
-|---|---|---|
-| ink / pitch / volt / blue / red / success / surfaces / borders | `primitives.ts` → `semantic.ts` | implemented (Phase 1) |
-| `ember.700/300` → `warning` + `urgency` semantic | `semantic.ts` | added in Phase 2 (this change: `urgency`, `onUrgency`) |
-| Plus Jakarta Sans / Inter | `expo-font` + theme `fontFamily` | **not yet loaded** (needs Turkish glyph visual test + bundle measurement) |
-| Sport tints | `sportTints` map keyed by `sports.slug` | **not yet implemented** (Phase 3) |
-| SVG icon subset | `src/ui/graphics/Icon.tsx` (`react-native-svg`) | **started**: 4 tab icons (compass, calendar, add-circle, person), outline + filled; more icons are added there as screens need them |
-| Court-line pattern | `src/ui/graphics` | **not yet implemented** |
-
-**Acceptance gate for any visual change:** `pnpm test` (contrast pairs in both themes) green · Playwright axe clean · screenshot review at 390/800/1280 in light and dark · Turkish glyph check · bundle ratchet not increased without a recorded reason.
-
-## 13. Open design questions
-
-1. Final name/logo → wordmark and icon reconsideration (does the three-figure circle suit a sports app, or does it read "community/charity"?).
-2. Whether to commission custom sport icons now or after the pilot (recommended: after the first 3 sports are confirmed).
-3. Photography plan and consent workflow for pilot marketing.
-4. Native large-title navigation headers (iOS) vs the quiet header above.
-5. A professional design review of this spec — recommended before the pilot, since this was authored by an engineer.

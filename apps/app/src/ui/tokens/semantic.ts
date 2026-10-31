@@ -5,10 +5,14 @@ export interface SemanticColors {
   bgApp: string;
   surfaceRaised: string;
   surfaceSunken: string;
+  /** Active layers and modal surfaces. */
+  surfaceOverlay: string;
   textPrimary: string;
   textSecondary: string;
+  textTertiary: string;
   textDisabled: string;
   actionPrimary: string;
+  actionPrimaryPressed: string;
   onActionPrimary: string;
   link: string;
   accent: string;
@@ -27,51 +31,53 @@ export const lightColors: SemanticColors = {
   bgApp: p.paper50,
   surfaceRaised: p.white,
   surfaceSunken: p.paper100,
-  textPrimary: p.ink900,
-  textSecondary: p.gray600,
-  textDisabled: p.gray500,
-  // The brand's lime does not work as text or fill on light grounds: the primary action is ink with a lime label.
-  actionPrimary: p.ink900,
-  onActionPrimary: p.lime400,
-  link: p.olive700,
-  accent: p.lime400,
-  onAccent: p.ink900,
-  danger: p.red700,
+  surfaceOverlay: p.white,
+  textPrimary: p.ink950,
+  textSecondary: p.slate700,
+  textTertiary: p.slate600,
+  textDisabled: p.slate500,
+  actionPrimary: p.redLight500,
+  actionPrimaryPressed: p.redLight600,
+  onActionPrimary: p.white,
+  link: p.coral700,
+  accent: p.redLight500,
+  onAccent: p.white,
+  danger: p.danger700,
   onDanger: p.white,
   warning: p.amber800,
   success: p.success700,
-  borderStrong: p.gray500,
+  borderStrong: p.slate500,
   borderSubtle: p.paper300,
   focusRing: p.blue700,
-  overlay: 'rgba(14, 17, 22, 0.5)',
+  overlay: 'rgba(17, 17, 19, 0.5)',
 };
 
 export const darkColors: SemanticColors = {
-  bgApp: p.ink900,
-  surfaceRaised: p.ink800,
-  surfaceSunken: p.ink950,
-  textPrimary: p.steel100,
-  textSecondary: p.steel300,
-  textDisabled: p.ink500,
-  actionPrimary: p.lime400,
-  onActionPrimary: p.ink900,
-  link: p.lime400,
-  accent: p.lime400,
-  onAccent: p.ink900,
-  danger: p.red300,
-  onDanger: p.ink900,
+  bgApp: p.charcoal950,
+  surfaceRaised: p.charcoal900,
+  surfaceSunken: p.charcoal925,
+  surfaceOverlay: p.charcoal800,
+  textPrimary: p.gray100,
+  textSecondary: p.gray300,
+  textTertiary: p.gray400,
+  textDisabled: p.gray600,
+  actionPrimary: p.red500,
+  actionPrimaryPressed: p.red600,
+  onActionPrimary: p.white,
+  // Red text fails on dark surfaces: links and active text use a lighter coral.
+  link: p.coral300,
+  accent: p.red500,
+  onAccent: p.white,
+  danger: p.danger300,
+  onDanger: p.charcoal950,
   warning: p.amber300,
   success: p.success300,
-  borderStrong: p.ink500,
-  borderSubtle: p.ink700,
+  borderStrong: p.gray550,
+  borderSubtle: p.charcoal700,
   focusRing: p.blue300,
   overlay: 'rgba(0, 0, 0, 0.6)',
 };
 
-/**
- * Foreground/background pairs that MUST meet WCAG 2.2 AA: 4.5:1 for text, 3:1 for UI boundaries and
- * focus indicators. Enforced by tokens.test.ts for both themes.
- */
 export const requiredContrast: readonly {
   fg: keyof SemanticColors;
   bg: keyof SemanticColors;
@@ -83,6 +89,16 @@ export const requiredContrast: readonly {
   { fg: 'textPrimary', bg: 'surfaceSunken', min: 4.5, note: 'body text on sunken areas' },
   { fg: 'textSecondary', bg: 'bgApp', min: 4.5, note: 'secondary text on page' },
   { fg: 'textSecondary', bg: 'surfaceRaised', min: 4.5, note: 'secondary text on cards' },
+  { fg: 'textPrimary', bg: 'surfaceOverlay', min: 4.5, note: 'body text on modals' },
+  { fg: 'textSecondary', bg: 'surfaceOverlay', min: 4.5, note: 'secondary text on modals' },
+  { fg: 'textTertiary', bg: 'bgApp', min: 4.5, note: 'tertiary text on page' },
+  { fg: 'textTertiary', bg: 'surfaceRaised', min: 4.5, note: 'tertiary text on cards' },
+  { fg: 'onActionPrimary', bg: 'actionPrimaryPressed', min: 4.5, note: 'pressed button label' },
+  { fg: 'link', bg: 'surfaceOverlay', min: 4.5, note: 'links on modals' },
+  { fg: 'success', bg: 'surfaceOverlay', min: 4.5, note: 'success text on modals' },
+  { fg: 'danger', bg: 'surfaceOverlay', min: 4.5, note: 'error text on modals' },
+  { fg: 'warning', bg: 'surfaceOverlay', min: 4.5, note: 'warning text on modals' },
+  { fg: 'borderStrong', bg: 'bgApp', min: 3, note: 'input boundary on page' },
   { fg: 'onActionPrimary', bg: 'actionPrimary', min: 4.5, note: 'primary button label' },
   { fg: 'link', bg: 'bgApp', min: 4.5, note: 'links on page' },
   { fg: 'link', bg: 'surfaceRaised', min: 4.5, note: 'links on cards' },

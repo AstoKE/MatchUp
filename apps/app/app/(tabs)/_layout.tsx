@@ -22,7 +22,7 @@ const railSize = (width: number) => ({
  */
 export default function TabsLayout() {
   const { t } = useTranslation('nav');
-  const { colors, breakpoint, spacing } = useTheme();
+  const { colors, breakpoint, spacing, typography } = useTheme();
   // Android edge-to-edge: the explicit bar height below must include the system gesture/nav bar inset,
   // or the labels collide with it (found on the emulator, docs/native-validation/).
   const insets = useSafeAreaInsets();
@@ -39,7 +39,7 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarLabelPosition: wide ? 'beside-icon' : undefined,
         tabBarStyle: {
-          backgroundColor: colors.surfaceRaised,
+          backgroundColor: colors.bgApp,
           borderColor: colors.borderSubtle,
           ...(breakpoint === 'compact'
             ? {
@@ -49,7 +49,7 @@ export default function TabsLayout() {
               }
             : { ...railSize(breakpoint === 'medium' ? 184 : 248), paddingTop: spacing[4] }),
         },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
+        tabBarLabelStyle: typography.micro,
         tabBarActiveBackgroundColor: colors.surfaceSunken,
         tabBarInactiveBackgroundColor: 'transparent',
       }}

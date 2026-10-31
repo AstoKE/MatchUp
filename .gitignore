@@ -44,3 +44,6 @@ apps/app/e2e-mobile/results/
 
 # Generated throw-away auth-abuse lab stack (scripts/auth-lab.mjs)
 supabase-lab/
+
+# Third-party design reference screenshots: local only, never production assets (docs/design.md §11).
+docs/references/

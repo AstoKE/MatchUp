@@ -1,30 +1,38 @@
 /**
- * Primitive design tokens (layer 1). Direction A "Gece Maçı" chosen by the founder 2026-10-30
- * (docs/design.md). The light theme is derived from it, not drawn by the founder.
- * Components never use primitives directly — they use semantic tokens via useTheme().
+ * Primitive design tokens (layer 1): charcoal and warm red, docs/design.md §3 and §11 (the measured deviations).
+ * The light theme is derived, not drawn. Components never use primitives directly: semantic tokens via useTheme().
  */
 export const palette = {
-  ink950: '#0A0D12',
-  ink900: '#0E1116',
-  ink800: '#171C23',
-  ink700: '#222B38',
-  ink500: '#6B7888',
-  steel300: '#A9B4C0',
-  steel100: '#F2F5F7',
-  paper50: '#F4F6F8',
-  paper100: '#E9EDF2',
-  paper300: '#D5DCE4',
-  gray600: '#4A5565',
-  gray500: '#7A8696',
+  charcoal950: '#0B0B0C',
+  charcoal925: '#111113',
+  charcoal900: '#18191B',
+  charcoal800: '#222326',
+  charcoal700: '#323438',
+  gray550: '#7A7F87',
+  gray600: '#6F747C',
+  gray400: '#8D929A',
+  gray300: '#AAAEB5',
+  gray100: '#F5F5F6',
+  paper50: '#F6F6F7',
+  paper100: '#ECECEE',
+  paper300: '#DDDEE1',
+  slate700: '#55585F',
+  slate600: '#62666D',
+  slate500: '#7F848B',
+  ink950: '#111113',
   white: '#FFFFFF',
-  lime400: '#C6F432',
-  olive700: '#3F6B00',
-  red700: '#B42318',
-  red300: '#FF8A80',
+  red500: '#D73641',
+  red600: '#B82633',
+  redLight500: '#C42B38',
+  redLight600: '#A32230',
+  coral300: '#FF8A8F',
+  coral700: '#B3212E',
+  danger300: '#EC6262',
+  danger700: '#A61B1B',
+  amber300: '#E6AB4A',
   amber800: '#8A4B00',
-  amber300: '#FFB454',
+  success300: '#45B58A',
   success700: '#067647',
-  success300: '#6EE7A8',
   blue700: '#1D4ED8',
   blue300: '#93B4FF',
 } as const;
@@ -44,24 +52,32 @@ export const spacing = {
   18: 72,
 } as const;
 
-export const radius = { sm: 6, md: 10, lg: 20, xl: 28, pill: 999 } as const;
+export const radius = { sm: 6, md: 12, lg: 16, xl: 20, pill: 999 } as const;
+
+/** Loaded in app/_layout.tsx. One family per weight: a fontWeight on top would be synthesized or ignored per platform. */
+export const fontFamily = {
+  regular: 'Inter_400Regular',
+  semibold: 'Inter_600SemiBold',
+  bold: 'Inter_700Bold',
+} as const;
 
 export const typography = {
-  display: { fontSize: 36, lineHeight: 42, fontWeight: '700' },
-  headline: { fontSize: 28, lineHeight: 34, fontWeight: '700' },
-  title: { fontSize: 22, lineHeight: 28, fontWeight: '700' },
-  titleSm: { fontSize: 18, lineHeight: 26, fontWeight: '600' },
-  body: { fontSize: 16, lineHeight: 24, fontWeight: '400' },
-  bodySm: { fontSize: 14, lineHeight: 20, fontWeight: '400' },
-  label: { fontSize: 14, lineHeight: 20, fontWeight: '600' },
-  caption: { fontSize: 12, lineHeight: 16, fontWeight: '400' },
+  display: { fontSize: 34, lineHeight: 40, fontFamily: fontFamily.bold },
+  headline: { fontSize: 26, lineHeight: 32, fontFamily: fontFamily.bold },
+  title: { fontSize: 20, lineHeight: 26, fontFamily: fontFamily.bold },
+  titleSm: { fontSize: 17, lineHeight: 24, fontFamily: fontFamily.semibold },
+  body: { fontSize: 16, lineHeight: 24, fontFamily: fontFamily.regular },
+  bodySm: { fontSize: 14, lineHeight: 20, fontFamily: fontFamily.regular },
+  label: { fontSize: 15, lineHeight: 20, fontFamily: fontFamily.semibold },
+  caption: { fontSize: 13, lineHeight: 18, fontFamily: fontFamily.regular },
+  micro: { fontSize: 12, lineHeight: 16, fontFamily: fontFamily.semibold },
 } as const;
 export type TypographyVariant = keyof typeof typography;
 
 /** Maximum OS font scaling we design for (WCAG: text must be resizable without loss; layouts wrap). */
 export const MAX_FONT_SCALE = 1.6;
 
-export const motion = { fast: 120, base: 200, slow: 300 } as const;
+export const motion = { fast: 140, base: 180, slow: 220 } as const;
 
 /** Layout breakpoints (min widths). */
 export const breakpoints = { medium: 768, expanded: 1200 } as const;
