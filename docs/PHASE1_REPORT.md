@@ -68,7 +68,7 @@ Date: 2026-10-24 · Status: **Phase 1 complete, with the documented gaps below.*
 
 **Known issues (none critical):**
 1. **Medium — sign-up enumeration signal.** `422 user_already_exists` for confirmed addresses (pinned by a test; UI is uniform). Needs CAPTCHA + CDN rate limits (+ possibly an Edge Function front) before launch. ADR-0014.
-2. **Low (accepted, scoped)** — `node-forge ≤1.4.0` advisory (GHSA-86w9-cpqp-85rv) reached only through Expo's CLI dev tooling, never bundled; no patched release exists. Allow-listed in `pnpm-workspace.yaml` with the reason; revisit on every Expo bump. (A second advisory, zod < 4.6.6 inside the CLI, is fixed by an override.)
+2. **Resolved (2026-10-31)** — `node-forge ≤1.4.0` advisories (GHSA-86w9-cpqp-85rv and five newer ones) reached only through Expo's CLI dev tooling, never bundled. Originally allow-listed because no patch existed; `node-forge 1.4.2` is now released, so the allow-list entry is gone and an override (`@expo/cli>node-forge`) pins the patched version. Drop the override once Expo's CLI depends on a patched release itself. (A second advisory, zod < 4.6.6 inside the CLI, is fixed by an override.)
 3. **Hosted-only protections are not testable locally** and are therefore **unverified**: leaked-password protection, CAPTCHA, custom SMTP/SPF/DKIM, production rate limits, JWT/session settings on a hosted project. They are listed in DEPLOYMENT's readiness checklist.
 4. Web session lives in `localStorage` (supabase-js default) → CSP/headers are a launch prerequisite (ADR-0014).
 5. Terms/Privacy acceptance and the 18+ confirmation are **not captured yet** (onboarding is Phase 2). The sign-up screen must not be exposed to real users before then; `user_consents` and `adult_confirmed_at` exist for it.
