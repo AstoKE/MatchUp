@@ -113,7 +113,13 @@ describe('rating under concurrency', () => {
       expect(l.attended).toBe(2); // the cap, not four
       expect(l.first).toBe(1); // once per sport
       expect(l.signals).toBe(4); // every attendance still counts for reliability
-      expect(l.total).toBe(2 * 50 + 30);
+      // + FIRST_MATCH, awarded once although four finalizations saw "at least one attendance" at the same moment.
+      expect(l.total).toBe(2 * 50 + 30 + 50);
+      const badges = await db().query(
+        `select 1 from public.user_achievements where user_id = $1 and code = 'FIRST_MATCH'`,
+        [player.user.id],
+      );
+      expect(badges.rowCount).toBe(1);
       expect(l.cache).toBe(l.total); // the cache agrees with the ledger
     }
   });

@@ -3,6 +3,40 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      achievement_definitions: {
+        Row: {
+          code: string;
+          descriptions: NonNullable<Json>;
+          is_active: boolean;
+          names: NonNullable<Json>;
+          rule: NonNullable<Json>;
+          scope: string;
+          version: number;
+          xp_bonus: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          code: string;
+          descriptions: NonNullable<Json>;
+          is_active?: boolean;
+          names: NonNullable<Json>;
+          rule: NonNullable<Json>;
+          scope: string;
+          version?: number;
+          xp_bonus: number;
+        };
+        Update: {
+          code?: string;
+          descriptions?: NonNullable<Json>;
+          is_active?: boolean;
+          names?: NonNullable<Json>;
+          rule?: NonNullable<Json>;
+          scope?: string;
+          version?: number;
+          xp_bonus?: number;
+        };
+        Relationships: [];
+      };
       app_config: {
         Row: {
           key: string;
@@ -799,6 +833,66 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [];
+      };
+      user_achievements: {
+        Row: {
+          awarded_at: string;
+          code: string;
+          id: string;
+          revoked_at: string | null;
+          source_event_id: string | null;
+          sport_id: string | null;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          awarded_at?: string;
+          code: string;
+          id?: string;
+          revoked_at?: string | null;
+          source_event_id?: string | null;
+          sport_id?: string | null;
+          user_id: string;
+        };
+        Update: {
+          awarded_at?: string;
+          code?: string;
+          id?: string;
+          revoked_at?: string | null;
+          source_event_id?: string | null;
+          sport_id?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_achievements_code_fkey';
+            columns: ['code'];
+            isOneToOne: false;
+            referencedRelation: 'achievement_definitions';
+            referencedColumns: ['code'];
+          },
+          {
+            foreignKeyName: 'user_achievements_source_event_id_fkey';
+            columns: ['source_event_id'];
+            isOneToOne: false;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_achievements_sport_id_fkey';
+            columns: ['sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sports';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_achievements_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       user_consents: {
         Row: {
