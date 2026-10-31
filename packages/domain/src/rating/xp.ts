@@ -54,4 +54,6 @@ export const xpDedupeKey = {
   firstInSport: (user: string, sport: string) => `first_sport:${user}:${sport}`,
   reviewsSubmitted: (event: string, user: string) => `reviews:${event}:${user}`,
   fairPlay: (event: string, user: string) => `fairplay:${event}:${user}`,
+  achievement: (code: string, user: string, sport?: string) =>
+    sport ? `ach:${code}:${user}:${sport}` : `ach:${code}:${user}`,
 } as const;
