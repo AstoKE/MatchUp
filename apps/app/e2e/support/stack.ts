@@ -138,7 +138,14 @@ export async function createPublishedEvent(
   stack: LocalStack,
   email: string,
   title: string,
-  options: { publish?: boolean; autoApprove?: boolean; inviteOnly?: boolean } = {},
+  options: {
+    publish?: boolean;
+    autoApprove?: boolean;
+    inviteOnly?: boolean;
+    capacity?: number;
+    sportSlug?: string;
+    formatSlug?: string;
+  } = {},
 ): Promise<string> {
   const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
   const tokenResponse = await fetch(`${stack.apiUrl}/auth/v1/token?grant_type=password`, {
@@ -150,9 +157,11 @@ export async function createPublishedEvent(
   const headers = { ...base, Authorization: `Bearer ${token}` };
   const get = async <T>(path: string) =>
     ((await (await fetch(`${stack.apiUrl}/rest/v1/${path}`, { headers })).json()) as T[])[0]!;
-  const sport = await get<{ id: string }>('sports?select=id&slug=eq.football');
+  const sport = await get<{ id: string }>(
+    `sports?select=id&slug=eq.${options.sportSlug ?? 'football'}`,
+  );
   const format = await get<{ id: string }>(
-    `sport_formats?select=id&slug=eq.5v5&sport_id=eq.${sport.id}`,
+    `sport_formats?select=id&slug=eq.${options.formatSlug ?? '5v5'}&sport_id=eq.${sport.id}`,
   );
   const city = await get<{ id: string }>('cities?select=id&slug=eq.ankara');
   const district = await get<{ id: string }>(
@@ -173,7 +182,7 @@ export async function createPublishedEvent(
         city_id: city.id,
         district_id: district.id,
         location_label: 'ODTÜ Halı Saha 2',
-        capacity: 12,
+        capacity: options.capacity ?? 12,
         auto_approve: options.autoApprove ?? false,
         visibility: options.inviteOnly ? 'INVITE_ONLY' : 'PUBLIC',
       },

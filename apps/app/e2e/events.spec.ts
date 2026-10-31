@@ -635,3 +635,110 @@ test.describe('progress on the profile (Phase 5 / M5c)', () => {
     await expectNoBlocking(page);
   });
 });
+
+test.describe('the whole lifecycle (F-35)', () => {
+  test('request → approve → full → waitlist → a player leaves → promote → attendance → notified → review → profile', async ({
+    browser,
+  }) => {
+    test.setTimeout(120_000); // four signed-in browsers through a whole event
+    const s = requireStack();
+    const tag = uniqueEmail('x').slice(2, 10);
+    const title = `Yaşam döngüsü ${tag}`;
+    const emails = {
+      host: uniqueEmail('life-host'),
+      ada: uniqueEmail('life-ada'),
+      bora: uniqueEmail('life-bora'),
+      cem: uniqueEmail('life-cem'),
+    };
+    createdIds.push((await createOnboardedUser(s, emails.host, { displayName: 'Evsahibi' })).id);
+    createdIds.push((await createOnboardedUser(s, emails.ada, { displayName: 'Ada' })).id);
+    createdIds.push((await createOnboardedUser(s, emails.bora, { displayName: 'Bora' })).id);
+    createdIds.push((await createOnboardedUser(s, emails.cem, { displayName: 'Cem' })).id);
+    // Room for the organizer, who plays, and two players.
+    const eventId = await createPublishedEvent(s, emails.host, title, {
+      capacity: 3,
+      sportSlug: 'running',
+      formatSlug: 'group-run',
+    });
+
+    const open = async (email: string) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      await signIn(page, email);
+      await page.goto(`/e/${eventId}`);
+      return { page, main: page.getByRole('main'), context };
+    };
+    const ada = await open(emails.ada);
+    const bora = await open(emails.bora);
+    const cem = await open(emails.cem);
+    const host = await open(emails.host);
+
+    // Two requests, two approvals: the event is full.
+    for (const player of [ada, bora]) {
+      await player.main.getByRole('button', { name: 'Katılma isteği gönder' }).click();
+      await player.main.getByRole('button', { name: 'İsteği gönder' }).click();
+      await expect(player.main.getByText('İstek gönderildi', { exact: true })).toBeVisible();
+    }
+    await host.page.reload();
+    await host.main.getByRole('button', { name: 'Onayla' }).first().click();
+    await expect(host.main.getByText('2/3 kişi', { exact: true })).toBeVisible();
+    await host.main.getByRole('button', { name: 'Onayla' }).first().click();
+    await expect(host.main.getByText('3/3 kişi', { exact: true })).toBeVisible();
+
+    // The third player can only join the waitlist.
+    await cem.page.reload();
+    // The form's send button keeps the waitlist wording.
+    await cem.main.getByRole('button', { name: 'Etkinlik dolu, bekleme listesine katıl' }).click();
+    await cem.main.getByLabel('Organizatöre mesaj (isteğe bağlı)').fill('Yer açılırsa gelirim');
+    await cem.main.getByRole('button', { name: 'Etkinlik dolu, bekleme listesine katıl' }).click();
+    await expect(cem.main.getByText('Bekleme listesindesin', { exact: true })).toBeVisible();
+
+    // A player leaves; the organizer promotes the waitlisted one by an explicit tap.
+    await bora.page.reload();
+    await bora.main.getByRole('button', { name: 'Etkinlikten ayrıl' }).click();
+    await expect(bora.main.getByRole('button', { name: 'Katılma isteği gönder' })).toBeVisible();
+    await host.page.reload();
+    await expect(host.main.getByText('2/3 kişi', { exact: true })).toBeVisible();
+    await host.main.getByRole('button', { name: 'Onayla' }).click();
+    await expect(host.main.getByText('3/3 kişi', { exact: true })).toBeVisible();
+
+    // The game happens: attendance, then final.
+    startEvent(eventId);
+    await host.page.reload();
+    for (const name of ['Ada', 'Cem']) {
+      const row = host.main.getByRole('radiogroup', { name });
+      await row.getByRole('radio', { name: 'Geldi' }).click();
+      await expect(row.getByRole('radio', { name: 'Geldi' })).toBeChecked();
+    }
+    await host.main.getByRole('button', { name: 'Yoklamayı kesinleştir' }).click();
+    await host.main.getByRole('button', { name: 'Evet, kesinleştir' }).click();
+    await expect(host.main.getByText('Ada: Geldi')).toBeVisible();
+    await expect(host.page.getByRole('status').first()).toBeVisible();
+
+    // The player is told, follows the notification and reviews.
+    await ada.page.goto('/notifications');
+    await expect(ada.main.getByText(new RegExp(`${title} için yoklama kesinleşti`))).toBeVisible();
+    await expectNoBlocking(ada.page);
+    await ada.page.goto(`/e/${eventId}`);
+    await expect(ada.main.getByText('Geldin olarak işaretlendin.')).toBeVisible();
+    await ada.main
+      .getByRole('radiogroup', { name: 'Cem' })
+      .getByRole('radio', { name: '5' })
+      .click();
+    await ada.main.getByRole('button', { name: /Değerlendirmeleri gönder/ }).click();
+    await expect(ada.main.getByText('Cem: değerlendirildi')).toBeVisible();
+
+    // Bora left before the game: no attendance section, no review, no XP.
+    await bora.page.goto('/profile');
+    await expect(bora.page.getByText('Seviye 1', { exact: true })).toBeVisible();
+    await expect(bora.page.getByText(/^0 XP/)).toBeVisible();
+
+    // The player's progress: 50 attended + 30 first in sport + 50 FIRST_MATCH.
+    await ada.page.goto('/profile');
+    await expect(ada.page.getByText('Seviye 2', { exact: true })).toBeVisible();
+    await expect(ada.page.getByText(/^130 XP/)).toBeVisible();
+    await expect(ada.page.getByText('İlk Maç', { exact: true })).toBeVisible();
+
+    for (const session of [ada, bora, cem, host]) await session.context.close();
+  });
+});
