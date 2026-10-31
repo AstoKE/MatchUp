@@ -30,6 +30,14 @@ The founder picked one of three drawn directions (A "Gece Maçı", B "Mahalle Ma
 - **Logo:** not in the Discover header or on the account screens any more (founder's request 2026-10-30, consistent with §3); the new mark is the app and web icon only.
 - **Applied so far:** color tokens (both themes), the radius scale, pill buttons, the Discover header without the logo. **Not yet:** fonts, card and event page layouts, tab bar details, sport tints (§4.2 item 6, a separate review), a dark/light preference setting (the app follows the system).
 
+### Founder's notes for the general design pass (2026-10-31, not applied yet)
+
+From testing the Phase 5 screens. Apply them when the general design pass starts; the behaviour is already correct.
+
+- **Badges are round icons**, not the text cards the profile shows today.
+- **XP and level are a progress bar**, as in games: current level, filled share toward the next level. Today it is text only. Keep the numbers available to screen readers.
+- **Negative states stand out**, with a warning icon or a red or orange color: an expired window (reviews, disputes), being marked absent, and similar. Today they are plain text. Use the `danger` and `warning` tokens; never color alone (§ accessibility minimums): the text or icon must say it too. This does not change the rule that a neutral state (not marked, under review) is not presented as a penalty.
+
 ## 1. What we take from GoodRec — and what we do not
 
 GoodRec (public marketing pages, reviewed 2026-10-24; app not seen) is our **usability benchmark**: a player can answer, within a second of seeing a game, *what / when / where / how many spots / can I trust it?* — and has one obvious action.
