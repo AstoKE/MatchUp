@@ -365,6 +365,10 @@ test.describe('Discover for a signed-in player (UI tour)', () => {
     await main.getByRole('button', { name: 'Filtreler', exact: true }).click();
     const dialog = page.getByRole('dialog', { name: 'Filtreler' });
     await expect(dialog).toBeVisible();
+    // One named dialog, active at once: an inactive React Native Web modal has aria-modal without a role, no focus trap and no Escape.
+    await expect(page.getByRole('dialog')).toHaveCount(1);
+    await expect(page.locator('[aria-modal="true"]:not([role])')).toHaveCount(0);
+    await expectNoBlocking(page);
     await dialog.getByRole('checkbox', { name: 'Akşam', exact: true }).click();
     await expectNoBlocking(page);
     await page.keyboard.press('Escape');

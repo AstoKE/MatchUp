@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
 import { Modal, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useReducedMotion, useTheme } from '../theme';
+import { useTheme } from '../theme';
 import { Text } from './Text';
 
 /**
  * A modal panel: from the bottom on a phone, centered on wider screens. Modal keeps focus inside on web and handles
  * Escape and Android back through onClose. The caller provides the localized close action in `footer`.
+ * No animation: React Native Web activates a modal (dialog role, focus trap, Escape) only when its animation has ended.
  */
 export function Sheet({
   visible,
@@ -26,15 +27,9 @@ export function Sheet({
 }) {
   const { colors, radius, spacing, breakpoint } = useTheme();
   const insets = useSafeAreaInsets();
-  const reduced = useReducedMotion();
   const compact = breakpoint === 'compact';
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType={reduced ? 'none' : 'fade'}
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent aria-label={title} onRequestClose={onClose}>
       <View
         style={{
           flex: 1,
@@ -56,9 +51,6 @@ export function Sheet({
           }}
         />
         <View
-          role="dialog"
-          aria-modal
-          aria-label={title}
           accessibilityViewIsModal
           style={{
             maxHeight: '85%',
