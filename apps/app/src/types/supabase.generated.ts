@@ -1228,6 +1228,7 @@ export type Database = {
       export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
       finalize_attendance: { Args: { p_event_id: string }; Returns: undefined };
       get_event: { Args: { p_event_id: string; p_invite_token?: string }; Returns: Json };
+      get_event_attendance: { Args: { p_event_id: string }; Returns: Json };
       get_my_account: {
         Args: Record<PropertyKey, never>;
         Returns: {
