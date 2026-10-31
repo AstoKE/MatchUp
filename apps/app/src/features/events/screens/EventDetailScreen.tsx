@@ -5,7 +5,18 @@ import { useTranslation } from 'react-i18next';
 import { localizedName, useCatalog, type Catalog } from '@/features/catalog';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
-import { Banner, Button, EmptyState, Screen, SportBadge, Text, useTheme, useToast } from '@/ui';
+import {
+  Banner,
+  Button,
+  EmptyState,
+  IconButton,
+  Screen,
+  SportArtwork,
+  SportBadge,
+  Text,
+  useTheme,
+  useToast,
+} from '@/ui';
 import type { EventDetails } from '../api/events-api';
 import { AttendancePanel } from '../components/AttendancePanel';
 import { InvitePanel } from '../components/InvitePanel';
@@ -69,19 +80,42 @@ export function EventDetailScreen() {
   return <Detail event={event.data} catalog={catalog.data} inviteToken={inviteToken} />;
 }
 
-function Row({ label, value, large }: { label: string; value: string; large?: boolean }) {
-  const { spacing } = useTheme();
+/** One fact. Short ones sit side by side and wrap at large text sizes; `wide` takes the whole line. */
+function Tile({
+  label,
+  value,
+  wide,
+  children,
+}: {
+  label: string;
+  value?: string;
+  wide?: boolean;
+  children?: ReactNode;
+}) {
+  const { colors, radius, spacing } = useTheme();
   return (
-    <View style={{ gap: spacing[1] }}>
-      <Text variant="label" tone="secondary">
+    <View
+      style={{
+        flexGrow: 1,
+        flexBasis: wide ? '100%' : '40%',
+        gap: spacing[1],
+        padding: spacing[3],
+        borderRadius: radius.lg,
+        borderWidth: 1,
+        borderColor: colors.borderSubtle,
+        backgroundColor: colors.surfaceRaised,
+      }}
+    >
+      <Text variant="caption" tone="secondary">
         {label}
       </Text>
-      <Text variant={large ? 'titleSm' : 'body'}>{value}</Text>
+      {value ? <Text variant="label">{value}</Text> : null}
+      {children}
     </View>
   );
 }
 
-/** A raised group of facts; the outline keeps it visible in both themes without a shadow. */
+/** A raised group; the outline keeps it visible in both themes without a shadow. */
 function Card({ children }: { children: ReactNode }) {
   const { colors, radius, spacing } = useTheme();
   return (
@@ -111,6 +145,7 @@ function Detail({
 }) {
   const { t } = useTranslation(['events', 'common']);
   const { spacing, breakpoint } = useTheme();
+  const compact = breakpoint === 'compact';
   const { height: windowHeight } = useWindowDimensions();
   const router = useRouter();
   const toast = useToast();
@@ -137,7 +172,7 @@ function Detail({
   const joinable = event.status === 'PUBLISHED' && !started;
   // On a phone the join action is pinned under the content (design.md §8: the thumb zone); the request
   // form that opens from it scrolls inside the pinned area so it never covers the whole page.
-  const stickyJoin = breakpoint === 'compact';
+  const stickyJoin = compact;
   const joinPanel =
     !isOrganizer && joinable ? (
       stickyJoin ? (
@@ -162,12 +197,25 @@ function Detail({
 
   return (
     <Screen maxWidth={640} footer={joinPanel && stickyJoin ? joinPanel : undefined}>
-      <View style={{ alignItems: 'flex-start' }}>
-        <Button
-          variant="tertiary"
-          label={t('events:detail.backToDiscover')}
-          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+      {/* Edge to edge on a phone (cancels the page's gutter and top padding), a contained image on wider screens. */}
+      <View
+        style={
+          compact ? { marginHorizontal: -spacing[4], marginTop: -spacing[4] } : { marginTop: 0 }
+        }
+      >
+        <SportArtwork
+          slug={sport?.slug}
+          height={compact ? 220 : 260}
+          iconSize={72}
+          square={compact}
         />
+        <View style={{ position: 'absolute', top: spacing[3], left: spacing[3] }}>
+          <IconButton
+            icon="chevron-left"
+            label={t('events:detail.backToDiscover')}
+            onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+          />
+        </View>
       </View>
       <View style={{ gap: spacing[3] }}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
@@ -181,9 +229,13 @@ function Detail({
               .join(' · ')}
           />
           <Pill
-            label={t(`events:status.${event.status}`)}
+            label={
+              event.status === 'PUBLISHED' && started
+                ? t('events:detail.started')
+                : t(`events:status.${event.status}`)
+            }
             tone={
-              event.status === 'PUBLISHED'
+              event.status === 'PUBLISHED' && !started
                 ? 'success'
                 : event.status === 'CANCELED'
                   ? 'danger'
@@ -211,14 +263,14 @@ function Detail({
       ) : null}
       {error ? <Banner kind="danger" message={error} /> : null}
 
-      <Card>
-        <Row
-          large
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+        <Tile
+          wide
           label={t('events:detail.when')}
           value={`${formatEventStart(event.startsAt, timeZone, locale)} · ${t('events:detail.durationValue', { count: event.durationMinutes })}`}
         />
-        <Row
-          large
+        <Tile
+          wide
           label={t('events:detail.where')}
           value={
             place
@@ -226,10 +278,7 @@ function Detail({
               : t('events:detail.whereHidden', { district: districtName })
           }
         />
-        <View style={{ gap: spacing[2] }}>
-          <Text variant="label" tone="secondary">
-            {t('events:detail.capacity')}
-          </Text>
+        <Tile wide label={t('events:detail.capacity')}>
           <SlotMeter approved={event.approvedCount} capacity={event.capacity} />
           <View
             style={{
@@ -239,26 +288,20 @@ function Detail({
               gap: spacing[2],
             }}
           >
-            <Text variant="titleSm">
+            <Text variant="label">
               {t('events:detail.capacityValue', {
                 approved: event.approvedCount,
                 capacity: event.capacity,
               })}
             </Text>
-            <Text tone="secondary">
+            <Text variant="bodySm" tone="secondary">
               {openSlots > 0
                 ? t('events:detail.spotsLeft', { count: openSlots })
                 : t('events:detail.full')}
             </Text>
           </View>
-        </View>
-      </Card>
-
-      <Card>
-        {event.organizerName ? (
-          <Row label={t('events:detail.organizer')} value={event.organizerName} />
-        ) : null}
-        <Row
+        </Tile>
+        <Tile
           label={t('events:detail.skill')}
           value={
             event.skillMin === null && event.skillMax === null
@@ -269,8 +312,19 @@ function Detail({
                 })
           }
         />
+        {event.organizerName ? (
+          <Tile label={t('events:detail.organizer')} value={event.organizerName} />
+        ) : null}
+        <Tile
+          label={t('events:detail.booking')}
+          value={t(`events:booking.${event.bookingStatus}`)}
+        />
+        {event.setting ? (
+          <Tile label={t('events:detail.setting')} value={t(`events:setting.${event.setting}`)} />
+        ) : null}
         {event.costAmountMinor !== null ? (
-          <Row
+          <Tile
+            wide
             label={t('events:detail.cost')}
             value={[
               t('events:detail.costValue', { amount: formatCost(event.costAmountMinor, locale) }),
@@ -280,20 +334,13 @@ function Detail({
               .join(' · ')}
           />
         ) : null}
-        {event.setting ? (
-          <Row label={t('events:detail.setting')} value={t(`events:setting.${event.setting}`)} />
-        ) : null}
-        <Row
-          label={t('events:detail.booking')}
-          value={t(`events:booking.${event.bookingStatus}`)}
-        />
         {event.equipmentNote ? (
-          <Row label={t('events:detail.equipment')} value={event.equipmentNote} />
+          <Tile wide label={t('events:detail.equipment')} value={event.equipmentNote} />
         ) : null}
         {event.private?.participantNotes ? (
-          <Row label={t('events:detail.notes')} value={event.private.participantNotes} />
+          <Tile wide label={t('events:detail.notes')} value={event.private.participantNotes} />
         ) : null}
-      </Card>
+      </View>
 
       {event.participants ? (
         <Card>

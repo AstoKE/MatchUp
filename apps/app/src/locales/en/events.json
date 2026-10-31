@@ -120,7 +120,8 @@
     "participants_one": "Going ({{count}})",
     "participants_other": "Going ({{count}})",
     "participantsNone": "No other approved players yet.",
-    "participantsHidden": "The list of players is shown to approved players."
+    "participantsHidden": "The list of players is shown to approved players.",
+    "started": "Started"
   },
   "edit": {
     "title": "Edit event",
@@ -194,17 +195,17 @@
     "filtersClose": "Close filters"
   },
   "join": {
-    "signInToJoin": "Sign in to join",
-    "request": "Request to join",
-    "joinWaitlist": "Event is full, join the waitlist",
+    "signInToJoin": "Sign in to request a spot",
+    "request": "Send join request",
+    "joinWaitlist": "Apply for the waitlist",
     "send": "Send request",
     "withdraw": "Withdraw request",
     "leave": "Leave the event",
     "withdrawn": "Your request was withdrawn.",
     "state": {
-      "REQUESTED": "Request sent",
+      "REQUESTED": "Waiting for approval",
       "WAITLISTED": "You're on the waitlist",
-      "APPROVED": "You're in"
+      "APPROVED": "Your spot is confirmed"
     },
     "stateHint": {
       "REQUESTED": "We'll tell you when the organizer decides.",
@@ -223,7 +224,7 @@
     "positionNone": "No preference",
     "result": {
       "REQUESTED": "Request sent. We'll tell you when the organizer approves.",
-      "APPROVED": "You're in.",
+      "APPROVED": "Your spot is confirmed.",
       "WAITLISTED": "The event is full. You were added to the waitlist."
     }
   },
@@ -258,8 +259,8 @@
       "PAST": "Past"
     },
     "status": {
-      "REQUESTED": "Request sent",
-      "APPROVED": "Approved",
+      "REQUESTED": "Waiting for approval",
+      "APPROVED": "Your spot is confirmed",
       "REJECTED": "Declined",
       "WAITLISTED": "On the waitlist",
       "CANCELED": "Request withdrawn",

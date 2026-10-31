@@ -182,7 +182,7 @@ describe('joining an event', () => {
 
   it('sends a guest to sign in and back to this event', async () => {
     await renderApp(<EventDetailScreen />);
-    await pressReady('Giriş yap ve katıl');
+    await pressReady('Giriş yap ve katılım iste');
     expect(mockRouter.push).toHaveBeenCalledWith({
       pathname: '/sign-in',
       params: { returnTo: `/e/${EVENT}` },
@@ -192,7 +192,7 @@ describe('joining an event', () => {
 
   it('sends the request with the message and shows what happens next', async () => {
     await renderApp(<EventDetailScreen />, { session: player });
-    await pressReady('Katılma isteği gönder');
+    await pressReady('Katılım isteği gönder');
     expect(screen.getByText('Organizatör görünen adını ve seviyeni görecek.')).toBeTruthy();
     await fireEvent.changeText(
       screen.getByLabelText('Organizatöre mesaj (isteğe bağlı)'),
@@ -212,7 +212,7 @@ describe('joining an event', () => {
 
   it('passes the chosen position along', async () => {
     await renderApp(<EventDetailScreen />, { session: player });
-    await pressReady('Katılma isteği gönder');
+    await pressReady('Katılım isteği gönder');
     await press(/^Tercih ettiğin pozisyon/);
     await fireEvent.press(screen.getByRole('radio', { name: 'Kaleci' }));
     await press('İsteği gönder');
@@ -221,27 +221,38 @@ describe('joining an event', () => {
     );
   });
 
+  it('a published event that has begun says it started, not that it is open', async () => {
+    mockApi.fetchEvent.mockResolvedValue(
+      event({ startsAt: new Date(Date.now() - 3_600_000).toISOString() }),
+    );
+    mockApi.fetchMyParticipation.mockResolvedValue(null);
+    await renderApp(<EventDetailScreen />, { session: player });
+    expect(await screen.findByText('Başladı')).toBeTruthy();
+    expect(screen.queryByText('Yayında')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Katılım isteği gönder' })).toBeNull();
+  });
+
   it('says so when the event is full and offers the waitlist', async () => {
     mockApi.fetchEvent.mockResolvedValue(event({ approvedCount: 12 }));
     mockApi.requestJoin.mockResolvedValue('WAITLISTED');
     await renderApp(<EventDetailScreen />, { session: player });
-    await pressReady('Etkinlik dolu, bekleme listesine katıl');
-    await press('Etkinlik dolu, bekleme listesine katıl');
-    expect(await screen.findByText('Etkinlik dolu. Bekleme listesine eklendin.')).toBeTruthy();
+    await pressReady('Yedek listeye başvur');
+    await press('Yedek listeye başvur');
+    expect(await screen.findByText('Etkinlik dolu. Yedek listeye eklendin.')).toBeTruthy();
   });
 
   it('offers nothing when the event is full and has no waitlist', async () => {
     mockApi.fetchEvent.mockResolvedValue(event({ approvedCount: 12, waitlistEnabled: false }));
     await renderApp(<EventDetailScreen />, { session: player });
     expect(await screen.findAllByText('Etkinlik dolu.')).not.toHaveLength(0);
-    expect(screen.queryByRole('button', { name: /Katılma isteği|bekleme listesine/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Katılma isteği|yedek listeye/ })).toBeNull();
   });
 
   it('tells the player when a request is approved at once', async () => {
     mockApi.fetchEvent.mockResolvedValue(event({ autoApprove: true }));
     mockApi.requestJoin.mockResolvedValue('APPROVED');
     await renderApp(<EventDetailScreen />, { session: player });
-    await pressReady('Katılma isteği gönder');
+    await pressReady('Katılım isteği gönder');
     expect(screen.getByText('Bu etkinlikte yer varsa isteğin hemen onaylanır.')).toBeTruthy();
     await press('İsteği gönder');
     expect(await screen.findByText('Katılımın onaylandı.')).toBeTruthy();
@@ -250,15 +261,15 @@ describe('joining an event', () => {
   it('shows the server refusal in plain words', async () => {
     mockApi.requestJoin.mockRejectedValue(new AppError('REGISTRATION_CLOSED'));
     await renderApp(<EventDetailScreen />, { session: player });
-    await pressReady('Katılma isteği gönder');
+    await pressReady('Katılım isteği gönder');
     await press('İsteği gönder');
     expect(await screen.findByText('Bu etkinliğin katılım kaydı kapandı.')).toBeTruthy();
   });
 
   it.each([
-    ['REQUESTED', 'İstek gönderildi', 'İsteği geri çek'],
-    ['WAITLISTED', 'Bekleme listesindesin', 'İsteği geri çek'],
-    ['APPROVED', 'Onaylandın', 'Etkinlikten ayrıl'],
+    ['REQUESTED', 'Onay bekleniyor', 'İsteği geri çek'],
+    ['WAITLISTED', 'Yedek listedesin', 'İsteği geri çek'],
+    ['APPROVED', 'Katılım onaylandı', 'Etkinlikten ayrıl'],
   ])('%s: shows the state and lets the player step back', async (status, label, action) => {
     mockApi.fetchMyParticipation.mockResolvedValue(mine(status));
     await renderApp(<EventDetailScreen />, { session: player });
@@ -278,13 +289,13 @@ describe('joining an event', () => {
     mockApi.fetchMyParticipation.mockResolvedValue(mine('CANCELED', 3));
     await renderApp(<EventDetailScreen />, { session: player });
     expect(await screen.findByText('Bu etkinlik için istek hakkın doldu.')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Katılma isteği gönder' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Katılım isteği gönder' })).toBeNull();
   });
 
   it('lets a player ask again after withdrawing (fewer than three tries)', async () => {
     mockApi.fetchMyParticipation.mockResolvedValue(mine('CANCELED', 1));
     await renderApp(<EventDetailScreen />, { session: player });
-    expect(await screen.findByRole('button', { name: 'Katılma isteği gönder' })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: 'Katılım isteği gönder' })).toBeTruthy();
   });
 
   it('does not offer joining on a canceled or already started event', async () => {
@@ -293,7 +304,9 @@ describe('joining an event', () => {
     );
     await renderApp(<EventDetailScreen />, { session: player });
     await screen.findByText('Perşembe maçı');
-    expect(screen.queryByRole('button', { name: /Katılma isteği|Giriş yap ve katıl/ })).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: /Katılma isteği|Giriş yap ve katılım iste/ }),
+    ).toBeNull();
   });
 });
 
@@ -340,7 +353,7 @@ describe('the event page for different viewers', () => {
     mockInvite = 'tok-from-link';
     mockApi.fetchEvent.mockResolvedValue(event({ visibility: 'INVITE_ONLY' }));
     await renderApp(<EventDetailScreen />, { session: player });
-    await pressReady('Katılma isteği gönder');
+    await pressReady('Katılım isteği gönder');
     await press('İsteği gönder');
     expect(mockApi.fetchEvent.mock.calls[0]).toEqual([EVENT, 'tok-from-link']);
     expect(mockApi.requestJoin.mock.calls[0]?.[0]).toMatchObject({ inviteToken: 'tok-from-link' });
@@ -379,7 +392,7 @@ describe("the organizer's queue", () => {
       participationId: request().id,
       decision: 'approve',
     });
-    await press('Bekleme listesine al');
+    await press('Yedek listeye al');
     expect(mockApi.decideParticipation).toHaveBeenLastCalledWith({
       participationId: request().id,
       decision: 'waitlist',

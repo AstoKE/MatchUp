@@ -84,7 +84,7 @@ export function JoinPanel({
         {error ? <Banner kind="danger" message={error} /> : null}
         <Pill
           label={t(`events:join.state.${status}`)}
-          tone={status === 'APPROVED' ? 'success' : 'neutral'}
+          tone={status === 'APPROVED' ? 'success' : 'warning'}
         />
         <Text tone="secondary">{t(`events:join.stateHint.${status}`)}</Text>
         {withdrawButton(t(status === 'APPROVED' ? 'events:join.leave' : 'events:join.withdraw'))}

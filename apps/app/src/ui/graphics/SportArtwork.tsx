@@ -14,6 +14,7 @@ export function SportArtwork({
   width,
   height,
   iconSize,
+  square = false,
 }: {
   slug: string | undefined;
   /** A square thumbnail. */
@@ -22,6 +23,8 @@ export function SportArtwork({
   width?: number | `${number}%`;
   height?: number;
   iconSize?: number;
+  /** No rounded corners (edge to edge). */
+  square?: boolean;
 }) {
   const { colors, radius } = useTheme();
   const id = useId();
@@ -34,7 +37,7 @@ export function SportArtwork({
       style={{
         width: size ?? width ?? '100%',
         height: boxHeight,
-        borderRadius: radius.md,
+        borderRadius: square ? 0 : radius.md,
         overflow: 'hidden',
         alignItems: 'center',
         justifyContent: 'center',
