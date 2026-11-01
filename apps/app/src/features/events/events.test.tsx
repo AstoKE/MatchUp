@@ -1,4 +1,4 @@
-import { AppError, zonedTimeToUtc } from '@matchup/domain';
+import { formatTypedDate, utcToZonedParts, AppError, zonedTimeToUtc } from '@matchup/domain';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { SessionState } from '@/features/auth';
 import { renderApp } from '@/test/render';
@@ -181,26 +181,33 @@ async function choose(selectLabel: RegExp, option: string) {
 }
 
 describe('CreateEventScreen', () => {
-  async function fillAll() {
+  /** Walks the steps to the one holding the details; `toReview` goes on to the last step. */
+  async function fillAll(toReview = true) {
     await screen.findByText('Ne oynanacak?');
     await choose(/^Spor:/, 'Futbol');
-    await fireEvent.changeText(screen.getByLabelText('Başlık'), '  Perşembe   maçı ');
     await press('İleri');
-    await screen.findByText('Ne zaman, nerede?');
+    await screen.findByText('Ne zaman, kaç kişi?');
+    await press('İleri');
+    await screen.findByText('Nerede?');
     await choose(/^İlçe:/, 'Çankaya');
     await fireEvent.changeText(screen.getByLabelText('Yer'), 'ODTÜ Halı Saha 2');
     await press('İleri');
-    await screen.findByText('Kimler, kaç kişi?');
+    await screen.findByText('Etkinlik detayları');
+    await fireEvent.changeText(screen.getByLabelText('Başlık'), '  Perşembe   maçı ');
+    if (toReview) {
+      await press('İleri');
+      await screen.findByText('Gözden geçir ve yayınla');
+    }
   }
 
-  it('does not leave step 1 without a sport, a format and a title', async () => {
+  it('does not leave step 1 without a sport and a format', async () => {
     await renderApp(<CreateEventScreen />, { session: signedIn });
     await screen.findByText('Ne oynanacak?');
     await press('İleri');
     expect(await screen.findByText('Bir spor seç.')).toBeTruthy();
     expect(screen.getByText('Bir format seç.')).toBeTruthy();
-    expect(screen.getByText('Başlık en az 3 karakter olmalı.')).toBeTruthy();
-    expect(screen.queryByText('Ne zaman, nerede?')).toBeNull();
+    expect(screen.getByText('Devam etmek için işaretli alanları düzelt.')).toBeTruthy();
+    expect(screen.queryByText('Ne zaman, kaç kişi?')).toBeNull();
   });
 
   it('choosing a sport picks its first format and that format’s default capacity', async () => {
@@ -213,8 +220,16 @@ describe('CreateEventScreen', () => {
   it('publishes exactly what was chosen, with the start converted from Ankara time to UTC', async () => {
     mockApi.createEvent.mockResolvedValue(EVENT);
     await renderApp(<CreateEventScreen />, { session: signedIn });
-    await fillAll();
+    await screen.findByText('Ne oynanacak?');
+    await choose(/^Spor:/, 'Futbol');
+    await press('İleri');
     await press('Kontenjanı artır');
+    await press('İleri');
+    await choose(/^İlçe:/, 'Çankaya');
+    await fireEvent.changeText(screen.getByLabelText('Yer'), 'ODTÜ Halı Saha 2');
+    await press('İleri');
+    await fireEvent.changeText(screen.getByLabelText('Başlık'), '  Perşembe   maçı ');
+    await press('İleri');
     await press('Yayınla');
     await waitFor(() => expect(mockApi.createEvent).toHaveBeenCalledTimes(1));
     const call = mockApi.createEvent.mock.calls[0]?.[0] as {
@@ -252,8 +267,16 @@ describe('CreateEventScreen', () => {
   it('lets the organizer say indoor or outdoor and sends that choice', async () => {
     mockApi.createEvent.mockResolvedValue(EVENT);
     await renderApp(<CreateEventScreen />, { session: signedIn });
-    await fillAll();
+    await screen.findByText('Ne oynanacak?');
+    await choose(/^Spor:/, 'Futbol');
+    await press('İleri');
+    await press('İleri');
+    await choose(/^İlçe:/, 'Çankaya');
+    await fireEvent.changeText(screen.getByLabelText('Yer'), 'ODTÜ Halı Saha 2');
     await fireEvent.press(screen.getByRole('radio', { name: 'Açık hava' }));
+    await press('İleri');
+    await fireEvent.changeText(screen.getByLabelText('Başlık'), '  Perşembe   maçı ');
+    await press('İleri');
     await press('Yayınla');
     await waitFor(() => expect(mockApi.createEvent).toHaveBeenCalledTimes(1));
     const call = mockApi.createEvent.mock.calls[0]?.[0] as { input: Record<string, unknown> };
@@ -263,7 +286,7 @@ describe('CreateEventScreen', () => {
   it('lets the organizer switch on automatic approval and sends that choice', async () => {
     mockApi.createEvent.mockResolvedValue(EVENT);
     await renderApp(<CreateEventScreen />, { session: signedIn });
-    await fillAll();
+    await fillAll(false);
     expect(
       screen.getByText(/Yer boşken ve bekleyen yokken oyuncular hemen onaylanır/),
     ).toBeTruthy();
@@ -272,6 +295,7 @@ describe('CreateEventScreen', () => {
       checked: false,
     });
     await fireEvent.press(box);
+    await press('İleri');
     await press('Yayınla');
     await waitFor(() => expect(mockApi.createEvent).toHaveBeenCalledTimes(1));
     const call = mockApi.createEvent.mock.calls[0]?.[0] as { input: Record<string, unknown> };
@@ -314,11 +338,58 @@ describe('CreateEventScreen', () => {
     await renderApp(<CreateEventScreen />, { session: signedIn });
     await screen.findByText('Ne oynanacak?');
     await choose(/^Spor:/, 'Futbol');
-    await fireEvent.changeText(screen.getByLabelText('Başlık'), 'Maç');
     await press('İleri');
     await fireEvent.changeText(await screen.findByLabelText('Tarih (GG.AA.YYYY)'), '31.02.2027');
     await press('İleri');
     expect(await screen.findByText('Geçerli bir tarih gir (GG.AA.YYYY).')).toBeTruthy();
+  });
+
+  it('reviews what was entered, says who approves, and jumps back to a section', async () => {
+    await renderApp(<CreateEventScreen />, { session: signedIn });
+    await fillAll();
+    expect(screen.getByText('Çankaya · ODTÜ Halı Saha 2')).toBeTruthy();
+    expect(screen.getByText('Perşembe   maçı')).toBeTruthy();
+    expect(screen.getByText(/Katılım isteklerini sen onaylarsın/)).toBeTruthy();
+    await press('Nerede? bölümünü düzenle');
+    expect(await screen.findByLabelText('Yer')).toBeTruthy();
+    expect(mockApi.createEvent).not.toHaveBeenCalled();
+  });
+
+  it('says a stated cost is not collected', async () => {
+    await renderApp(<CreateEventScreen />, { session: signedIn });
+    await fillAll(false);
+    await fireEvent.changeText(screen.getByLabelText(/^Kişi başı ücret/), '150');
+    await press('İleri');
+    expect(await screen.findByText('~150 ₺ · bilgilendirme')).toBeTruthy();
+    expect(screen.getByText(/ödeme uygulama üzerinden alınmaz/)).toBeTruthy();
+  });
+
+  it('a bad field found when publishing goes back to its step', async () => {
+    mockApi.createEvent.mockResolvedValue(EVENT);
+    await renderApp(<CreateEventScreen />, { session: signedIn });
+    await screen.findByText('Ne oynanacak?');
+    await choose(/^Spor:/, 'Futbol');
+    await press('İleri');
+    // Half an hour ahead: fine for a draft, too soon to publish.
+    const soon = utcToZonedParts(
+      new Date(Date.now() + 30 * 60_000).toISOString(),
+      'Europe/Istanbul',
+    );
+    await fireEvent.changeText(
+      await screen.findByLabelText('Tarih (GG.AA.YYYY)'),
+      formatTypedDate(soon.date),
+    );
+    await fireEvent.changeText(screen.getByLabelText('Başlangıç saati (SS:DD)'), soon.time);
+    await press('İleri');
+    await choose(/^İlçe:/, 'Çankaya');
+    await fireEvent.changeText(screen.getByLabelText('Yer'), 'ODTÜ Halı Saha 2');
+    await press('İleri');
+    await fireEvent.changeText(screen.getByLabelText('Başlık'), 'Perşembe maçı');
+    await press('İleri');
+    await press('Yayınla');
+    expect(await screen.findByLabelText('Tarih (GG.AA.YYYY)')).toBeTruthy();
+    expect(screen.getByText('Devam etmek için işaretli alanları düzelt.')).toBeTruthy();
+    expect(mockApi.createEvent).not.toHaveBeenCalled();
   });
 
   it('works in English too', async () => {
@@ -483,11 +554,13 @@ describe('EditEventScreen', () => {
     expect(
       await screen.findByText('Yayınlandıktan sonra spor, format ve oynama durumu değiştirilemez.'),
     ).toBeTruthy();
+    await press('İleri');
+    expect(screen.queryByRole('checkbox', { name: /Ben de oynayacağım/ })).toBeNull();
+    await press('İleri');
+    await press('İleri');
     expect(screen.getByLabelText('Başlık').props.value).toBe('Perşembe maçı');
     await fireEvent.changeText(screen.getByLabelText('Başlık'), 'Cuma maçı');
     await press('İleri');
-    await press('İleri');
-    expect(screen.queryByRole('checkbox', { name: /Ben de oynayacağım/ })).toBeNull();
     await act(async () => {
       await press('Değişiklikleri kaydet');
     });

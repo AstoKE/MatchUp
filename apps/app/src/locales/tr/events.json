@@ -10,12 +10,18 @@
     "saving": "Kaydediliyor…",
     "published": "Etkinliğin yayında.",
     "draftSaved": "Taslak kaydedildi.",
-    "loadFailed": "Etkinlik bilgileri yüklenemedi."
+    "loadFailed": "Etkinlik bilgileri yüklenemedi.",
+    "editSection": "Düzenle",
+    "editSectionNamed": "{{section}} bölümünü düzenle",
+    "approvalNote": "Katılım isteklerini sen onaylarsın; onaylamadığın kimse katılımcı olmaz.",
+    "fixErrors": "Devam etmek için işaretli alanları düzelt."
   },
   "steps": {
     "what": "Ne oynanacak?",
-    "whenWhere": "Ne zaman, nerede?",
-    "participation": "Kimler, kaç kişi?"
+    "when": "Ne zaman, kaç kişi?",
+    "where": "Nerede?",
+    "details": "Etkinlik detayları",
+    "review": "Gözden geçir ve yayınla"
   },
   "fields": {
     "sport": "Spor",
