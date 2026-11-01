@@ -1,6 +1,6 @@
 {
   "title": "Profilini oluşturalım",
-  "stepOf": "Adım {{current}} / {{total}}",
+  "stepOf": "Adım {{current}}/{{total}}",
   "next": "İleri",
   "back": "Geri",
   "finish": "Bitir",

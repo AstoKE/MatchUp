@@ -27,7 +27,7 @@ function toggle<T>(list: readonly T[], value: T): T[] {
 }
 
 /**
- * Discover's filters (docs/design.md §5.1): the frequent ones on one scrollable line (day, open spots, sports), the rest
+ * Discover's filters (docs/design.md §5.1): the frequent ones up front (day, open spots, sports), the rest
  * in a sheet behind a button that shows how many filters are active. Same filters as before, on every screen size.
  */
 export function DiscoverFilters({
@@ -42,49 +42,60 @@ export function DiscoverFilters({
   city: CatalogCity | undefined;
 }) {
   const { t } = useTranslation('events');
-  const { spacing } = useTheme();
+  const { spacing, breakpoint } = useTheme();
+  const compact = breakpoint === 'compact';
   const [open, setOpen] = useState(false);
   const locale = currentLocale();
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch });
   const count = activeFilterCount(filters);
+  const chips = (
+    <>
+      <Button
+        variant="secondary"
+        label={count > 0 ? t('discover.filtersWithCount', { count }) : t('discover.filtersTitle')}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onPress={() => setOpen(true)}
+      />
+      {DATE_PRESETS.filter((value) => value !== 'ANY').map((value) => (
+        <ToggleChip
+          key={value}
+          label={t(`discover.date.${value}`)}
+          selected={filters.datePreset === value}
+          onPress={() => set({ datePreset: filters.datePreset === value ? 'ANY' : value })}
+        />
+      ))}
+      <ToggleChip
+        label={t('discover.onlyOpen')}
+        selected={filters.onlyOpen}
+        onPress={() => set({ onlyOpen: !filters.onlyOpen })}
+      />
+      {sports.map((sport) => (
+        <ToggleChip
+          key={sport.id}
+          label={localizedName(sport.names, locale)}
+          icon={(color) => <SportIcon slug={sport.slug} color={color} size={20} />}
+          selected={filters.sportIds.includes(sport.id)}
+          onPress={() => set({ sportIds: toggle(filters.sportIds, sport.id) })}
+        />
+      ))}
+    </>
+  );
 
   return (
     <View role="group" accessibilityLabel={t('discover.filtersTitle')} style={{ gap: spacing[2] }}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: spacing[2], alignItems: 'center' }}
-      >
-        <Button
-          variant="secondary"
-          label={count > 0 ? t('discover.filtersWithCount', { count }) : t('discover.filtersTitle')}
-          aria-haspopup="dialog"
-          aria-expanded={open}
-          onPress={() => setOpen(true)}
-        />
-        {DATE_PRESETS.filter((value) => value !== 'ANY').map((value) => (
-          <ToggleChip
-            key={value}
-            label={t(`discover.date.${value}`)}
-            selected={filters.datePreset === value}
-            onPress={() => set({ datePreset: filters.datePreset === value ? 'ANY' : value })}
-          />
-        ))}
-        <ToggleChip
-          label={t('discover.onlyOpen')}
-          selected={filters.onlyOpen}
-          onPress={() => set({ onlyOpen: !filters.onlyOpen })}
-        />
-        {sports.map((sport) => (
-          <ToggleChip
-            key={sport.id}
-            label={localizedName(sport.names, locale)}
-            icon={(color) => <SportIcon slug={sport.slug} color={color} size={20} />}
-            selected={filters.sportIds.includes(sport.id)}
-            onPress={() => set({ sportIds: toggle(filters.sportIds, sport.id) })}
-          />
-        ))}
-      </ScrollView>
+      {/* One scrolling line on a phone; a mouse cannot scroll a line whose bar is hidden, so wider screens wrap. */}
+      {compact ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: spacing[2], alignItems: 'center' }}
+        >
+          {chips}
+        </ScrollView>
+      ) : (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>{chips}</View>
+      )}
       {count > 0 ? (
         <View style={{ alignItems: 'flex-start' }}>
           <Button

@@ -227,3 +227,16 @@ Founder's notes from testing Phase 5 (applied 2026-11-01, on the profile and the
 - XP and level are a progress bar, as in games: current level, filled share toward the next. Numbers stay available to screen readers.
 - Negative states stand out with a warning icon or a red or orange color: an expired window, being marked absent and similar. A neutral state (not marked, under review) is not presented as a penalty.
 
+12. Validation record (2026-11-01)
+Definition of done, §9 rule 7. What was actually run, and what was not.
+
+Verified on web, Chromium (`e2e/responsive.spec.ts`, every run): discover, sign-in, event, manage, create, My Events, profile, settings and notifications at 320 px dark, 390 px light, 820 px light and 1280 px dark: no sideways scrolling, no serious or critical axe findings. 320 px is also what 200 % browser zoom gives a 640 px window. The join, status, attendance and review screens are covered by `events.spec.ts` at the default size, dark or as the runner chooses, with axe.
+Seen by eye once, at 320, 390, 820 and 1280 px: those screens plus sign-up, reviews and onboarding (not the join and status screens at every size).
+
+Not verified:
+- iOS and Android devices with this redesign, including Inter loading, the pinned buttons above the keyboard, and the Maestro flows updated in the redesign PRs.
+- Native dynamic text at large sizes (`maxFontSizeMultiplier` 1.6); the web zoom check does not cover it.
+- VoiceOver and TalkBack by hand; keyboard only through the existing shell tests.
+
+Deviation: no stored screenshot comparison (§9 rule 8 "where practical"). Font rendering differs between machines, so baselines would fail for the wrong reasons; the layout and accessibility checks above run instead.
+
