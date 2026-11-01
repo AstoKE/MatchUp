@@ -222,7 +222,7 @@ control border	#323438	#7A7F87	Inputs need 3:1 (WCAG 1.4.11); #323438 stays for 
 
 Primary red and danger are close, so: destructive buttons are outlined, and a negative state always carries an icon or text as well as color.
 
-Founder's notes from testing Phase 5:
+Founder's notes from testing Phase 5 (applied 2026-11-01, on the profile and the event screens):
 - Badges are round icons, not text cards.
 - XP and level are a progress bar, as in games: current level, filled share toward the next. Numbers stay available to screen readers.
 - Negative states stand out with a warning icon or a red or orange color: an expired window, being marked absent and similar. A neutral state (not marked, under review) is not presented as a penalty.

@@ -97,7 +97,7 @@ function ReviewForm({
     return (
       <View style={{ gap: spacing[3] }}>
         {title}
-        <Text tone="secondary">{t('events:reviews.closed')}</Text>
+        <Banner kind="warning" message={t('events:reviews.closed')} />
       </View>
     );
   }

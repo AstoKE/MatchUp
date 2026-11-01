@@ -80,6 +80,7 @@
     "provisional": "Provisional: few reviews so far.",
     "provisionalWithOwn": "Provisional: few reviews so far. Your own estimate: {{own}}",
     "badgesTitle": "Badges",
-    "noBadges": "No badges yet. You earn them by playing."
+    "noBadges": "No badges yet. You earn them by playing.",
+    "barLabel": "Progress to level {{level}}"
   }
 }

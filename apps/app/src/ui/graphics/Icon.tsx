@@ -9,13 +9,64 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
  * bundle to what we use (docs/PERFORMANCE.md).
  */
 export type IconName =
-  'compass' | 'calendar' | 'add-circle' | 'person' | 'chevron-left' | 'check' | 'clock';
+  | 'compass'
+  | 'calendar'
+  | 'add-circle'
+  | 'person'
+  | 'chevron-left'
+  | 'check'
+  | 'clock'
+  | 'alert'
+  | 'star'
+  | 'trophy'
+  | 'heart';
 
 const STROKE = 1.75;
 
 type Glyph = (color: string) => ReactElement;
 
 const outline: Record<IconName, Glyph> = {
+  alert: (c) => (
+    <>
+      <Path
+        d="M12 3.5L2.75 20h18.5z"
+        stroke={c}
+        strokeWidth={STROKE}
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <Path d="M12 10v4.5" stroke={c} strokeWidth={STROKE} strokeLinecap="round" />
+      <Circle cx={12} cy={17.25} r={1} fill={c} />
+    </>
+  ),
+  star: (c) => (
+    <Path
+      d="M12 3.5l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.8l6-.8z"
+      stroke={c}
+      strokeWidth={STROKE}
+      strokeLinejoin="round"
+      fill="none"
+    />
+  ),
+  trophy: (c) => (
+    <Path
+      d="M8 4h8v6a4 4 0 0 1-8 0zM8 6H4.5v1.5A3.5 3.5 0 0 0 8 11M16 6h3.5v1.5A3.5 3.5 0 0 1 16 11M12 14v4M8.5 20h7"
+      stroke={c}
+      strokeWidth={STROKE}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  ),
+  heart: (c) => (
+    <Path
+      d="M12 20s-7.5-4.6-7.5-10A4.25 4.25 0 0 1 12 7.4 4.25 4.25 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"
+      stroke={c}
+      strokeWidth={STROKE}
+      strokeLinejoin="round"
+      fill="none"
+    />
+  ),
   check: (c) => (
     <Path
       d="M5 12.5l4.5 4.5L19 7.5"
@@ -97,6 +148,47 @@ const outline: Record<IconName, Glyph> = {
 };
 
 const filled: Record<IconName, Glyph> = {
+  alert: (c) => (
+    <>
+      <Path
+        d="M12 3.5L2.75 20h18.5z"
+        stroke={c}
+        strokeWidth={STROKE}
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <Path d="M12 10v4.5" stroke={c} strokeWidth={STROKE} strokeLinecap="round" />
+      <Circle cx={12} cy={17.25} r={1} fill={c} />
+    </>
+  ),
+  star: (c) => (
+    <Path
+      d="M12 3.5l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.8l6-.8z"
+      stroke={c}
+      strokeWidth={STROKE}
+      strokeLinejoin="round"
+      fill="none"
+    />
+  ),
+  trophy: (c) => (
+    <Path
+      d="M8 4h8v6a4 4 0 0 1-8 0zM8 6H4.5v1.5A3.5 3.5 0 0 0 8 11M16 6h3.5v1.5A3.5 3.5 0 0 1 16 11M12 14v4M8.5 20h7"
+      stroke={c}
+      strokeWidth={STROKE}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  ),
+  heart: (c) => (
+    <Path
+      d="M12 20s-7.5-4.6-7.5-10A4.25 4.25 0 0 1 12 7.4 4.25 4.25 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"
+      stroke={c}
+      strokeWidth={STROKE}
+      strokeLinejoin="round"
+      fill="none"
+    />
+  ),
   check: (c) => (
     <Path
       d="M5 12.5l4.5 4.5L19 7.5"

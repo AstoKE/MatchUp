@@ -80,6 +80,7 @@
     "provisional": "Geçici: henüz az değerlendirme var.",
     "provisionalWithOwn": "Geçici: henüz az değerlendirme var. Kendi tahminin: {{own}}",
     "badgesTitle": "Rozetler",
-    "noBadges": "Henüz rozetin yok. Maçlara katıldıkça kazanırsın."
+    "noBadges": "Henüz rozetin yok. Maçlara katıldıkça kazanırsın.",
+    "barLabel": "Seviye {{level}} için ilerleme"
   }
 }

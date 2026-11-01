@@ -12,6 +12,7 @@ import { currentLocale } from '@/lib/i18n';
 import { EmptyState, Skeleton, Text, useTheme } from '@/ui';
 import type { MyProfile } from '../api/profile-api';
 import { useMyProgress } from '../hooks';
+import { BadgeIcon } from './BadgeIcon';
 
 /**
  * Skill, reliability and XP stay three separate things on screen too (RATING_SYSTEM §1). The copy says a skill
@@ -43,7 +44,10 @@ export function ProgressSection({ profile, catalog }: { profile: MyProfile; cata
 
   const { xpTotal, reliability, ratings, badges } = progress.data;
   const level = levelFromXp(xpTotal);
-  const toNext = xpRequiredForLevel(level + 1) - xpTotal;
+  const levelStart = xpRequiredForLevel(level);
+  const levelEnd = xpRequiredForLevel(level + 1);
+  const toNext = levelEnd - xpTotal;
+  const share = Math.round(((xpTotal - levelStart) / (levelEnd - levelStart)) * 100);
   const number = new Intl.NumberFormat(locale, {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
@@ -68,8 +72,33 @@ export function ProgressSection({ profile, catalog }: { profile: MyProfile; cata
         <Text variant="title" heading={2}>
           {t('profile:progress.title')}
         </Text>
-        <View accessible style={box}>
+        <View accessible style={[box, { gap: spacing[2] }]}>
           <Text variant="titleSm">{t('profile:progress.level', { level })}</Text>
+          {/* The numbers stay in text below: the bar is the same fact, for the eye. */}
+          <View
+            testID="level-bar"
+            role="progressbar"
+            aria-label={t('profile:progress.barLabel', { level: level + 1 })}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={share}
+            style={{
+              height: 12,
+              borderRadius: radius.pill,
+              borderWidth: 1,
+              borderColor: colors.borderStrong,
+              backgroundColor: colors.surfaceSunken,
+              overflow: 'hidden',
+            }}
+          >
+            <View
+              style={{
+                width: `${share}%`,
+                height: '100%',
+                backgroundColor: colors.actionPrimary,
+              }}
+            />
+          </View>
           <Text variant="caption" tone="secondary">
             {t('profile:progress.xp', { xp: xpTotal, next: toNext })}
           </Text>
@@ -136,13 +165,22 @@ export function ProgressSection({ profile, catalog }: { profile: MyProfile; cata
         {badges.length === 0 ? (
           <Text tone="secondary">{t('profile:progress.noBadges')}</Text>
         ) : (
-          <View role="list" style={{ gap: spacing[2] }}>
+          <View role="list" style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[3] }}>
             {badges.map((b) => (
-              <View key={`${b.code}:${b.sportId ?? ''}`} role="listitem" accessible style={box}>
-                <Text variant="label">
+              <View
+                key={`${b.code}:${b.sportId ?? ''}`}
+                role="listitem"
+                accessible
+                style={{ flexBasis: '30%', flexGrow: 1, alignItems: 'center', gap: spacing[1] }}
+              >
+                <BadgeIcon
+                  code={b.code}
+                  sportSlug={catalog.sports.find((s) => s.id === b.sportId)?.slug}
+                />
+                <Text variant="label" style={{ textAlign: 'center' }}>
                   {localizedName(b.names, locale).replace('{sport}', sportName(b.sportId))}
                 </Text>
-                <Text variant="caption" tone="secondary">
+                <Text variant="caption" tone="secondary" style={{ textAlign: 'center' }}>
                   {localizedName(b.descriptions, locale)}
                 </Text>
               </View>

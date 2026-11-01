@@ -91,7 +91,7 @@ function OrganizerAttendance({ eventId, data }: { eventId: string; data: EventAt
             return (
               <View key={p.participationId} role="listitem">
                 {frozen || p.attendance === 'DISPUTED' ? (
-                  <Text>
+                  <Text tone={p.attendance === 'ABSENT' ? 'danger' : 'primary'}>
                     {t('events:attendance.row', {
                       name,
                       status: t(`events:attendance.status.${p.attendance}`),
@@ -188,7 +188,16 @@ function MyAttendance({ eventId, data }: { eventId: string; data: EventAttendanc
       <Text variant="title" heading={2}>
         {t('events:attendance.mineTitle')}
       </Text>
-      <Text>{t(`events:attendance.mine.${my.attendance}`)}</Text>
+      {my.attendance === 'ABSENT' ? (
+        <Banner
+          kind="warning"
+          message={
+            canDispute ? t('events:attendance.mine.ABSENT') : t('events:attendance.absentClosed')
+          }
+        />
+      ) : (
+        <Text>{t(`events:attendance.mine.${my.attendance}`)}</Text>
+      )}
       {error ? <Banner kind="danger" message={error} /> : null}
       {canDispute && !open ? (
         <View style={{ alignItems: 'flex-start' }}>

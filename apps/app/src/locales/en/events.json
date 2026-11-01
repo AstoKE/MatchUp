@@ -372,7 +372,8 @@
     "disputeHint": "Read by administrators. At most 500 characters.",
     "disputeSend": "Send dispute",
     "disputedToast": "Your dispute was received",
-    "row": "{{name}}: {{status}}"
+    "row": "{{name}}: {{status}}",
+    "absentClosed": "You were marked absent. The time to dispute has passed."
   },
   "reviews": {
     "title": "Reviews",
