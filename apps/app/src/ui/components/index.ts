@@ -6,6 +6,7 @@ export * from './EmptyState';
 export * from './Screen';
 export * from './SegmentedChoice';
 export * from './IconButton';
+export * from './ScreenHeader';
 export * from './Select';
 export * from './Sheet';
 export * from './Skeleton';

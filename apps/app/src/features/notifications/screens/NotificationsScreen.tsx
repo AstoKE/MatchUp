@@ -4,7 +4,18 @@ import { useTranslation } from 'react-i18next';
 import { RequireOnboarded } from '@/features/onboarding';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
-import { Button, EmptyState, Screen, Skeleton, Text, TOUCH_TARGET, useTheme } from '@/ui';
+import {
+  Button,
+  EmptyState,
+  Screen,
+  Skeleton,
+  Text,
+  TOUCH_TARGET,
+  useTheme,
+  Icon,
+  ScreenHeader,
+  type IconName,
+} from '@/ui';
 import type { AppNotification } from '../api/notifications-api';
 import { useMarkRead, useNotifications } from '../hooks';
 
@@ -20,6 +31,7 @@ export function NotificationsScreen() {
 function Inbox() {
   const { t } = useTranslation(['notifications', 'common']);
   const { spacing } = useTheme();
+  const router = useRouter();
   const list = useNotifications();
   const markRead = useMarkRead();
   const items = list.data ?? [];
@@ -27,9 +39,11 @@ function Inbox() {
 
   return (
     <Screen maxWidth={640}>
-      <Text variant="headline" heading={1}>
-        {t('notifications:title')}
-      </Text>
+      <ScreenHeader
+        title={t('notifications:title')}
+        backLabel={t('common:back')}
+        onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+      />
       {hasUnread ? (
         <View style={{ alignItems: 'flex-start' }}>
           <Button
@@ -60,9 +74,14 @@ function Inbox() {
           ))}
         </View>
       ) : items.length === 0 ? (
-        <EmptyState title={t('notifications:emptyTitle')} body={t('notifications:emptyBody')} />
+        <EmptyState
+          title={t('notifications:emptyTitle')}
+          body={t('notifications:emptyBody')}
+          actionLabel={t('notifications:emptyAction')}
+          onAction={() => router.push('/')}
+        />
       ) : (
-        <View role="list" style={{ gap: spacing[3] }}>
+        <View role="list" style={{ gap: spacing[2] }}>
           {items.map((n) => (
             <View key={n.id} role="listitem">
               <Row notification={n} onOpen={() => markRead.mutate([n.id])} />
@@ -72,6 +91,18 @@ function Inbox() {
       )}
     </Screen>
   );
+}
+
+/** Good and bad news are told apart at a glance; the words carry the meaning, the icon is decorative. */
+function lookOf(type: AppNotification['type']): {
+  icon: IconName;
+  color: 'success' | 'danger' | 'textSecondary';
+} {
+  if (type === 'REQUEST_APPROVED') return { icon: 'check', color: 'success' };
+  if (type === 'REQUEST_REJECTED' || type === 'PARTICIPANT_REMOVED' || type === 'EVENT_CANCELED') {
+    return { icon: 'alert', color: 'danger' };
+  }
+  return { icon: 'calendar', color: 'textSecondary' };
 }
 
 function Row({ notification, onOpen }: { notification: AppNotification; onOpen: () => void }) {
@@ -88,6 +119,7 @@ function Row({ notification, onOpen }: { notification: AppNotification; onOpen: 
     minute: '2-digit',
   }).format(new Date(notification.createdAt));
   const eventId = notification.eventId;
+  const look = lookOf(notification.type);
   return (
     <Pressable
       accessibilityRole={eventId ? 'link' : 'text'}
@@ -98,23 +130,31 @@ function Row({ notification, onOpen }: { notification: AppNotification; onOpen: 
       }}
       style={{
         minHeight: TOUCH_TARGET,
-        gap: spacing[1],
-        padding: spacing[4],
+        flexDirection: 'row',
+        gap: spacing[3],
+        padding: spacing[3],
         borderRadius: radius.lg,
         borderWidth: 1,
-        borderColor: notification.read ? colors.borderSubtle : colors.actionPrimary,
-        backgroundColor: colors.surfaceRaised,
+        borderColor: colors.borderSubtle,
+        backgroundColor: notification.read ? 'transparent' : colors.surfaceRaised,
       }}
     >
-      {notification.read ? null : (
-        <Text variant="label" style={{ color: colors.link }}>
-          {t('new')}
-        </Text>
-      )}
-      <Text variant={notification.read ? 'body' : 'titleSm'}>{text}</Text>
-      <Text variant="caption" tone="secondary">
-        {when}
-      </Text>
+      <Icon name={look.icon} color={colors[look.color]} />
+      <View style={{ flex: 1, gap: spacing[1] }}>
+        <Text variant={notification.read ? 'bodySm' : 'label'}>{text}</Text>
+        <View
+          style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing[2] }}
+        >
+          {notification.read ? null : (
+            <Text variant="micro" style={{ color: colors.link }}>
+              {t('new')}
+            </Text>
+          )}
+          <Text variant="caption" tone="secondary">
+            {when}
+          </Text>
+        </View>
+      </View>
     </Pressable>
   );
 }

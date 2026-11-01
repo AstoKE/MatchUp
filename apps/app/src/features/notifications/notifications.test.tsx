@@ -73,6 +73,18 @@ beforeEach(() => {
 });
 
 describe('NotificationsScreen', () => {
+  it('tells good and bad news apart, in words and with an icon', async () => {
+    mockApi.fetchNotifications.mockResolvedValue([
+      note({ id: 'a', type: 'REQUEST_APPROVED' }),
+      note({ id: 'b', type: 'REQUEST_REJECTED' }),
+    ]);
+    await renderApp(<NotificationsScreen />, { session: signedIn });
+    expect(await screen.findByText(/isteğin onaylandı/)).toBeTruthy();
+    expect(screen.getByText(/kabul edilmedi/)).toBeTruthy();
+    expect(screen.getByTestId('icon-check-outline', { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.getByTestId('icon-alert-outline', { includeHiddenElements: true })).toBeTruthy();
+  });
+
   it('lists what happened in plain words, newest first, with the event title', async () => {
     mockApi.fetchNotifications.mockResolvedValue([
       note({ id: 'a', type: 'REQUEST_APPROVED' }),

@@ -259,6 +259,11 @@ describe('EditSportsScreen', () => {
 });
 
 describe('SettingsScreen', () => {
+  it('says organizers still see reliability when weighing a request', async () => {
+    await renderApp(<SettingsScreen />, { session });
+    expect(await screen.findByText(/Kapatsan da organizatörler/)).toBeTruthy();
+  });
+
   it('explains what each visibility choice means today and saves the choice with theme and language', async () => {
     await renderApp(<SettingsScreen />, { session });
     expect(await screen.findByText(/Şimdilik kimse göremez/)).toBeTruthy();

@@ -22,5 +22,6 @@
     "EVENT_CHANGED": "The time or place of {{event}} changed.",
     "ATTENDANCE_FINALIZED": "Attendance for {{event}} is final. Check your attendance and review the people you played with."
   },
-  "unknown": "You have a new notification."
+  "unknown": "You have a new notification.",
+  "emptyAction": "Discover events"
 }

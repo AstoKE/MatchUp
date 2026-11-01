@@ -12,6 +12,7 @@ import {
   Button,
   Checkbox,
   Screen,
+  ScreenHeader,
   SegmentedChoice,
   Text,
   useSchemePreference,
@@ -62,9 +63,11 @@ function Settings({ profile }: { profile: MyProfile }) {
 
   return (
     <Screen maxWidth={560}>
-      <Text variant="headline" heading={1}>
-        {t('profile:settings.title')}
-      </Text>
+      <ScreenHeader
+        title={t('profile:settings.title')}
+        backLabel={t('common:back')}
+        onBack={() => (router.canGoBack() ? router.back() : router.replace('/profile'))}
+      />
       {error ? <Banner kind="danger" message={error} /> : null}
 
       <Section title={t('profile:settings.privacy')}>
@@ -87,6 +90,9 @@ function Settings({ profile }: { profile: MyProfile }) {
           checked={showReliability}
           onChange={setShowReliability}
         />
+        <Text variant="caption" tone="secondary">
+          {t('profile:settings.reliabilityHelp')}
+        </Text>
         <Checkbox
           label={t('profile:settings.showBadges')}
           checked={showBadges}
@@ -150,16 +156,23 @@ function Settings({ profile }: { profile: MyProfile }) {
       </Section>
 
       <AccountSection />
-
-      <Button variant="tertiary" label={t('common:back')} onPress={() => router.back()} />
     </Screen>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  const { spacing } = useTheme();
+  const { colors, radius, spacing } = useTheme();
   return (
-    <View style={{ gap: spacing[3] }}>
+    <View
+      style={{
+        gap: spacing[3],
+        padding: spacing[4],
+        borderRadius: radius.lg,
+        borderWidth: 1,
+        borderColor: colors.borderSubtle,
+        backgroundColor: colors.surfaceRaised,
+      }}
+    >
       <Text variant="title" heading={2}>
         {title}
       </Text>

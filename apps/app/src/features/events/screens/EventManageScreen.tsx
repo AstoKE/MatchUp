@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { errorText } from '@/lib/error-text';
-import { Banner, Button, EmptyState, IconButton, Screen, Text, useTheme, useToast } from '@/ui';
+import { Banner, Button, EmptyState, Screen, ScreenHeader, Text, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
 import { AttendancePanel } from '../components/AttendancePanel';
 import { InvitePanel } from '../components/InvitePanel';
@@ -83,31 +83,25 @@ function Manage({ event }: { event: EventDetails }) {
 
   return (
     <Screen maxWidth={640}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-        <IconButton
-          icon="chevron-left"
-          label={t('events:detail.backToDiscover')}
-          onPress={() =>
-            router.canGoBack()
-              ? router.back()
-              : router.replace({ pathname: '/e/[id]', params: { id: event.id } })
-          }
-        />
-        <View style={{ flex: 1 }}>
-          <Text variant="headline" heading={1}>
-            {t('events:manage.title')}
-          </Text>
-          <Text tone="secondary">
-            {[event.title, t(`events:status.${event.status}`)].join(' · ')}
-          </Text>
-          <Text variant="bodySm" tone="secondary">
-            {t('events:detail.capacityValue', {
-              approved: event.approvedCount,
-              capacity: event.capacity,
-            })}
-          </Text>
-        </View>
-      </View>
+      <ScreenHeader
+        title={t('events:manage.title')}
+        backLabel={t('events:detail.backToDiscover')}
+        onBack={() =>
+          router.canGoBack()
+            ? router.back()
+            : router.replace({ pathname: '/e/[id]', params: { id: event.id } })
+        }
+      >
+        <Text tone="secondary">
+          {[event.title, t(`events:status.${event.status}`)].join(' · ')}
+        </Text>
+        <Text variant="bodySm" tone="secondary">
+          {t('events:detail.capacityValue', {
+            approved: event.approvedCount,
+            capacity: event.capacity,
+          })}
+        </Text>
+      </ScreenHeader>
       {error ? <Banner kind="danger" message={error} /> : null}
 
       {event.status === 'PUBLISHED' ? <RequestsPanel event={event} /> : null}
