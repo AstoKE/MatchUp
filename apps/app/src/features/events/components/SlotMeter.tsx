@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
-import { Text, useTheme } from '@/ui';
+import { Icon, Text, useTheme } from '@/ui';
 
 /**
  * Filled-spots meter (design.md §4.2 rule 3): the track is a 1 px `borderStrong` outline on the sunken
@@ -34,7 +34,7 @@ export function SlotMeter({ approved, capacity }: { approved: number; capacity: 
   );
 }
 
-/** Small status label. Never colour alone: it always carries words (design.md §4.2 rule 2). */
+/** Small status label. Never colour alone: it always carries words; bad news also carries an icon. */
 export function Pill({
   label,
   tone = 'neutral',
@@ -67,6 +67,7 @@ export function Pill({
         gap: spacing[2],
       }}
     >
+      {tone === 'danger' ? <Icon name="alert" color={colors.danger} size={14} /> : null}
       {icon}
       <Text variant="micro">{label}</Text>
     </View>

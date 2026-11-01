@@ -280,11 +280,13 @@ function Detail({
                 capacity: event.capacity,
               })}
             </Text>
-            <Text variant="bodySm" tone="secondary">
-              {openSlots > 0
-                ? t('events:detail.spotsLeft', { count: openSlots })
-                : t('events:detail.full')}
-            </Text>
+            {joinable ? (
+              <Text variant="bodySm" tone="secondary">
+                {openSlots > 0
+                  ? t('events:detail.spotsLeft', { count: openSlots })
+                  : t('events:detail.full')}
+              </Text>
+            ) : null}
           </View>
         </Tile>
         <Tile

@@ -211,6 +211,7 @@ describe('joining an event', () => {
     await renderApp(<EventDetailScreen />, { session: player });
     expect(await screen.findByText('Başladı')).toBeTruthy();
     expect(screen.queryByText('Yayında')).toBeNull();
+    expect(screen.queryByText(/yer kaldı/)).toBeNull();
     expect(screen.queryByRole('button', { name: 'Katılım isteği gönder' })).toBeNull();
   });
 

@@ -32,7 +32,12 @@ function badgesFor(event: MyEventItem): CardBadge[] {
     });
   }
   if (event.myStatus && event.myStatus !== 'ORGANIZER') {
-    const tone = event.myStatus === 'APPROVED' ? 'success' : 'warning';
+    const tone =
+      event.myStatus === 'APPROVED'
+        ? 'success'
+        : event.myStatus === 'REJECTED' || event.myStatus === 'REMOVED'
+          ? 'danger'
+          : 'warning';
     badges.push({ label: t(`events:mine.status.${event.myStatus}`), tone });
   }
   return badges;

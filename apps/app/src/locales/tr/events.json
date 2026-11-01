@@ -372,7 +372,8 @@
     "disputeHint": "Yöneticiler okur. En fazla 500 karakter.",
     "disputeSend": "İtirazı gönder",
     "disputedToast": "İtirazın alındı",
-    "row": "{{name}}: {{status}}"
+    "row": "{{name}}: {{status}}",
+    "absentClosed": "Gelmedin olarak işaretlendin. İtiraz süresi doldu."
   },
   "reviews": {
     "title": "Değerlendirme",

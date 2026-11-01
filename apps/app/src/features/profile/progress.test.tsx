@@ -51,6 +51,10 @@ describe('progress on the profile', () => {
     await show();
     expect(await screen.findByText('Seviye 2')).toBeTruthy();
     expect(screen.getByText('130 XP · sonraki seviyeye 170 XP')).toBeTruthy();
+    // 30 of the 200 XP between level 2 (100) and level 3 (300).
+    expect(
+      screen.getByTestId('level-bar', { includeHiddenElements: true }).props['aria-valuenow'],
+    ).toBe(15);
   });
 
   it('below three signals reliability shows "new player", not a percentage', async () => {

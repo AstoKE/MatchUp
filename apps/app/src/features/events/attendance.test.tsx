@@ -112,6 +112,18 @@ describe('a player', () => {
     expect(screen.queryByRole('button', { name: 'İtiraz et' })).toBeNull();
   });
 
+  it('an absent mark stands out with an icon; a neutral state does not', async () => {
+    mockApi.fetchEventAttendance.mockResolvedValue(own('ABSENT'));
+    const first = await renderApp(<AttendancePanel eventId={EVENT} isOrganizer={false} />);
+    expect(await screen.findByText('Gelmedin olarak işaretlendin.')).toBeTruthy();
+    expect(screen.getByTestId('icon-alert-outline', { includeHiddenElements: true })).toBeTruthy();
+    await first.unmount();
+    mockApi.fetchEventAttendance.mockResolvedValue(own('NOT_CONFIRMED'));
+    await renderApp(<AttendancePanel eventId={EVENT} isOrganizer={false} />);
+    expect(await screen.findByText(/Organizatör seni işaretlemedi/)).toBeTruthy();
+    expect(screen.queryByTestId('icon-alert-outline', { includeHiddenElements: true })).toBeNull();
+  });
+
   it('cannot dispute a present mark', async () => {
     mockApi.fetchEventAttendance.mockResolvedValue(own('PRESENT'));
     await renderApp(<AttendancePanel eventId={EVENT} isOrganizer={false} />);
@@ -140,7 +152,9 @@ describe('a player', () => {
       own('ABSENT', { disputeClosesAt: '2020-01-01T00:00:00Z' }),
     );
     await renderApp(<AttendancePanel eventId={EVENT} isOrganizer={false} />);
-    expect(await screen.findByText('Gelmedin olarak işaretlendin.')).toBeTruthy();
+    expect(
+      await screen.findByText('Gelmedin olarak işaretlendin. İtiraz süresi doldu.'),
+    ).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'İtiraz et' })).toBeNull();
   });
 

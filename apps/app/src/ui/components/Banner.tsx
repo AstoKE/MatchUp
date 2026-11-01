@@ -1,10 +1,11 @@
 import { View } from 'react-native';
+import { Icon } from '../graphics/Icon';
 import { useTheme } from '../theme';
 import { Text } from './Text';
 
 export type BannerKind = 'info' | 'warning' | 'danger' | 'success';
 
-/** Inline status message. Never color-only: always carries text (and role="alert" for danger). */
+/** Inline status message. Never color-only: always text, an icon when it is bad news, role="alert" for danger. */
 export function Banner({ kind = 'info', message }: { kind?: BannerKind; message: string }) {
   const { colors, spacing, radius } = useTheme();
   const accent = {
@@ -21,10 +22,17 @@ export function Banner({ kind = 'info', message }: { kind?: BannerKind; message:
         backgroundColor: colors.surfaceRaised,
         borderRadius: radius.md,
         padding: spacing[3],
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: spacing[2],
       }}
     >
+      {kind === 'warning' || kind === 'danger' ? (
+        <Icon name="alert" color={accent} size={20} />
+      ) : null}
       <Text
         variant="bodySm"
+        style={{ flex: 1 }}
         role={kind === 'danger' ? 'alert' : 'status'}
         accessibilityLiveRegion={kind === 'danger' ? 'assertive' : 'polite'}
       >

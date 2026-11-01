@@ -81,13 +81,13 @@ export function JoinPanel({
   }
   if (status === 'REJECTED' || status === 'REMOVED') {
     // No reason is ever shown: the organizer's decision is theirs, and it is final for this event.
-    return <Banner kind="info" message={t('events:join.unavailable')} />;
+    return <Banner kind="warning" message={t('events:join.unavailable')} />;
   }
   if (status === 'CANCELED' && (mine.data?.requestCount ?? 0) >= MAX_REQUESTS) {
-    return <Banner kind="info" message={t('events:join.limitReached')} />;
+    return <Banner kind="warning" message={t('events:join.limitReached')} />;
   }
   if (full && !event.waitlistEnabled) {
-    return <Banner kind="info" message={t('events:join.fullNoWaitlist')} />;
+    return <Banner kind="warning" message={t('events:join.fullNoWaitlist')} />;
   }
 
   return (

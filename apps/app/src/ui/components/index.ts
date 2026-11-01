@@ -1,3 +1,4 @@
+export * from './Avatar';
 export * from './Banner';
 export * from './Button';
 export * from './Checkbox';

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { signOut, useSession, VerifyEmailBanner } from '@/features/auth';
 import { localizedName, type Catalog } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
-import { Button, Screen, Text, useTheme } from '@/ui';
+import { Avatar, Button, Screen, Text, useTheme } from '@/ui';
 import type { MyProfile } from '../api/profile-api';
 import { ProgressSection } from '../components/ProgressSection';
 import { WithProfile } from '../components/WithProfile';
@@ -34,14 +34,21 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
   return (
     <Screen maxWidth={640}>
       <VerifyEmailBanner />
-      <View style={{ gap: spacing[1] }}>
-        <Text variant="headline" heading={1}>
-          {profile.displayName}
-        </Text>
-        {session.status === 'authenticated' && session.email ? (
-          <Text tone="secondary">{t('auth:signedInAs', { email: session.email })}</Text>
-        ) : null}
-        <Text tone="secondary">{location || t('profile:noLocation')}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+        <Avatar name={profile.displayName} />
+        <View style={{ flex: 1, gap: spacing[1] }}>
+          <Text variant="headline" heading={1}>
+            {profile.displayName}
+          </Text>
+          {session.status === 'authenticated' && session.email ? (
+            <Text variant="bodySm" tone="secondary">
+              {t('auth:signedInAs', { email: session.email })}
+            </Text>
+          ) : null}
+          <Text variant="bodySm" tone="secondary">
+            {location || t('profile:noLocation')}
+          </Text>
+        </View>
       </View>
 
       <Text>{profile.bio ?? t('profile:noBio')}</Text>
