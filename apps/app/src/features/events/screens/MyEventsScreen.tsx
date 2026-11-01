@@ -1,4 +1,4 @@
-import { MY_EVENT_BUCKETS, type MyEventBucket } from '@matchup/domain';
+import type { MyEventBucket } from '@matchup/domain';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -32,20 +32,24 @@ function badgesFor(event: MyEventItem): CardBadge[] {
     });
   }
   if (event.myStatus && event.myStatus !== 'ORGANIZER') {
-    const tone =
-      event.myStatus === 'APPROVED'
-        ? 'success'
-        : event.myStatus === 'REQUESTED'
-          ? 'neutral'
-          : 'warning';
+    const tone = event.myStatus === 'APPROVED' ? 'success' : 'warning';
     badges.push({ label: t(`events:mine.status.${event.myStatus}`), tone });
   }
   return badges;
 }
 
+const TABS = ['UPCOMING', 'APPLIED', 'ORGANIZING', 'PAST'] as const;
+type Tab = (typeof TABS)[number];
+const PRIMARY_BUCKET: Record<Tab, MyEventBucket> = {
+  UPCOMING: 'APPROVED',
+  APPLIED: 'PENDING',
+  ORGANIZING: 'ORGANIZING',
+  PAST: 'PAST',
+};
+
 /**
- * My Events (PRD §4.5): the caller's own events and participations in five tabs. Needs an account.
- * Requests and approvals arrive with participation (M4); until then ORGANIZING and PAST hold the rows.
+ * My Events (docs/design.md §5.6): four tabs over the five server buckets; "applied" shows pending requests and the
+ * waitlist as two sections, each with its own paging. Needs an account.
  */
 export function MyEventsScreen() {
   // The queries live below the gate: a guest is redirected without ever asking the server.
@@ -61,92 +65,118 @@ function MyEventsContent() {
   const { spacing } = useTheme();
   const router = useRouter();
   const catalog = useCatalog();
-  const [bucket, setBucket] = useState<MyEventBucket>('ORGANIZING');
-  const list = useMyEvents(bucket);
-  const items = list.data?.pages.flatMap((page) => page.items) ?? [];
+  const [tab, setTab] = useState<Tab>('UPCOMING');
+  const primary = useMyEvents(PRIMARY_BUCKET[tab]);
+  const waitlist = useMyEvents('WAITLISTED', tab === 'APPLIED');
+  const lists =
+    tab === 'APPLIED'
+      ? [
+          { bucket: 'PENDING' as const, query: primary },
+          { bucket: 'WAITLISTED' as const, query: waitlist },
+        ]
+      : [{ bucket: PRIMARY_BUCKET[tab], query: primary }];
+  const failed = lists.find((l) => l.query.isError)?.query;
+  const pending = lists.some((l) => l.query.isPending);
+  const itemsOf = (query: typeof primary) => query.data?.pages.flatMap((page) => page.items) ?? [];
+  const empty = lists.every((l) => itemsOf(l.query).length === 0);
 
   return (
-    <>
-      <Screen>
-        <VerifyEmailBanner />
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: spacing[3],
-          }}
-        >
-          <Text variant="headline" heading={1}>
-            {t('nav:myEvents')}
-          </Text>
-          <NotificationBell />
-        </View>
-        <SegmentedChoice
-          label={t('events:mine.bucketLabel')}
-          options={MY_EVENT_BUCKETS.map((value) => ({
-            value,
-            label: t(`events:mine.bucket.${value}`),
-          }))}
-          value={bucket}
-          onChange={setBucket}
-        />
+    <Screen maxWidth={720}>
+      <VerifyEmailBanner />
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: spacing[3],
+        }}
+      >
+        <Text variant="headline" heading={1}>
+          {t('nav:myEvents')}
+        </Text>
+        <NotificationBell />
+      </View>
+      <SegmentedChoice
+        label={t('events:mine.tabLabel')}
+        options={TABS.map((value) => ({ value, label: t(`events:mine.tab.${value}`) }))}
+        value={tab}
+        onChange={setTab}
+      />
 
-        {list.isError || catalog.isError ? (
-          <EmptyState
-            title={t('events:mine.loadFailed')}
-            body={errorText(list.error ?? catalog.error)}
-            actionLabel={t('common:retry')}
-            onAction={() => {
-              if (list.isError) void list.refetch();
-              if (catalog.isError) void catalog.refetch();
-            }}
-          />
-        ) : list.isPending || !catalog.data ? (
-          <View
-            accessible
-            accessibilityRole="progressbar"
-            accessibilityLabel={t('common:loading')}
-            style={{ gap: spacing[3] }}
-          >
-            {[0, 1].map((n) => (
-              <Skeleton key={n} height={140} radiusKey="lg" />
-            ))}
-          </View>
-        ) : items.length === 0 ? (
-          <EmptyState
-            title={t(`events:mine.empty.${bucket}.title`)}
-            body={t(`events:mine.empty.${bucket}.body`)}
-            actionLabel={t(
-              bucket === 'ORGANIZING' ? 'events:mine.createFirst' : 'events:mine.browse',
-            )}
-            onAction={() => router.push(bucket === 'ORGANIZING' ? '/create' : '/')}
-          />
-        ) : (
-          <View style={{ gap: spacing[3] }}>
-            <Text variant="caption" tone="secondary" accessibilityLiveRegion="polite">
-              {t('events:discover.resultCount', { count: items.length })}
-            </Text>
-            <View role="list" style={{ gap: spacing[3] }}>
-              {items.map((event) => (
-                <View key={event.id} role="listitem">
-                  <EventListRow event={event} catalog={catalog.data} badges={badgesFor(event)} />
+      {failed || catalog.isError ? (
+        <EmptyState
+          title={t('events:mine.loadFailed')}
+          body={errorText(failed?.error ?? catalog.error)}
+          actionLabel={t('common:retry')}
+          onAction={() => {
+            lists.forEach((l) => {
+              if (l.query.isError) void l.query.refetch();
+            });
+            if (catalog.isError) void catalog.refetch();
+          }}
+        />
+      ) : pending || !catalog.data ? (
+        <View
+          accessible
+          accessibilityRole="progressbar"
+          accessibilityLabel={t('common:loading')}
+          style={{ gap: spacing[2] }}
+        >
+          {[0, 1].map((n) => (
+            <Skeleton key={n} height={104} radiusKey="lg" />
+          ))}
+        </View>
+      ) : empty ? (
+        <EmptyState
+          title={t(`events:mine.empty.${tab}.title`)}
+          body={t(`events:mine.empty.${tab}.body`)}
+          actionLabel={t(tab === 'ORGANIZING' ? 'events:mine.createFirst' : 'events:mine.browse')}
+          onAction={() => router.push(tab === 'ORGANIZING' ? '/create' : '/')}
+        />
+      ) : (
+        <View style={{ gap: spacing[4] }}>
+          {lists.map(({ bucket, query }) => {
+            const items = itemsOf(query);
+            if (items.length === 0) return null;
+            return (
+              <View key={bucket} style={{ gap: spacing[2] }}>
+                {tab === 'APPLIED' ? (
+                  <Text variant="title" heading={2}>
+                    {bucket === 'PENDING'
+                      ? t('events:mine.section.PENDING', { count: items.length })
+                      : t('events:mine.section.WAITLISTED', { count: items.length })}
+                  </Text>
+                ) : (
+                  <Text variant="caption" tone="secondary" accessibilityLiveRegion="polite">
+                    {t('events:discover.resultCount', { count: items.length })}
+                  </Text>
+                )}
+                <View role="list" style={{ gap: spacing[2] }}>
+                  {items.map((event) => (
+                    <View key={event.id} role="listitem">
+                      <EventListRow
+                        event={event}
+                        catalog={catalog.data}
+                        badges={badgesFor(event)}
+                      />
+                    </View>
+                  ))}
                 </View>
-              ))}
-            </View>
-            {list.hasNextPage ? (
-              <Button
-                label={t('events:discover.loadMore')}
-                variant="secondary"
-                loading={list.isFetchingNextPage}
-                loadingLabel={t('events:discover.loadMoreLoading')}
-                onPress={() => void list.fetchNextPage()}
-              />
-            ) : null}
-          </View>
-        )}
-      </Screen>
-    </>
+                {query.hasNextPage ? (
+                  <Button
+                    label={t('events:discover.loadMore')}
+                    variant="secondary"
+                    loading={query.isFetchingNextPage}
+                    loadingLabel={t('events:discover.loadMoreLoading')}
+                    onPress={() => void query.fetchNextPage()}
+                  />
+                ) : null}
+              </View>
+            );
+          })}
+        </View>
+      )}
+    </Screen>
   );
 }

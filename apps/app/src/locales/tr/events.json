@@ -254,14 +254,6 @@
     "rejectYes": "Evet, reddet"
   },
   "mine": {
-    "bucketLabel": "Etkinlik grubu",
-    "bucket": {
-      "ORGANIZING": "Düzenlediklerim",
-      "PENDING": "Bekleyen",
-      "APPROVED": "Onaylı",
-      "WAITLISTED": "Yedek",
-      "PAST": "Geçmiş"
-    },
     "status": {
       "REQUESTED": "Onay bekleniyor",
       "APPROVED": "Katılım onaylandı",
@@ -274,28 +266,37 @@
     "pendingRequests_other": "{{count}} bekleyen istek",
     "loadFailed": "Etkinliklerin yüklenemedi",
     "createFirst": "Etkinlik oluştur",
-    "browse": "Etkinliklere göz at",
+    "browse": "Etkinlikleri keşfet",
     "empty": {
+      "UPCOMING": {
+        "title": "Henüz katıldığın etkinlik yok",
+        "body": "Katılımın onaylanan yaklaşan etkinlikler burada listelenir."
+      },
+      "APPLIED": {
+        "title": "Bekleyen başvurun yok",
+        "body": "Katılım isteği gönderdiğin etkinlikler ve yedek listeler burada görünür."
+      },
       "ORGANIZING": {
         "title": "Düzenlediğin etkinlik yok",
         "body": "Oluşturduğun taslaklar ve yaklaşan etkinlikler burada görünür."
-      },
-      "PENDING": {
-        "title": "Bekleyen isteğin yok",
-        "body": "Katılma isteği gönderdiğin etkinlikler, organizatör karar verene kadar burada durur."
-      },
-      "APPROVED": {
-        "title": "Onaylandığın etkinlik yok",
-        "body": "Katılımın onaylanan yaklaşan etkinlikler burada listelenir."
-      },
-      "WAITLISTED": {
-        "title": "Yedek listede değilsin",
-        "body": "Dolu etkinliklerde beklediğin yerler burada görünür."
       },
       "PAST": {
         "title": "Geçmiş etkinlik yok",
         "body": "Biten, iptal edilen ve tamamlanan etkinliklerin burada kalır."
       }
+    },
+    "tabLabel": "Etkinlik grubu",
+    "tab": {
+      "UPCOMING": "Yaklaşan",
+      "APPLIED": "Başvurularım",
+      "ORGANIZING": "Düzenlediklerim",
+      "PAST": "Geçmiş"
+    },
+    "section": {
+      "PENDING_one": "Onay bekleyen ({{count}})",
+      "PENDING_other": "Onay bekleyen ({{count}})",
+      "WAITLISTED_one": "Yedek listede ({{count}})",
+      "WAITLISTED_other": "Yedek listede ({{count}})"
     }
   },
   "validation": {

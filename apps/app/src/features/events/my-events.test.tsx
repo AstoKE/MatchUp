@@ -127,33 +127,69 @@ beforeEach(() => {
 });
 
 describe('MyEventsScreen', () => {
-  it('opens on the events I organize, with drafts and pending-request counts marked', async () => {
+  it('opens on my confirmed upcoming events', async () => {
+    mockApi.fetchMyEvents.mockResolvedValue(
+      page([item({ id: 'a', title: 'Onaylı maç', myStatus: 'APPROVED' })]),
+    );
+    await renderApp(<MyEventsScreen />, { session: signedIn });
+    expect(await screen.findByText('Onaylı maç')).toBeTruthy();
+    expect(mockApi.fetchMyEvents).toHaveBeenCalledWith('APPROVED', null);
+    expect(screen.getByText('Katılım onaylandı')).toBeTruthy();
+    expect(screen.getByRole('radio', { name: 'Yaklaşan', checked: true })).toBeTruthy();
+    expect(mockApi.fetchMyEvents).not.toHaveBeenCalledWith('WAITLISTED', null);
+  });
+
+  it('marks drafts and pending-request counts in the events I organize', async () => {
+    await renderApp(<MyEventsScreen />, { session: signedIn });
+    await screen.findByText('Perşembe maçı');
     mockApi.fetchMyEvents.mockResolvedValue(
       page([
         item({ id: 'a', title: 'Taslak maç', status: 'DRAFT', approvedCount: 0 }),
         item({ id: 'b', title: 'Yayındaki maç', pendingCount: 3 }),
       ]),
     );
-    await renderApp(<MyEventsScreen />, { session: signedIn });
+    await fireEvent.press(screen.getByRole('radio', { name: 'Düzenlediklerim' }));
     expect(await screen.findByText('Taslak maç')).toBeTruthy();
-    expect(mockApi.fetchMyEvents).toHaveBeenCalledWith('ORGANIZING', null);
+    expect(mockApi.fetchMyEvents).toHaveBeenLastCalledWith('ORGANIZING', null);
     expect(screen.getByText('Taslak')).toBeTruthy();
     expect(screen.getByText('3 bekleyen istek')).toBeTruthy();
     expect(screen.getByText('2 etkinlik')).toBeTruthy();
-    expect(screen.getByRole('radio', { name: 'Düzenlediklerim', checked: true })).toBeTruthy();
   });
 
-  it('switches tabs and shows where I stand on each event', async () => {
+  it('my requests shows pending and waitlist as two sections, in words', async () => {
     await renderApp(<MyEventsScreen />, { session: signedIn });
     await screen.findByText('Perşembe maçı');
-    mockApi.fetchMyEvents.mockResolvedValue(
-      page([item({ id: 'p', title: 'İstek attığım maç', myStatus: 'REQUESTED' })]),
+    mockApi.fetchMyEvents.mockImplementation((bucket: string) =>
+      Promise.resolve(
+        bucket === 'PENDING'
+          ? page([item({ id: 'p', title: 'İstek attığım maç', myStatus: 'REQUESTED' })])
+          : page([item({ id: 'w', title: 'Yedekte olduğum maç', myStatus: 'WAITLISTED' })]),
+      ),
     );
-    await fireEvent.press(screen.getByRole('radio', { name: 'Bekleyen' }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Başvurularım' }));
     expect(await screen.findByText('İstek attığım maç')).toBeTruthy();
-    expect(mockApi.fetchMyEvents).toHaveBeenLastCalledWith('PENDING', null);
+    expect(await screen.findByText('Yedekte olduğum maç')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Onay bekleyen (1)' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Yedek listede (1)' })).toBeTruthy();
     expect(screen.getByText('Onay bekleniyor')).toBeTruthy();
+    expect(screen.getByText('Yedek listede')).toBeTruthy();
     expect(screen.queryByText('Perşembe maçı')).toBeNull();
+  });
+
+  it('my requests with only a waitlist shows that section alone', async () => {
+    await renderApp(<MyEventsScreen />, { session: signedIn });
+    await screen.findByText('Perşembe maçı');
+    mockApi.fetchMyEvents.mockImplementation((bucket: string) =>
+      Promise.resolve(
+        bucket === 'PENDING'
+          ? page([])
+          : page([item({ id: 'w', title: 'Yedekte olduğum maç', myStatus: 'WAITLISTED' })]),
+      ),
+    );
+    await fireEvent.press(screen.getByRole('radio', { name: 'Başvurularım' }));
+    expect(await screen.findByText('Yedekte olduğum maç')).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: /Onay bekleyen/ })).toBeNull();
+    expect(screen.queryByText('Bekleyen başvurun yok')).toBeNull();
   });
 
   it('shows canceled events in the past tab as canceled', async () => {
@@ -170,6 +206,8 @@ describe('MyEventsScreen', () => {
   it('offers to create the first event when I organize nothing', async () => {
     mockApi.fetchMyEvents.mockResolvedValue(page([]));
     await renderApp(<MyEventsScreen />, { session: signedIn });
+    await screen.findByText('Henüz katıldığın etkinlik yok');
+    await fireEvent.press(screen.getByRole('radio', { name: 'Düzenlediklerim' }));
     expect(await screen.findByText('Düzenlediğin etkinlik yok')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Etkinlik oluştur' }));
     expect(mockRouter.push).toHaveBeenCalledWith('/create');
@@ -178,10 +216,10 @@ describe('MyEventsScreen', () => {
   it('sends me to Discover from the participant tabs when they are empty', async () => {
     mockApi.fetchMyEvents.mockResolvedValue(page([]));
     await renderApp(<MyEventsScreen />, { session: signedIn });
-    await screen.findByText('Düzenlediğin etkinlik yok');
-    await fireEvent.press(screen.getByRole('radio', { name: 'Yedek' }));
-    expect(await screen.findByText('Yedek listede değilsin')).toBeTruthy();
-    await fireEvent.press(screen.getByRole('button', { name: 'Etkinliklere göz at' }));
+    await screen.findByText('Henüz katıldığın etkinlik yok');
+    await fireEvent.press(screen.getByRole('radio', { name: 'Başvurularım' }));
+    expect(await screen.findByText('Bekleyen başvurun yok')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Etkinlikleri keşfet' }));
     expect(mockRouter.push).toHaveBeenCalledWith('/');
   });
 
@@ -203,7 +241,7 @@ describe('MyEventsScreen', () => {
     await screen.findByText('Birinci');
     await fireEvent.press(screen.getByRole('button', { name: 'Daha fazla göster' }));
     expect(await screen.findByText('İkinci')).toBeTruthy();
-    expect(mockApi.fetchMyEvents).toHaveBeenLastCalledWith('ORGANIZING', cursor);
+    expect(mockApi.fetchMyEvents).toHaveBeenLastCalledWith('APPROVED', cursor);
   });
 
   it('does not ask the server anything for a guest: they are sent to sign in', async () => {
