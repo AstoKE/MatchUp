@@ -198,6 +198,8 @@ test.describe('My Events (Phase 3 / M3b)', () => {
     await page.getByRole('tab', { name: 'Etkinliklerim' }).click();
     await expect(page.getByRole('heading', { name: 'Etkinliklerim', level: 1 })).toBeVisible();
     const main = page.getByRole('main');
+    await expect(main.getByText('Henüz katıldığın etkinlik yok')).toBeVisible();
+    await main.getByRole('radio', { name: 'Düzenlediklerim' }).click();
     await expect(main.getByRole('link', { name: new RegExp(`E2E yayında ${tag}`) })).toBeVisible();
     const draft = main.getByRole('link', { name: new RegExp(`E2E taslak ${tag}`) });
     await expect(draft).toBeVisible();
@@ -205,8 +207,9 @@ test.describe('My Events (Phase 3 / M3b)', () => {
     await expectNoBlocking(page);
 
     // The other tabs are empty for an organizer who has not asked to join anything.
-    await main.getByRole('radio', { name: 'Bekleyen' }).click();
-    await expect(main.getByText('Bekleyen isteğin yok')).toBeVisible();
+    await main.getByRole('radio', { name: 'Başvurularım' }).click();
+    await expect(main.getByText('Bekleyen başvurun yok')).toBeVisible();
+    await expectNoBlocking(page);
     await main.getByRole('radio', { name: 'Düzenlediklerim' }).click();
     await draft.click();
     await expect(page).toHaveURL(/\/e\/[0-9a-f-]{36}$/);
@@ -220,6 +223,7 @@ test.describe('My Events (Phase 3 / M3b)', () => {
     const stranger = await context.newPage();
     await signIn(stranger, strangerEmail);
     await stranger.getByRole('tab', { name: 'Etkinliklerim' }).click();
+    await stranger.getByRole('main').getByRole('radio', { name: 'Düzenlediklerim' }).click();
     await expect(stranger.getByText('Düzenlediğin etkinlik yok')).toBeVisible();
     await expect(stranger.getByRole('main').getByText(new RegExp(`E2E .* ${tag}`))).toHaveCount(0);
     await context.close();
@@ -287,7 +291,10 @@ test.describe('joining an event (Phase 3 / M4)', () => {
       player.page.getByRole('main').getByText('Katılım onaylandı', { exact: true }),
     ).toBeVisible();
     await player.page.getByRole('tab', { name: 'Etkinliklerim' }).click();
-    await player.page.getByRole('main').getByRole('radio', { name: 'Onaylı' }).click();
+    await player.page
+      .getByRole('main')
+      .getByRole('radio', { name: 'Yaklaşan', checked: true })
+      .click();
     await expect(
       player.page.getByRole('main').getByRole('link', { name: new RegExp(title) }),
     ).toBeVisible();

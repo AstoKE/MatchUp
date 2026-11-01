@@ -254,14 +254,6 @@
     "rejectYes": "Yes, decline"
   },
   "mine": {
-    "bucketLabel": "Event group",
-    "bucket": {
-      "ORGANIZING": "Organizing",
-      "PENDING": "Pending",
-      "APPROVED": "Approved",
-      "WAITLISTED": "Waitlisted",
-      "PAST": "Past"
-    },
     "status": {
       "REQUESTED": "Waiting for approval",
       "APPROVED": "Your spot is confirmed",
@@ -274,28 +266,37 @@
     "pendingRequests_other": "{{count}} pending requests",
     "loadFailed": "Couldn't load your events",
     "createFirst": "Create an event",
-    "browse": "Browse events",
+    "browse": "Discover events",
     "empty": {
+      "UPCOMING": {
+        "title": "You haven't joined any events yet",
+        "body": "Upcoming events with a confirmed spot are listed here."
+      },
+      "APPLIED": {
+        "title": "No open requests",
+        "body": "Events you asked to join and waitlists appear here."
+      },
       "ORGANIZING": {
-        "title": "You're not organizing anything",
-        "body": "Your drafts and upcoming events show up here."
-      },
-      "PENDING": {
-        "title": "No pending requests",
-        "body": "Events you asked to join wait here until the organizer decides."
-      },
-      "APPROVED": {
-        "title": "No approved events yet",
-        "body": "Upcoming events you were approved for are listed here."
-      },
-      "WAITLISTED": {
-        "title": "You're not on any waitlist",
-        "body": "Places you wait for on full events show up here."
+        "title": "You aren't organizing any events",
+        "body": "Your drafts and upcoming events appear here."
       },
       "PAST": {
         "title": "No past events",
-        "body": "Events that ended, were canceled or completed stay here."
+        "body": "Finished, canceled and completed events stay here."
       }
+    },
+    "tabLabel": "Event group",
+    "tab": {
+      "UPCOMING": "Upcoming",
+      "APPLIED": "My requests",
+      "ORGANIZING": "Organizing",
+      "PAST": "Past"
+    },
+    "section": {
+      "PENDING_one": "Waiting for approval ({{count}})",
+      "PENDING_other": "Waiting for approval ({{count}})",
+      "WAITLISTED_one": "On the waitlist ({{count}})",
+      "WAITLISTED_other": "On the waitlist ({{count}})"
     }
   },
   "validation": {
