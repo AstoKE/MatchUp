@@ -1,9 +1,10 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
-import { Banner, Button, EmptyState, Skeleton, Text, useTheme } from '@/ui';
+import { Banner, Button, EmptyState, Skeleton, Text, TOUCH_TARGET, useTheme } from '@/ui';
 import type { EventDetails } from '../api/events-api';
 import type { EventRequest, OrganizerDecision } from '../api/participation-api';
 import { useDecideParticipation, useEventRequests } from '../hooks';
@@ -150,6 +151,7 @@ function RequestRow({
 }) {
   const { t } = useTranslation(['events', 'common']);
   const { colors, radius, spacing } = useTheme();
+  const router = useRouter();
   const name = request.displayName ?? t('events:requests.unnamed');
   const locale = currentLocale();
   const decimal = new Intl.NumberFormat(locale, {
@@ -168,7 +170,20 @@ function RequestRow({
         backgroundColor: colors.surfaceRaised,
       }}
     >
-      <Text variant="titleSm">{name}</Text>
+      {request.userId ? (
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel={t('events:requests.openCard', { name })}
+          onPress={() => router.push({ pathname: '/u/[id]', params: { id: request.userId ?? '' } })}
+          style={{ minHeight: TOUCH_TARGET, justifyContent: 'center', alignSelf: 'flex-start' }}
+        >
+          <Text variant="titleSm" tone="link">
+            {name}
+          </Text>
+        </Pressable>
+      ) : (
+        <Text variant="titleSm">{name}</Text>
+      )}
       <Text variant="caption" tone="secondary">
         {[
           request.level !== null ? t('events:requests.level', { level: request.level }) : null,

@@ -1,6 +1,6 @@
 # Phase 6 plan: trust, moderation and admin
 
-Status 2026-11-01: **M1 and M2 built**, the rest not started. Scope: ROADMAP F-27, F-28, the rest of F-19 and F-30, plus what Phase 5 left here. Sources of truth stay `docs/PRD.md` §4.9, `docs/DATABASE.md` §3.6, `docs/SECURITY.md`, `docs/USER_FLOWS.md` FL-9 and FL-11. This file sequences the work and lists what a decision is needed for.
+Status 2026-11-01: **M1, M2 and M3 built**, the rest not started. Scope: ROADMAP F-27, F-28, the rest of F-19 and F-30, plus what Phase 5 left here. Sources of truth stay `docs/PRD.md` §4.9, `docs/DATABASE.md` §3.6, `docs/SECURITY.md`, `docs/USER_FLOWS.md` FL-9 and FL-11. This file sequences the work and lists what a decision is needed for.
 
 **Why now.** The pilot has real people meeting strangers and rating each other. Without reporting, blocking and someone able to act on them it cannot start, and the app stores require them for user-generated content (SECURITY §8). Today a dispute can only be resolved by a SQL function nobody has a screen for.
 
@@ -30,6 +30,8 @@ Not there: `user_blocks`, `reports`, `moderation_actions`, any `admin_*` RPC but
 - **Tests:** duplicates, rate limit under concurrency, targets the reporter cannot see, no PII in logs.
 
 ### M3: report and block screens
+
+**Status 2026-11-01: built:** player card `/u/<id>` with report and block, report on the event page, blocked people in settings. `get_player_card` in `20261101130000_player_card.sql` gives `profile_visibility`, `show_reliability` and `show_badges` their effect; the roster and the queue gained `user_id`, deliberately (the allow-lists in `10_participation` and `11_get_event` changed with it). pgTAP `22_player_card` (23), components, a Playwright flow. Nine mutations of `get_player_card` are caught. **The web bundle reached 883 of 885 kB: M5's console has to be lazy, and something must shrink before more shared code lands.**
 
 - A small player card (name, level, reliability if shown) reached from a roster and the request queue, with Report and Block. Report on the event page. Blocked people in settings, with unblock. Copy tr and en.
 - **Honors** `profile_visibility`, `show_reliability`, `show_badges`, which do nothing today: the read goes through a new RPC.

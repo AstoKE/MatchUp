@@ -127,7 +127,8 @@
     "participants_other": "Katılanlar ({{count}})",
     "participantsNone": "Henüz onaylanmış başka oyuncu yok.",
     "participantsHidden": "Katılımcı listesi onaylanan oyunculara gösterilir.",
-    "started": "Başladı"
+    "started": "Başladı",
+    "reportEvent": "Bu etkinliği bildir"
   },
   "edit": {
     "title": "Etkinliği düzenle",
@@ -257,7 +258,8 @@
     "reliability": "Güvenilirlik {{value}}",
     "newPlayer": "Yeni oyuncu",
     "confirmReject": "{{name}} reddedilsin mi? Bu etkinlik için kesindir.",
-    "rejectYes": "Evet, reddet"
+    "rejectYes": "Evet, reddet",
+    "openCard": "{{name}} profilini aç"
   },
   "mine": {
     "status": {

@@ -81,6 +81,7 @@ export async function decideParticipation(args: {
 
 const requestRow = z.object({
   id: z.uuid(),
+  user_id: z.optional(z.uuid()),
   status: z.enum(['REQUESTED', 'WAITLISTED', 'APPROVED']),
   display_name: z.nullable(z.string()),
   level: z.nullable(z.number()),
@@ -95,6 +96,8 @@ const requestRow = z.object({
 
 export interface EventRequest {
   id: string;
+  /** Null until the hosted database has the latest migration: the name is then plain text. */
+  userId: string | null;
   status: 'REQUESTED' | 'WAITLISTED' | 'APPROVED';
   displayName: string | null;
   /** Self-assessed level for the event's sport, when the player gave one. */
@@ -115,6 +118,7 @@ export async function fetchEventRequests(eventId: string): Promise<EventRequest[
   const page = z.object({ items: z.array(requestRow) }).parse(data);
   return page.items.map((row) => ({
     id: row.id,
+    userId: row.user_id ?? null,
     status: row.status,
     displayName: row.display_name,
     level: row.level,

@@ -1,0 +1,40 @@
+{
+  "title": "Oyuncu",
+  "unnamed": "Oyuncu",
+  "unavailable": "Bu oyuncu görüntülenemiyor",
+  "sports": "Sporları",
+  "ownLevel": "Kendi tahmini {{level}}",
+  "rating": "Puan {{rating}}",
+  "report": {
+    "open": "Bildir",
+    "titleUser": "Oyuncuyu bildir",
+    "titleEvent": "Etkinliği bildir",
+    "reason": "Neden bildiriyorsun?",
+    "details": "Ayrıntılar (isteğe bağlı)",
+    "detailsHint": "Yöneticiler okur. En fazla {{max}} karakter.",
+    "send": "Bildirimi gönder",
+    "sent": "Bildirimin alındı. Teşekkürler.",
+    "reasons": {
+      "SPAM": "Spam",
+      "HARASSMENT": "Taciz veya hakaret",
+      "UNSAFE": "Güvensiz davranış",
+      "FAKE_EVENT": "Sahte etkinlik",
+      "INAPPROPRIATE": "Uygunsuz içerik",
+      "OTHER": "Diğer"
+    }
+  },
+  "block": {
+    "open": "Engelle",
+    "confirm": "{{name}} engellensin mi? Birbirinizin etkinliklerini göremez, katılamaz ve birbirinizi değerlendiremezsiniz. Karşı tarafa bildirilmez. Bekleyen istekler kapanır.",
+    "yes": "Evet, engelle",
+    "done": "{{name}} engellendi."
+  },
+  "blocked": {
+    "title": "Engellediklerim",
+    "empty": "Kimseyi engellemedin.",
+    "loadFailed": "Liste yüklenemedi",
+    "unblock": "Engeli kaldır",
+    "unblockNamed": "{{name}} için engeli kaldır",
+    "unblocked": "Engel kaldırıldı."
+  }
+}

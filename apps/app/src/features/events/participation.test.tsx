@@ -141,6 +141,7 @@ function event(over: Partial<EventDetails> = {}): EventDetails {
 const mine = (status: string, requestCount = 1) => ({ status, requestCount, isOrganizer: false });
 const request = (over: Partial<EventRequest> = {}): EventRequest => ({
   id: '00000000-0000-4000-8000-000000000c01',
+  userId: null,
   status: 'REQUESTED',
   displayName: 'Deniz D',
   level: 3.5,
@@ -278,7 +279,12 @@ describe('joining an event', () => {
 describe('the event page for different viewers', () => {
   it('shows the organizer and, to someone allowed to, the approved players', async () => {
     mockApi.fetchEvent.mockResolvedValue(
-      event({ participants: [{ displayName: 'Deniz D' }, { displayName: null }] }),
+      event({
+        participants: [
+          { userId: null, displayName: 'Deniz D' },
+          { userId: null, displayName: null },
+        ],
+      }),
     );
     await renderApp(<EventDetailScreen />, { session: player });
     expect(await screen.findByText('Ayşe A')).toBeTruthy();

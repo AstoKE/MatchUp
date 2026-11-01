@@ -62,6 +62,10 @@ const baseProfile = {
   sports: [{ sportId: FOOTBALL, level: 3.5, positionIds: [KEEPER] }],
 };
 
+jest.mock('@/features/players/api/players-api', () => ({
+  REPORT_REASONS: [],
+  fetchMyBlocks: () => Promise.resolve([]),
+}));
 jest.mock('./api/progress-api', () => ({
   fetchMyProgress: () =>
     Promise.resolve({ xpTotal: 0, reliability: null, ratings: [], badges: [] }),
@@ -266,7 +270,7 @@ describe('SettingsScreen', () => {
 
   it('explains what each visibility choice means today and saves the choice with theme and language', async () => {
     await renderApp(<SettingsScreen />, { session });
-    expect(await screen.findByText(/Şimdilik kimse göremez/)).toBeTruthy();
+    expect(await screen.findByText(/birlikte etkinliğe katıldığın kişiler/)).toBeTruthy();
     await fireEvent.press(screen.getByRole('radio', { name: 'Herkes' }));
     expect(screen.getByText(/E-posta adresin hiçbir zaman gösterilmez/)).toBeTruthy();
     await fireEvent.press(screen.getByRole('checkbox', { name: 'Rozetlerimi göster' }));
@@ -295,14 +299,14 @@ describe('SettingsScreen', () => {
   it('shows a server error instead of pretending the save worked', async () => {
     mockApi.updateMySettings.mockRejectedValueOnce(new AppError('NETWORK'));
     await renderApp(<SettingsScreen />, { session });
-    await screen.findByText(/Şimdilik kimse göremez/);
+    await screen.findByText(/birlikte etkinliğe katıldığın kişiler/);
     await press('Kaydet');
     expect(await screen.findByText(/Bağlanılamadı|bağlan/i)).toBeTruthy();
   });
 
   it('links to the draft legal texts', async () => {
     await renderApp(<SettingsScreen />, { session });
-    await screen.findByText(/Şimdilik kimse göremez/);
+    await screen.findByText(/birlikte etkinliğe katıldığın kişiler/);
     await press('Kullanım Koşulları');
     await press('Gizlilik Bildirimi');
     expect(mockRouter.push.mock.calls).toEqual([['/legal/terms'], ['/legal/privacy']]);

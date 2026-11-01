@@ -7,6 +7,7 @@ import enLegal from '@/locales/en/legal.json';
 import enNav from '@/locales/en/nav.json';
 import enNotifications from '@/locales/en/notifications.json';
 import enOnboarding from '@/locales/en/onboarding.json';
+import enPlayers from '@/locales/en/players.json';
 import enProfile from '@/locales/en/profile.json';
 import trAccount from '@/locales/tr/account.json';
 import trAuth from '@/locales/tr/auth.json';
@@ -17,6 +18,7 @@ import trLegal from '@/locales/tr/legal.json';
 import trNav from '@/locales/tr/nav.json';
 import trNotifications from '@/locales/tr/notifications.json';
 import trOnboarding from '@/locales/tr/onboarding.json';
+import trPlayers from '@/locales/tr/players.json';
 import trProfile from '@/locales/tr/profile.json';
 
 export const resources = {
@@ -25,6 +27,7 @@ export const resources = {
     nav: trNav,
     auth: trAuth,
     errors: trErrors,
+    players: trPlayers,
     profile: trProfile,
     onboarding: trOnboarding,
     legal: trLegal,
@@ -37,6 +40,7 @@ export const resources = {
     nav: enNav,
     auth: enAuth,
     errors: enErrors,
+    players: enPlayers,
     profile: enProfile,
     onboarding: enOnboarding,
     legal: enLegal,
@@ -52,6 +56,7 @@ export const namespaces = [
   'nav',
   'auth',
   'errors',
+  'players',
   'profile',
   'onboarding',
   'legal',

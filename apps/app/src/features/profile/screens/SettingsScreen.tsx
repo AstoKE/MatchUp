@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AccountSection } from '@/features/account';
+import { BlockedList } from '@/features/players';
 import { LanguagePicker } from '@/features/settings';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
@@ -28,7 +29,7 @@ export function SettingsScreen() {
 }
 
 function Settings({ profile }: { profile: MyProfile }) {
-  const { t } = useTranslation(['profile', 'common', 'auth']);
+  const { t } = useTranslation(['players', 'profile', 'common', 'auth']);
   const router = useRouter();
   const toast = useToast();
   const { spacing } = useTheme();
@@ -153,6 +154,10 @@ function Settings({ profile }: { profile: MyProfile }) {
             onPress={() => router.push('/legal/privacy')}
           />
         </View>
+      </Section>
+
+      <Section title={t('players:blocked.title')}>
+        <BlockedList />
       </Section>
 
       <AccountSection />
