@@ -19,8 +19,12 @@
   },
   "jest": {
     "preset": "jest-expo",
+    "maxWorkers": 4,
     "setupFiles": [
       "<rootDir>/jest.setup.js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.after-env.js"
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
