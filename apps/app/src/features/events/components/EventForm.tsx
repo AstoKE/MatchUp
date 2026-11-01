@@ -25,13 +25,15 @@ import {
 } from '@/ui';
 import { eventValidationMessage } from '../format';
 
-export const EVENT_FORM_STEPS = 3;
+export const EVENT_FORM_STEPS = 5;
 
 /** Fields validated (and shown) on each step, in order. */
 export const STEP_FIELDS: readonly (readonly (keyof EventDraft)[])[] = [
-  ['sportId', 'formatId', 'title', 'description'],
-  ['date', 'time', 'durationMinutes', 'districtId', 'placeLabel', 'addressText'],
-  ['capacity', 'skillMin', 'costText', 'costNote', 'equipmentNote', 'participantNotes'],
+  ['sportId', 'formatId'],
+  ['date', 'time', 'durationMinutes', 'capacity'],
+  ['districtId', 'placeLabel', 'addressText'],
+  ['title', 'description', 'skillMin', 'costText', 'costNote', 'equipmentNote', 'participantNotes'],
+  [],
 ];
 
 const DURATIONS = [30, 45, 60, 75, 90, 105, 120, 150, 180, 240, 300, 360, 480] as const;
@@ -45,12 +47,16 @@ export interface EventFormProps {
   /** Published events: sport, format and "organizer plays" are immutable (I-7). */
   locked: boolean;
   now: Date;
+  /** The review step's way back to a section. */
+  onGoTo: (step: number) => void;
 }
 
 export function EventForm(props: EventFormProps) {
   if (props.step === 0) return <WhatStep {...props} />;
-  if (props.step === 1) return <WhenWhereStep {...props} />;
-  return <ParticipationStep {...props} />;
+  if (props.step === 1) return <WhenStep {...props} />;
+  if (props.step === 2) return <WhereStep {...props} />;
+  if (props.step === 3) return <DetailsStep {...props} />;
+  return <ReviewStep {...props} />;
 }
 
 function WhatStep({ catalog, draft, onChange, errors, locked }: EventFormProps) {
@@ -107,23 +113,6 @@ function WhatStep({ catalog, draft, onChange, errors, locked }: EventFormProps) 
         }}
         error={eventValidationMessage(errors.formatId)}
       />
-      <TextField
-        label={t('fields.title')}
-        hint={t('fields.titleHint')}
-        value={draft.title}
-        onChangeText={(title) => onChange({ title })}
-        error={eventValidationMessage(errors.title)}
-        maxLength={80}
-        returnKeyType="next"
-      />
-      <TextField
-        label={t('fields.description')}
-        value={draft.description}
-        onChangeText={(description) => onChange({ description })}
-        error={eventValidationMessage(errors.description)}
-        maxLength={2000}
-        multiline
-      />
     </View>
   );
 }
@@ -133,7 +122,7 @@ function addDays(isoDate: string, days: number): string {
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
 }
 
-function WhenWhereStep({ catalog, draft, onChange, errors, now }: EventFormProps) {
+function WhenStep({ catalog, draft, onChange, errors, locked, now }: EventFormProps) {
   const { t } = useTranslation('events');
   const { spacing } = useTheme();
   const locale = currentLocale();
@@ -148,6 +137,12 @@ function WhenWhereStep({ catalog, draft, onChange, errors, now }: EventFormProps
     timeZone: 'UTC',
   });
 
+  const format = catalog.sports
+    .find((s) => s.id === draft.sportId)
+    ?.formats.find((f) => f.id === draft.formatId);
+  const min = format?.minParticipants ?? 2;
+  const max = format?.maxParticipants ?? 500;
+
   const pickDate = (iso: string) => {
     setDateText(formatTypedDate(iso));
     onChange({ date: iso });
@@ -156,7 +151,7 @@ function WhenWhereStep({ catalog, draft, onChange, errors, now }: EventFormProps
   return (
     <View style={{ gap: spacing[4] }}>
       <Text variant="title" heading={2}>
-        {t('steps.whenWhere')}
+        {t('steps.when')}
       </Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
         {Array.from({ length: 7 }, (_, i) => addDays(today, i)).map((iso, i) => (
@@ -207,6 +202,51 @@ function WhenWhereStep({ catalog, draft, onChange, errors, now }: EventFormProps
         onChange={(value) => onChange({ durationMinutes: Number(value) })}
         error={eventValidationMessage(errors.durationMinutes)}
       />
+      <View style={{ gap: spacing[2] }}>
+        <Text variant="label">{t('fields.capacity')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+          <Button
+            variant="secondary"
+            label="−"
+            accessibilityLabel={t('fields.decrease')}
+            disabled={draft.capacity <= min}
+            onPress={() => onChange({ capacity: draft.capacity - 1 })}
+          />
+          <Text accessibilityLiveRegion="polite">
+            {t('fields.capacityValue', { count: draft.capacity })}
+          </Text>
+          <Button
+            variant="secondary"
+            label="+"
+            accessibilityLabel={t('fields.increase')}
+            disabled={draft.capacity >= max}
+            onPress={() => onChange({ capacity: draft.capacity + 1 })}
+          />
+        </View>
+        <Text variant="caption" tone={errors.capacity ? 'danger' : 'secondary'}>
+          {eventValidationMessage(errors.capacity) ?? t('fields.capacityRange', { min, max })}
+        </Text>
+      </View>
+      {locked ? null : (
+        <Checkbox
+          label={t('fields.organizerPlays')}
+          checked={draft.organizerPlays}
+          onChange={(organizerPlays) => onChange({ organizerPlays })}
+        />
+      )}
+    </View>
+  );
+}
+
+function WhereStep({ catalog, draft, onChange, errors }: EventFormProps) {
+  const { t } = useTranslation('events');
+  const { spacing } = useTheme();
+  const locale = currentLocale();
+  return (
+    <View style={{ gap: spacing[4] }}>
+      <Text variant="title" heading={2}>
+        {t('steps.where')}
+      </Text>
       <Select
         label={t('fields.city')}
         placeholder={t('fields.city')}
@@ -261,72 +301,6 @@ function WhenWhereStep({ catalog, draft, onChange, errors, now }: EventFormProps
           {t('fields.locationApprovedHint')}
         </Text>
       ) : null}
-    </View>
-  );
-}
-
-function ParticipationStep({ catalog, draft, onChange, errors, locked }: EventFormProps) {
-  const { t } = useTranslation('events');
-  const { spacing } = useTheme();
-  const format = catalog.sports
-    .find((s) => s.id === draft.sportId)
-    ?.formats.find((f) => f.id === draft.formatId);
-  const min = format?.minParticipants ?? 2;
-  const max = format?.maxParticipants ?? 500;
-  const skillOptions = SKILL_LEVELS.map((level) => ({
-    value: String(level),
-    label: String(level),
-  }));
-  return (
-    <View style={{ gap: spacing[4] }}>
-      <Text variant="title" heading={2}>
-        {t('steps.participation')}
-      </Text>
-      <View style={{ gap: spacing[2] }}>
-        <Text variant="label">{t('fields.capacity')}</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-          <Button
-            variant="secondary"
-            label="−"
-            accessibilityLabel={t('fields.decrease')}
-            disabled={draft.capacity <= min}
-            onPress={() => onChange({ capacity: draft.capacity - 1 })}
-          />
-          <Text accessibilityLiveRegion="polite">
-            {t('fields.capacityValue', { count: draft.capacity })}
-          </Text>
-          <Button
-            variant="secondary"
-            label="+"
-            accessibilityLabel={t('fields.increase')}
-            disabled={draft.capacity >= max}
-            onPress={() => onChange({ capacity: draft.capacity + 1 })}
-          />
-        </View>
-        <Text variant="caption" tone={errors.capacity ? 'danger' : 'secondary'}>
-          {eventValidationMessage(errors.capacity) ?? t('fields.capacityRange', { min, max })}
-        </Text>
-      </View>
-      {locked ? null : (
-        <Checkbox
-          label={t('fields.organizerPlays')}
-          checked={draft.organizerPlays}
-          onChange={(organizerPlays) => onChange({ organizerPlays })}
-        />
-      )}
-      <Checkbox
-        label={t('fields.waitlist')}
-        checked={draft.waitlistEnabled}
-        onChange={(waitlistEnabled) => onChange({ waitlistEnabled })}
-      />
-      <Checkbox
-        label={t('fields.autoApprove')}
-        checked={draft.autoApprove}
-        onChange={(autoApprove) => onChange({ autoApprove })}
-      />
-      <Text variant="caption" tone="secondary">
-        {t('fields.autoApproveHint')}
-      </Text>
       <SegmentedChoice
         label={t('fields.setting')}
         value={draft.setting ?? 'NONE'}
@@ -337,14 +311,54 @@ function ParticipationStep({ catalog, draft, onChange, errors, locked }: EventFo
           { value: 'OUTDOOR', label: t('setting.OUTDOOR') },
         ]}
       />
-      <SegmentedChoice
-        label={t('fields.visibility')}
-        value={draft.visibility}
-        onChange={(visibility) => onChange({ visibility })}
-        options={[
-          { value: 'PUBLIC', label: t('fields.visibilityPublic') },
-          { value: 'INVITE_ONLY', label: t('fields.visibilityInvite') },
-        ]}
+      <Select
+        label={t('fields.booking')}
+        placeholder={t('fields.booking')}
+        value={draft.bookingStatus}
+        options={BOOKING_STATUSES.map((status) => ({
+          value: status,
+          label: t(`booking.${status}`),
+        }))}
+        onChange={(value) => {
+          const status = BOOKING_STATUSES.find((s) => s === value);
+          if (status) onChange({ bookingStatus: status });
+        }}
+      />
+      <Text variant="caption" tone="secondary">
+        {t('fields.bookingHint')}
+      </Text>
+    </View>
+  );
+}
+
+function DetailsStep({ draft, onChange, errors }: EventFormProps) {
+  const { t } = useTranslation('events');
+  const { spacing } = useTheme();
+  const skillOptions = SKILL_LEVELS.map((level) => ({
+    value: String(level),
+    label: String(level),
+  }));
+  return (
+    <View style={{ gap: spacing[4] }}>
+      <Text variant="title" heading={2}>
+        {t('steps.details')}
+      </Text>
+      <TextField
+        label={t('fields.title')}
+        hint={t('fields.titleHint')}
+        value={draft.title}
+        onChangeText={(title) => onChange({ title })}
+        error={eventValidationMessage(errors.title)}
+        maxLength={80}
+        returnKeyType="next"
+      />
+      <TextField
+        label={t('fields.description')}
+        value={draft.description}
+        onChangeText={(description) => onChange({ description })}
+        error={eventValidationMessage(errors.description)}
+        maxLength={2000}
+        multiline
       />
       <Select
         label={t('fields.skillMin')}
@@ -363,21 +377,27 @@ function ParticipationStep({ catalog, draft, onChange, errors, locked }: EventFo
         options={skillOptions}
         onChange={(value) => onChange({ skillMax: value === null ? null : Number(value) })}
       />
-      <Select
-        label={t('fields.booking')}
-        placeholder={t('fields.booking')}
-        value={draft.bookingStatus}
-        options={BOOKING_STATUSES.map((status) => ({
-          value: status,
-          label: t(`booking.${status}`),
-        }))}
-        onChange={(value) => {
-          const status = BOOKING_STATUSES.find((s) => s === value);
-          if (status) onChange({ bookingStatus: status });
-        }}
+      <SegmentedChoice
+        label={t('fields.visibility')}
+        value={draft.visibility}
+        onChange={(visibility) => onChange({ visibility })}
+        options={[
+          { value: 'PUBLIC', label: t('fields.visibilityPublic') },
+          { value: 'INVITE_ONLY', label: t('fields.visibilityInvite') },
+        ]}
+      />
+      <Checkbox
+        label={t('fields.waitlist')}
+        checked={draft.waitlistEnabled}
+        onChange={(waitlistEnabled) => onChange({ waitlistEnabled })}
+      />
+      <Checkbox
+        label={t('fields.autoApprove')}
+        checked={draft.autoApprove}
+        onChange={(autoApprove) => onChange({ autoApprove })}
       />
       <Text variant="caption" tone="secondary">
-        {t('fields.bookingHint')}
+        {t('fields.autoApproveHint')}
       </Text>
       <TextField
         label={t('fields.cost')}
@@ -412,6 +432,131 @@ function ParticipationStep({ catalog, draft, onChange, errors, locked }: EventFo
         maxLength={1000}
         multiline
       />
+    </View>
+  );
+}
+
+function ReviewStep({ catalog, draft, onGoTo }: EventFormProps) {
+  const { t } = useTranslation('events');
+  const { colors, radius, spacing } = useTheme();
+  const locale = currentLocale();
+  const sport = catalog.sports.find((s) => s.id === draft.sportId);
+  const format = sport?.formats.find((f) => f.id === draft.formatId);
+  const city = catalog.cities.find((c) => c.id === draft.cityId);
+  const district = city?.districts.find((d) => d.id === draft.districtId);
+  const skill =
+    draft.skillMin === null && draft.skillMax === null
+      ? t('detail.skillAny')
+      : t('detail.skillRange', { min: draft.skillMin ?? 1, max: draft.skillMax ?? 5 });
+  const sections: { step: number; title: string; rows: [string, string][] }[] = [
+    {
+      step: 0,
+      title: t('steps.what'),
+      rows: [
+        [t('fields.sport'), sport ? localizedName(sport.names, locale) : ''],
+        [t('fields.format'), format ? localizedName(format.names, locale) : ''],
+      ],
+    },
+    {
+      step: 1,
+      title: t('steps.when'),
+      rows: [
+        [t('detail.when'), `${formatTypedDate(draft.date)} ${draft.time}`],
+        [t('fields.duration'), t('fields.minutes', { count: draft.durationMinutes })],
+        [t('fields.capacity'), t('fields.capacityValue', { count: draft.capacity })],
+      ],
+    },
+    {
+      step: 2,
+      title: t('steps.where'),
+      rows: [
+        [
+          t('detail.where'),
+          [district && localizedName(district.names, locale), draft.placeLabel.trim()]
+            .filter(Boolean)
+            .join(' · '),
+        ],
+        [t('fields.booking'), t(`booking.${draft.bookingStatus}`)],
+      ],
+    },
+    {
+      step: 3,
+      title: t('steps.details'),
+      rows: [
+        [t('fields.title'), draft.title.trim()],
+        [t('detail.skill'), skill],
+        ...(draft.costText.trim()
+          ? ([[t('detail.cost'), t('detail.costValue', { amount: draft.costText.trim() })]] as [
+              string,
+              string,
+            ][])
+          : []),
+      ],
+    },
+  ];
+  return (
+    <View style={{ gap: spacing[4] }}>
+      <Text variant="title" heading={2}>
+        {t('steps.review')}
+      </Text>
+      {sections.map((section) => (
+        <View
+          key={section.step}
+          style={{
+            gap: spacing[2],
+            padding: spacing[3],
+            borderRadius: radius.lg,
+            borderWidth: 1,
+            borderColor: colors.borderSubtle,
+            backgroundColor: colors.surfaceRaised,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Text variant="label" heading={3}>
+              {section.title}
+            </Text>
+            <Button
+              variant="tertiary"
+              label={t('create.editSection')}
+              accessibilityLabel={t('create.editSectionNamed', { section: section.title })}
+              onPress={() => onGoTo(section.step)}
+            />
+          </View>
+          {section.rows.map(([label, value]) => (
+            <View
+              key={label}
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                gap: spacing[2],
+              }}
+            >
+              <Text variant="bodySm" tone="secondary">
+                {label}
+              </Text>
+              <Text variant="label" style={{ flexShrink: 1 }}>
+                {value}
+              </Text>
+            </View>
+          ))}
+        </View>
+      ))}
+      <Text tone="secondary">
+        {t(draft.autoApprove ? 'fields.autoApproveHint' : 'create.approvalNote')}
+      </Text>
+      {draft.costText.trim() ? (
+        <Text variant="caption" tone="secondary">
+          {t('fields.costHint')}
+        </Text>
+      ) : null}
     </View>
   );
 }

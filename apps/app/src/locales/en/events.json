@@ -10,12 +10,18 @@
     "saving": "Saving…",
     "published": "Your event is live.",
     "draftSaved": "Draft saved.",
-    "loadFailed": "Couldn't load the event data."
+    "loadFailed": "Couldn't load the event data.",
+    "editSection": "Edit",
+    "editSectionNamed": "Edit {{section}}",
+    "approvalNote": "You approve join requests; nobody joins until you do.",
+    "fixErrors": "Fix the marked fields to continue."
   },
   "steps": {
     "what": "What will you play?",
-    "whenWhere": "When and where?",
-    "participation": "Who and how many?"
+    "when": "When, and how many?",
+    "where": "Where?",
+    "details": "Event details",
+    "review": "Review and publish"
   },
   "fields": {
     "sport": "Sport",

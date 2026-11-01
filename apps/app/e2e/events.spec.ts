@@ -68,20 +68,30 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
 
     await choose(page, /^Spor:/, 'Futbol');
     await expect(page.getByRole('button', { name: /^Format: 5v5/ })).toBeVisible();
-    await page.getByLabel('Başlık', { exact: true }).fill('E2E perşembe maçı');
     await page.getByRole('button', { name: 'İleri' }).click();
 
-    await expect(page.getByRole('heading', { name: 'Ne zaman, nerede?' })).toBeVisible();
-    await choose(page, /^İlçe:/, 'Çankaya');
-    await page.getByLabel('Yer', { exact: true }).fill('ODTÜ Halı Saha 2');
-    await page.getByLabel('Açık adres (isteğe bağlı)', { exact: true }).fill('Üniversiteler Mh. 1');
+    await expect(page.getByRole('heading', { name: 'Ne zaman, kaç kişi?' })).toBeVisible();
+    await page.getByRole('button', { name: 'Kontenjanı artır' }).click();
+    await expect(page.getByText('11 kişi', { exact: true })).toBeVisible();
     await expectNoBlocking(page);
     await page.getByRole('button', { name: 'İleri' }).click();
 
-    await expect(page.getByRole('heading', { name: 'Kimler, kaç kişi?' })).toBeVisible();
-    await page.getByRole('button', { name: 'Kontenjanı artır' }).click();
-    await expect(page.getByText('11 kişi', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Nerede?' })).toBeVisible();
+    await choose(page, /^İlçe:/, 'Çankaya');
+    await page.getByLabel('Yer', { exact: true }).fill('ODTÜ Halı Saha 2');
+    await page.getByLabel('Açık adres (isteğe bağlı)', { exact: true }).fill('Üniversiteler Mh. 1');
     await page.getByRole('radio', { name: 'Açık hava', exact: true }).click();
+    await expectNoBlocking(page);
+    await page.getByRole('button', { name: 'İleri' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Etkinlik detayları' })).toBeVisible();
+    await page.getByLabel('Başlık', { exact: true }).fill('E2E perşembe maçı');
+    await expectNoBlocking(page);
+    await page.getByRole('button', { name: 'İleri' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Gözden geçir ve yayınla' })).toBeVisible();
+    await expect(page.getByText('E2E perşembe maçı')).toBeVisible();
+    await expect(page.getByText(/Katılım isteklerini sen onaylarsın/)).toBeVisible();
     await expectNoBlocking(page);
     await page.getByRole('button', { name: 'Yayınla' }).click();
 
@@ -110,8 +120,10 @@ test.describe('organizing an event (Phase 3 / M2)', () => {
     await expect(
       page.getByText('Yayınlandıktan sonra spor, format ve oynama durumu değiştirilemez.'),
     ).toBeVisible();
-    await page.getByLabel('Başlık', { exact: true }).fill('E2E cuma maçı');
     await page.getByRole('button', { name: 'İleri' }).click();
+    await page.getByRole('button', { name: 'İleri' }).click();
+    await page.getByRole('button', { name: 'İleri' }).click();
+    await page.getByLabel('Başlık', { exact: true }).fill('E2E cuma maçı');
     await page.getByRole('button', { name: 'İleri' }).click();
     await page.getByRole('button', { name: 'Değişiklikleri kaydet' }).click();
     await expect(page.getByText(/^E2E cuma maçı · Yayında/)).toBeVisible();
