@@ -1,6 +1,6 @@
 # Phase 6 plan: trust, moderation and admin
 
-Status 2026-11-01: **M1 built**, the rest not started. Scope: ROADMAP F-27, F-28, the rest of F-19 and F-30, plus what Phase 5 left here. Sources of truth stay `docs/PRD.md` §4.9, `docs/DATABASE.md` §3.6, `docs/SECURITY.md`, `docs/USER_FLOWS.md` FL-9 and FL-11. This file sequences the work and lists what a decision is needed for.
+Status 2026-11-01: **M1 and M2 built**, the rest not started. Scope: ROADMAP F-27, F-28, the rest of F-19 and F-30, plus what Phase 5 left here. Sources of truth stay `docs/PRD.md` §4.9, `docs/DATABASE.md` §3.6, `docs/SECURITY.md`, `docs/USER_FLOWS.md` FL-9 and FL-11. This file sequences the work and lists what a decision is needed for.
 
 **Why now.** The pilot has real people meeting strangers and rating each other. Without reporting, blocking and someone able to act on them it cannot start, and the app stores require them for user-generated content (SECURITY §8). Today a dispute can only be resolved by a SQL function nobody has a screen for.
 
@@ -23,6 +23,8 @@ Not there: `user_blocks`, `reports`, `moderation_actions`, any `admin_*` RPC but
 - **Acceptance:** after a block, neither side can find, join or review the other, and neither is told why.
 
 ### M2: reporting, in the database
+
+**Status 2026-11-01: built** in `20261101120000_reports.sql`: `reports`, `report(target_type, target_id, reason, details, invite_token)`, 20 a day under a per-reporter lock, export and purge. pgTAP `21_reports` (38), `reports-concurrency` (2). Reporter and target learn nothing about the outcome (`status` and `handled_by` are not readable). Reports about someone are not in their export, that would identify the reporter. Repeating an open report returns the first and costs nothing. No screen yet (M3); nobody can act on a report yet (M4).
 
 - `reports` with an open-per-target unique rule, `report(target_type, target_id, reason, details)`, 20 a day (S-16), checked that the reporter could actually see the target; export; details removed on purge. A reporter never learns what was done beyond "closed" (FL-9).
 - **Tests:** duplicates, rate limit under concurrency, targets the reporter cannot see, no PII in logs.

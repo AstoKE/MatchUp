@@ -641,6 +641,61 @@ export type Database = {
           },
         ];
       };
+      reports: {
+        Row: {
+          created_at: string;
+          details: string | null;
+          handled_at: string | null;
+          handled_by: string | null;
+          id: string;
+          reason: string;
+          reporter_id: string;
+          status: string;
+          target_id: string;
+          target_type: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          details?: string | null;
+          handled_at?: string | null;
+          handled_by?: string | null;
+          id?: string;
+          reason: string;
+          reporter_id: string;
+          status?: string;
+          target_id: string;
+          target_type: string;
+        };
+        Update: {
+          created_at?: string;
+          details?: string | null;
+          handled_at?: string | null;
+          handled_by?: string | null;
+          id?: string;
+          reason?: string;
+          reporter_id?: string;
+          status?: string;
+          target_id?: string;
+          target_type?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'reports_handled_by_fkey';
+            columns: ['handled_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reports_reporter_id_fkey';
+            columns: ['reporter_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       skill_reviews: {
         Row: {
           created_at: string;
@@ -1300,6 +1355,16 @@ export type Database = {
       };
       remove_sport_profile: { Args: { p_sport_id: string }; Returns: undefined };
       replace_my_sport_profiles: { Args: { p_sports: Json }; Returns: undefined };
+      report: {
+        Args: {
+          p_details?: string;
+          p_invite_token?: string;
+          p_reason: string;
+          p_target_id: string;
+          p_target_type: string;
+        };
+        Returns: string;
+      };
       request_account_deletion: { Args: Record<PropertyKey, never>; Returns: string };
       request_join: {
         Args: {
