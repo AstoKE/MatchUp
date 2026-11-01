@@ -31,7 +31,7 @@ export function EmptyState({
         </Text>
       ) : null}
       {actionLabel && onAction ? (
-        <Button label={actionLabel} onPress={onAction} variant="secondary" />
+        <Button label={actionLabel} onPress={onAction} style={{ alignSelf: 'center' }} />
       ) : null}
     </View>
   );

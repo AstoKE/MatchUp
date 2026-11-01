@@ -45,7 +45,8 @@
     "legal": "Legal",
     "terms": "Terms of Use",
     "privacyNotice": "Privacy Notice",
-    "account": "Account"
+    "account": "Account",
+    "reliabilityHelp": "Even when off, organizers see it while weighing your request."
   },
   "validation": {
     "NAME_TOO_SHORT": "Use at least 2 characters.",

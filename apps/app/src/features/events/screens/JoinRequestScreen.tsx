@@ -10,8 +10,8 @@ import {
   Banner,
   Button,
   EmptyState,
-  IconButton,
   Screen,
+  ScreenHeader,
   Select,
   Text,
   TextField,
@@ -165,22 +165,15 @@ function Form({
         />
       }
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-        <IconButton
-          icon="chevron-left"
-          label={t('events:detail.backToDiscover')}
-          onPress={() =>
-            router.canGoBack()
-              ? router.back()
-              : router.replace({ pathname: '/e/[id]', params: { id: event.id } })
-          }
-        />
-        <View style={{ flex: 1 }}>
-          <Text variant="headline" heading={1}>
-            {t('events:join.confirmTitle')}
-          </Text>
-        </View>
-      </View>
+      <ScreenHeader
+        title={t('events:join.confirmTitle')}
+        backLabel={t('events:detail.backToDiscover')}
+        onBack={() =>
+          router.canGoBack()
+            ? router.back()
+            : router.replace({ pathname: '/e/[id]', params: { id: event.id } })
+        }
+      />
       {error ? <Banner kind="danger" message={error} /> : null}
       <EventSummaryPanel event={event} catalog={catalog} />
       <Text tone="secondary">

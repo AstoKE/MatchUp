@@ -22,5 +22,6 @@
     "EVENT_CHANGED": "{{event}} etkinliğinin zamanı veya yeri değişti.",
     "ATTENDANCE_FINALIZED": "{{event}} için yoklama kesinleşti. Katılımını kontrol et, birlikte oynadıklarını değerlendir."
   },
-  "unknown": "Yeni bir bildirimin var."
+  "unknown": "Yeni bir bildirimin var.",
+  "emptyAction": "Etkinlikleri keşfet"
 }
