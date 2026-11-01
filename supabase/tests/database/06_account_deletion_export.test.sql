@@ -103,8 +103,9 @@ select is(
   -- tombstone (no free text, no identifier left once the profile is anonymized; counsel to confirm, SECURITY §8).
   -- user_sport_ratings (Phase 5): exported; deleted on purge (derived, recomputable, no use without the account).
   -- user_achievements (Phase 5): exported; deleted on purge, for the same reason.
+  -- user_blocks (Phase 6): exported; deleted on purge, both directions.
   array['event_participations', 'events', 'notifications', 'platform_admins', 'reliability_events', 'skill_reviews',
-        'user_achievements', 'user_consents', 'user_progress', 'user_settings', 'user_sport_positions', 'user_sport_profiles',
+        'user_achievements', 'user_blocks', 'user_consents', 'user_progress', 'user_settings', 'user_sport_positions', 'user_sport_profiles',
         'user_sport_ratings', 'xp_transactions'],
   'per-user tables are exactly the ones export_my_data and purge_account handle'
 );

@@ -894,6 +894,40 @@ export type Database = {
           },
         ];
       };
+      user_blocks: {
+        Row: {
+          blocked_id: string;
+          blocker_id: string;
+          created_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          blocked_id: string;
+          blocker_id: string;
+          created_at?: string;
+        };
+        Update: {
+          blocked_id?: string;
+          blocker_id?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_blocks_blocked_id_fkey';
+            columns: ['blocked_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_blocks_blocker_id_fkey';
+            columns: ['blocker_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       user_consents: {
         Row: {
           granted_at: string;
@@ -1196,6 +1230,7 @@ export type Database = {
         Returns: undefined;
       };
       approve_participation: { Args: { p_participation_id: string }; Returns: undefined };
+      block_user: { Args: { p_user_id: string }; Returns: undefined };
       cancel_account_deletion: { Args: Record<PropertyKey, never>; Returns: undefined };
       cancel_event: {
         Args: { p_event_id: string; p_message?: string; p_reason: string };
@@ -1244,6 +1279,7 @@ export type Database = {
         }[];
       };
       list_event_requests: { Args: { p_event_id: string }; Returns: Json };
+      list_my_blocks: { Args: Record<PropertyKey, never>; Returns: Json };
       list_my_events: {
         Args: { p_bucket: string; p_cursor?: Json; p_limit?: number };
         Returns: Json;
@@ -1281,6 +1317,7 @@ export type Database = {
         Returns: undefined;
       };
       submit_reviews: { Args: { p_event_id: string; p_reviews: Json }; Returns: number };
+      unblock_user: { Args: { p_user_id: string }; Returns: undefined };
       update_event: { Args: { p_event_id: string; p_input: Json }; Returns: undefined };
       update_my_profile: {
         Args: { p_bio: string; p_city_id: string; p_display_name: string; p_district_id: string };

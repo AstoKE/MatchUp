@@ -366,7 +366,8 @@ All RPCs: `SECURITY DEFINER`, `SET search_path = ''`, `REVOKE ALL FROM PUBLIC, a
 | `admin_resolve_attendance_dispute(participation_id, resolution)` | 5 — **built (M1)** | platform admin with MFA (`aal2`) | audited (`ATTENDANCE_DISPUTE_RESOLVED`); no screen until Phase 6 |
 | `submit_reviews(event_id, reviews[])` | 5 — **built (M2)** | participant | `reviews` = `[{reviewee_id, skill_score 1–5, fair_play?}]`, at most 60, all or nothing; both people verified present at a finalized event, inside the 72 h window; non-participants get `NOT_FOUND`, otherwise `REVIEW_NOT_ELIGIBLE`, `ALREADY_REVIEWED`, `WINDOW_CLOSED` |
 | `mark_notifications_read(ids)` | 3 | self | |
-| `report(target_type, target_id, reason, details)`, `block_user(id)`, `unblock_user(id)` | 6 | self | |
+| `block_user(id)`, `unblock_user(id)`, `list_my_blocks()` | 6 — **built (M1)** | self | mutual and silent: neither side finds, joins or reviews the other; open requests between them are rejected without a notification; someone already approved stays approved |
+| `report(target_type, target_id, reason, details)` | 6 | self | |
 | `admin_*` (queue, action, resolve dispute, verify venue, suspend) | 6 | admin | audited |
 | `request_account_deletion()`, `cancel_account_deletion()` | 6 | self | actual purge by Edge Function after grace |
 | `track_event(name, props)` | 7 | self | allowlist, rate limited |
@@ -393,7 +394,7 @@ RLS is **enabled on every table** (CI check fails on any table without it). Help
 | `user_achievements` | self; others if visible and `show_badges`; admin | none (system) |
 | `notifications` | self | `read_at` via RPC only |
 | `reports` | reporter (own); admin | none (RPC) |
-| `user_blocks` | blocker (own) | none (RPC) |
+| `user_blocks` | blocker (own), never the blocked person | none (RPC) |
 | `moderation_actions`, `audit_logs` | admin | none |
 | `rate_limit_counters`, `analytics_events` | none (service / RPC only) | none |
 

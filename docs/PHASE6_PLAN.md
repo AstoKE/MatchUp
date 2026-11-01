@@ -1,6 +1,6 @@
 # Phase 6 plan: trust, moderation and admin
 
-Status 2026-11-01: **plan, nothing built.** Scope: ROADMAP F-27, F-28, the rest of F-19 and F-30, plus what Phase 5 left here. Sources of truth stay `docs/PRD.md` §4.9, `docs/DATABASE.md` §3.6, `docs/SECURITY.md`, `docs/USER_FLOWS.md` FL-9 and FL-11. This file sequences the work and lists what a decision is needed for.
+Status 2026-11-01: **M1 built**, the rest not started. Scope: ROADMAP F-27, F-28, the rest of F-19 and F-30, plus what Phase 5 left here. Sources of truth stay `docs/PRD.md` §4.9, `docs/DATABASE.md` §3.6, `docs/SECURITY.md`, `docs/USER_FLOWS.md` FL-9 and FL-11. This file sequences the work and lists what a decision is needed for.
 
 **Why now.** The pilot has real people meeting strangers and rating each other. Without reporting, blocking and someone able to act on them it cannot start, and the app stores require them for user-generated content (SECURITY §8). Today a dispute can only be resolved by a SQL function nobody has a screen for.
 
@@ -13,6 +13,8 @@ Not there: `user_blocks`, `reports`, `moderation_actions`, any `admin_*` RPC but
 ## Milestones (one at a time, each leaves `pnpm check`, `db:test`, `test:integration` and web E2E green)
 
 ### M1: blocking, in the database
+
+**Status 2026-11-01: built** in `20261101110000_user_blocks.sql`: `user_blocks`, `block_user`, `unblock_user`, `list_my_blocks`, restrictive RLS on events and profile tables, a trigger behind the RPCs, checks in `get_event`, `request_join`, `search_events`, `get_event_reviews`, the review trigger; export and purge. pgTAP `20_user_blocks` (46), `blocks-concurrency` (2). Open requests between the pair are rejected silently (FL-9, more exact than this plan). `list_event_requests` needs no filter: what remains after a block is approved players, whom the organizer must be able to remove. Search with 5000 events and 300 blocks took about 92 ms, against about 52 ms for a guest, on this laptop, rolled back. No screen yet (M3).
 
 - `user_blocks`, `block_user`, `unblock_user`, `list_my_blocks`; export and purge (ADR-0017).
 - **Enforced on the server everywhere it matters (S-12):** `request_join` and invites both ways, `search_events` and `get_event` hide the other's events, `list_event_requests` and rosters, `submit_reviews` and `get_event_reviews` (S-8, left open in Phase 5). A block never reveals itself: the blocked person gets the same answer as for anything else unavailable.
