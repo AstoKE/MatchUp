@@ -163,7 +163,7 @@ Seeded via `supabase/seed/` (idempotent upserts keyed by slug). Catalog edits in
 | Table | Purpose | Notes |
 |---|---|---|
 | `notifications` | In-app inbox + future outbox | `id`, `user_id`, `type`, `payload` jsonb (ids only — no PII), `dedupe_key` UQ, `read_at`, `created_at`. Inserted inside the same transaction as the triggering change |
-| `reports` | User reports | `reporter_id`, `target_type` `USER/EVENT/VENUE/REVIEW`, `target_id`, `reason` enum, `details` ≤ 1000, `status` `OPEN/ACTIONED/DISMISSED`, `handled_by`, `handled_at`; UQ per (reporter, target) while OPEN |
+| `reports` | User reports | `reporter_id`, `target_type` `USER/EVENT` (PHASE6_PLAN decision 2), `target_id`, `reason` enum, `details` ≤ 1000, `status` `OPEN/ACTIONED/DISMISSED`, `handled_by`, `handled_at`; UQ per (reporter, target) while OPEN |
 | `user_blocks` | Blocking | **(blocker_id, blocked_id)**, CK ≠ |
 | `moderation_actions` | Admin decisions | `admin_id`, `action` enum, `target_type/id`, `report_id`, `reason`, `created_at` — append-only |
 | `audit_logs` | Security-relevant events | `actor_id`, `action`, `target`, `metadata` jsonb (no secrets/PII), `created_at` — append-only, no IP stored in MVP |
@@ -367,7 +367,7 @@ All RPCs: `SECURITY DEFINER`, `SET search_path = ''`, `REVOKE ALL FROM PUBLIC, a
 | `submit_reviews(event_id, reviews[])` | 5 — **built (M2)** | participant | `reviews` = `[{reviewee_id, skill_score 1–5, fair_play?}]`, at most 60, all or nothing; both people verified present at a finalized event, inside the 72 h window; non-participants get `NOT_FOUND`, otherwise `REVIEW_NOT_ELIGIBLE`, `ALREADY_REVIEWED`, `WINDOW_CLOSED` |
 | `mark_notifications_read(ids)` | 3 | self | |
 | `block_user(id)`, `unblock_user(id)`, `list_my_blocks()` | 6 — **built (M1)** | self | mutual and silent: neither side finds, joins or reviews the other; open requests between them are rejected without a notification; someone already approved stays approved |
-| `report(target_type, target_id, reason, details)` | 6 | self | |
+| `report(target_type, target_id, reason, details, invite_token)` | 6 — **built (M2)** | self | `USER` and `EVENT` only; only what the reporter could see, otherwise `NOT_FOUND`; 20 a day (`RATE_LIMITED`); repeating an open report returns the first |
 | `admin_*` (queue, action, resolve dispute, verify venue, suspend) | 6 | admin | audited |
 | `request_account_deletion()`, `cancel_account_deletion()` | 6 | self | actual purge by Edge Function after grace |
 | `track_event(name, props)` | 7 | self | allowlist, rate limited |
