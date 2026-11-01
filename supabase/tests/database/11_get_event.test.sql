@@ -148,8 +148,8 @@ select is((select array_agg(p ->> 'display_name') from jsonb_array_elements(publ
   array['Onaylı O'], 'the roster lists approved players only (not the pending one, not the organizer)');
 select is((public.get_event(pg_temp.ev('pub')) ->> 'participants_visible')::boolean, true, '... and says so');
 select is((select array_agg(k order by k) from (select distinct jsonb_object_keys(p) k
-    from jsonb_array_elements(public.get_event(pg_temp.ev('pub')) -> 'participants') p) s), array['display_name'],
-  'a roster entry holds a display name and nothing else');
+    from jsonb_array_elements(public.get_event(pg_temp.ev('pub')) -> 'participants') p) s), array['display_name', 'user_id'],
+  'a roster entry holds a display name and the id that opens a card, nothing else');
 select is(public.get_event(pg_temp.ev('canc')) ->> 'status', 'CANCELED', 'a participant still sees a canceled event they were in');
 select is(public.get_event(pg_temp.ev('draft')), null::jsonb, 'but not a draft');
 

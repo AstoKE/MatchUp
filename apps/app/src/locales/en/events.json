@@ -127,7 +127,8 @@
     "participants_other": "Going ({{count}})",
     "participantsNone": "No other approved players yet.",
     "participantsHidden": "The list of players is shown to approved players.",
-    "started": "Started"
+    "started": "Started",
+    "reportEvent": "Report this event"
   },
   "edit": {
     "title": "Edit event",
@@ -257,7 +258,8 @@
     "reliability": "Reliability {{value}}",
     "newPlayer": "New player",
     "confirmReject": "Decline {{name}}? This is final for this event.",
-    "rejectYes": "Yes, decline"
+    "rejectYes": "Yes, decline",
+    "openCard": "Open {{name}}'s profile"
   },
   "mine": {
     "status": {

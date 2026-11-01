@@ -31,7 +31,7 @@
     "everyone": "Herkes",
     "peers": "Etkinlik arkadaşları",
     "helpEveryone": "Giriş yapmış herkes görünen adını, hakkında yazını ve sporlarını görebilir. E-posta adresin hiçbir zaman gösterilmez.",
-    "helpPeers": "Varsayılan. Etkinlik özelliği geldiğinde yalnızca birlikte etkinliğe katıldığın kişiler görebilecek. Şimdilik kimse göremez.",
+    "helpPeers": "Varsayılan. Yalnızca birlikte etkinliğe katıldığın kişiler ve isteğini değerlendiren organizatörler görebilir.",
     "showReliability": "Güvenilirlik puanımı göster",
     "showBadges": "Rozetlerimi göster",
     "appearance": "Görünüm",

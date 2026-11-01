@@ -1,8 +1,10 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useSession } from '@/features/auth';
 import { localizedName, useCatalog, type Catalog } from '@/features/catalog';
+import { ReportSheet } from '@/features/players';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import {
@@ -14,6 +16,7 @@ import {
   SportArtwork,
   SportBadge,
   Text,
+  TOUCH_TARGET,
   useTheme,
 } from '@/ui';
 import type { EventDetails } from '../api/events-api';
@@ -145,6 +148,8 @@ function Detail({
   const compact = breakpoint === 'compact';
   const router = useRouter();
   const locale = currentLocale();
+  const session = useSession();
+  const [reporting, setReporting] = useState(false);
   // Read the clock once per visit (render must stay pure); actions revalidate on the server anyway.
   const [openedAt] = useState(Date.now);
 
@@ -340,8 +345,23 @@ function Detail({
           ) : (
             <View role="list" style={{ gap: spacing[2] }}>
               {event.participants.map((p, index) => (
-                <View key={index} role="listitem">
-                  <Text>{p.displayName ?? t('events:requests.unnamed')}</Text>
+                <View key={p.userId ?? index} role="listitem">
+                  {p.userId ? (
+                    <Pressable
+                      accessibilityRole="link"
+                      accessibilityLabel={t('events:requests.openCard', {
+                        name: p.displayName ?? t('events:requests.unnamed'),
+                      })}
+                      onPress={() =>
+                        router.push({ pathname: '/u/[id]', params: { id: p.userId ?? '' } })
+                      }
+                      style={{ minHeight: TOUCH_TARGET, justifyContent: 'center' }}
+                    >
+                      <Text tone="link">{p.displayName ?? t('events:requests.unnamed')}</Text>
+                    </Pressable>
+                  ) : (
+                    <Text>{p.displayName ?? t('events:requests.unnamed')}</Text>
+                  )}
                 </View>
               ))}
             </View>
@@ -360,6 +380,22 @@ function Detail({
       ) : null}
 
       {action && !stickyJoin ? action : null}
+      {!isOrganizer && session.status === 'authenticated' ? (
+        <View style={{ alignItems: 'flex-start' }}>
+          <Button
+            variant="tertiary"
+            label={t('events:detail.reportEvent')}
+            onPress={() => setReporting(true)}
+          />
+          <ReportSheet
+            visible={reporting}
+            targetType="EVENT"
+            targetId={event.id}
+            inviteToken={inviteToken}
+            onClose={() => setReporting(false)}
+          />
+        </View>
+      ) : null}
       {started &&
       !isOrganizer &&
       (event.status === 'PUBLISHED' || event.status === 'COMPLETED') &&

@@ -31,7 +31,7 @@
     "everyone": "Everyone",
     "peers": "Event peers",
     "helpEveryone": "Anyone signed in can see your display name, about text and sports. Your email address is never shown.",
-    "helpPeers": "Default. Once events arrive, only people you take part in events with will be able to see it. For now nobody can.",
+    "helpPeers": "Default. Only people you shared an event with, and organizers weighing your request, can see it.",
     "showReliability": "Show my reliability score",
     "showBadges": "Show my badges",
     "appearance": "Appearance",

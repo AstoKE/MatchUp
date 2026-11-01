@@ -212,6 +212,28 @@ export function deleteEventsOf(userId: string) {
   ]);
 }
 
+async function rpcAs(stack: LocalStack, email: string, name: string, body: unknown) {
+  const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
+  const tokenResponse = await fetch(`${stack.apiUrl}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: base,
+    body: JSON.stringify({ email, password: PASSWORD }),
+  });
+  const { access_token: token } = (await tokenResponse.json()) as { access_token: string };
+  const response = await fetch(`${stack.apiUrl}/rest/v1/rpc/${name}`, {
+    method: 'POST',
+    headers: { ...base, Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) throw new Error(`${name} failed: ${response.status} ${await response.text()}`);
+  return response;
+}
+
+/** TEST-ONLY: a player requests through the real RPC, and nobody has answered yet. */
+export async function requestToJoin(stack: LocalStack, eventId: string, playerEmail: string) {
+  await rpcAs(stack, playerEmail, 'request_join', { p_event_id: eventId });
+}
+
 /** TEST-ONLY: a player requests through the real RPC; the organizer approves through the real RPC. */
 export async function joinApproved(
   stack: LocalStack,
@@ -219,29 +241,12 @@ export async function joinApproved(
   playerEmail: string,
   organizerEmail: string,
 ) {
-  const call = async (email: string, name: string, body: unknown) => {
-    const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
-    const tokenResponse = await fetch(`${stack.apiUrl}/auth/v1/token?grant_type=password`, {
-      method: 'POST',
-      headers: base,
-      body: JSON.stringify({ email, password: PASSWORD }),
-    });
-    const { access_token: token } = (await tokenResponse.json()) as { access_token: string };
-    const response = await fetch(`${stack.apiUrl}/rest/v1/rpc/${name}`, {
-      method: 'POST',
-      headers: { ...base, Authorization: `Bearer ${token}` },
-      body: JSON.stringify(body),
-    });
-    if (!response.ok)
-      throw new Error(`${name} failed: ${response.status} ${await response.text()}`);
-    return response;
-  };
-  await call(playerEmail, 'request_join', { p_event_id: eventId });
+  await requestToJoin(stack, eventId, playerEmail);
   const requests = (await (
-    await call(organizerEmail, 'list_event_requests', { p_event_id: eventId })
+    await rpcAs(stack, organizerEmail, 'list_event_requests', { p_event_id: eventId })
   ).json()) as { items: { id: string; status: string }[] };
   for (const row of requests.items.filter((r) => r.status === 'REQUESTED')) {
-    await call(organizerEmail, 'approve_participation', { p_participation_id: row.id });
+    await rpcAs(stack, organizerEmail, 'approve_participation', { p_participation_id: row.id });
   }
 }
 

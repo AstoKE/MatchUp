@@ -95,6 +95,7 @@ export default function TabsLayout() {
           'e/[id]/join',
           'e/[id]/manage',
           'e/[id]/requested',
+          'u/[id]',
           'notifications',
         ] as const
       ).map((name) => (

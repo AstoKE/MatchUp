@@ -1,0 +1,40 @@
+{
+  "title": "Player",
+  "unnamed": "Player",
+  "unavailable": "This player is not available",
+  "sports": "Sports",
+  "ownLevel": "Own estimate {{level}}",
+  "rating": "Rating {{rating}}",
+  "report": {
+    "open": "Report",
+    "titleUser": "Report player",
+    "titleEvent": "Report event",
+    "reason": "Why are you reporting?",
+    "details": "Details (optional)",
+    "detailsHint": "Read by administrators. At most {{max}} characters.",
+    "send": "Send report",
+    "sent": "Your report was received. Thank you.",
+    "reasons": {
+      "SPAM": "Spam",
+      "HARASSMENT": "Harassment or insults",
+      "UNSAFE": "Unsafe behavior",
+      "FAKE_EVENT": "Fake event",
+      "INAPPROPRIATE": "Inappropriate content",
+      "OTHER": "Other"
+    }
+  },
+  "block": {
+    "open": "Block",
+    "confirm": "Block {{name}}? You won't see each other's events, join them or review each other. They are not told. Open requests close.",
+    "yes": "Yes, block",
+    "done": "{{name}} blocked."
+  },
+  "blocked": {
+    "title": "People I blocked",
+    "empty": "You haven't blocked anyone.",
+    "loadFailed": "Could not load the list",
+    "unblock": "Unblock",
+    "unblockNamed": "Unblock {{name}}",
+    "unblocked": "Unblocked."
+  }
+}

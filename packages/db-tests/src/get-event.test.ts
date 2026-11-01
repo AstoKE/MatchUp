@@ -131,9 +131,9 @@ describe('get_event over the Data API', () => {
     const mine = (await get(ids.open, player.token)).body as Page;
     expect(mine.my_status).toBe('APPROVED');
     expect((mine.private as { address_text: string }).address_text).toBe('Gizli sokak 9');
-    expect(mine.participants).toEqual([{ display_name: 'Oyuncu' }]);
+    expect(mine.participants).toEqual([expect.objectContaining({ display_name: 'Oyuncu' })]);
     const organizers = (await get(ids.open, host.token)).body as Page;
-    expect(organizers.participants).toEqual([{ display_name: 'Oyuncu' }]);
+    expect(organizers.participants).toEqual([expect.objectContaining({ display_name: 'Oyuncu' })]);
     // Still nothing for someone who is not part of it.
     expect(((await get(ids.open, stranger.token)).body as Page).private).toBeNull();
   });

@@ -19,7 +19,11 @@ const privateRow = z.object({
   participant_notes: z.nullable(z.string()),
 });
 
-const participantRow = z.object({ display_name: z.nullable(z.string()) });
+// Optional: a hosted database without the latest migration does not send the id yet; the name is then plain text.
+const participantRow = z.object({
+  user_id: z.optional(z.uuid()),
+  display_name: z.nullable(z.string()),
+});
 
 const eventRow = z.object({
   id: z.uuid(),
@@ -104,7 +108,7 @@ export interface EventDetails {
     participantNotes: string | null;
   } | null;
   /** Approved players (display names), for the organizer and approved players; null when not visible. */
-  participants: { displayName: string | null }[] | null;
+  participants: { userId: string | null; displayName: string | null }[] | null;
 }
 
 /**
@@ -164,7 +168,10 @@ export async function fetchEvent(
         }
       : null,
     participants: row.participants_visible
-      ? (row.participants ?? []).map((p) => ({ displayName: p.display_name }))
+      ? (row.participants ?? []).map((p) => ({
+          userId: p.user_id ?? null,
+          displayName: p.display_name,
+        }))
       : null,
   };
 }

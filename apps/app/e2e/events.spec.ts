@@ -9,6 +9,7 @@ import {
   getLocalStack,
   joinApproved,
   PASSWORD,
+  requestToJoin,
   setFootballRating,
   startEvent,
   uniqueEmail,
@@ -800,5 +801,70 @@ test.describe('the whole lifecycle (F-35)', () => {
     await expect(ada.page.getByText('İlk Maç', { exact: true })).toBeVisible();
 
     for (const session of [ada, bora, cem, host]) await session.context.close();
+  });
+});
+
+test.describe('reporting and blocking (Phase 6 / M3)', () => {
+  test('a player opens a card, reports, blocks; neither side finds the other; unblocking brings it back', async ({
+    browser,
+  }) => {
+    test.setTimeout(90_000);
+    const s = requireStack();
+    const hostEmail = uniqueEmail('safe-host');
+    const playerEmail = uniqueEmail('safe-player');
+    createdIds.push((await createOnboardedUser(s, hostEmail, { displayName: 'Evsahibi Ali' })).id);
+    createdIds.push((await createOnboardedUser(s, playerEmail, { displayName: 'Oyuncu Ece' })).id);
+    const tag = hostEmail.slice(10, 18);
+    const title = `Güvenlik ${tag}`;
+    const eventId = await createPublishedEvent(s, hostEmail, title);
+    await requestToJoin(s, eventId, playerEmail);
+
+    const open = async (email: string) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      await signIn(page, email);
+      return { page, main: page.getByRole('main'), context };
+    };
+
+    // The organizer opens the player's card from the request queue.
+    const host = await open(hostEmail);
+    await host.page.goto(`/e/${eventId}/manage`);
+    await host.main.getByRole('link', { name: /Oyuncu Ece/ }).click();
+    await expect(host.main.getByRole('heading', { name: 'Oyuncu Ece', level: 1 })).toBeVisible();
+    await expectNoBlocking(host.page);
+
+    // The player reports the event from its page.
+    const player = await open(playerEmail);
+    await player.page.goto(`/e/${eventId}`);
+    await player.main.getByRole('button', { name: 'Bu etkinliği bildir' }).click();
+    const dialog = player.page.getByRole('dialog', { name: 'Etkinliği bildir' });
+    await dialog.getByRole('radio', { name: 'Sahte etkinlik' }).click();
+    await dialog.getByLabel('Ayrıntılar (isteğe bağlı)').fill('Böyle bir saha yok');
+    await expectNoBlocking(player.page);
+    await dialog.getByRole('button', { name: 'Bildirimi gönder' }).click();
+    await expect(dialog).toHaveCount(0);
+
+    // The organizer blocks the player: the player's request is closed and the event is gone for them, with no reason given.
+    await host.main.getByRole('button', { name: 'Engelle' }).click();
+    await host.main.getByRole('button', { name: 'Evet, engelle' }).click();
+    await expect(host.page).toHaveURL(/\/$/);
+
+    await player.page.goto(`/e/${eventId}`);
+    await expect(player.main.getByText('Aradığın içerik bulunamadı.')).toBeVisible();
+    await player.page.goto('/');
+    await expect(player.main.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
+    await expect(player.main.getByRole('link', { name: new RegExp(title) })).toHaveCount(0);
+
+    // The list in settings, and the way back.
+    await host.page.goto('/settings');
+    await expect(host.main.getByText('Oyuncu Ece')).toBeVisible();
+    await expectNoBlocking(host.page);
+    await host.main.getByRole('button', { name: 'Oyuncu Ece için engeli kaldır' }).click();
+    await expect(host.main.getByText('Kimseyi engellemedin.')).toBeVisible();
+    await player.page.goto(`/e/${eventId}`);
+    await expect(player.main.getByRole('heading', { name: title, level: 1 })).toBeVisible();
+
+    await host.context.close();
+    await player.context.close();
   });
 });

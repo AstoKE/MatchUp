@@ -1333,6 +1333,7 @@ export type Database = {
           user_id: string;
         }[];
       };
+      get_player_card: { Args: { p_user_id: string }; Returns: Json };
       list_event_requests: { Args: { p_event_id: string }; Returns: Json };
       list_my_blocks: { Args: Record<PropertyKey, never>; Returns: Json };
       list_my_events: {
