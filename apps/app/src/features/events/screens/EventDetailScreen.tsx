@@ -15,21 +15,18 @@ import {
   SportBadge,
   Text,
   useTheme,
-  useToast,
 } from '@/ui';
 import type { EventDetails } from '../api/events-api';
 import { AttendancePanel } from '../components/AttendancePanel';
-import { InvitePanel } from '../components/InvitePanel';
 import { JoinPanel } from '../components/JoinPanel';
-import { RequestsPanel } from '../components/RequestsPanel';
 import { ReviewPanel } from '../components/ReviewPanel';
 import { Pill, SlotMeter } from '../components/SlotMeter';
 import { formatCost, formatEventStart } from '../format';
-import { useCompleteEvent, useDeleteDraft, useEvent, usePublishEvent } from '../hooks';
+import { useEvent } from '../hooks';
 
 /**
- * Event detail at /e/<id>, open to guests (D-09): RLS decides what they see. Phase 3 / M2 builds the
- * organizer's actions; the join button and organizer line arrive with participation and discovery.
+ * Event detail at /e/<id>, open to guests (D-09): RLS decides what they see. The organizer's tools are one tap away,
+ * on /e/<id>/manage.
  */
 export function EventDetailScreen() {
   const { t } = useTranslation(['events', 'common', 'errors', 'nav']);
@@ -147,13 +144,7 @@ function Detail({
   const { spacing, breakpoint } = useTheme();
   const compact = breakpoint === 'compact';
   const router = useRouter();
-  const toast = useToast();
   const locale = currentLocale();
-  const publish = usePublishEvent();
-  const complete = useCompleteEvent();
-  const remove = useDeleteDraft();
-  const [error, setError] = useState<string | null>(null);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
   // Read the clock once per visit (render must stay pure); actions revalidate on the server anyway.
   const [openedAt] = useState(Date.now);
 
@@ -166,19 +157,22 @@ function Detail({
   const isOrganizer = event.isOrganizer;
   const started = openedAt >= Date.parse(event.startsAt);
   const place = event.private?.placeLabel ?? event.publicPlaceLabel;
-  const fail = (failure: unknown) => setError(errorText(failure));
   // Time pressure only matters for an event people can still join (design.md §4.2 rule 4).
   const joinable = event.status === 'PUBLISHED' && !started;
   // On a phone the join action is pinned under the content (design.md §8: the thumb zone).
   const stickyJoin = compact;
-  const joinPanel =
-    !isOrganizer && joinable ? (
-      stickyJoin ? (
-        <JoinPanel event={event} inviteToken={inviteToken} />
-      ) : (
-        <JoinPanel event={event} inviteToken={inviteToken} />
-      )
-    ) : null;
+  // The page's one dominant action: join, or for the organizer manage. A canceled event has nothing left to manage.
+  const action = isOrganizer ? (
+    event.status === 'CANCELED' ? null : (
+      <Button
+        label={t('events:manage.open')}
+        onPress={() => router.push({ pathname: '/e/[id]/manage', params: { id: event.id } })}
+        fullWidth
+      />
+    )
+  ) : joinable ? (
+    <JoinPanel event={event} inviteToken={inviteToken} />
+  ) : null;
   const openSlots = event.capacity - event.approvedCount;
   const urgency = !joinable
     ? null
@@ -189,7 +183,7 @@ function Detail({
         : null;
 
   return (
-    <Screen maxWidth={640} footer={joinPanel && stickyJoin ? joinPanel : undefined}>
+    <Screen maxWidth={640} footer={action && stickyJoin ? action : undefined}>
       {/* Edge to edge on a phone (cancels the page's gutter and top padding), a contained image on wider screens. */}
       <View
         style={
@@ -254,7 +248,6 @@ function Detail({
             .join(' — ')}
         />
       ) : null}
-      {error ? <Banner kind="danger" message={error} /> : null}
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
         <Tile
@@ -357,9 +350,6 @@ function Detail({
           {t('events:detail.participantsHidden')}
         </Text>
       ) : null}
-      {isOrganizer && event.inviteToken ? (
-        <InvitePanel eventId={event.id} token={event.inviteToken} />
-      ) : null}
       {event.description ? <Text>{event.description}</Text> : null}
       {event.visibility === 'INVITE_ONLY' ? (
         <Text variant="caption" tone="secondary">
@@ -367,12 +357,12 @@ function Detail({
         </Text>
       ) : null}
 
-      {joinPanel && !stickyJoin ? joinPanel : null}
-      {isOrganizer && event.status === 'PUBLISHED' ? <RequestsPanel event={event} /> : null}
+      {action && !stickyJoin ? action : null}
       {started &&
+      !isOrganizer &&
       (event.status === 'PUBLISHED' || event.status === 'COMPLETED') &&
-      (isOrganizer || event.participants !== null) ? (
-        <AttendancePanel eventId={event.id} isOrganizer={isOrganizer} />
+      event.participants !== null ? (
+        <AttendancePanel eventId={event.id} isOrganizer={false} />
       ) : null}
       {event.status === 'COMPLETED' && (isOrganizer || event.participants !== null) ? (
         <ReviewPanel
@@ -380,91 +370,6 @@ function Detail({
           timeZone={timeZone}
           descriptors={sport?.skillDescriptors ?? {}}
         />
-      ) : null}
-
-      {isOrganizer ? (
-        <View style={{ gap: spacing[3] }}>
-          {event.status === 'DRAFT' ? (
-            <Button
-              label={t('events:detail.publish')}
-              loading={publish.isPending}
-              loadingLabel={t('events:create.publishing')}
-              onPress={() => {
-                setError(null);
-                publish.mutate(event.id, {
-                  onSuccess: () => toast.show(t('events:detail.publishedToast'), 'success'),
-                  onError: fail,
-                });
-              }}
-              fullWidth
-            />
-          ) : null}
-          {event.status === 'DRAFT' || (event.status === 'PUBLISHED' && !started) ? (
-            <Button
-              variant="secondary"
-              label={t('events:detail.edit')}
-              onPress={() => router.push({ pathname: '/e/[id]/edit', params: { id: event.id } })}
-              fullWidth
-            />
-          ) : null}
-          {event.status === 'PUBLISHED' && !started ? (
-            <Button
-              variant="destructive"
-              label={t('events:detail.cancel')}
-              onPress={() => router.push({ pathname: '/e/[id]/cancel', params: { id: event.id } })}
-              fullWidth
-            />
-          ) : null}
-          {event.status === 'PUBLISHED' && started ? (
-            <Button
-              label={t('events:detail.complete')}
-              loading={complete.isPending}
-              loadingLabel={t('common:loading')}
-              onPress={() => {
-                setError(null);
-                complete.mutate(event.id, {
-                  onSuccess: () => toast.show(t('events:detail.completedToast'), 'success'),
-                  onError: fail,
-                });
-              }}
-              fullWidth
-            />
-          ) : null}
-          {event.status === 'DRAFT' && !confirmingDelete ? (
-            <Button
-              variant="tertiary"
-              label={t('events:detail.deleteDraft')}
-              onPress={() => setConfirmingDelete(true)}
-            />
-          ) : null}
-          {event.status === 'DRAFT' && confirmingDelete ? (
-            <View style={{ gap: spacing[2] }}>
-              <Text role="alert">{t('events:detail.confirmDelete')}</Text>
-              <View style={{ flexDirection: 'row', gap: spacing[3] }}>
-                <Button
-                  variant="destructive"
-                  label={t('events:detail.confirmDeleteYes')}
-                  loading={remove.isPending}
-                  loadingLabel={t('common:loading')}
-                  onPress={() =>
-                    remove.mutate(event.id, {
-                      onSuccess: () => {
-                        toast.show(t('events:detail.deleted'), 'success');
-                        router.replace('/create');
-                      },
-                      onError: fail,
-                    })
-                  }
-                />
-                <Button
-                  variant="secondary"
-                  label={t('events:detail.keep')}
-                  onPress={() => setConfirmingDelete(false)}
-                />
-              </View>
-            </View>
-          ) : null}
-        </View>
       ) : null}
     </Screen>
   );

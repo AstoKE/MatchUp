@@ -210,6 +210,8 @@ Decisions:
 - Auto-approve events stay. "Participation requires organizer approval" holds for all others; the green approved state appears only when the server answers APPROVED.
 - docs/references/ is git-ignored: third-party screenshots, never production assets. Local copies only.
 
+- Declining a request asks for confirmation like removing a player: it is final for that event (§5.7).
+
 Measured deviations from the §3.1 sample tokens (AA, enforced by tokens.test.ts):
 Token	Spec	Used	Why
 action primary	#E13C47	#D73641	White label was 4.25:1; now 4.67:1

@@ -25,6 +25,8 @@ const publicEnv = {
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
+  // Locally Chromium shares the machine with the Supabase containers: more workers ran a 15 GB laptop out of memory.
+  ...(process.env.CI ? {} : { workers: 3 }),
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],

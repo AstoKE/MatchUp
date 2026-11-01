@@ -5,6 +5,7 @@ import { renderApp } from '@/test/render';
 import type { EventDetails } from './api/events-api';
 import type { EventRequest } from './api/participation-api';
 import { EventDetailScreen } from './screens/EventDetailScreen';
+import { EventManageScreen } from './screens/EventManageScreen';
 
 const SPORT = '00000000-0000-4000-8000-0000000000f1';
 const F5 = '00000000-0000-4000-8000-0000000000f5';
@@ -146,6 +147,8 @@ const request = (over: Partial<EventRequest> = {}): EventRequest => ({
   message: 'Orta saha oynarım',
   requestedAt: '2026-11-01T10:00:00Z',
   requestCount: 1,
+  rating: null,
+  reliability: null,
   ...over,
 });
 
@@ -296,7 +299,7 @@ describe('the event page for different viewers', () => {
     mockApi.fetchEvent.mockResolvedValue(
       event({ isOrganizer: true, visibility: 'INVITE_ONLY', inviteToken: 'abc123' }),
     );
-    await renderApp(<EventDetailScreen />, { session: organizer });
+    await renderApp(<EventManageScreen />, { session: organizer });
     expect(await screen.findByText('Davet bağlantısı')).toBeTruthy();
     expect(screen.getByText(`http://localhost:8081/e/${EVENT}?invite=abc123`)).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Bağlantıyı kopyala ya da paylaş' })).toBeTruthy();
@@ -329,11 +332,10 @@ describe("the organizer's queue", () => {
     mockApi.fetchEvent.mockResolvedValue(event({ isOrganizer: true }));
   });
 
-  it('is not shown to players and the organizer does not see the join panel', async () => {
-    await renderApp(<EventDetailScreen />, { session: organizer });
-    await screen.findByText('Perşembe maçı');
-    expect(screen.queryByRole('button', { name: /Katılma isteği/ })).toBeNull();
+  it('is on the manage page, without the join panel', async () => {
+    await renderApp(<EventManageScreen />, { session: organizer });
     expect(await screen.findByText('Henüz istek yok.')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /Katılım isteği/ })).toBeNull();
     expect(mockApi.fetchEventRequests).toHaveBeenCalledWith(EVENT);
   });
 
@@ -346,9 +348,9 @@ describe("the organizer's queue", () => {
 
   it('shows who asked and approves, declines or waitlists with one tap', async () => {
     mockApi.fetchEventRequests.mockResolvedValue([request()]);
-    await renderApp(<EventDetailScreen />, { session: organizer });
+    await renderApp(<EventManageScreen />, { session: organizer });
     expect(await screen.findByText('Deniz D')).toBeTruthy();
-    expect(screen.getByText('Seviye 3.5')).toBeTruthy();
+    expect(screen.getByText(/^Seviye 3.5/)).toBeTruthy();
     expect(screen.getByText('Orta saha oynarım')).toBeTruthy();
     await press('Onayla');
     expect(mockApi.decideParticipation).toHaveBeenLastCalledWith({
@@ -360,17 +362,51 @@ describe("the organizer's queue", () => {
       participationId: request().id,
       decision: 'waitlist',
     });
-    await press('Reddet');
+  });
+
+  it('asks before declining, and can step back', async () => {
+    mockApi.fetchEventRequests.mockResolvedValue([request()]);
+    await renderApp(<EventManageScreen />, { session: organizer });
+    await pressReady('Reddet');
+    expect(mockApi.decideParticipation).not.toHaveBeenCalled();
+    expect(screen.getByText('Deniz D reddedilsin mi? Bu etkinlik için kesindir.')).toBeTruthy();
+    await press('Vazgeç');
+    await pressReady('Reddet');
+    await press('Evet, reddet');
     expect(mockApi.decideParticipation).toHaveBeenLastCalledWith({
       participationId: request().id,
       decision: 'reject',
     });
   });
 
+  it('shows pending requests and remaining capacity first', async () => {
+    mockApi.fetchEvent.mockResolvedValue(event({ isOrganizer: true, approvedCount: 9 }));
+    mockApi.fetchEventRequests.mockResolvedValue([
+      request(),
+      request({ id: '00000000-0000-4000-8000-000000000c02', status: 'APPROVED' }),
+    ]);
+    await renderApp(<EventManageScreen />, { session: organizer });
+    await screen.findAllByText('Deniz D');
+    expect(screen.getByText('Bekleyen istek')).toBeTruthy();
+    expect(screen.getByText('1')).toBeTruthy();
+    expect(screen.getByText('Kalan yer')).toBeTruthy();
+    expect(screen.getByText('3')).toBeTruthy();
+  });
+
+  it('shows rating and reliability when they exist, and "new player" when they do not', async () => {
+    mockApi.fetchEventRequests.mockResolvedValue([
+      request({ rating: 3.4, reliability: 0.92 }),
+      request({ id: '00000000-0000-4000-8000-000000000c02', displayName: 'Ece E' }),
+    ]);
+    await renderApp(<EventManageScreen />, { session: organizer });
+    expect(await screen.findByText(/Puan 3,4 · Güvenilirlik %92/)).toBeTruthy();
+    expect(screen.getByText(/Seviye 3.5 · Yeni oyuncu/)).toBeTruthy();
+  });
+
   it('cannot approve beyond the capacity and says why', async () => {
     mockApi.fetchEvent.mockResolvedValue(event({ isOrganizer: true, approvedCount: 12 }));
     mockApi.fetchEventRequests.mockResolvedValue([request()]);
-    await renderApp(<EventDetailScreen />, { session: organizer });
+    await renderApp(<EventManageScreen />, { session: organizer });
     await screen.findByText('Deniz D');
     expect(screen.getByText('Etkinlik dolu: onaylamak için önce bir yer açılmalı.')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Onayla', disabled: true })).toBeTruthy();
@@ -378,7 +414,7 @@ describe("the organizer's queue", () => {
 
   it('asks twice before removing an approved player', async () => {
     mockApi.fetchEventRequests.mockResolvedValue([request({ status: 'APPROVED' })]);
-    await renderApp(<EventDetailScreen />, { session: organizer });
+    await renderApp(<EventManageScreen />, { session: organizer });
     await pressReady('Etkinlikten çıkar');
     expect(mockApi.decideParticipation).not.toHaveBeenCalled();
     expect(
@@ -394,7 +430,7 @@ describe("the organizer's queue", () => {
   it('shows a server refusal on the queue', async () => {
     mockApi.fetchEventRequests.mockResolvedValue([request()]);
     mockApi.decideParticipation.mockRejectedValue(new AppError('EVENT_FULL'));
-    await renderApp(<EventDetailScreen />, { session: organizer });
+    await renderApp(<EventManageScreen />, { session: organizer });
     await screen.findByText('Deniz D');
     await press('Onayla');
     expect(await screen.findByText('Etkinlik dolu.')).toBeTruthy();

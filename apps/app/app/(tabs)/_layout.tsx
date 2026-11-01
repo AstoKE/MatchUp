@@ -93,6 +93,7 @@ export default function TabsLayout() {
           'e/[id]/edit',
           'e/[id]/cancel',
           'e/[id]/join',
+          'e/[id]/manage',
           'e/[id]/requested',
           'notifications',
         ] as const
