@@ -163,18 +163,28 @@ test.describe('discovering events (Phase 3 / M3)', () => {
     const title = `E2E keşif ${email.slice(9, 17)}`;
     const eventId = await createPublishedEvent(s, email, title);
 
+    // The first visit asks for a sport, and nothing is listed until it is answered.
     await page.goto('/');
     const card = page.getByRole('link', { name: new RegExp(title) });
+    await expect(page.getByRole('heading', { name: /Hangi sporda/, level: 2 })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Masa tenisi', exact: true })).toBeVisible();
+    await expect(card).toHaveCount(0);
+    await expectNoBlocking(page);
+    await page.getByRole('button', { name: 'Futbol', exact: true }).click();
     await expect(card).toBeVisible();
     await expect(card).toContainText('Çankaya · ODTÜ Halı Saha 2');
     await expect(card).toContainText('11 yer kaldı');
     await expectNoBlocking(page);
 
-    // A sport the event is not in hides it and says why; clearing the filter brings it back.
-    await page.getByRole('checkbox', { name: 'Tenis', exact: true }).click();
-    await expect(page.getByText('Bu filtrelere uyan etkinlik yok')).toBeVisible();
+    // Another sport from the same screen hides it; the choice survives a reload, without asking again.
+    await page.getByRole('radio', { name: 'Tenis', exact: true }).click();
     await expect(card).toHaveCount(0);
-    await page.getByRole('button', { name: 'Filtreleri temizle' }).first().click();
+    await page.reload();
+    await expect(page.getByRole('radio', { name: 'Tenis', exact: true })).toBeChecked();
+    await expect(page.getByRole('heading', { name: /Hangi sporda/ })).toHaveCount(0);
+    await expect(card).toHaveCount(0);
+    await expectNoBlocking(page);
+    await page.getByRole('radio', { name: 'Tüm sporlar', exact: true }).click();
     await expect(card).toBeVisible();
 
     await card.click();
@@ -344,7 +354,7 @@ test.describe('joining an event (Phase 3 / M4)', () => {
 });
 
 test.describe('Discover for a signed-in player (UI tour)', () => {
-  test('opens on the profile sports, groups by day, and clearing shows everything', async ({
+  test('asks for a sport without assuming the profile ones, and groups by day', async ({
     page,
   }) => {
     const s = requireStack();
@@ -355,22 +365,19 @@ test.describe('Discover for a signed-in player (UI tour)', () => {
     const title = `E2E gün ${hostEmail.slice(8, 16)}`;
     await createPublishedEvent(s, hostEmail, title);
 
-    // createOnboardedUser gives every user football, so the football event is on their own sports.
+    // createOnboardedUser gives every user football: offered first, not chosen for them.
     await signIn(page, playerEmail);
     const main = page.getByRole('main');
-    await expect(main.getByText(/Profilindeki sporlar gösteriliyor/)).toBeVisible();
-    await expect(main.getByRole('checkbox', { name: 'Futbol', exact: true })).toBeChecked();
+    await expect(main.getByRole('heading', { name: /Hangi sporda/, level: 2 })).toBeVisible();
+    await expect(main.getByRole('button').filter({ hasText: 'Futbol' })).toBeVisible();
+    await main.getByRole('button', { name: 'Futbol', exact: true }).click();
+    await expect(main.getByRole('radio', { name: 'Futbol', exact: true })).toBeChecked();
     const card = main.getByRole('link', { name: new RegExp(title) });
     await expect(card).toBeVisible();
     // The row sits under a day heading and shows only the time.
     await expect(main.getByRole('heading', { level: 2 }).first()).toBeVisible();
     await expect(card).toContainText(/\d{2}:\d{2}/);
     await expectNoBlocking(page);
-
-    await main.getByRole('button', { name: 'Filtreleri temizle' }).first().click();
-    await expect(main.getByText(/Profilindeki sporlar gösteriliyor/)).toHaveCount(0);
-    await expect(main.getByRole('checkbox', { name: 'Futbol', exact: true })).not.toBeChecked();
-    await expect(card).toBeVisible();
   });
 
   test('on a phone the events come first and the filters open on request', async ({ page }) => {
@@ -383,6 +390,7 @@ test.describe('Discover for a signed-in player (UI tour)', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     const main = page.getByRole('main');
+    await main.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
     const card = main.getByRole('link', { name: new RegExp(title) });
     await expect(card).toBeVisible();
     // The first event card is on the first screen, not pushed below a wall of filter chips.
@@ -390,7 +398,13 @@ test.describe('Discover for a signed-in player (UI tour)', () => {
     const box = await main.getByRole('listitem').first().boundingBox();
     expect(box?.y ?? Infinity).toBeLessThan(844);
     // The frequent filters stay on one line; the rest open in a dialog.
-    const chip = main.getByRole('checkbox', { name: 'Tenis', exact: true });
+    const sport = main.getByRole('radio', { name: 'Tenis', exact: true });
+    await sport.scrollIntoViewIfNeeded();
+    await sport.click();
+    await expect(sport).toBeChecked();
+    // A sport is not a filter: clearing leaves it alone, so go back to all of them by hand.
+    await main.getByRole('radio', { name: 'Tüm sporlar', exact: true }).click();
+    const chip = main.getByRole('checkbox', { name: 'Bu hafta', exact: true });
     await chip.scrollIntoViewIfNeeded();
     await chip.click();
     await expect(main.getByRole('button', { name: 'Filtreler (1)', exact: true })).toBeVisible();
@@ -428,6 +442,7 @@ test.describe('Sport icons and the pinned join action (UI tour)', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await signIn(page, playerEmail);
     const main = page.getByRole('main');
+    await main.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
     const card = main.getByRole('link', { name: new RegExp(title) });
     await expect(card.locator('[data-testid="sport-icon-football"]')).toBeVisible();
     await expectNoBlocking(page);
@@ -852,7 +867,11 @@ test.describe('reporting and blocking (Phase 6 / M3)', () => {
     await player.page.goto(`/e/${eventId}`);
     await expect(player.main.getByText('Aradığın içerik bulunamadı.')).toBeVisible();
     await player.page.goto('/');
-    await expect(player.main.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
+    await player.main.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
+    await expect(
+      player.main.getByRole('radio', { name: 'Tüm sporlar', exact: true }),
+    ).toBeChecked();
+    await expect(player.main.getByRole('progressbar')).toHaveCount(0);
     await expect(player.main.getByRole('link', { name: new RegExp(title) })).toHaveCount(0);
 
     // The list in settings, and the way back.

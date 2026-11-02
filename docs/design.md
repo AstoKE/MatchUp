@@ -205,6 +205,7 @@ Decisions:
 - Light theme stays (it is a setting today); dark is primary, light is derived with its own tokens.
 - Font: Inter, weights 400, 600 and 700. Weights 500 and 650 from §3.2 map to the nearest loaded one. Package @expo-google-fonts/inter, about 340 kB per weight, loaded at runtime on web and native.
 - Discover rows keep a small "paid" label; the amount and note are on the event page.
+- Discover asks for a sport on the first visit, then keeps a sport strip above the list and one sport or all of them selected (founder's decision, 2026-11-02; USER_FLOWS FL-2). The sport left the filter chips and the filter count, and "clear filters" leaves it alone.
 - Term: "yedek liste" (waitlist) everywhere.
 - Badges are round icons and XP is a progress bar (founder's notes of 2026-10-31, see below), inside a calm profile section, which is how "avoid gamification clutter" is honored.
 - Auto-approve events stay. "Participation requires organizer approval" holds for all others; the green approved state appears only when the server answers APPROVED.

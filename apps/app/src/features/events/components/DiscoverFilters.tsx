@@ -9,36 +9,25 @@ import {
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { localizedName, type CatalogCity, type CatalogSport } from '@/features/catalog';
+import { localizedName, type CatalogCity } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
-import {
-  Button,
-  SegmentedChoice,
-  Select,
-  Sheet,
-  SportIcon,
-  Text,
-  ToggleChip,
-  useTheme,
-} from '@/ui';
+import { Button, SegmentedChoice, Select, Sheet, Text, ToggleChip, useTheme } from '@/ui';
 
 function toggle<T>(list: readonly T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
 /**
- * Discover's filters (docs/design.md §5.1): the frequent ones up front (day, open spots, sports), the rest
+ * Discover's filters (docs/design.md §5.1): the frequent ones up front (day, open spots), the rest
  * in a sheet behind a button that shows how many filters are active. Same filters as before, on every screen size.
  */
 export function DiscoverFilters({
   filters,
   onChange,
-  sports,
   city,
 }: {
   filters: Filters;
   onChange: (next: Filters) => void;
-  sports: readonly CatalogSport[];
   city: CatalogCity | undefined;
 }) {
   const { t } = useTranslation('events');
@@ -70,15 +59,6 @@ export function DiscoverFilters({
         selected={filters.onlyOpen}
         onPress={() => set({ onlyOpen: !filters.onlyOpen })}
       />
-      {sports.map((sport) => (
-        <ToggleChip
-          key={sport.id}
-          label={localizedName(sport.names, locale)}
-          icon={(color) => <SportIcon slug={sport.slug} color={color} size={20} />}
-          selected={filters.sportIds.includes(sport.id)}
-          onPress={() => set({ sportIds: toggle(filters.sportIds, sport.id) })}
-        />
-      ))}
     </>
   );
 

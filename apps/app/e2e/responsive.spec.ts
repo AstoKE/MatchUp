@@ -64,6 +64,9 @@ for (const [label, width, height, colorScheme] of [
 
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
+    await expectSound(page, 'Discover, choosing a sport');
+    await page.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
+    await expect(page.getByRole('radio', { name: 'Tüm sporlar', exact: true })).toBeChecked();
     await expectSound(page, 'Discover');
 
     await page.goto('/sign-in');
@@ -97,8 +100,9 @@ test('on a desktop every filter chip can be reached with a mouse, without sidewa
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const page = await context.newPage();
   await page.goto('/');
+  await page.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
   // The last sport in the catalog: on one scrolling line it would be out of view.
-  const chips = page.getByRole('main').getByRole('checkbox');
+  const chips = page.getByRole('main').getByRole('radio');
   await expect(chips.last()).toBeVisible();
   await expect(chips.last()).toBeInViewport({ ratio: 1 });
   await context.close();

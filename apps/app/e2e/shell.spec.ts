@@ -9,6 +9,7 @@ test.describe('guest browsing (D-09)', () => {
     await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
     await expect(page.getByText('Ankara', { exact: true })).toBeVisible();
     // The list depends on what the database holds; the filters appear once Discover has loaded.
+    await page.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
     await expect(page.getByRole('checkbox', { name: 'Bugün' })).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('lang', 'tr');
   });

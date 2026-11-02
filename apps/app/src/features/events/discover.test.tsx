@@ -64,6 +64,13 @@ jest.mock('@/features/catalog/api/catalog-api', () => ({
   fetchCatalog: (...a: unknown[]) => mockApi.fetchCatalog(...a),
 }));
 
+const mockPreference = { stored: 'ALL' as string | null, store: jest.fn() };
+jest.mock('./discover-sport-preference', () => ({
+  ALL_SPORTS: 'ALL',
+  readDiscoverSport: () => Promise.resolve(mockPreference.stored),
+  storeDiscoverSport: (...a: unknown[]) => mockPreference.store(...a),
+}));
+
 const mockRouter = { replace: jest.fn(), push: jest.fn(), back: jest.fn() };
 jest.mock('expo-router', () => ({
   useRouter: () => mockRouter,
@@ -104,6 +111,7 @@ const page = (items: EventListItem[], nextCursor: EventListPage['nextCursor'] = 
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockPreference.stored = 'ALL';
   mockApi.fetchCatalog.mockResolvedValue(catalog);
   mockApi.searchEvents.mockResolvedValue(page([item()]));
 });
@@ -190,7 +198,7 @@ describe('DiscoverScreen', () => {
     await screen.findByText('Perşembe maçı');
     expect(lastPayload()).toEqual({ limit: 20 });
 
-    await fireEvent.press(screen.getByRole('checkbox', { name: 'Tenis' }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Tenis' }));
     await waitFor(() => expect(lastPayload()).toMatchObject({ sport_ids: [TENNIS] }));
 
     await fireEvent.press(screen.getByRole('checkbox', { name: 'Yalnızca yeri olan etkinlikler' }));
@@ -219,7 +227,7 @@ describe('DiscoverScreen', () => {
   it('keeps the frequent filters on one line and the rest in a sheet until asked for', async () => {
     await renderApp(<DiscoverScreen />);
     await screen.findByText('Perşembe maçı');
-    expect(screen.getByRole('checkbox', { name: 'Tenis' })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: 'Tenis' })).toBeTruthy();
     expect(screen.queryByRole('checkbox', { name: 'Akşam' })).toBeNull();
     await fireEvent.press(screen.getByRole('button', { name: 'Filtreler' }));
     expect(screen.getByRole('checkbox', { name: 'Akşam' })).toBeTruthy();
@@ -244,19 +252,33 @@ describe('DiscoverScreen', () => {
     expect(mockRouter.push).toHaveBeenCalledWith('/create');
   });
 
-  it('distinguishes "no match" from "nothing yet" and clearing the filters searches again', async () => {
+  it('tells "nothing in this sport" and "no match" from "nothing yet"', async () => {
     mockApi.searchEvents.mockResolvedValue(page([]));
     await renderApp(<DiscoverScreen />);
     await screen.findByText('Henüz etkinlik yok');
-    await fireEvent.press(screen.getByRole('checkbox', { name: 'Tenis' }));
+
+    await fireEvent.press(screen.getByRole('radio', { name: 'Tenis' }));
+    expect(await screen.findByText('Tenis için henüz etkinlik yok')).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Bugün' }));
     expect(screen.getByRole('button', { name: 'Filtreler (1)' })).toBeTruthy();
     expect(await screen.findByText('Bu filtrelere uyan etkinlik yok')).toBeTruthy();
 
     mockApi.searchEvents.mockResolvedValue(page([item()]));
     await fireEvent.press(screen.getAllByRole('button', { name: 'Filtreleri temizle' })[0]!);
     expect(await screen.findByText('Perşembe maçı')).toBeTruthy();
-    expect(lastPayload()).toEqual({ limit: 20 });
-    expect(screen.getByRole('checkbox', { name: 'Tenis', checked: false })).toBeTruthy();
+    expect(lastPayload()).toEqual({ limit: 20, sport_ids: [TENNIS] });
+    expect(screen.getByRole('radio', { name: 'Tenis', checked: true })).toBeTruthy();
+  });
+
+  it('offers every sport when the chosen one has no events', async () => {
+    mockPreference.stored = TENNIS;
+    mockApi.searchEvents.mockResolvedValue(page([]));
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Tenis için henüz etkinlik yok');
+    await fireEvent.press(screen.getByRole('button', { name: 'Tüm sporlar' }));
+    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20 }));
+    expect(mockPreference.store).toHaveBeenLastCalledWith('ALL');
   });
 
   it('shows a retryable error without leaking the raw message', async () => {
@@ -295,7 +317,73 @@ describe('DiscoverScreen', () => {
   });
 });
 
-describe('DiscoverScreen: days, urgency and the profile default', () => {
+describe('DiscoverScreen: choosing a sport', () => {
+  it('asks on the first visit, with every sport, and searches nothing until answered', async () => {
+    mockPreference.stored = null;
+    await renderApp(<DiscoverScreen />);
+    expect(await screen.findByRole('heading', { name: /Hangi sporda/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Futbol' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Tenis' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Tüm sporlar' })).toBeTruthy();
+    expect(mockApi.searchEvents).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: 'Filtreler' })).toBeNull();
+  });
+
+  it('shows only the chosen sport and remembers it', async () => {
+    mockPreference.stored = null;
+    await renderApp(<DiscoverScreen />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Tenis' }));
+    await screen.findByText('Perşembe maçı');
+    expect(lastPayload()).toEqual({ limit: 20, sport_ids: [TENNIS] });
+    expect(mockPreference.store).toHaveBeenCalledWith(TENNIS);
+    expect(screen.getByRole('radio', { name: 'Tenis', checked: true })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: /Hangi sporda/ })).toBeNull();
+  });
+
+  it('can start from every sport', async () => {
+    mockPreference.stored = null;
+    await renderApp(<DiscoverScreen />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Tüm sporlar' }));
+    await screen.findByText('Perşembe maçı');
+    expect(lastPayload()).toEqual({ limit: 20 });
+    expect(mockPreference.store).toHaveBeenCalledWith('ALL');
+  });
+
+  it('opens straight on a remembered sport and moves to another from the strip', async () => {
+    mockPreference.stored = SPORT;
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    expect(mockApi.searchEvents).toHaveBeenCalledTimes(1);
+    expect(lastPayload()).toEqual({ limit: 20, sport_ids: [SPORT] });
+
+    await fireEvent.press(screen.getByRole('radio', { name: 'Tenis' }));
+    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20, sport_ids: [TENNIS] }));
+    expect(screen.getByRole('radio', { name: 'Futbol', checked: false })).toBeTruthy();
+    expect(mockPreference.store).toHaveBeenLastCalledWith(TENNIS);
+
+    await fireEvent.press(screen.getByRole('radio', { name: 'Tüm sporlar' }));
+    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20 }));
+  });
+
+  it('keeps the other filters when the sport changes', async () => {
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Yalnızca yeri olan etkinlikler' }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Tenis' }));
+    await waitFor(() =>
+      expect(lastPayload()).toMatchObject({ only_open: true, sport_ids: [TENNIS] }),
+    );
+  });
+
+  it('asks again when the remembered sport no longer exists, without searching for it', async () => {
+    mockPreference.stored = '00000000-0000-4000-8000-0000000000ff';
+    await renderApp(<DiscoverScreen />);
+    expect(await screen.findByRole('heading', { name: /Hangi sporda/ })).toBeTruthy();
+    expect(mockApi.searchEvents).not.toHaveBeenCalled();
+  });
+});
+
+describe('DiscoverScreen: days, urgency and the order of sports', () => {
   // 13:00 on Tuesday 27 October 2026 in Istanbul.
   const NOW = Date.parse('2026-10-27T10:00:00Z');
   beforeEach(() => {
@@ -361,44 +449,40 @@ describe('DiscoverScreen: days, urgency and the profile default', () => {
       sports: [{ sportId: SPORT, level: 3, positionIds: [] }],
     };
 
-    it('opens on the sports of the profile, says so, and searches only once', async () => {
-      mockApi.fetchMyProfile.mockResolvedValue(profile);
+    const names = (role: 'button' | 'radio') =>
+      screen.getAllByRole(role).map((node) => node.props.accessibilityLabel as string);
+
+    it('puts the sports of the profile first when asking, and chooses none of them', async () => {
+      mockPreference.stored = null;
+      mockApi.fetchMyProfile.mockResolvedValue({
+        ...profile,
+        sports: [{ sportId: TENNIS, level: 3, positionIds: [] }],
+      });
       await renderApp(<DiscoverScreen />, { session: player });
-      expect(await screen.findByText(/Profilindeki sporlar gösteriliyor/)).toBeTruthy();
+      await screen.findByRole('heading', { name: /Hangi sporda/ });
+      expect(names('button').filter((n) => n === 'Tenis' || n === 'Futbol')).toEqual([
+        'Tenis',
+        'Futbol',
+      ]);
+      expect(mockApi.searchEvents).not.toHaveBeenCalled();
+    });
+
+    it('puts them first on the strip too, without filtering by them', async () => {
+      mockApi.fetchMyProfile.mockResolvedValue({
+        ...profile,
+        sports: [{ sportId: TENNIS, level: 3, positionIds: [] }],
+      });
+      await renderApp(<DiscoverScreen />, { session: player });
       await screen.findByText('Perşembe maçı');
-      expect(mockApi.searchEvents).toHaveBeenCalledTimes(1);
-      expect(lastPayload()).toMatchObject({ sport_ids: [SPORT] });
-      expect(screen.getByRole('button', { name: 'Filtreler (1)' })).toBeTruthy();
-      await openFilters();
-      expect(screen.getByRole('checkbox', { name: 'Futbol', checked: true })).toBeTruthy();
+      expect(names('radio')).toEqual(['Tüm sporlar', 'Tenis', 'Futbol']);
+      expect(lastPayload()).toEqual({ limit: 20 });
     });
 
-    it('lets the player change the filters, and the note goes away', async () => {
-      mockApi.fetchMyProfile.mockResolvedValue(profile);
-      await renderApp(<DiscoverScreen />, { session: player });
-      await screen.findByText(/Profilindeki sporlar gösteriliyor/);
-      await openFilters();
-      await fireEvent.press(screen.getByRole('checkbox', { name: 'Tenis' }));
-      await waitFor(() => expect(lastPayload()).toMatchObject({ sport_ids: [SPORT, TENNIS] }));
-      expect(screen.queryByText(/Profilindeki sporlar gösteriliyor/)).toBeNull();
-    });
-
-    it('clears to every sport, and does not bring the profile default back', async () => {
-      mockApi.fetchMyProfile.mockResolvedValue(profile);
-      await renderApp(<DiscoverScreen />, { session: player });
-      await screen.findByText(/Profilindeki sporlar gösteriliyor/);
-      await openFilters();
-      await fireEvent.press(screen.getAllByRole('button', { name: 'Filtreleri temizle' })[0]!);
-      await waitFor(() => expect(lastPayload()).toEqual({ limit: 20 }));
-      expect(screen.queryByText(/Profilindeki sporlar gösteriliyor/)).toBeNull();
-    });
-
-    it('shows everything when the profile has no sports or cannot be read', async () => {
+    it('still asks when the profile cannot be read', async () => {
+      mockPreference.stored = null;
       mockApi.fetchMyProfile.mockRejectedValue(new AppError('UNKNOWN'));
       await renderApp(<DiscoverScreen />, { session: player });
-      await screen.findByText('Perşembe maçı');
-      expect(lastPayload()).toEqual({ limit: 20 });
-      expect(screen.queryByText(/Profilindeki sporlar gösteriliyor/)).toBeNull();
+      expect(await screen.findByRole('heading', { name: /Hangi sporda/ })).toBeTruthy();
     });
   });
 });
