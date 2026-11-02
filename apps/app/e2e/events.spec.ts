@@ -444,13 +444,13 @@ test.describe('Sport icons and the pinned join action (UI tour)', () => {
     const main = page.getByRole('main');
     await main.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
     const card = main.getByRole('link', { name: new RegExp(title) });
-    await expect(card.locator('[data-testid="sport-icon-football"]')).toBeVisible();
+    await expect(card.locator('[data-testid="court-football"]')).toBeVisible();
     await expectNoBlocking(page);
 
     await card.click();
     await expect(page).toHaveURL(new RegExp(`/e/${eventId}$`));
     const detail = page.getByRole('main');
-    await expect(detail.locator('[data-testid="sport-icon-football"]').first()).toBeVisible();
+    await expect(detail.locator('[data-testid="court-football"]').first()).toBeVisible();
 
     // The action is pinned: it is on the first screen and still there after scrolling to the end.
     const join = detail.getByRole('button', { name: 'Katılım isteği gönder' });

@@ -58,7 +58,15 @@ export const spacing = {
   18: 72,
 } as const;
 
-export const radius = { sm: 6, md: 12, lg: 16, xl: 20, pill: 999 } as const;
+export const radius = {
+  sm: 8,
+  md: 16,
+  button: 18,
+  tile: 20,
+  lg: 22,
+  xl: 24,
+  pill: 999,
+} as const;
 
 /** Loaded in app/_layout.tsx. One family per weight: a fontWeight on top would be synthesized or ignored per platform. */
 export const fontFamily = {

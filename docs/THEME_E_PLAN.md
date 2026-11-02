@@ -1,6 +1,6 @@
 # Theme E plan
 
-**Status 2026-11-02: M0 merged, M1 (tokens and fonts) built.** Layouts are still the old ones. Phase 6 M4 starts after M6.
+**Status 2026-11-02: M0 and M1 merged, M2 (shared components) built.** Layouts are still the old ones; `SportArtwork` now draws the court, so the event hero and rows already show it. Phase 6 M4 starts after M6.
 
 What and why: `docs/design.md` §3 and §13, ADR-0023. Mockup: https://claude.ai/artifact/RbEqLVCQx1pt7WYCNETM5Q.
 
@@ -22,7 +22,7 @@ Each milestone is one branch and one PR, and the next one starts after the merge
 ### M2: shared components
 
 - Court drawings (ten SVGs) and `CourtTile`, `TimeTile`, `StatusChip` with icon and text.
-- Button, field, card, chip and `ToggleChip` shapes from §3.3. `SportArtwork` removed once nothing uses it.
+- Button, field, card, chip and `ToggleChip` shapes from §3.3. `SportArtwork` draws the court in M2 and goes once rows use `TimeTile` (M4) and the event page has its hero (M5). The sport glyphs are gone: the mockup has none, a color dot sits beside the name, and it paid for the courts. The Discover picker already uses `CourtTile`.
 - **Measure the bundle here.** There is 1 kB of margin: remove code first, and raise the ratchet only with a recorded reason.
 - **Tests:** component tests per status, axe.
 
@@ -35,7 +35,7 @@ Each milestone is one branch and one PR, and the next one starts after the merge
 
 ### M4: Discover
 
-Court tiles for the first visit, the sport strip, time-tile rows, the display heading. **The founder should confirm first:** the mockup shows tiles and "Bu akşam Ankara'da" together, while FL-2 lists nothing before a choice. FL-2 stays unless they say otherwise.
+The sport strip, time-tile rows, the display heading, the wide layout of the tiles. **The founder should confirm first:** the mockup shows tiles and "Bu akşam Ankara'da" together, while FL-2 lists nothing before a choice. FL-2 stays unless they say otherwise.
 
 ### M5: remaining screens
 

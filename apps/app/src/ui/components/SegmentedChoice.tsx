@@ -50,12 +50,12 @@ export function SegmentedChoice<T extends string>({
                 minWidth: TOUCH_TARGET,
                 paddingHorizontal: spacing[4],
                 paddingVertical: spacing[2],
-                borderRadius: radius.md,
+                borderRadius: radius.pill,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: selected ? colors.actionPrimary : 'transparent',
-                borderWidth: 1,
-                borderColor: selected ? colors.actionPrimary : colors.borderStrong,
+                backgroundColor: selected ? colors.selected : 'transparent',
+                borderWidth: 1.5,
+                borderColor: selected ? colors.selected : colors.borderStrong,
                 ...(focused === option.value
                   ? {
                       outlineColor: colors.focusRing,
@@ -68,7 +68,7 @@ export function SegmentedChoice<T extends string>({
             >
               <Text
                 variant="label"
-                style={{ color: selected ? colors.onActionPrimary : colors.textPrimary }}
+                style={{ color: selected ? colors.onSelected : colors.textPrimary }}
               >
                 {option.label}
               </Text>

@@ -38,9 +38,9 @@ export function ToggleChip({
         paddingHorizontal: spacing[4],
         paddingVertical: spacing[2],
         borderRadius: radius.pill,
-        borderWidth: 1,
-        borderColor: selected ? colors.actionPrimary : colors.borderStrong,
-        backgroundColor: selected ? colors.actionPrimary : 'transparent',
+        borderWidth: 1.5,
+        borderColor: selected ? colors.selected : colors.borderStrong,
+        backgroundColor: selected ? colors.selected : 'transparent',
         opacity: disabled ? 0.5 : 1,
         alignItems: 'center',
         justifyContent: 'center',
@@ -56,11 +56,8 @@ export function ToggleChip({
           : null),
       }}
     >
-      {icon ? <View>{icon(selected ? colors.onActionPrimary : colors.textPrimary)}</View> : null}
-      <Text
-        variant="label"
-        style={{ color: selected ? colors.onActionPrimary : colors.textPrimary }}
-      >
+      {icon ? <View>{icon(selected ? colors.onSelected : colors.textPrimary)}</View> : null}
+      <Text variant="label" style={{ color: selected ? colors.onSelected : colors.textPrimary }}>
         {label}
       </Text>
     </Pressable>

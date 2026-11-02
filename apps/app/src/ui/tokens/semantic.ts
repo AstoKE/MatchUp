@@ -25,6 +25,13 @@ export interface SemanticColors {
   borderSubtle: string;
   focusRing: string;
   overlay: string;
+  /** A chosen chip or segment; the action blue stays for actions. */
+  selected: string;
+  onSelected: string;
+  statusApproved: string;
+  onStatusApproved: string;
+  statusPending: string;
+  onStatusPending: string;
   /** The floating dock is dark in both themes, so it has its own colors, its own focus ring included. */
   dock: string;
   dockBorder: string;
@@ -57,6 +64,12 @@ export const lightColors: SemanticColors = {
   borderSubtle: p.paper300,
   focusRing: p.blue500,
   overlay: 'rgba(17, 35, 29, 0.5)',
+  selected: p.ink950,
+  onSelected: p.white,
+  statusApproved: p.success700,
+  onStatusApproved: p.white,
+  statusPending: p.amber300,
+  onStatusPending: p.ink950,
   dock: p.ink950,
   dockBorder: p.ink950,
   onDock: p.paper50,
@@ -89,6 +102,12 @@ export const darkColors: SemanticColors = {
   borderSubtle: p.forest700,
   focusRing: p.blue200,
   overlay: 'rgba(0, 0, 0, 0.6)',
+  selected: p.paper50,
+  onSelected: p.ink950,
+  statusApproved: p.success700,
+  onStatusApproved: p.white,
+  statusPending: p.amber300,
+  onStatusPending: p.ink950,
   dock: p.forest800,
   dockBorder: p.forest650,
   onDock: p.paper50,
@@ -146,6 +165,9 @@ export const requiredContrast: readonly {
   { fg: 'borderStrong', bg: 'surfaceRaised', min: 3, note: 'input/control boundary' },
   { fg: 'focusRing', bg: 'bgApp', min: 3, note: 'focus indicator on page' },
   { fg: 'focusRing', bg: 'surfaceRaised', min: 3, note: 'focus indicator on cards' },
+  { fg: 'onSelected', bg: 'selected', min: 4.5, note: 'chosen chip' },
+  { fg: 'onStatusApproved', bg: 'statusApproved', min: 4.5, note: 'approved chip' },
+  { fg: 'onStatusPending', bg: 'statusPending', min: 4.5, note: 'pending chip' },
   { fg: 'onDock', bg: 'dock', min: 4.5, note: 'dock icons and labels' },
   { fg: 'onDockActive', bg: 'dockActive', min: 4.5, note: 'active dock item' },
   { fg: 'dockFocusRing', bg: 'dock', min: 3, note: 'focus indicator in the dock' },
