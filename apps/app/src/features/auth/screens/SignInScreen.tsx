@@ -50,7 +50,7 @@ export function SignInScreen() {
   });
 
   return (
-    <AuthScreenLayout title={t('auth:signInTitle')}>
+    <AuthScreenLayout court title={t('auth:signInTitle')}>
       {failure ? <Banner kind="danger" message={failureText(failure)} /> : null}
       <Controller
         control={control}

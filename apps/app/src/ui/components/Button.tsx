@@ -61,7 +61,7 @@ export function Button({
         {
           minHeight: prominent ? 54 : fullWidth ? 48 : TOUCH_TARGET,
           minWidth: TOUCH_TARGET,
-          paddingHorizontal: spacing[5],
+          paddingHorizontal: variant === 'tertiary' ? 0 : spacing[5],
           paddingVertical: spacing[3],
           borderRadius: prominent ? radius.button : fullWidth ? radius.md : radius.pill,
           alignItems: 'center',

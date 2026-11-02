@@ -38,7 +38,19 @@ function badgesFor(event: MyEventItem): CardBadge[] {
         : event.myStatus === 'REJECTED' || event.myStatus === 'REMOVED'
           ? 'danger'
           : 'warning';
-    badges.push({ label: t(`events:mine.status.${event.myStatus}`), tone });
+    const chip =
+      event.myStatus === 'APPROVED'
+        ? 'approved'
+        : event.myStatus === 'REQUESTED'
+          ? 'pending'
+          : event.myStatus === 'WAITLISTED'
+            ? 'waitlist'
+            : undefined;
+    badges.push({
+      label: t(`events:mine.status.${event.myStatus}`),
+      tone,
+      ...(chip ? { chip } : null),
+    });
   }
   return badges;
 }
