@@ -8,13 +8,14 @@ import { ReportSheet } from '@/features/players';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import {
+  Avatar,
   Banner,
   Button,
+  CourtDrawing,
   EmptyState,
   IconButton,
   Screen,
-  SportArtwork,
-  SportDot,
+  sportColors,
   Text,
   TOUCH_TARGET,
   useTheme,
@@ -80,36 +81,22 @@ export function EventDetailScreen() {
   return <Detail event={event.data} catalog={catalog.data} inviteToken={inviteToken} />;
 }
 
-/** One fact. Short ones sit side by side and wrap at large text sizes; `wide` takes the whole line. */
-function Tile({
-  label,
-  value,
-  wide,
-  children,
-}: {
-  label: string;
-  value?: string;
-  wide?: boolean;
-  children?: ReactNode;
-}) {
-  const { colors, radius, spacing } = useTheme();
+/** One fact on its own line (docs/design.md §5.2): a label over a value. */
+function Fact({ label, value, children }: { label: string; value?: string; children?: ReactNode }) {
+  const { colors, spacing } = useTheme();
   return (
     <View
       style={{
-        flexGrow: 1,
-        flexBasis: wide ? '100%' : '40%',
         gap: spacing[1],
-        padding: spacing[3],
-        borderRadius: radius.lg,
-        borderWidth: 1,
-        borderColor: colors.borderSubtle,
-        backgroundColor: colors.surfaceRaised,
+        paddingVertical: spacing[3],
+        borderBottomWidth: 1,
+        borderBottomColor: colors.borderSubtle,
       }}
     >
       <Text variant="caption" tone="secondary">
         {label}
       </Text>
-      {value ? <Text variant="label">{value}</Text> : null}
+      {value ? <Text variant="titleSm">{value}</Text> : null}
       {children}
     </View>
   );
@@ -144,7 +131,7 @@ function Detail({
   inviteToken: string | null;
 }) {
   const { t } = useTranslation(['events', 'common']);
-  const { spacing, breakpoint } = useTheme();
+  const { colors, radius, spacing, breakpoint } = useTheme();
   const compact = breakpoint === 'compact';
   const router = useRouter();
   const locale = currentLocale();
@@ -154,6 +141,8 @@ function Detail({
   const [openedAt] = useState(Date.now);
 
   const sport = catalog.sports.find((s) => s.id === event.sportId);
+  const court = sport ? sportColors[sport.slug] : undefined;
+  const onCourt = court?.on ?? colors.textPrimary;
   const format = sport?.formats.find((f) => f.id === event.formatId);
   const city = catalog.cities.find((c) => c.id === event.cityId);
   const district = city?.districts.find((d) => d.id === event.districtId);
@@ -189,51 +178,63 @@ function Detail({
 
   return (
     <Screen maxWidth={640} footer={action && stickyJoin ? action : undefined}>
-      {/* Edge to edge on a phone (cancels the page's gutter and top padding), a contained image on wider screens. */}
+      {/* Edge to edge on a phone (cancels the page's gutter and top padding), a contained panel on wider screens. */}
       <View
-        style={
-          compact ? { marginHorizontal: -spacing[4], marginTop: -spacing[4] } : { marginTop: 0 }
-        }
+        style={{
+          gap: spacing[2],
+          padding: spacing[4],
+          backgroundColor: court?.court ?? colors.surfaceSunken,
+          ...(compact
+            ? { marginHorizontal: -spacing[4], marginTop: -spacing[4] }
+            : { borderRadius: radius.xl }),
+        }}
       >
-        <SportArtwork slug={sport?.slug} height={compact ? 220 : 260} square={compact} />
-        <View style={{ position: 'absolute', top: spacing[3], left: spacing[3] }}>
-          <IconButton
-            icon="chevron-left"
-            label={t('events:detail.backToDiscover')}
-            onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-          />
+        <IconButton
+          icon="chevron-left"
+          label={t('events:detail.backToDiscover')}
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+        />
+        <View style={{ height: 120 }}>
+          <CourtDrawing slug={sport?.slug} color={onCourt} />
         </View>
-      </View>
-      <View style={{ gap: spacing[3] }}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
-          <Pill
-            icon={<SportDot slug={sport?.slug} />}
-            label={[
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            paddingHorizontal: spacing[3],
+            paddingVertical: spacing[1],
+            borderRadius: radius.pill,
+            backgroundColor: colors.dockActive,
+          }}
+        >
+          <Text variant="micro" style={{ color: colors.onDockActive }}>
+            {[
               sport && localizedName(sport.names, locale),
               format && localizedName(format.names, locale),
             ]
               .filter(Boolean)
               .join(' · ')}
-          />
-          <Pill
-            label={
-              event.status === 'PUBLISHED' && started
-                ? t('events:detail.started')
-                : t(`events:status.${event.status}`)
-            }
-            tone={
-              event.status === 'PUBLISHED' && !started
-                ? 'success'
-                : event.status === 'CANCELED'
-                  ? 'danger'
-                  : 'neutral'
-            }
-          />
-          {urgency ? <Pill label={urgency} tone="warning" /> : null}
+          </Text>
         </View>
-        <Text variant="headline" heading={1}>
+        <Text variant="headline" heading={1} style={{ color: onCourt }}>
           {event.title}
         </Text>
+      </View>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+        <Pill
+          label={
+            event.status === 'PUBLISHED' && started
+              ? t('events:detail.started')
+              : t(`events:status.${event.status}`)
+          }
+          tone={
+            event.status === 'PUBLISHED' && !started
+              ? 'success'
+              : event.status === 'CANCELED'
+                ? 'danger'
+                : 'neutral'
+          }
+        />
+        {urgency ? <Pill label={urgency} tone="warning" /> : null}
       </View>
       {event.status === 'CANCELED' && event.cancelReason ? (
         <Banner
@@ -249,14 +250,12 @@ function Detail({
         />
       ) : null}
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
-        <Tile
-          wide
+      <View>
+        <Fact
           label={t('events:detail.when')}
           value={`${formatEventStart(event.startsAt, timeZone, locale)} · ${t('events:detail.durationValue', { count: event.durationMinutes })}`}
         />
-        <Tile
-          wide
+        <Fact
           label={t('events:detail.where')}
           value={
             place
@@ -264,7 +263,18 @@ function Detail({
               : t('events:detail.whereHidden', { district: districtName })
           }
         />
-        <Tile wide label={t('events:detail.capacity')}>
+        <Fact
+          label={t('events:detail.skill')}
+          value={
+            event.skillMin === null && event.skillMax === null
+              ? t('events:detail.skillAny')
+              : t('events:detail.skillRange', {
+                  min: event.skillMin ?? 1,
+                  max: event.skillMax ?? 5,
+                })
+          }
+        />
+        <Fact label={t('events:detail.capacity')}>
           <SlotMeter approved={event.approvedCount} capacity={event.capacity} />
           <View
             style={{
@@ -288,31 +298,16 @@ function Detail({
               </Text>
             ) : null}
           </View>
-        </Tile>
-        <Tile
-          label={t('events:detail.skill')}
-          value={
-            event.skillMin === null && event.skillMax === null
-              ? t('events:detail.skillAny')
-              : t('events:detail.skillRange', {
-                  min: event.skillMin ?? 1,
-                  max: event.skillMax ?? 5,
-                })
-          }
-        />
-        {event.organizerName ? (
-          <Tile label={t('events:detail.organizer')} value={event.organizerName} />
-        ) : null}
-        <Tile
+        </Fact>
+        <Fact
           label={t('events:detail.booking')}
           value={t(`events:booking.${event.bookingStatus}`)}
         />
         {event.setting ? (
-          <Tile label={t('events:detail.setting')} value={t(`events:setting.${event.setting}`)} />
+          <Fact label={t('events:detail.setting')} value={t(`events:setting.${event.setting}`)} />
         ) : null}
         {event.costAmountMinor !== null ? (
-          <Tile
-            wide
+          <Fact
             label={t('events:detail.cost')}
             value={[
               t('events:detail.costValue', { amount: formatCost(event.costAmountMinor, locale) }),
@@ -323,12 +318,24 @@ function Detail({
           />
         ) : null}
         {event.equipmentNote ? (
-          <Tile wide label={t('events:detail.equipment')} value={event.equipmentNote} />
+          <Fact label={t('events:detail.equipment')} value={event.equipmentNote} />
         ) : null}
         {event.private?.participantNotes ? (
-          <Tile wide label={t('events:detail.notes')} value={event.private.participantNotes} />
+          <Fact label={t('events:detail.notes')} value={event.private.participantNotes} />
         ) : null}
       </View>
+
+      {event.organizerName ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+          <Avatar name={event.organizerName} size={44} />
+          <View style={{ flexShrink: 1 }}>
+            <Text variant="titleSm">{event.organizerName}</Text>
+            <Text variant="caption" tone="secondary">
+              {t('events:detail.organizer')}
+            </Text>
+          </View>
+        </View>
+      ) : null}
 
       {event.participants ? (
         <Card>

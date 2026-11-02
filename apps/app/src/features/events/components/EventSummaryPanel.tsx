@@ -2,9 +2,9 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, type Catalog } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
-import { SportArtwork, Text, useTheme } from '@/ui';
+import { Text, TimeTile, useTheme } from '@/ui';
 import type { EventDetails } from '../api/events-api';
-import { formatCost, formatEventStart } from '../format';
+import { formatCost, formatEventStart, formatEventTime } from '../format';
 
 /** What the player is asking to join (docs/design.md §5.3). A stated cost is information, never an in-app charge. */
 export function EventSummaryPanel({ event, catalog }: { event: EventDetails; catalog: Catalog }) {
@@ -29,7 +29,10 @@ export function EventSummaryPanel({ event, catalog }: { event: EventDetails; cat
         backgroundColor: colors.surfaceRaised,
       }}
     >
-      <SportArtwork slug={sport?.slug} size={60} />
+      <TimeTile
+        slug={sport?.slug}
+        time={formatEventTime(event.startsAt, city?.timeZone ?? 'Europe/Istanbul', locale)}
+      />
       <View style={{ flex: 1, gap: spacing[1] }}>
         <Text variant="titleSm">{event.title}</Text>
         <Text variant="caption" tone="secondary">

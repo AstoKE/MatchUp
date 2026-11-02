@@ -1,6 +1,6 @@
 # Theme E plan
 
-**Status 2026-11-02: M0 to M3 merged, M4 (Discover) built.** The other screens keep their old layouts; `SportArtwork` draws the court on the event page until M5. Phase 6 M4 starts after M6.
+**Status 2026-11-02: M0 to M4 merged, M5a (event page and join) built.** The other screens keep their old layouts. Phase 6 M4 starts after M6.
 
 What and why: `docs/design.md` §3 and §13, ADR-0023. Mockup: https://claude.ai/artifact/RbEqLVCQx1pt7WYCNETM5Q.
 
@@ -39,7 +39,9 @@ The sport strip, time-tile rows, the display heading, the wide layout of the til
 
 ### M5: remaining screens
 
-Event hero and dots, join, status, My Events, profile (keeping level, reliability and badges), auth, onboarding, create, manage, player card, notifications, settings. Check ₺ wherever a cost is shown. Probably more than one PR.
+**M5a:** event hero, facts and dots, organizer line, join summary. `SportArtwork` is gone.
+
+**Then:** My Events with `StatusChip`, profile (keeping level, reliability and badges), auth, onboarding, create, manage, player card, notifications, settings. Check ₺ wherever a cost is shown.
 
 ### M6: validation
 
