@@ -6,7 +6,7 @@ const nav = (page: Page) => page.getByRole('tablist').first();
 test.describe('guest browsing (D-09)', () => {
   test('opens Discover without an account and shows the Turkish-first UI', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Hangi sahada/, level: 1 })).toBeVisible();
     await expect(page.getByText('Ankara', { exact: true })).toBeVisible();
     // The list depends on what the database holds; the filters appear once Discover has loaded.
     await page.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
@@ -27,7 +27,7 @@ test.describe('guest browsing (D-09)', () => {
     const context = await browser.newContext({ locale: 'en-US' });
     const page = await context.newPage();
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Discover', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Which court/, level: 1 })).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await context.close();
   });

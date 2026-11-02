@@ -199,8 +199,8 @@
     "settingAny": "Fark etmez",
     "filtersDone": "Sonuçları göster",
     "filtersClose": "Filtreleri kapat",
-    "pickerTitle": "Hangi sporda etkinlik arıyorsun?",
-    "pickerHint": "Seçimini sonra listenin üstünden istediğin zaman değiştirebilirsin.",
+    "pickerTitle": "Hangi sahada oynuyoruz?",
+    "pickerHint": "Bir spor seç, açık etkinlikleri gör. Seçimini sonra listenin üstünden değiştirebilirsin.",
     "allSports": "Tüm sporlar",
     "noSportTitle": "{{sport}} için henüz etkinlik yok",
     "noSportBody": "Başka bir spora bak ya da tüm sporları gör."

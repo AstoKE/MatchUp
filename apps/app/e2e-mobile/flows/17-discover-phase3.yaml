@@ -6,7 +6,7 @@ appId: com.example.matchup.dev
 - launchApp
 - runFlow:
     when:
-      visible: 'Which sport.*'
+      visible: 'Which court.*'
     commands:
       - tapOn: 'All sports'
 - assertVisible: ${TITLE}

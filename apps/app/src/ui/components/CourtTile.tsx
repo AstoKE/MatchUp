@@ -15,7 +15,7 @@ export function CourtTile({
   label: string;
   onPress: () => void;
 }) {
-  const { colors, radius, spacing } = useTheme();
+  const { breakpoint, colors, radius, spacing } = useTheme();
   const [focused, setFocused] = useState(false);
   const court = sportColors[slug];
   const on = court?.on ?? colors.textPrimary;
@@ -27,8 +27,6 @@ export function CourtTile({
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={({ pressed }) => ({
-        flexGrow: 1,
-        flexBasis: 130,
         minHeight: TOUCH_TARGET * 2,
         borderRadius: radius.tile,
         backgroundColor: court?.court ?? colors.surfaceSunken,
@@ -43,7 +41,13 @@ export function CourtTile({
           : null),
       })}
     >
-      <View style={{ height: 64, padding: spacing[1], paddingBottom: 0 }}>
+      <View
+        style={{
+          height: breakpoint === 'expanded' ? 104 : 64,
+          padding: spacing[1],
+          paddingBottom: 0,
+        }}
+      >
         <CourtDrawing slug={slug} color={on} />
       </View>
       <Text
