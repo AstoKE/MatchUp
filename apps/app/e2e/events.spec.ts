@@ -166,7 +166,7 @@ test.describe('discovering events (Phase 3 / M3)', () => {
     // The first visit asks for a sport, and nothing is listed until it is answered.
     await page.goto('/');
     const card = page.getByRole('link', { name: new RegExp(title) });
-    await expect(page.getByRole('heading', { name: /Hangi sporda/, level: 2 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Hangi sahada/, level: 1 })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Masa tenisi', exact: true })).toBeVisible();
     await expect(card).toHaveCount(0);
     await expectNoBlocking(page);
@@ -181,7 +181,7 @@ test.describe('discovering events (Phase 3 / M3)', () => {
     await expect(card).toHaveCount(0);
     await page.reload();
     await expect(page.getByRole('radio', { name: 'Tenis', exact: true })).toBeChecked();
-    await expect(page.getByRole('heading', { name: /Hangi sporda/ })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: /Hangi sahada/ })).toHaveCount(0);
     await expect(card).toHaveCount(0);
     await expectNoBlocking(page);
     await page.getByRole('radio', { name: 'Tüm sporlar', exact: true }).click();
@@ -368,7 +368,7 @@ test.describe('Discover for a signed-in player (UI tour)', () => {
     // createOnboardedUser gives every user football: offered first, not chosen for them.
     await signIn(page, playerEmail);
     const main = page.getByRole('main');
-    await expect(main.getByRole('heading', { name: /Hangi sporda/, level: 2 })).toBeVisible();
+    await expect(main.getByRole('heading', { name: /Hangi sahada/, level: 1 })).toBeVisible();
     await expect(main.getByRole('button').filter({ hasText: 'Futbol' })).toBeVisible();
     await main.getByRole('button', { name: 'Futbol', exact: true }).click();
     await expect(main.getByRole('radio', { name: 'Futbol', exact: true })).toBeChecked();
@@ -444,7 +444,7 @@ test.describe('Sport icons and the pinned join action (UI tour)', () => {
     const main = page.getByRole('main');
     await main.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
     const card = main.getByRole('link', { name: new RegExp(title) });
-    await expect(card.locator('[data-testid="court-football"]')).toBeVisible();
+    await expect(card).toContainText('Futbol');
     await expectNoBlocking(page);
 
     await card.click();

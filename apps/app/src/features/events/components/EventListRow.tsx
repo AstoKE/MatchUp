@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, type Catalog } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
-import { SportArtwork, Text, TOUCH_TARGET, useTheme } from '@/ui';
+import { Text, TimeTile, TOUCH_TARGET, useTheme } from '@/ui';
 import type { EventListItem } from '../api/search-api';
 import { formatEventStart, formatEventTime } from '../format';
 import { Pill } from './SlotMeter';
@@ -15,7 +15,7 @@ export interface CardBadge {
 }
 
 /**
- * One event in a list (docs/design.md §5.1): sport, title, time, place and availability at a glance. Only guest-readable
+ * One event in a list (docs/design.md §5.1): time on the sport's color, then sport, title, place and availability. Only guest-readable
  * fields. Availability is words, not a bar; skill range, organizer and the cost amount are on the event page.
  */
 export function EventListRow({
@@ -32,7 +32,7 @@ export function EventListRow({
   badges?: readonly CardBadge[];
 }) {
   const { t } = useTranslation('events');
-  const { colors, radius, spacing } = useTheme();
+  const { breakpoint, colors, radius, spacing } = useTheme();
   const router = useRouter();
   const [focused, setFocused] = useState(false);
   const locale = currentLocale();
@@ -98,19 +98,12 @@ export function EventListRow({
           : null),
       })}
     >
-      <SportArtwork slug={sport?.slug} size={60} />
-      <View style={{ flex: 1, gap: spacing[1] }}>
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[2] }}>
-          <Text variant="titleSm" heading={showDate ? 2 : 3} style={{ flex: 1 }}>
-            {event.title}
-          </Text>
-          {showDate ? null : (
-            <Text variant="label">{formatEventTime(event.startsAt, timeZone, locale)}</Text>
-          )}
-        </View>
-        {showDate ? (
-          <Text variant="bodySm">{formatEventStart(event.startsAt, timeZone, locale)}</Text>
-        ) : null}
+      <TimeTile
+        slug={sport?.slug}
+        time={formatEventTime(event.startsAt, timeZone, locale)}
+        size={breakpoint === 'expanded' ? 80 : 64}
+      />
+      <View style={{ flex: 1, gap: 2 }}>
         <Text variant="caption" tone="secondary">
           {[
             sport && localizedName(sport.names, locale),
@@ -120,6 +113,12 @@ export function EventListRow({
             .filter(Boolean)
             .join(' · ')}
         </Text>
+        <Text variant="titleSm" heading={showDate ? 2 : 3}>
+          {event.title}
+        </Text>
+        {showDate ? (
+          <Text variant="bodySm">{formatEventStart(event.startsAt, timeZone, locale)}</Text>
+        ) : null}
         <Text variant="caption" tone="secondary">
           {where}
         </Text>
@@ -127,13 +126,20 @@ export function EventListRow({
           style={{
             flexDirection: 'row',
             flexWrap: 'wrap',
-            gap: spacing[1],
+            alignItems: 'center',
+            gap: spacing[2],
             marginTop: spacing[1],
           }}
         >
-          {allBadges.map((badge) => (
-            <Pill key={badge.label} label={badge.label} tone={badge.tone} />
-          ))}
+          {allBadges.map((badge) =>
+            badge.tone === 'neutral' ? (
+              <Text key={badge.label} variant="micro">
+                {badge.label}
+              </Text>
+            ) : (
+              <Pill key={badge.label} label={badge.label} tone={badge.tone} />
+            ),
+          )}
         </View>
       </View>
     </Pressable>

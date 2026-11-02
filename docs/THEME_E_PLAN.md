@@ -1,6 +1,6 @@
 # Theme E plan
 
-**Status 2026-11-02: M0 to M2 merged, M3 (dock) built.** Layouts are still the old ones; `SportArtwork` now draws the court, so the event hero and rows already show it. Phase 6 M4 starts after M6.
+**Status 2026-11-02: M0 to M3 merged, M4 (Discover) built.** The other screens keep their old layouts; `SportArtwork` draws the court on the event page until M5. Phase 6 M4 starts after M6.
 
 What and why: `docs/design.md` §3 and §13, ADR-0023. Mockup: https://claude.ai/artifact/RbEqLVCQx1pt7WYCNETM5Q.
 
@@ -35,7 +35,7 @@ Each milestone is one branch and one PR, and the next one starts after the merge
 
 ### M4: Discover
 
-The sport strip, time-tile rows, the display heading, the wide layout of the tiles. **The founder should confirm first:** the mockup shows tiles and "Bu akşam Ankara'da" together, while FL-2 lists nothing before a choice. FL-2 stays unless they say otherwise.
+The sport strip, time-tile rows, the display heading, the wide layout of the tiles. The mockup shows tiles and "Bu akşam Ankara'da" together, while FL-2 lists nothing before a choice. **FL-2 stays;** the founder was told and can change it.
 
 ### M5: remaining screens
 

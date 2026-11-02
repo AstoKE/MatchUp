@@ -199,8 +199,8 @@
     "settingAny": "Any",
     "filtersDone": "Show results",
     "filtersClose": "Close filters",
-    "pickerTitle": "Which sport are you looking for?",
-    "pickerHint": "You can change this any time from above the list.",
+    "pickerTitle": "Which court are we playing on?",
+    "pickerHint": "Pick a sport to see open events. You can change it later from above the list.",
     "allSports": "All sports",
     "noSportTitle": "No {{sport}} events yet",
     "noSportBody": "Try another sport or see all of them."

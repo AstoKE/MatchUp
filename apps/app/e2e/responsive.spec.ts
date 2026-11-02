@@ -76,7 +76,7 @@ for (const [label, width, height, colorScheme] of [
     const page = await context.newPage();
 
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Hangi sahada/, level: 1 })).toBeVisible();
     await expectSound(page, 'Discover, choosing a sport');
     await expectClearOfDock(page, page.getByRole('button', { name: 'Tüm sporlar', exact: true }));
     await page.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();

@@ -15,30 +15,31 @@ export function SportPicker({
   onChoose: (choice: string) => void;
 }) {
   const { t } = useTranslation('events');
-  const { spacing } = useTheme();
+  const { spacing, breakpoint } = useTheme();
   const locale = currentLocale();
   return (
     <View style={{ gap: spacing[3] }}>
-      <View style={{ gap: spacing[1] }}>
-        <Text variant="title" heading={2}>
-          {t('discover.pickerTitle')}
-        </Text>
-        <Text tone="secondary">{t('discover.pickerHint')}</Text>
-      </View>
+      <Text tone="secondary">{t('discover.pickerHint')}</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
         {sports.map((sport) => (
-          <CourtTile
+          // Two or five to a row: ten sports leave no row half empty.
+          <View
             key={sport.id}
-            label={localizedName(sport.names, locale)}
-            slug={sport.slug}
-            onPress={() => onChoose(sport.id)}
-          />
+            style={{ flexGrow: 1, flexBasis: breakpoint === 'compact' ? '48%' : '18%' }}
+          >
+            <CourtTile
+              label={localizedName(sport.names, locale)}
+              slug={sport.slug}
+              onPress={() => onChoose(sport.id)}
+            />
+          </View>
         ))}
       </View>
       <Button
         variant="tertiary"
         label={t('discover.allSports')}
         onPress={() => onChoose(ALL_SPORTS)}
+        style={{ paddingHorizontal: 0 }}
       />
     </View>
   );

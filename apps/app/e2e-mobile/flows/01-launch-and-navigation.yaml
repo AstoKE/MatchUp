@@ -5,7 +5,7 @@ appId: com.example.matchup.dev
     clearState: true
 - assertVisible: 'Discover'
 # The first visit asks for a sport
-- assertVisible: 'Which sport.*'
+- assertVisible: 'Which court.*'
 - takeScreenshot: 01-discover-sport-picker
 - tapOn: 'All sports'
 # Phase 3: the list depends on what the database holds, the filters button is always there on a phone

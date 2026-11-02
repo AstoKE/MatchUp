@@ -9,7 +9,7 @@ appId: com.example.matchup.dev
 - assertVisible: 'Profil'
 - runFlow:
     when:
-      visible: 'Hangi sporda.*'
+      visible: 'Hangi sahada.*'
     commands:
       - tapOn: 'Tüm sporlar'
 - assertVisible: 'Filtreler'

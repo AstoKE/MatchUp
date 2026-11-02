@@ -15,7 +15,7 @@ import { NotificationBell } from '@/features/notifications';
 import { useMyProfile } from '@/features/profile';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
-import { Button, EmptyState, Screen, Skeleton, Text, useTheme } from '@/ui';
+import { Button, EmptyState, Screen, Skeleton, Text, TOUCH_TARGET, useTheme } from '@/ui';
 import { DiscoverFilters } from '../components/DiscoverFilters';
 import { SportPicker, SportStrip } from '../components/DiscoverSports';
 import { EventListRow } from '../components/EventListRow';
@@ -30,7 +30,8 @@ import { useEventSearch } from '../hooks';
  */
 export function DiscoverScreen() {
   const { t } = useTranslation(['events', 'common', 'nav']);
-  const { spacing } = useTheme();
+  const { spacing, breakpoint } = useTheme();
+  const expanded = breakpoint === 'expanded';
   const router = useRouter();
   const catalog = useCatalog();
   const profile = useMyProfile();
@@ -90,18 +91,39 @@ export function DiscoverScreen() {
   const groups = useMemo(() => groupByLocalDay(items, timeZone), [items, timeZone]);
   const locale = currentLocale();
   const chosenSport = catalog.data?.sports.find((sport) => sport.id === choice);
+  const asking = ready && choice === null;
 
   return (
-    <Screen maxWidth={720}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-        <View style={{ flex: 1 }}>
-          <Text variant="headline" heading={1}>
-            {t('nav:discover')}
+    <Screen maxWidth={expanded ? 1280 : 720}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: spacing[3],
+          minHeight: TOUCH_TARGET,
+        }}
+      >
+        {city ? (
+          <Text variant="label" tone="secondary">
+            {localizedName(city.names, locale)}
           </Text>
-          {city ? <Text tone="secondary">{localizedName(city.names, locale)}</Text> : null}
-        </View>
+        ) : (
+          <View />
+        )}
         <NotificationBell />
       </View>
+      <Text
+        variant="headline"
+        heading={1}
+        style={
+          expanded && asking
+            ? { fontSize: 60, lineHeight: 62, letterSpacing: -1.5, maxWidth: 640 }
+            : undefined
+        }
+      >
+        {asking ? t('events:discover.pickerTitle') : t('nav:discover')}
+      </Text>
 
       {ready && choice !== null ? (
         <>
@@ -120,7 +142,7 @@ export function DiscoverScreen() {
             if (search.isError) void search.refetch();
           }}
         />
-      ) : ready && choice === null ? (
+      ) : asking ? (
         <SportPicker sports={sports} onChoose={choose} />
       ) : search.isPending || !catalog.data || !ready ? (
         <View
@@ -170,9 +192,18 @@ export function DiscoverScreen() {
                 <Text variant="title" heading={2}>
                   {named ? t(`events:discover.day.${named}`) : formatDayHeading(group.date, locale)}
                 </Text>
-                <View role="list" style={{ gap: spacing[2] }}>
+                <View
+                  role="list"
+                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[3] }}
+                >
                   {group.items.map((event) => (
-                    <View key={event.id} role="listitem">
+                    <View
+                      key={event.id}
+                      role="listitem"
+                      style={{
+                        width: expanded ? '32.6%' : breakpoint === 'medium' ? '49%' : '100%',
+                      }}
+                    >
                       <EventListRow event={event} catalog={catalog.data} showDate={false} />
                     </View>
                   ))}

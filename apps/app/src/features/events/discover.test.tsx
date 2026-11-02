@@ -321,7 +321,7 @@ describe('DiscoverScreen: choosing a sport', () => {
   it('asks on the first visit, with every sport, and searches nothing until answered', async () => {
     mockPreference.stored = null;
     await renderApp(<DiscoverScreen />);
-    expect(await screen.findByRole('heading', { name: /Hangi sporda/ })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: /Hangi sahada/ })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Futbol' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Tenis' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Tüm sporlar' })).toBeTruthy();
@@ -337,7 +337,7 @@ describe('DiscoverScreen: choosing a sport', () => {
     expect(lastPayload()).toEqual({ limit: 20, sport_ids: [TENNIS] });
     expect(mockPreference.store).toHaveBeenCalledWith(TENNIS);
     expect(screen.getByRole('radio', { name: 'Tenis', checked: true })).toBeTruthy();
-    expect(screen.queryByRole('heading', { name: /Hangi sporda/ })).toBeNull();
+    expect(screen.queryByRole('heading', { name: /Hangi sahada/ })).toBeNull();
   });
 
   it('can start from every sport', async () => {
@@ -378,7 +378,7 @@ describe('DiscoverScreen: choosing a sport', () => {
   it('asks again when the remembered sport no longer exists, without searching for it', async () => {
     mockPreference.stored = '00000000-0000-4000-8000-0000000000ff';
     await renderApp(<DiscoverScreen />);
-    expect(await screen.findByRole('heading', { name: /Hangi sporda/ })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: /Hangi sahada/ })).toBeTruthy();
     expect(mockApi.searchEvents).not.toHaveBeenCalled();
   });
 });
@@ -459,7 +459,7 @@ describe('DiscoverScreen: days, urgency and the order of sports', () => {
         sports: [{ sportId: TENNIS, level: 3, positionIds: [] }],
       });
       await renderApp(<DiscoverScreen />, { session: player });
-      await screen.findByRole('heading', { name: /Hangi sporda/ });
+      await screen.findByRole('heading', { name: /Hangi sahada/ });
       expect(names('button').filter((n) => n === 'Tenis' || n === 'Futbol')).toEqual([
         'Tenis',
         'Futbol',
@@ -482,7 +482,7 @@ describe('DiscoverScreen: days, urgency and the order of sports', () => {
       mockPreference.stored = null;
       mockApi.fetchMyProfile.mockRejectedValue(new AppError('UNKNOWN'));
       await renderApp(<DiscoverScreen />, { session: player });
-      expect(await screen.findByRole('heading', { name: /Hangi sporda/ })).toBeTruthy();
+      expect(await screen.findByRole('heading', { name: /Hangi sahada/ })).toBeTruthy();
     });
   });
 });
