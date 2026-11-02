@@ -1,3 +1,4 @@
+export * from './CourtDrawing';
 export * from './Icon';
-export * from './SportIcon';
+export * from './SportDot';
 export * from './SportArtwork';

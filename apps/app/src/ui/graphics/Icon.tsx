@@ -19,13 +19,17 @@ export type IconName =
   | 'alert'
   | 'star'
   | 'trophy'
-  | 'heart';
+  | 'heart'
+  | 'list';
 
 const STROKE = 1.75;
 
 type Glyph = (color: string) => ReactElement;
 
 const outline: Record<IconName, Glyph> = {
+  list: (c) => (
+    <Path d="M5 7h14M5 12h14M5 17h9" stroke={c} strokeWidth={STROKE} strokeLinecap="round" />
+  ),
   alert: (c) => (
     <>
       <Path
@@ -148,6 +152,9 @@ const outline: Record<IconName, Glyph> = {
 };
 
 const filled: Record<IconName, Glyph> = {
+  list: (c) => (
+    <Path d="M5 7h14M5 12h14M5 17h9" stroke={c} strokeWidth={2.5} strokeLinecap="round" />
+  ),
   alert: (c) => (
     <>
       <Path

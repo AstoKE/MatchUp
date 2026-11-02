@@ -14,7 +14,7 @@ import {
   IconButton,
   Screen,
   SportArtwork,
-  SportBadge,
+  SportDot,
   Text,
   TOUCH_TARGET,
   useTheme,
@@ -195,12 +195,7 @@ function Detail({
           compact ? { marginHorizontal: -spacing[4], marginTop: -spacing[4] } : { marginTop: 0 }
         }
       >
-        <SportArtwork
-          slug={sport?.slug}
-          height={compact ? 220 : 260}
-          iconSize={72}
-          square={compact}
-        />
+        <SportArtwork slug={sport?.slug} height={compact ? 220 : 260} square={compact} />
         <View style={{ position: 'absolute', top: spacing[3], left: spacing[3] }}>
           <IconButton
             icon="chevron-left"
@@ -212,7 +207,7 @@ function Detail({
       <View style={{ gap: spacing[3] }}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
           <Pill
-            icon={<SportBadge slug={sport?.slug} size={24} />}
+            icon={<SportDot slug={sport?.slug} />}
             label={[
               sport && localizedName(sport.names, locale),
               format && localizedName(format.names, locale),

@@ -1,9 +1,9 @@
-import { useRef, useState, type ComponentRef } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { useRef, type ComponentRef } from 'react';
+import { ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, type CatalogSport } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
-import { SportIcon, Text, ToggleChip, TOUCH_TARGET, useTheme } from '@/ui';
+import { Button, CourtTile, SportDot, Text, ToggleChip, useTheme } from '@/ui';
 import { ALL_SPORTS } from '../discover-sport-preference';
 
 /** What Discover shows before the first choice: every sport the app has, and "all of them". */
@@ -27,53 +27,20 @@ export function SportPicker({
       </View>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
         {sports.map((sport) => (
-          <Tile
+          <CourtTile
             key={sport.id}
             label={localizedName(sport.names, locale)}
             slug={sport.slug}
             onPress={() => onChoose(sport.id)}
           />
         ))}
-        <Tile label={t('discover.allSports')} onPress={() => onChoose(ALL_SPORTS)} />
       </View>
+      <Button
+        variant="tertiary"
+        label={t('discover.allSports')}
+        onPress={() => onChoose(ALL_SPORTS)}
+      />
     </View>
-  );
-}
-
-function Tile({ label, slug, onPress }: { label: string; slug?: string; onPress: () => void }) {
-  const { colors, radius, spacing } = useTheme();
-  const [focused, setFocused] = useState(false);
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={onPress}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-      style={{
-        flexGrow: 1,
-        flexBasis: 140,
-        minHeight: TOUCH_TARGET * 2,
-        padding: spacing[3],
-        gap: spacing[2],
-        justifyContent: 'center',
-        borderRadius: radius.lg,
-        borderWidth: 1,
-        borderColor: colors.borderSubtle,
-        backgroundColor: colors.surfaceRaised,
-        ...(focused
-          ? {
-              outlineColor: colors.focusRing,
-              outlineWidth: 2,
-              outlineOffset: 2,
-              outlineStyle: 'solid' as const,
-            }
-          : null),
-      }}
-    >
-      {slug ? <SportIcon slug={slug} color={colors.textPrimary} size={28} /> : null}
-      <Text variant="label">{label}</Text>
-    </Pressable>
   );
 }
 
@@ -105,7 +72,7 @@ export function SportStrip({
       <ToggleChip
         radio
         label={label}
-        icon={slug ? (color) => <SportIcon slug={slug} color={color} size={20} /> : undefined}
+        icon={slug ? () => <SportDot slug={slug} /> : undefined}
         selected={id === choice}
         onPress={() => onChoose(id)}
       />

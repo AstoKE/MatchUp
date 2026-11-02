@@ -30,8 +30,8 @@ export function IconButton({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: colors.surfaceOverlay,
-        borderWidth: 1,
-        borderColor: colors.borderStrong,
+        borderWidth: 1.5,
+        borderColor: colors.textPrimary,
         opacity: pressed ? 0.85 : 1,
         ...(focused
           ? {

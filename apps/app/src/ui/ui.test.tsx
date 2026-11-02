@@ -6,17 +6,20 @@ import { initI18n } from '@/lib/i18n';
 import {
   Banner,
   Button,
+  CourtDrawing,
+  CourtTile,
   EmptyState,
   Icon,
   type IconName,
   Screen,
   Skeleton,
   sportColors,
-  SportBadge,
-  SportIcon,
+  StatusChip,
+  SportDot,
   Text,
   TextField,
   ThemeProvider,
+  TimeTile,
   ToastProvider,
   useSchemePreference,
   useTheme,
@@ -188,7 +191,7 @@ describe('Icon', () => {
   });
 });
 
-describe('SportIcon and SportBadge', () => {
+describe('Sport colors and courts', () => {
   const slugs = [
     'football',
     'futsal',
@@ -202,29 +205,58 @@ describe('SportIcon and SportBadge', () => {
     'walking',
   ];
 
-  it.each(slugs)('%s has its own glyph at the requested size', async (slug) => {
-    await renderThemed(<SportIcon slug={slug} color="#000" size={20} />);
-    const icon = screen.getByTestId(`sport-icon-${slug}`, { includeHiddenElements: true });
-    expect(icon.props.style).toEqual({ width: 20, height: 20 });
+  it.each(slugs)('%s has a court drawing, hidden from screen readers', async (slug) => {
+    await renderThemed(<CourtDrawing slug={slug} color="#000" />);
+    expect(screen.getByTestId(`court-${slug}`, { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.queryByTestId(`court-${slug}`)).toBeNull();
   });
+
+  it('a court tile is a button named by its sport', async () => {
+    const onPress = jest.fn();
+    await renderThemed(<CourtTile slug="tennis" label="Tenis" onPress={onPress} />);
+    await fireEvent.press(screen.getByRole('button', { name: 'Tenis' }));
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('a sport added later still gets a tile and a time, in neutral colors', async () => {
+    await renderThemed(
+      <>
+        <CourtTile slug="curling" label="Curling" onPress={jest.fn()} />
+        <TimeTile slug="curling" time="19:30" />
+      </>,
+    );
+    expect(screen.getByRole('button', { name: 'Curling' })).toBeTruthy();
+    expect(screen.getByText('19:30')).toBeTruthy();
+  });
+
+  it.each(['approved', 'pending', 'waitlist'] as const)(
+    'the %s chip carries its words',
+    async (kind) => {
+      await renderThemed(<StatusChip kind={kind} label="Durum" />);
+      expect(screen.getByText('Durum')).toBeTruthy();
+    },
+  );
 
   it('every catalog sport has a court color, so nothing is uncolored by accident', () => {
     for (const slug of slugs) expect(sportColors[slug]?.court).toMatch(/^#[0-9A-F]{6}$/i);
   });
 
-  it('draws a neutral ball for a sport added later instead of nothing', async () => {
-    await renderThemed(<SportIcon slug="curling" color="#000" />);
-    expect(screen.getByTestId('sport-icon-curling', { includeHiddenElements: true })).toBeTruthy();
-    await renderThemed(<SportIcon slug={undefined} color="#000" />);
-    expect(screen.getByTestId('sport-icon-unknown', { includeHiddenElements: true })).toBeTruthy();
+  it('falls back to a neutral court and dot for a sport added later', async () => {
+    await renderThemed(
+      <>
+        <CourtDrawing slug="curling" color="#000" />
+        <SportDot slug={undefined} />
+      </>,
+    );
+    expect(screen.getByTestId('court-curling', { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.getByTestId('sport-dot-unknown', { includeHiddenElements: true })).toBeTruthy();
   });
 
-  it('is decorative: hidden from assistive technology', async () => {
-    await renderThemed(<SportBadge slug="football" />);
-    const icon = screen.getByTestId('sport-icon-football', { includeHiddenElements: true });
-    expect(icon.props.accessibilityElementsHidden).toBe(true);
-    expect(icon.props['aria-hidden']).toBe(true);
-    expect(screen.queryByTestId('sport-icon-football')).toBeNull();
+  it('the dot is decorative: hidden from assistive technology', async () => {
+    await renderThemed(<SportDot slug="football" />);
+    const dot = screen.getByTestId('sport-dot-football', { includeHiddenElements: true });
+    expect(dot.props['aria-hidden']).toBe(true);
+    expect(screen.queryByTestId('sport-dot-football')).toBeNull();
   });
 });
 

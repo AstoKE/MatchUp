@@ -178,7 +178,7 @@ Use consistent list rows, section dividers, explicit status labels, and obvious 
 - The court drawings are the imagery: our own line art of each sport's playing area, drawn as SVG in the app. There are no photos in the MVP.
 - If venue photos arrive later, they need their own design decision and properly licensed content.
 - Do not use screenshots or photos from the supplied GoodRec references as production assets.
-- Use a coherent icon set, consistent stroke width; don't mix emoji as primary UI icons with line icons.
+- A sport beside its name is a small dot in its court color; there are no sport glyphs. Use a coherent icon set, consistent stroke width; don't mix emoji as primary UI icons with line icons.
 - All microcopy must be natural Turkish, concise and accurate. Use internationalization keys; do not hardcode UX copy into domain logic.
 8. Accessibility and trust requirements
 - WCAG 2.2 AA target for web, with platform-specific mobile accessibility best practices.

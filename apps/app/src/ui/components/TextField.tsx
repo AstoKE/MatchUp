@@ -66,11 +66,11 @@ export const TextField = forwardRef<TextInputInstance, TextFieldProps>(function 
         }}
         style={{
           ...typography.body,
-          minHeight: TOUCH_TARGET,
-          paddingHorizontal: spacing[3],
+          minHeight: 52,
+          paddingHorizontal: spacing[4],
           paddingVertical: spacing[2],
           borderRadius: radius.md,
-          borderWidth: error ? 2 : 1,
+          borderWidth: error ? 2 : 1.5,
           borderColor: error ? colors.danger : colors.borderStrong,
           backgroundColor: colors.surfaceRaised,
           color: colors.textPrimary,

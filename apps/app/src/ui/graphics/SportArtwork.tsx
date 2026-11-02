@@ -1,20 +1,17 @@
-import { useId } from 'react';
 import { View } from 'react-native';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useTheme } from '../theme';
 import { sportColors } from '../tokens';
-import { SportIcon } from './SportIcon';
+import { CourtDrawing } from './CourtDrawing';
 
 /**
- * Stands in for a venue photo (docs/design.md §7): no event has one yet (venues are Phase 4). A soft gradient of the
- * sport's tint with its icon, drawn in-house. Decorative: the sport's name is always in the text beside it.
+ * The sport's court on its own color (docs/design.md §7): what stands where other apps show a photo.
+ * Decorative: the sport's name is always in the text beside it.
  */
 export function SportArtwork({
   slug,
   size,
   width,
   height,
-  iconSize,
   square = false,
 }: {
   slug: string | undefined;
@@ -23,42 +20,23 @@ export function SportArtwork({
   /** Or free dimensions; a number or a share of the parent. */
   width?: number | `${number}%`;
   height?: number;
-  iconSize?: number;
   /** No rounded corners (edge to edge). */
   square?: boolean;
 }) {
-  const { colors, radius } = useTheme();
-  const id = useId();
-  const tint = (slug && sportColors[slug]?.court) || colors.borderStrong;
-  const boxHeight = size ?? height ?? 60;
+  const { colors, radius, spacing } = useTheme();
+  const court = slug ? sportColors[slug] : undefined;
   return (
     <View
-      accessibilityElementsHidden
-      importantForAccessibility="no"
       style={{
         width: size ?? width ?? '100%',
-        height: boxHeight,
+        height: size ?? height ?? 60,
+        padding: spacing[1],
         borderRadius: square ? 0 : radius.md,
         overflow: 'hidden',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.surfaceSunken,
+        backgroundColor: court?.court ?? colors.surfaceSunken,
       }}
     >
-      <Svg width="100%" height="100%" style={{ position: 'absolute' }}>
-        <Defs>
-          <LinearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0" stopColor={tint} stopOpacity={0.7} />
-            <Stop offset="1" stopColor={tint} stopOpacity={0.15} />
-          </LinearGradient>
-        </Defs>
-        <Rect width="100%" height="100%" fill={`url(#${id})`} />
-      </Svg>
-      <SportIcon
-        slug={slug}
-        color={colors.textPrimary}
-        size={iconSize ?? Math.round(boxHeight / 2)}
-      />
+      <CourtDrawing slug={slug} color={court?.on ?? colors.textSecondary} />
     </View>
   );
 }

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Icon, SportIcon, useTheme, type IconName } from '@/ui';
+import { CourtDrawing, Icon, sportColors, useTheme, type IconName } from '@/ui';
 
 const ICONS: Record<string, IconName> = {
   FIRST_MATCH: 'star',
@@ -13,6 +13,7 @@ const ICONS: Record<string, IconName> = {
 /** A round badge (docs/design.md §11). Decorative: its name is written under it. A per-sport badge shows the sport. */
 export function BadgeIcon({ code, sportSlug }: { code: string; sportSlug: string | undefined }) {
   const { colors, radius } = useTheme();
+  const court = code === 'SPORT_REGULAR' && sportSlug ? sportColors[sportSlug] : undefined;
   return (
     <View
       accessibilityElementsHidden
@@ -24,13 +25,15 @@ export function BadgeIcon({ code, sportSlug }: { code: string; sportSlug: string
         borderRadius: radius.pill,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.surfaceRaised,
+        backgroundColor: court?.court ?? colors.surfaceRaised,
         borderWidth: 2,
         borderColor: colors.actionPrimary,
       }}
     >
       {code === 'SPORT_REGULAR' ? (
-        <SportIcon slug={sportSlug} color={colors.textPrimary} size={32} />
+        <View style={{ width: 42, height: 28 }}>
+          <CourtDrawing slug={sportSlug} color={court?.on ?? colors.textPrimary} />
+        </View>
       ) : (
         <Icon name={ICONS[code] ?? 'star'} color={colors.textPrimary} size={30} />
       )}
