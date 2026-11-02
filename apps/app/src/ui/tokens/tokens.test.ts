@@ -1,4 +1,11 @@
-import { breakpointForWidth, contrastRatio, darkColors, lightColors, requiredContrast } from '.';
+import {
+  breakpointForWidth,
+  contrastRatio,
+  darkColors,
+  lightColors,
+  requiredContrast,
+  sportColors,
+} from '.';
 
 describe('contrast helper', () => {
   it('matches known WCAG values', () => {
@@ -21,6 +28,12 @@ describe.each([
       expect(contrastRatio(colors[rule.fg], colors[rule.bg])).toBeGreaterThanOrEqual(rule.min);
     },
   );
+});
+
+describe('court colors', () => {
+  it.each(Object.entries(sportColors))('%s keeps its label readable', (_slug, { court, on }) => {
+    expect(contrastRatio(on, court)).toBeGreaterThanOrEqual(4.5);
+  });
 });
 
 describe('themes are structurally identical', () => {

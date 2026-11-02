@@ -1,40 +1,46 @@
 /**
- * Primitive design tokens (layer 1): charcoal and warm red, docs/design.md §3 and §11 (the measured deviations).
- * The light theme is derived, not drawn. Components never use primitives directly: semantic tokens via useTheme().
+ * Primitive design tokens (layer 1): Theme E, docs/design.md §3 and §13.
+ * Components never use primitives directly: semantic tokens via useTheme().
  */
 export const palette = {
-  charcoal950: '#0B0B0C',
-  charcoal925: '#111113',
-  charcoal900: '#18191B',
-  charcoal800: '#222326',
-  charcoal700: '#323438',
-  gray550: '#7A7F87',
-  gray600: '#6F747C',
-  gray400: '#8D929A',
-  gray300: '#AAAEB5',
-  gray100: '#F5F5F6',
-  paper50: '#F6F6F7',
-  paper100: '#ECECEE',
-  paper300: '#DDDEE1',
-  slate700: '#55585F',
-  slate600: '#62666D',
-  slate500: '#7F848B',
-  ink950: '#111113',
   white: '#FFFFFF',
-  red500: '#D73641',
-  red600: '#B82633',
-  redLight500: '#C42B38',
-  redLight600: '#A32230',
-  coral300: '#FF8A8F',
-  coral700: '#B3212E',
-  danger300: '#EC6262',
-  danger700: '#A61B1B',
-  amber300: '#E6AB4A',
-  amber800: '#8A4B00',
-  success300: '#45B58A',
-  success700: '#067647',
-  blue700: '#1D4ED8',
-  blue300: '#93B4FF',
+  ink950: '#11231D',
+  // Green-tinted neutrals, light to dark.
+  paper50: '#F2F5F1',
+  paper100: '#E7ECE7',
+  paper300: '#D9E0DA',
+  sage500: '#7C8C84',
+  sage600: '#5C6C65',
+  sage700: '#4B5C55',
+  mist300: '#A9B7B0',
+  mist400: '#8FA098',
+  mist600: '#6F8078',
+  forest950: '#0E1512',
+  forest925: '#121A16',
+  forest900: '#17211C',
+  forest800: '#1F2B25',
+  forest700: '#2B3832',
+  forest650: '#33443C',
+  blue500: '#2F4FD0',
+  blue600: '#2540AE',
+  blue200: '#AEBBFF',
+  danger700: '#B3261E',
+  danger300: '#FF8A80',
+  amber800: '#7A5600',
+  amber300: '#E3B64F',
+  success700: '#1F6B4F',
+  success300: '#5FC79B',
+  // One per sport; some equal a color above on purpose (design.md §3.1).
+  courtFootball: '#1F6B4F',
+  courtFutsal: '#2F4FD0',
+  courtBasketball: '#A4561A',
+  courtVolleyball: '#E3B64F',
+  courtTennis: '#17707F',
+  courtPadel: '#4A3FB0',
+  courtBadminton: '#7A2E8E',
+  courtTableTennis: '#0F5C8A',
+  courtRunning: '#B23A2E',
+  courtWalking: '#5B6B2E',
 } as const;
 
 /** 4-pt spacing scale. */
@@ -56,21 +62,34 @@ export const radius = { sm: 6, md: 12, lg: 16, xl: 20, pill: 999 } as const;
 
 /** Loaded in app/_layout.tsx. One family per weight: a fontWeight on top would be synthesized or ignored per platform. */
 export const fontFamily = {
-  regular: 'Inter_400Regular',
-  semibold: 'Inter_600SemiBold',
-  bold: 'Inter_700Bold',
+  regular: 'Figtree_400Regular',
+  semibold: 'Figtree_600SemiBold',
+  bold: 'Figtree_700Bold',
+  extrabold: 'Figtree_800ExtraBold',
+  headingBold: 'BricolageGrotesque_700Bold',
+  headingExtrabold: 'BricolageGrotesque_800ExtraBold',
 } as const;
 
 export const typography = {
-  display: { fontSize: 34, lineHeight: 40, fontFamily: fontFamily.bold },
-  headline: { fontSize: 26, lineHeight: 32, fontFamily: fontFamily.bold },
-  title: { fontSize: 20, lineHeight: 26, fontFamily: fontFamily.bold },
-  titleSm: { fontSize: 17, lineHeight: 24, fontFamily: fontFamily.semibold },
+  display: {
+    fontSize: 38,
+    lineHeight: 42,
+    letterSpacing: -1,
+    fontFamily: fontFamily.headingExtrabold,
+  },
+  headline: {
+    fontSize: 34,
+    lineHeight: 38,
+    letterSpacing: -1,
+    fontFamily: fontFamily.headingExtrabold,
+  },
+  title: { fontSize: 21, lineHeight: 26, letterSpacing: -0.3, fontFamily: fontFamily.headingBold },
+  titleSm: { fontSize: 17, lineHeight: 24, fontFamily: fontFamily.bold },
   body: { fontSize: 16, lineHeight: 24, fontFamily: fontFamily.regular },
   bodySm: { fontSize: 14, lineHeight: 20, fontFamily: fontFamily.regular },
-  label: { fontSize: 15, lineHeight: 20, fontFamily: fontFamily.semibold },
+  label: { fontSize: 15, lineHeight: 20, fontFamily: fontFamily.bold },
   caption: { fontSize: 13, lineHeight: 18, fontFamily: fontFamily.regular },
-  micro: { fontSize: 12, lineHeight: 16, fontFamily: fontFamily.semibold },
+  micro: { fontSize: 12, lineHeight: 16, fontFamily: fontFamily.extrabold },
 } as const;
 export type TypographyVariant = keyof typeof typography;
 

@@ -2,7 +2,8 @@ import { useId } from 'react';
 import { View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useTheme } from '../theme';
-import { SPORT_TINTS, SportIcon } from './SportIcon';
+import { sportColors } from '../tokens';
+import { SportIcon } from './SportIcon';
 
 /**
  * Stands in for a venue photo (docs/design.md §7): no event has one yet (venues are Phase 4). A soft gradient of the
@@ -28,7 +29,7 @@ export function SportArtwork({
 }) {
   const { colors, radius } = useTheme();
   const id = useId();
-  const tint = (slug && SPORT_TINTS[slug]) || colors.borderStrong;
+  const tint = (slug && sportColors[slug]?.court) || colors.borderStrong;
   const boxHeight = size ?? height ?? 60;
   return (
     <View

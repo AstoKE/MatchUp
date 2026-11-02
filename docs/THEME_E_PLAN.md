@@ -1,6 +1,6 @@
 # Theme E plan
 
-**Status 2026-11-02: M0 is this document, not merged yet. Nothing is built.** Phase 6 M4 starts after M6.
+**Status 2026-11-02: M0 merged, M1 (tokens and fonts) built.** Layouts are still the old ones. Phase 6 M4 starts after M6.
 
 What and why: `docs/design.md` §3 and §13, ADR-0023. Mockup: https://claude.ai/artifact/RbEqLVCQx1pt7WYCNETM5Q.
 
