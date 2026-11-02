@@ -25,6 +25,13 @@ export interface SemanticColors {
   borderSubtle: string;
   focusRing: string;
   overlay: string;
+  /** The floating dock is dark in both themes, so it has its own colors, its own focus ring included. */
+  dock: string;
+  dockBorder: string;
+  onDock: string;
+  dockActive: string;
+  onDockActive: string;
+  dockFocusRing: string;
 }
 
 export const lightColors: SemanticColors = {
@@ -33,49 +40,75 @@ export const lightColors: SemanticColors = {
   surfaceSunken: p.paper100,
   surfaceOverlay: p.white,
   textPrimary: p.ink950,
-  textSecondary: p.slate700,
-  textTertiary: p.slate600,
-  textDisabled: p.slate500,
-  actionPrimary: p.redLight500,
-  actionPrimaryPressed: p.redLight600,
+  textSecondary: p.sage700,
+  textTertiary: p.sage600,
+  textDisabled: p.sage500,
+  actionPrimary: p.blue500,
+  actionPrimaryPressed: p.blue600,
   onActionPrimary: p.white,
-  link: p.coral700,
-  accent: p.redLight500,
+  link: p.blue500,
+  accent: p.blue500,
   onAccent: p.white,
   danger: p.danger700,
   onDanger: p.white,
   warning: p.amber800,
   success: p.success700,
-  borderStrong: p.slate500,
+  borderStrong: p.sage500,
   borderSubtle: p.paper300,
-  focusRing: p.blue700,
-  overlay: 'rgba(17, 17, 19, 0.5)',
+  focusRing: p.blue500,
+  overlay: 'rgba(17, 35, 29, 0.5)',
+  dock: p.ink950,
+  dockBorder: p.ink950,
+  onDock: p.paper50,
+  dockActive: p.paper50,
+  onDockActive: p.ink950,
+  dockFocusRing: p.blue200,
 };
 
 export const darkColors: SemanticColors = {
-  bgApp: p.charcoal950,
-  surfaceRaised: p.charcoal900,
-  surfaceSunken: p.charcoal925,
-  surfaceOverlay: p.charcoal800,
-  textPrimary: p.gray100,
-  textSecondary: p.gray300,
-  textTertiary: p.gray400,
-  textDisabled: p.gray600,
-  actionPrimary: p.red500,
-  actionPrimaryPressed: p.red600,
+  bgApp: p.forest950,
+  surfaceRaised: p.forest900,
+  surfaceSunken: p.forest925,
+  surfaceOverlay: p.forest800,
+  textPrimary: p.paper50,
+  textSecondary: p.mist300,
+  textTertiary: p.mist400,
+  textDisabled: p.mist600,
+  actionPrimary: p.blue500,
+  actionPrimaryPressed: p.blue600,
   onActionPrimary: p.white,
-  // Red text fails on dark surfaces: links and active text use a lighter coral.
-  link: p.coral300,
-  accent: p.red500,
+  // The action blue is 2.78:1 on the dark page: links and active text use a lighter blue.
+  link: p.blue200,
+  accent: p.blue500,
   onAccent: p.white,
   danger: p.danger300,
-  onDanger: p.charcoal950,
+  onDanger: p.forest950,
   warning: p.amber300,
   success: p.success300,
-  borderStrong: p.gray550,
-  borderSubtle: p.charcoal700,
-  focusRing: p.blue300,
+  borderStrong: p.mist600,
+  borderSubtle: p.forest700,
+  focusRing: p.blue200,
   overlay: 'rgba(0, 0, 0, 0.6)',
+  dock: p.forest800,
+  dockBorder: p.forest650,
+  onDock: p.paper50,
+  dockActive: p.paper50,
+  onDockActive: p.ink950,
+  dockFocusRing: p.blue200,
+};
+
+/** One per catalog sport, the same in both themes; `on` is the label and line drawing on it. */
+export const sportColors: Readonly<Record<string, { court: string; on: string }>> = {
+  football: { court: p.courtFootball, on: p.white },
+  futsal: { court: p.courtFutsal, on: p.white },
+  basketball: { court: p.courtBasketball, on: p.white },
+  volleyball: { court: p.courtVolleyball, on: p.ink950 },
+  tennis: { court: p.courtTennis, on: p.white },
+  padel: { court: p.courtPadel, on: p.white },
+  badminton: { court: p.courtBadminton, on: p.white },
+  'table-tennis': { court: p.courtTableTennis, on: p.white },
+  running: { court: p.courtRunning, on: p.white },
+  walking: { court: p.courtWalking, on: p.white },
 };
 
 export const requiredContrast: readonly {
@@ -113,4 +146,7 @@ export const requiredContrast: readonly {
   { fg: 'borderStrong', bg: 'surfaceRaised', min: 3, note: 'input/control boundary' },
   { fg: 'focusRing', bg: 'bgApp', min: 3, note: 'focus indicator on page' },
   { fg: 'focusRing', bg: 'surfaceRaised', min: 3, note: 'focus indicator on cards' },
+  { fg: 'onDock', bg: 'dock', min: 4.5, note: 'dock icons and labels' },
+  { fg: 'onDockActive', bg: 'dockActive', min: 4.5, note: 'active dock item' },
+  { fg: 'dockFocusRing', bg: 'dock', min: 3, note: 'focus indicator in the dock' },
 ];

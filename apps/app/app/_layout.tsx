@@ -1,6 +1,9 @@
-import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
-import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold';
-import { Inter_700Bold } from '@expo-google-fonts/inter/700Bold';
+import { BricolageGrotesque_700Bold } from '@expo-google-fonts/bricolage-grotesque/700Bold';
+import { BricolageGrotesque_800ExtraBold } from '@expo-google-fonts/bricolage-grotesque/800ExtraBold';
+import { Figtree_400Regular } from '@expo-google-fonts/figtree/400Regular';
+import { Figtree_600SemiBold } from '@expo-google-fonts/figtree/600SemiBold';
+import { Figtree_700Bold } from '@expo-google-fonts/figtree/700Bold';
+import { Figtree_800ExtraBold } from '@expo-google-fonts/figtree/800ExtraBold';
 import { useFonts } from 'expo-font';
 import { Stack, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -53,7 +56,14 @@ function Shell() {
 
 export default function RootLayout() {
   // Local assets: a short wait, and a failure falls back to the system font instead of blocking the app.
-  const [fontsLoaded, fontError] = useFonts({ Inter_400Regular, Inter_600SemiBold, Inter_700Bold });
+  const [fontsLoaded, fontError] = useFonts({
+    BricolageGrotesque_700Bold,
+    BricolageGrotesque_800ExtraBold,
+    Figtree_400Regular,
+    Figtree_600SemiBold,
+    Figtree_700Bold,
+    Figtree_800ExtraBold,
+  });
   if (!fontsLoaded && !fontError) return null;
   return (
     <SafeAreaProvider>

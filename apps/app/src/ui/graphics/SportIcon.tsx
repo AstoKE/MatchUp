@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useTheme } from '../theme';
+import { sportColors } from '../tokens';
 
 /**
  * One in-house outline glyph per sport (docs/design.md §7): 24 px grid, 1.75 px stroke, rounded joins,
@@ -146,24 +147,10 @@ export function SportIcon({
   );
 }
 
-/** Decorative tints (design.md §4.6), used only at low opacity behind the icon; the name carries the meaning. */
-export const SPORT_TINTS: Record<string, string> = {
-  football: '#2E9E5B',
-  futsal: '#1FA38A',
-  basketball: '#E0701F',
-  volleyball: '#D9A400',
-  tennis: '#9AB800',
-  padel: '#2A8FD6',
-  badminton: '#6B5BD6',
-  'table-tennis': '#D6457A',
-  running: '#C2410C',
-  walking: '#5B6B82',
-};
-
 /** The sport's icon on a soft tint (design.md §4.6: 12-16 % opacity; the icon stays in the text colour). */
 export function SportBadge({ slug, size = 32 }: { slug: string | undefined; size?: number }) {
   const { colors, radius } = useTheme();
-  const tint = (slug && SPORT_TINTS[slug]) || colors.borderStrong;
+  const tint = (slug && sportColors[slug]?.court) || colors.borderStrong;
   return (
     <View
       style={{

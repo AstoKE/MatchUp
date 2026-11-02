@@ -74,7 +74,7 @@ export default function TabsLayout() {
                 size={item.emphasized ? size + 6 : size}
                 color={
                   item.emphasized
-                    ? colors.actionPrimary
+                    ? colors.link
                     : typeof color === 'string'
                       ? color
                       : colors.textSecondary

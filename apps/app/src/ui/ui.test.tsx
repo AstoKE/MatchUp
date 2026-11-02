@@ -11,7 +11,7 @@ import {
   type IconName,
   Screen,
   Skeleton,
-  SPORT_TINTS,
+  sportColors,
   SportBadge,
   SportIcon,
   Text,
@@ -208,8 +208,8 @@ describe('SportIcon and SportBadge', () => {
     expect(icon.props.style).toEqual({ width: 20, height: 20 });
   });
 
-  it('every catalog sport has a tint, so a badge is never untinted by accident', () => {
-    for (const slug of slugs) expect(SPORT_TINTS[slug]).toMatch(/^#[0-9A-F]{6}$/i);
+  it('every catalog sport has a court color, so nothing is uncolored by accident', () => {
+    for (const slug of slugs) expect(sportColors[slug]?.court).toMatch(/^#[0-9A-F]{6}$/i);
   });
 
   it('draws a neutral ball for a sport added later instead of nothing', async () => {
