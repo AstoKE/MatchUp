@@ -1,6 +1,6 @@
 MatchUp — Product Design System & UI/UX Specification
 Status: Approved visual direction; detailed values are implementation targets, subject to platform/accessibility validation.
-Version: 1.0 · 2026-10-31
+Version: 2.0 (Theme E) · 2026-11-02, replacing the charcoal and red of version 1.0 (ADR-0023; decisions and deviations in §13)
 Owner: MatchUp
 Applies to: Expo / React Native / Expo Web, iOS, Android, and responsive web.
 Primary audience: Adults in Turkey; Turkish-first interface, English-ready.
@@ -27,46 +27,68 @@ These are illustrative screen examples, not a complete page inventory. Extend th
 8. Original branding: Preserve the visual mood while making MatchUp recognizably its own product.
 3. Visual language
 3.1 Color palette
-Adopt charcoal/black + warm red/coral as the main direction inspired by the provided screenshots. The previous bright-lime visual language should not remain randomly mixed into the UI. Treat lime as a legacy/provisional palette until a deliberate brand decision. The logo may be revisited separately; do not force a multicolor logo to dictate the entire product palette.
+Theme E: every sport has its own court color and line drawing, on a quiet green-tinted ground, with one blue for actions. Light and dark are equal themes and the app follows the device unless the person chooses otherwise. The logo may be revisited separately; do not force a multicolor logo to dictate the entire product palette.
 
-Recommended starting design tokens (verify AA contrast, especially small text and disabled states):
-Token	Hex	Usage
-color.bg.canvas	#0B0B0C	Main dark background
-color.bg.surface	#18191B	Event cards, fields, panels
-color.bg.surfaceRaised	#222326	Active layers and modal surfaces
-color.border.subtle	#323438	Delicate card/input boundaries
-color.text.primary	#F5F5F6	Titles and body copy
-color.text.secondary	#AAAEB5	Metadata
-color.text.tertiary	#8D929A	Secondary details, with contrast checks
-color.brand.primary	#E13C47	Main CTA, active states
-color.brand.pressed	#BF2936	Pressed button
-color.success	#32996F	Confirmed participation
-color.warning	#E6AB4A	Pending approval / warning
-color.danger	#EC6262	Error/destructive actions
+Tokens. All pairs were measured with the WCAG formula on 2026-11-02 and tokens.test.ts enforces them. Lowest result: control border on the light page, 3.22:1 against a required 3:1.
+Token	Light	Dark	Usage
+bgApp	#F2F5F1	#0E1512	Page
+surfaceRaised	#FFFFFF	#17211C	Cards, fields
+surfaceSunken	#E7ECE7	#121A16	Sunken areas
+surfaceOverlay	#FFFFFF	#1F2B25	Sheets and modals
+textPrimary	#11231D	#F2F5F1	Titles and body copy
+textSecondary	#4B5C55	#A9B7B0	Metadata
+textTertiary	#5C6C65	#8FA098	Secondary details
+actionPrimary	#2F4FD0	#2F4FD0	Main action, white label
+actionPrimaryPressed	#2540AE	#2540AE	Pressed action
+link	#2F4FD0	#AEBBFF	Links and active text
+danger	#B3261E	#FF8A80	Errors, destructive actions
+warning	#7A5600	#E3B64F	Warning text
+success	#1F6B4F	#5FC79B	Success text
+borderStrong	#7C8C84	#6F8078	Inputs and controls
+borderSubtle	#D9E0DA	#2B3832	Decorative card borders
+focusRing	#2F4FD0	#AEBBFF	Focus on page and cards
+dock	#11231D	#1F2B25	Dock background (dark in both themes)
+onDock	#F2F5F1	#F2F5F1	Dock icons and labels
+dockFocusRing	#AEBBFF	#AEBBFF	Focus inside the dock (the blue ring is 2.46:1 on it)
 
+Court colors are the same in both themes. The label is white except on volleyball, which uses #11231D; lowest 5.35:1.
+Sport	Court color
+football	#1F6B4F
+futsal	#2F4FD0
+basketball	#A4561A
+volleyball	#E3B64F
+tennis	#17707F
+padel	#4A3FB0
+badminton	#7A2E8E
+table-tennis	#0F5C8A
+running	#B23A2E
+walking	#5B6B2E
 
-Use semantic tokens, not hardcoded color literals across screens. Introduce accessible light-mode tokens if light mode is supported; do not auto-invert brand colors. Color must never be the sole carrier of status.
+Status chips: approved #1F6B4F with white text and a check; pending #E3B64F with #11231D text and a clock; waitlist outlined in textPrimary with a list icon.
+
+Use semantic tokens, not hardcoded color literals across screens; court colors are tokens too. Some court colors equal a meaning elsewhere (futsal and action blue, volleyball and pending, football and approved), so a court color never carries a status: status always has its icon and text. Color must never be the sole carrier of status.
 3.2 Typography
-Use a legible sans-serif font with strong Turkish support (including ğ, ü, ş, ı, ö, ç, İ). Prefer a well-supported font such as Inter, or a compatible system font when platform footprint/performance warrants it. Avoid copying an external brand's signature typography.
+Bricolage Grotesque for headings and time tiles, Figtree for everything else. Both contain ğ, ü, ş, ı, ö, ç and İ (checked in the font files, 2026-11-02). Figtree has no ₺ glyph, so the sign falls back to the system font; check how it looks wherever a cost is shown. Weights loaded: Bricolage 700 and 800, Figtree 400, 600, 700 and 800. Avoid copying an external brand's signature typography.
 
 Base styles, responsive to dynamic text settings:
-Style	Starting size	Weight	Usage
-Screen title	24–28	700	Page heading
-Section title	19–22	700	Day headers / grouped listings
-Card title	16–17	650–700	Event name
-Body	14–16	400–500	Event details and descriptions
-Metadata	12–13	400–500	Time, sport, distance
-Micro label	11–12	600	Chips and status
-Button	15–16	650–700	CTA
+Style	Starting size	Font and weight	Usage
+Display	34–38 (up to 60 on desktop Discover)	Bricolage 800	Page heading
+Section title	21 (30 on desktop)	Bricolage 700	Day headers / grouped listings
+Time tile	18–21	Bricolage 800	Time on an event row
+Card title	16–19	Figtree 700	Event name
+Body	14–16	Figtree 400	Event details and descriptions
+Metadata	12–14	Figtree 400–600	Time, sport, distance
+Micro label	12	Figtree 800	Chips and status
+Button	15–17	Figtree 700–800	CTA
 
 
 Do not shrink essential information to reproduce the reference image's pixel density. Support 200% text scaling as far as practical; layouts must reflow gracefully.
 3.3 Shape, spacing and motion
 - 4pt spacing foundation; recommended scale: 4, 8, 12, 16, 20, 24, 32, 40, 48.
-- Cards: ~16–20px radius; chips: fully rounded; buttons: ~12–16px or pill where appropriate.
-- Cards should mostly use subtle borders and contrasting surfaces, not heavy drop shadows.
+- Cards: ~22px radius; court tiles: 18–20px; fields: 16px; primary buttons: 18px, 54px tall; chips and dock: fully rounded.
+- Cards should mostly use subtle borders and contrasting surfaces, not heavy drop shadows. Only the dock floats with a shadow.
 - Primary mobile padding: 16px, adapted for tablet/desktop.
-- List row image: rounded thumbnail (~52–64px) if the screen uses compact listing.
+- List row: a court-colored time tile (64px on a phone, 80px on desktop) instead of a thumbnail.
 - Animations: restrained 140–220ms transitions; no distracting bounce loops. Respect reduced motion.
 - Loading: skeleton placeholders for lists/details, clear retry/empty/error states.
 4. Core components
@@ -84,23 +106,22 @@ Every interactive component should define: default, pressed, focused, disabled, 
 Goal: Quickly browse upcoming local activities, with sport/date filters and obvious availability.
 
 Layout:
-- Dark background, clear app title / city selector at top.
-- One-line or horizontally scrollable filter chips: sport, date, time of day, available spots; show active-filter indicator and reset option.
+- City at top, with the notification bell.
+- First visit: a large question and one court tile per sport, plus "all sports" (USER_FLOWS FL-2). After that: the sport strip, then one-line or horizontally scrollable filter chips: date, time of day, available spots; show active-filter indicator and reset option.
 - Group events under localized day headings: Bugün, Yarın, 4 Kasım Çarşamba.
-- Use compact rounded rectangular rows/cards with a small venue image, event name or venue, sport/format, time, availability/status chip.
+- Use compact rounded rows/cards with a court-colored time tile, sport/format, event name, place, availability/status chip.
 - Offer list/map toggle when a map screen exists; map is not required to block the list experience.
-- Sticky bottom navigation: Keşfet, Etkinliklerim, Oluştur, Profil for MVP; center create action may be visually emphasized, but not at the expense of hierarchy.
+- Floating dock on every screen size: Keşfet, Etkinliklerim, Oluştur, Profil for MVP; the center create action is a blue circle. Icons only on a phone, icons and labels on wider screens; every item keeps its accessible name.
 - Avoid unnecessary progress bars on every compact list row; display clear 3 yer kaldı or 12/14 kişi text. Capacity bar may be used in event detail or expanded cards.
 Interaction: Tapping a row opens detail; filters remain discoverable; sign-in is not required for public event discovery. Do not expose private participants, hidden location details, or sensitive user data to guests.
 5.2 Event detail — reference: event-detail.png
 Goal: Make a user confident enough to request a spot.
 
 Layout:
-- Tall, edge-to-edge venue/event hero image (responsive height and graceful fallback if no photo).
-- Dark lower overlay/gradient for readable title and concise badges; no text over poorly contrasted image regions.
-- Sport/format, event title, approximate location, date, time, duration and spots near the top.
+- Edge-to-edge hero in the sport's court color with its court line drawing, holding the sport/format chip and the event title. No photo is needed.
+- Date, time, duration, approximate location and spots directly below; the roster as filled and open dots where capacity allows.
 - Further details: skill requirements, organizer summary, remaining capacity, attendance expectations, venue/booking information and any disclosed participation costs.
-- Sticky CTA area at bottom with safe-area padding.
+- Sticky CTA area at bottom with safe-area padding. The dock is hidden on this screen and the join screens, so one action stays dominant.
 CTA states:
 - Guest: Giriş yap ve katılım iste.
 - Eligible authenticated user: Katılım isteği gönder.
@@ -115,7 +136,7 @@ Goal: Review the event and submit a request with minimal friction.
 
 Layout:
 - Minimal title: Katılım isteğini onayla.
-- Compact event-summary panel with venue thumbnail, sport/format, date/time, approximate location and any price/cost disclosures.
+- Compact event-summary panel with the time tile, sport/format, date/time, approximate location and any price/cost disclosures.
 - Present essential participation conditions without adding redundant mandatory consent checkboxes each time.
 - Distinguish mandatory platform legal consent (captured at onboarding) from event-specific rules requiring an explicit acknowledgment, if applicable.
 - Sticky full-width CTA: İstek gönder.
@@ -144,19 +165,18 @@ Tabs/filters: Yaklaşan, Başvurularım, Düzenlediklerim, Geçmiş. Distinguish
 5.7 Organizer management
 Emphasize pending requests and remaining capacity. Show candidate's sport-specific level, reliability indicator (when meaningful sample exists), and essential profile info. Actions: approve, reject, remove with safeguards and confirmation for destructive actions. Do not show unnecessary personal data.
 5.8 Profile and onboarding
-Use the same dark surfaces and restrained cards. Showcase identity, selected sports, sport-specific skill, reliability, XP and achievements as distinct metrics. Do not conflate skill and experience. Provide profile privacy choices, 18+ gate and clear consent copy. Avoid gamification clutter.
+Use the same surfaces and restrained cards, in both themes. Showcase identity, selected sports, sport-specific skill, reliability, XP and achievements as distinct metrics. Do not conflate skill and experience. Provide profile privacy choices, 18+ gate and clear consent copy. Avoid gamification clutter.
 5.9 Notifications / settings / empty states
 Use consistent list rows, section dividers, explicit status labels, and obvious empty state actions. Create useful empty states such as Henüz katıldığın etkinlik yok with Etkinlikleri keşfet action.
 6. Responsive web behavior
-- Mobile: single column; sticky bottom tabs and CTAs; platform safe areas.
-- Tablet: wider gutters, potentially two-column list/detail patterns.
-- Desktop: max-width content container, top/side navigation instead of stretched bottom mobile bar; filters in an accessible horizontal toolbar or panel; list/map split view if useful.
-- Avoid giant full-bleed mobile hero images on desktop; constrain image aspect ratio and text widths.
+- Mobile: single column; floating dock and sticky CTAs; platform safe areas. Content keeps enough bottom space that the dock never covers it.
+- Tablet: wider gutters, potentially two-column list/detail patterns; the dock with labels, centered.
+- Desktop: max-width content container (1280px on Discover); the same centered dock with labels, never stretched; filters in an accessible horizontal toolbar or panel; list/map split view if useful.
+- Avoid giant full-bleed mobile heroes on desktop; constrain the court hero and text widths.
 - Support keyboard, hover, focus-visible and accessible dialogs on web.
 7. Photos, icons and content
-- Images should feature authentic sports spaces and situations; prefer supplied or properly licensed content.
-- Use venue thumbnails in lists and larger images in details. Provide dependable gradient/illustrated fallbacks when images are unavailable.
-- Keep image treatments consistent: predictable crop, gentle corner radius, lightweight dark gradient for white text overlays.
+- The court drawings are the imagery: our own line art of each sport's playing area, drawn as SVG in the app. There are no photos in the MVP.
+- If venue photos arrive later, they need their own design decision and properly licensed content.
 - Do not use screenshots or photos from the supplied GoodRec references as production assets.
 - Use a coherent icon set, consistent stroke width; don't mix emoji as primary UI icons with line icons.
 - All microcopy must be natural Turkish, concise and accurate. Use internationalization keys; do not hardcode UX copy into domain logic.
@@ -199,11 +219,9 @@ When requested:
 6. Report changed files, screenshot comparisons, test results and any remaining issues.
 
 11. Recorded decisions and deviations (2026-11-01)
-The founder's decisions after the audit, and where measurement moved a value. The spec above is otherwise unchanged. Older code comments citing "design.md §n" refer to docs/design-v0.2-archive.md.
+The founder's decisions after the audit, and where measurement moved a value. Older code comments citing "design.md §n" refer to docs/design-v0.2-archive.md. The choices of theme and font and the measured table below were replaced by Theme E (§13), and stay in git history; the rest still holds.
 
 Decisions:
-- Light theme stays (it is a setting today); dark is primary, light is derived with its own tokens.
-- Font: Inter, weights 400, 600 and 700. Weights 500 and 650 from §3.2 map to the nearest loaded one. Package @expo-google-fonts/inter, about 340 kB per weight, loaded at runtime on web and native.
 - Discover rows keep a small "paid" label; the amount and note are on the event page.
 - Discover asks for a sport on the first visit, then keeps a sport strip above the list and one sport or all of them selected (founder's decision, 2026-11-02; USER_FLOWS FL-2). The sport left the filter chips and the filter count, and "clear filters" leaves it alone.
 - Term: "yedek liste" (waitlist) everywhere.
@@ -213,15 +231,7 @@ Decisions:
 
 - Declining a request asks for confirmation like removing a player: it is final for that event (§5.7).
 
-Measured deviations from the §3.1 sample tokens (AA, enforced by tokens.test.ts):
-Token	Spec	Used	Why
-action primary	#E13C47	#D73641	White label was 4.25:1; now 4.67:1
-action pressed	#BF2936	#B82633	Stays clearly darker than the new primary
-link / active text	#E13C47	#FF8A8F	Red text was 4.14 on surface and 3.70 on raised; now 7.78 and 6.95
-success	#32996F	#45B58A	Was 4.43 on raised; now 6.16
-control border	#323438	#7A7F87	Inputs need 3:1 (WCAG 1.4.11); #323438 stays for decorative card borders
-
-Primary red and danger are close, so: destructive buttons are outlined, and a negative state always carries an icon or text as well as color.
+Destructive buttons are outlined, and a negative state always carries an icon or text as well as color.
 
 Founder's notes from testing Phase 5 (applied 2026-11-01, on the profile and the event screens):
 - Badges are round icons, not text cards.
@@ -229,7 +239,7 @@ Founder's notes from testing Phase 5 (applied 2026-11-01, on the profile and the
 - Negative states stand out with a warning icon or a red or orange color: an expired window, being marked absent and similar. A neutral state (not marked, under review) is not presented as a penalty.
 
 12. Validation record (2026-11-01)
-Definition of done, §9 rule 7. What was actually run, and what was not.
+Definition of done, §9 rule 7. What was actually run, and what was not. This records version 1.0; Theme E gets its own record at the end of docs/THEME_E_PLAN.md.
 
 Verified on web, Chromium (`e2e/responsive.spec.ts`, every run): discover, sign-in, event, manage, create, My Events, profile, settings and notifications at 320 px dark, 390 px light, 820 px light and 1280 px dark: no sideways scrolling, no serious or critical axe findings. 320 px is also what 200 % browser zoom gives a 640 px window. The join, status, attendance and review screens are covered by `events.spec.ts` at the default size, dark or as the runner chooses, with axe.
 Seen by eye once, at 320, 390, 820 and 1280 px: those screens plus sign-up, reviews and onboarding (not the join and status screens at every size).
@@ -240,4 +250,28 @@ Not verified:
 - VoiceOver and TalkBack by hand; keyboard only through the existing shell tests.
 
 Deviation: no stored screenshot comparison (§9 rule 8 "where practical"). Font rendering differs between machines, so baselines would fail for the wrong reasons; the layout and accessibility checks above run instead.
+
+13. Theme E (2026-11-02)
+The founder chose mockup direction E: https://claude.ai/artifact/RbEqLVCQx1pt7WYCNETM5Q (Discover on desktop and phone; sign-in, event detail, join, My Events and profile on a phone; light and dark). §3, §5.1 to §5.3, §6 and §7 now describe it. Screens the mockup does not draw follow the same system. Reasons and consequences: ADR-0023. Work in steps: docs/THEME_E_PLAN.md.
+
+Founder's decisions:
+- Action color: blue #2F4FD0, replacing red and coral.
+- Fonts: Bricolage Grotesque and Figtree from the start, replacing Inter.
+- Navigation: floating dock on every screen size, replacing the left rail.
+- Default theme: follow the device. Light and dark are equal; dark is no longer primary.
+
+Where the app deliberately differs from the mockup. These hold until the founder changes them:
+Mockup	App	Why
+Participant avatars on event cards	None	List data has no participants, and guests must not see them (§5.1)
+Tiles and a "Bu akşam Ankara'da" list together on Discover	Tiles first, list after a choice	The founder's decision of the same day (§11, FL-2); confirm at the Discover milestone
+Six tiles and a "show all" link on a phone	All ten tiles and an "all sports" link	The link in the app selects every sport (FL-2)
+"Ankara" as a button	Plain text	The pilot has one city, and a control with one choice is a dead end (§9)
+Avatar at the top, no bell	Notification bell, no avatar	Notifications exist and need a way in; Profile is in the dock
+Profile without level, reliability or badges	They stay	Built features, §5.8 and §11
+Dock inside the screen drawing	Also respects safe areas and text scaling	§2 rule 6 and 7
+
+Accessibility additions the mockup needed:
+- A separate focus color inside the dock, since the action blue measures 2.46:1 on it.
+- On a dark page the action blue measures 2.78:1 and court tiles as low as 2.05:1 against their surroundings. WCAG 1.4.11 does not require more, because the label inside identifies each control, and the focus ring is what must stand out. Volleyball on the light page is 1.73:1 for the same reason.
+- Court drawings are decorative for screen readers; the sport name is the label.
 
