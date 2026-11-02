@@ -26,3 +26,4 @@ Format: Context · Decision · Consequences · Status. One decision per file, im
 | [0020](0020-auto-approve-and-participation-rules.md) | Optional auto-approve for organizers; participation rules fixed in M4 (amends PRD §4.3) | Accepted |
 | [0021](0021-get-event-and-invite-links.md) | `get_event` for the event page and invite links as capability URLs (amends DATABASE §9, ADR-0020) | Accepted |
 | [0022](0022-ios-validation-eas-build-github-test.md) | Build the iOS simulator app on EAS, test it on a GitHub macOS runner | Accepted (first stage) |
+| [0023](0023-theme-e-visual-identity.md) | Theme E: court colors, a blue action, a floating dock and new fonts (replaces `design.md` 1.0) | Accepted |

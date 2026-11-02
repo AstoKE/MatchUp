@@ -39,6 +39,8 @@ Not there: `user_blocks`, `reports`, `moderation_actions`, any `admin_*` RPC but
 
 ### M4: admin, in the database
 
+**Waits for Theme E** (`docs/THEME_E_PLAN.md`), by the founder's decision of 2026-11-02.
+
 - `moderation_actions` (append-only), `admin_list_reports`, `admin_get_report`, `admin_resolve_report`, `admin_suspend_user` / `admin_reinstate_user`, `admin_hide_event`, `admin_cancel_event`, `admin_hide_review`, `admin_list_disputes`. All check `is_admin()` and `aal2` (S-14) and write the audit log.
 - **Suspension:** writes refused with `ACCOUNT_RESTRICTED` (S-13), sessions ended, profile and events hidden; verify what a suspended organizer's upcoming events do.
 - **What a hidden review does:** ratings recomputed. **What a revoked badge does with its XP:** see decision 3.

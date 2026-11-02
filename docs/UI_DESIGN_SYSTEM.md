@@ -1,6 +1,6 @@
 # UI Design System
 
-> **Status: PROVISIONAL.** The founder will supply a `design.md`. **When it arrives, `design.md` is the source of truth for visual identity** (colors, type, shape, tone, imagery). This document then becomes the *engineering mapping* of that file (tokens → code, component contract, accessibility rules). Until then, the values below are a coherent default so Phase 1 can build token plumbing without blocking. **Do not build final screens before `design.md` is reconciled** (task M3 in the Phase 1 plan).
+> **`docs/design.md` is the source of truth for visual identity**, now Theme E (ADR-0023). This file holds the engineering contract: token architecture, components, accessibility. Its color values, type scale and navigation below are **older than Theme E**: where they differ, `design.md` wins, and M1 to M3 of `docs/THEME_E_PLAN.md` change the code to match.
 >
 > Precedence if documents disagree: accessibility minimums in §8 > `design.md` > this file's visual defaults.
 
