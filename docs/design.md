@@ -121,7 +121,7 @@ Layout:
 - Edge-to-edge hero in the sport's court color with its court line drawing, holding the sport/format chip and the event title. No photo is needed.
 - Date, time, duration, approximate location and spots directly below; the roster as filled and open dots where capacity allows.
 - Further details: skill requirements, organizer summary, remaining capacity, attendance expectations, venue/booking information and any disclosed participation costs.
-- Sticky CTA area at bottom with safe-area padding. The dock is hidden on this screen and the join screens, so one action stays dominant.
+- Sticky CTA area at bottom with safe-area padding. On a phone the dock is hidden on this screen and the join form, so one action stays dominant; other pinned actions sit above it.
 CTA states:
 - Guest: Giriş yap ve katılım iste.
 - Eligible authenticated user: Katılım isteği gönder.

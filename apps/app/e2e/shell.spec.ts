@@ -64,9 +64,9 @@ test.describe('deep links and errors', () => {
 
 test.describe('responsive navigation', () => {
   const cases = [
-    { name: 'compact (375px): bottom tab bar', width: 375, height: 800, position: 'bottom' },
-    { name: 'medium (800px): left rail', width: 800, height: 800, position: 'left' },
-    { name: 'expanded (1280px): left rail', width: 1280, height: 800, position: 'left' },
+    { name: 'compact (375px): dock with icons', width: 375, height: 800, labels: false },
+    { name: 'medium (800px): dock with labels', width: 800, height: 800, labels: true },
+    { name: 'expanded (1280px): dock with labels', width: 1280, height: 800, labels: true },
   ] as const;
 
   for (const c of cases) {
@@ -76,14 +76,12 @@ test.describe('responsive navigation', () => {
       await expect(page.getByRole('tab', { name: 'Keşfet' })).toBeVisible();
       const box = await nav(page).boundingBox();
       expect(box).not.toBeNull();
-      if (c.position === 'bottom') {
-        expect(box!.y).toBeGreaterThan(c.height / 2);
-        expect(box!.width).toBeGreaterThan(c.width * 0.9);
-      } else {
-        expect(box!.x).toBeLessThan(40);
-        expect(box!.width).toBeLessThan(c.width / 2);
-        expect(box!.height).toBeGreaterThan(c.height / 2);
-      }
+      // Floating at the bottom, centered and never stretched across a wide window.
+      expect(box!.y).toBeGreaterThan(c.height / 2);
+      expect(box!.y + box!.height).toBeLessThan(c.height);
+      expect(Math.abs(box!.x + box!.width / 2 - c.width / 2)).toBeLessThanOrEqual(1);
+      expect(box!.width).toBeLessThanOrEqual(c.labels ? 700 : c.width);
+      await expect(nav(page).getByText('Etkinliklerim')).toHaveCount(c.labels ? 1 : 0);
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
       );

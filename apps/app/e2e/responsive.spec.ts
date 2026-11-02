@@ -1,5 +1,5 @@
 import { AxeBuilder } from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import {
   createOnboardedUser,
   createPublishedEvent,
@@ -42,6 +42,19 @@ async function expectSound(page: Page, where: string) {
   ).toEqual([]);
 }
 
+/** Scrolled to the end, the page's last control is not under the floating dock. */
+async function expectClearOfDock(page: Page, last: Locator) {
+  await last.scrollIntoViewIfNeeded();
+  await page.getByRole('main').evaluate((main) => {
+    for (const el of main.querySelectorAll('*')) el.scrollTop = el.scrollHeight;
+  });
+  const [item, dock] = await Promise.all([
+    last.boundingBox(),
+    page.getByRole('tablist').boundingBox(),
+  ]);
+  expect((item?.y ?? 0) + (item?.height ?? 0)).toBeLessThanOrEqual(dock?.y ?? 0);
+}
+
 for (const [label, width, height, colorScheme] of [
   ['smallest phone, dark', 320, 640, 'dark'],
   ['phone, light', 390, 800, 'light'],
@@ -65,6 +78,7 @@ for (const [label, width, height, colorScheme] of [
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
     await expectSound(page, 'Discover, choosing a sport');
+    await expectClearOfDock(page, page.getByRole('button', { name: 'Tüm sporlar', exact: true }));
     await page.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
     await expect(page.getByRole('radio', { name: 'Tüm sporlar', exact: true })).toBeChecked();
     await expectSound(page, 'Discover');

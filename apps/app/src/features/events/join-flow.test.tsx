@@ -280,8 +280,8 @@ describe('after the request', () => {
     expect(await screen.findByRole('heading', { name: 'İsteğin gönderildi' })).toBeTruthy();
     expect(screen.getByText('Organizatör onayladığında sana bildireceğiz.')).toBeTruthy();
     expect(screen.getByText('Onay bekleniyor')).toBeTruthy();
-    expect(screen.getByTestId('icon-clock-outline', { includeHiddenElements: true })).toBeTruthy();
-    expect(screen.queryByTestId('icon-check-outline', { includeHiddenElements: true })).toBeNull();
+    expect(screen.getByTestId('icon-clock', { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.queryByTestId('icon-check', { includeHiddenElements: true })).toBeNull();
     expect(screen.queryByText(/onaylandı/)).toBeNull();
   });
 
@@ -289,14 +289,14 @@ describe('after the request', () => {
     mockApi.fetchMyParticipation.mockResolvedValue(mine('WAITLISTED'));
     await renderApp(<RequestStatusScreen />, { session: player });
     expect(await screen.findByRole('heading', { name: 'Yedek listeye başvurdun' })).toBeTruthy();
-    expect(screen.queryByTestId('icon-check-outline', { includeHiddenElements: true })).toBeNull();
+    expect(screen.queryByTestId('icon-check', { includeHiddenElements: true })).toBeNull();
   });
 
   it('green only when the server says approved', async () => {
     mockApi.fetchMyParticipation.mockResolvedValue(mine('APPROVED'));
     await renderApp(<RequestStatusScreen />, { session: player });
     expect(await screen.findByRole('heading', { name: 'Katılımın onaylandı' })).toBeTruthy();
-    expect(screen.getByTestId('icon-check-outline', { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.getByTestId('icon-check', { includeHiddenElements: true })).toBeTruthy();
   });
 
   it.each(['REJECTED', 'CANCELED', 'REMOVED'])(

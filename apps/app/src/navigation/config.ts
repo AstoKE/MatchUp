@@ -8,7 +8,6 @@ export interface NavItem {
   /** Route file name inside app/(tabs)/ */
   name: 'index' | 'my-events' | 'create' | 'profile';
   labelKey: 'discover' | 'myEvents' | 'create' | 'profile';
-  /** Outline when idle, filled when focused; the emphasized item is always filled. */
   icon: IconName;
   /** public = guests may open it (D-09); authenticated = needs an account. */
   access: 'public' | 'authenticated';
@@ -32,7 +31,7 @@ export const navItems: readonly NavItem[] = [
   {
     name: 'create',
     labelKey: 'create',
-    icon: 'add-circle',
+    icon: 'plus',
     access: 'authenticated',
     emphasized: true,
   },

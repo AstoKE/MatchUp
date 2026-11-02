@@ -39,6 +39,7 @@ export interface SemanticColors {
   dockActive: string;
   onDockActive: string;
   dockFocusRing: string;
+  shadow: string;
 }
 
 export const lightColors: SemanticColors = {
@@ -76,6 +77,7 @@ export const lightColors: SemanticColors = {
   dockActive: p.paper50,
   onDockActive: p.ink950,
   dockFocusRing: p.blue200,
+  shadow: 'rgba(17, 35, 29, 0.35)',
 };
 
 export const darkColors: SemanticColors = {
@@ -114,6 +116,7 @@ export const darkColors: SemanticColors = {
   dockActive: p.paper50,
   onDockActive: p.ink950,
   dockFocusRing: p.blue200,
+  shadow: 'rgba(0, 0, 0, 0.55)',
 };
 
 /** One per catalog sport, the same in both themes; `on` is the label and line drawing on it. */

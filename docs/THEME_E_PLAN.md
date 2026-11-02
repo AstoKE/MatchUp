@@ -1,6 +1,6 @@
 # Theme E plan
 
-**Status 2026-11-02: M0 and M1 merged, M2 (shared components) built.** Layouts are still the old ones; `SportArtwork` now draws the court, so the event hero and rows already show it. Phase 6 M4 starts after M6.
+**Status 2026-11-02: M0 to M2 merged, M3 (dock) built.** Layouts are still the old ones; `SportArtwork` now draws the court, so the event hero and rows already show it. Phase 6 M4 starts after M6.
 
 What and why: `docs/design.md` §3 and §13, ADR-0023. Mockup: https://claude.ai/artifact/RbEqLVCQx1pt7WYCNETM5Q.
 
@@ -29,7 +29,7 @@ Each milestone is one branch and one PR, and the next one starts after the merge
 ### M3: dock
 
 - `Dock` through the `tabBar` option, replacing the tab bar and the left rail: icons on a phone, icons and labels on wider screens, the blue create button, `dockFocusRing`.
-- Hidden on the event page and the join screens. Bottom space on every screen so nothing is covered.
+- Hidden on a phone on the event page and the join form; wider screens keep it, since nothing else navigates there. Other pinned actions sit above the dock. Bottom space on every screen so nothing is covered.
 - Accessible names, `tab` roles, focus order and safe-area behavior stay.
 - **Tests:** the shell E2E (keyboard, tabs), a check at four sizes that the last item of a scrolled page is not under the dock, 200 % zoom with labels.
 

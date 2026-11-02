@@ -81,8 +81,8 @@ describe('NotificationsScreen', () => {
     await renderApp(<NotificationsScreen />, { session: signedIn });
     expect(await screen.findByText(/isteğin onaylandı/)).toBeTruthy();
     expect(screen.getByText(/kabul edilmedi/)).toBeTruthy();
-    expect(screen.getByTestId('icon-check-outline', { includeHiddenElements: true })).toBeTruthy();
-    expect(screen.getByTestId('icon-alert-outline', { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.getByTestId('icon-check', { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.getByTestId('icon-alert', { includeHiddenElements: true })).toBeTruthy();
   });
 
   it('lists what happened in plain words, newest first, with the event title', async () => {
