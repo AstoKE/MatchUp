@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme';
+import { useDockSpace } from './Dock';
 
 export interface ScreenProps {
   children: ReactNode;
@@ -35,6 +36,7 @@ export function Screen({
 }: ScreenProps) {
   const { colors, spacing, breakpoint } = useTheme();
   const insets = useSafeAreaInsets();
+  const dockSpace = useDockSpace();
   const gutter =
     breakpoint === 'expanded' ? spacing[8] : breakpoint === 'medium' ? spacing[6] : spacing[4];
 
@@ -47,7 +49,7 @@ export function Screen({
           alignSelf: 'center',
           paddingHorizontal: gutter,
           paddingTop: spacing[4],
-          paddingBottom: spacing[8],
+          paddingBottom: spacing[8] + (footer ? 0 : dockSpace),
           gap: spacing[4],
         },
         contentStyle,
@@ -95,7 +97,8 @@ export function Screen({
               borderTopColor: colors.borderSubtle,
               backgroundColor: colors.surfaceRaised,
               paddingHorizontal: gutter,
-              paddingVertical: spacing[3],
+              paddingTop: spacing[3],
+              paddingBottom: spacing[3] + Math.max(dockSpace, insets.bottom),
               alignItems: 'center',
             }}
           >

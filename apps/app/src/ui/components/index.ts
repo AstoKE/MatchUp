@@ -3,6 +3,7 @@ export * from './Banner';
 export * from './Button';
 export * from './Checkbox';
 export * from './CourtTile';
+export * from './Dock';
 export * from './EmptyState';
 export * from './Screen';
 export * from './SegmentedChoice';

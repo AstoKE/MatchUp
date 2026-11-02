@@ -1,110 +1,76 @@
-import { Tabs } from 'expo-router';
+import { Tabs, usePathname } from 'expo-router';
 import { Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { navItems } from '@/navigation/config';
 import { tabAccessibilityLabel } from '@/navigation/tab-label';
-import { Icon, useTheme } from '@/ui';
-
-/** Fixed-width rail (React Navigation otherwise sizes the left bar to its container). */
-const railSize = (width: number) => ({
-  width,
-  minWidth: width,
-  maxWidth: width,
-  flexGrow: 0,
-  flexShrink: 0,
-  flexBasis: width,
-});
+import { Dock, DockSpaceProvider, useTheme, useVisibleDockSpace } from '@/ui';
 
 /**
- * Primary navigation. Compact screens: bottom tab bar. Medium/expanded: a left rail (UI_DESIGN_SYSTEM §6).
+ * Primary navigation: the floating dock on every screen size. On a phone it steps aside on the event page and
+ * the join form, whose pinned action is the one thing to do there (docs/design.md §5.2).
  * Items come from navigation/config.ts (data-driven; Community can be added later).
  */
 export default function TabsLayout() {
   const { t } = useTranslation('nav');
-  const { colors, breakpoint, spacing, typography } = useTheme();
-  // Android edge-to-edge: the explicit bar height below must include the system gesture/nav bar inset,
-  // or the labels collide with it (found on the emulator, docs/native-validation/).
-  const insets = useSafeAreaInsets();
-  const wide = breakpoint !== 'compact';
+  const { breakpoint } = useTheme();
+  const pathname = usePathname();
+  const space = useVisibleDockSpace();
+  const hidden = breakpoint === 'compact' && /^\/e\/[^/]+(\/join)?$/.test(pathname);
 
   return (
-    <Tabs
-      // Opening an event from a tab and going back returns to where the user came from.
-      backBehavior="history"
-      screenOptions={{
-        headerShown: false,
-        tabBarPosition: wide ? 'left' : 'bottom',
-        tabBarActiveTintColor: colors.link,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarLabelPosition: wide ? 'beside-icon' : undefined,
-        tabBarStyle: {
-          backgroundColor: colors.bgApp,
-          borderColor: colors.borderSubtle,
-          ...(breakpoint === 'compact'
-            ? {
-                height: 68 + insets.bottom,
-                paddingTop: spacing[1],
-                paddingBottom: spacing[2] + insets.bottom,
-              }
-            : { ...railSize(breakpoint === 'medium' ? 184 : 248), paddingTop: spacing[4] }),
-        },
-        tabBarLabelStyle: typography.micro,
-        tabBarActiveBackgroundColor: colors.surfaceSunken,
-        tabBarInactiveBackgroundColor: 'transparent',
-      }}
-    >
-      {navItems.map((item, position) => (
-        <Tabs.Screen
-          key={item.name}
-          name={item.name}
-          options={{
-            title: t(item.labelKey),
-            tabBarAccessibilityLabel: tabAccessibilityLabel(
-              t,
-              t(item.labelKey),
-              position + 1,
-              navItems.length,
-              Platform.OS,
-            ),
-            tabBarIcon: ({ color, size, focused }) => (
-              <Icon
-                name={item.icon}
-                variant={focused || item.emphasized ? 'filled' : 'outline'}
-                size={item.emphasized ? size + 6 : size}
-                color={
-                  item.emphasized
-                    ? colors.link
-                    : typeof color === 'string'
-                      ? color
-                      : colors.textSecondary
-                }
-              />
-            ),
-          }}
-        />
-      ))}
-      {/* Event routes (/e/<id>, edit, cancel) and the inbox live in this group so the navigation stays visible, but
-          they are not destinations of their own: no bar/rail button, and `display: none` so they take no width (they squeezed the four real tabs into the left half and truncated the labels). `href: null` is not an option,
-          it marks the tab hidden and navigating to a hidden tab redirects away (expo-router 58). */}
-      {(
-        [
-          'e/[id]/index',
-          'e/[id]/edit',
-          'e/[id]/cancel',
-          'e/[id]/join',
-          'e/[id]/manage',
-          'e/[id]/requested',
-          'u/[id]',
-          'notifications',
-        ] as const
-      ).map((name) => (
-        <Tabs.Screen
-          key={name}
-          name={name}
-          options={{ tabBarButton: () => null, tabBarItemStyle: { display: 'none' } }}
-        />
-      ))}
-    </Tabs>
+    <DockSpaceProvider value={hidden ? 0 : space}>
+      <Tabs
+        // Opening an event from a tab and going back returns to where the user came from.
+        backBehavior="history"
+        screenOptions={{ headerShown: false }}
+        tabBar={({ state, navigateToTab }) => {
+          if (hidden) return null;
+          const current = state.routes[state.index]?.name;
+          return (
+            <Dock
+              items={navItems.map((item, position) => ({
+                key: item.name,
+                label: t(item.labelKey),
+                accessibilityLabel: tabAccessibilityLabel(
+                  t,
+                  t(item.labelKey),
+                  position + 1,
+                  navItems.length,
+                  Platform.OS,
+                ),
+                icon: item.icon,
+                emphasized: item.emphasized,
+                selected: current === item.name,
+                onPress: () => {
+                  const route = state.routes.find((r) => r.name === item.name);
+                  if (route && current !== item.name) navigateToTab(route.key);
+                },
+              }))}
+            />
+          );
+        }}
+      >
+        {navItems.map((item) => (
+          <Tabs.Screen key={item.name} name={item.name} options={{ title: t(item.labelKey) }} />
+        ))}
+        {/* Event routes and the inbox live in this group so the dock stays visible; they are not destinations of
+            their own. The dock only draws navItems. `href: null` is not an option: navigating to a hidden tab
+            redirects away (expo-router 58). */}
+        {(
+          [
+            'e/[id]/index',
+            'e/[id]/edit',
+            'e/[id]/cancel',
+            'e/[id]/join',
+            'e/[id]/manage',
+            'e/[id]/requested',
+            'u/[id]',
+            'notifications',
+          ] as const
+        ).map((name) => (
+          <Tabs.Screen key={name} name={name} />
+        ))}
+      </Tabs>
+    </DockSpaceProvider>
   );
 }

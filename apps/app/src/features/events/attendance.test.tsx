@@ -116,12 +116,12 @@ describe('a player', () => {
     mockApi.fetchEventAttendance.mockResolvedValue(own('ABSENT'));
     const first = await renderApp(<AttendancePanel eventId={EVENT} isOrganizer={false} />);
     expect(await screen.findByText('Gelmedin olarak işaretlendin.')).toBeTruthy();
-    expect(screen.getByTestId('icon-alert-outline', { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.getByTestId('icon-alert', { includeHiddenElements: true })).toBeTruthy();
     await first.unmount();
     mockApi.fetchEventAttendance.mockResolvedValue(own('NOT_CONFIRMED'));
     await renderApp(<AttendancePanel eventId={EVENT} isOrganizer={false} />);
     expect(await screen.findByText(/Organizatör seni işaretlemedi/)).toBeTruthy();
-    expect(screen.queryByTestId('icon-alert-outline', { includeHiddenElements: true })).toBeNull();
+    expect(screen.queryByTestId('icon-alert', { includeHiddenElements: true })).toBeNull();
   });
 
   it('cannot dispute a present mark', async () => {

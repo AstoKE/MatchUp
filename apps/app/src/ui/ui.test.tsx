@@ -6,6 +6,7 @@ import { initI18n } from '@/lib/i18n';
 import {
   Banner,
   Button,
+  Dock,
   CourtDrawing,
   CourtTile,
   EmptyState,
@@ -163,28 +164,50 @@ describe('Text, Banner, EmptyState, Skeleton, Screen', () => {
   });
 });
 
-describe('Icon', () => {
-  const names: IconName[] = ['compass', 'calendar', 'add-circle', 'person'];
+describe('Dock', () => {
+  const items = (onPress: () => void) => [
+    {
+      key: 'a',
+      label: 'Keşfet',
+      accessibilityLabel: 'Keşfet',
+      icon: 'compass' as const,
+      selected: true,
+      onPress,
+    },
+    {
+      key: 'b',
+      label: 'Oluştur',
+      accessibilityLabel: 'Oluştur',
+      icon: 'plus' as const,
+      emphasized: true,
+      selected: false,
+      onPress,
+    },
+  ];
 
-  it.each(names)('%s renders both variants at the requested size', async (name) => {
-    await renderThemed(
-      <>
-        <Icon name={name} color="#000" />
-        <Icon name={name} color="#000" variant="filled" size={30} />
-      </>,
+  it('names every destination, marks the current one and reacts to a press', async () => {
+    const onPress = jest.fn();
+    await renderThemed(<Dock items={items(onPress)} />);
+    expect(screen.getByRole('tab', { name: 'Keşfet', selected: true })).toBeTruthy();
+    await fireEvent.press(screen.getByRole('tab', { name: 'Oluştur', selected: false }));
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Icon', () => {
+  const names: IconName[] = ['compass', 'calendar', 'plus', 'person'];
+
+  it.each(names)('%s renders at the requested size', async (name) => {
+    await renderThemed(<Icon name={name} color="#000" size={30} />);
+    expect(screen.getByTestId(`icon-${name}`, { includeHiddenElements: true }).props.style).toEqual(
+      { width: 30, height: 30 },
     );
-    expect(
-      screen.getByTestId(`icon-${name}-outline`, { includeHiddenElements: true }).props.style,
-    ).toEqual({ width: 24, height: 24 });
-    expect(
-      screen.getByTestId(`icon-${name}-filled`, { includeHiddenElements: true }).props.style,
-    ).toEqual({ width: 30, height: 30 });
   });
 
   it('is hidden from assistive technology on native and web', async () => {
     await renderThemed(<Icon name="compass" color="#000" />);
-    expect(screen.queryByTestId('icon-compass-outline')).toBeNull();
-    const icon = screen.getByTestId('icon-compass-outline', { includeHiddenElements: true });
+    expect(screen.queryByTestId('icon-compass')).toBeNull();
+    const icon = screen.getByTestId('icon-compass', { includeHiddenElements: true });
     expect(icon.props.accessibilityElementsHidden).toBe(true);
     expect(icon.props.importantForAccessibility).toBe('no-hide-descendants');
     expect(icon.props['aria-hidden']).toBe(true);

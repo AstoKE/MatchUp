@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../theme';
 import { Button } from './Button';
@@ -81,10 +82,12 @@ function ToastViewport({
 }) {
   const { colors, spacing, radius } = useTheme();
   const { t } = useTranslation('common');
+  // Above the dock, which the toast host cannot see from here: the same height on every screen.
+  const bottom = spacing[18] + spacing[6] + useSafeAreaInsets().bottom;
   return (
     <View
       pointerEvents="box-none"
-      style={{ position: 'absolute', left: 0, right: 0, bottom: spacing[6], alignItems: 'center' }}
+      style={{ position: 'absolute', left: 0, right: 0, bottom, alignItems: 'center' }}
     >
       {items.map((item) => (
         <View
