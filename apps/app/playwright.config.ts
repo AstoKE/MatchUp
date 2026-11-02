@@ -22,6 +22,11 @@ const publicEnv = {
   EXPO_PUBLIC_WEB_URL: `http://localhost:${PORT}`,
 };
 
+// `.env.local` can point at the hosted project (`pnpm env:hosted`), and the app under test would then sign up and sign in there.
+if (!['127.0.0.1', 'localhost'].includes(new URL(publicEnv.EXPO_PUBLIC_SUPABASE_URL).hostname)) {
+  throw new Error('E2E runs only against the local stack: run `pnpm env:local` first.');
+}
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,

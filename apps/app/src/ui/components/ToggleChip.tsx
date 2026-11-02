@@ -4,13 +4,14 @@ import { TOUCH_TARGET } from '../tokens';
 import { useTheme } from '../theme';
 import { Text } from './Text';
 
-/** A pill that can be switched on and off (multi-select such as sports or positions). */
+/** A pill that can be switched on and off (multi-select such as sports or positions), or one of a `radio` group. */
 export function ToggleChip({
   label,
   selected,
   onPress,
   disabled = false,
   icon,
+  radio = false,
 }: {
   label: string;
   selected: boolean;
@@ -18,12 +19,13 @@ export function ToggleChip({
   disabled?: boolean;
   /** Decorative leading glyph, drawn in the chip's own text colour; the label stays the accessible name. */
   icon?: (color: string) => ReactNode;
+  radio?: boolean;
 }) {
   const { colors, radius, spacing } = useTheme();
   const [focused, setFocused] = useState(false);
   return (
     <Pressable
-      accessibilityRole="checkbox"
+      accessibilityRole={radio ? 'radio' : 'checkbox'}
       accessibilityLabel={label}
       aria-checked={selected}
       aria-disabled={disabled}

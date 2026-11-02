@@ -396,7 +396,7 @@ if (!ONLY.length || ONLY.some((id) => /^N(1[7-9]|2[0-2])/.test(id))) {
 
     const discovered = await flow(
       'N17',
-      'Discover on the device: opens on the profile sports, filters behind a button, join action on the first screen',
+      'Discover on the device: chooses a sport, filters behind a button, join action on the first screen',
       '17-discover-phase3.yaml',
       { TITLE: title },
     );

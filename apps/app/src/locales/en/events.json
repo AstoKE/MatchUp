@@ -194,12 +194,16 @@
       "TODAY": "Today",
       "TOMORROW": "Tomorrow"
     },
-    "fromProfile": "Showing the sports on your profile. Change or clear the filters to see more.",
     "filtersWithCount": "Filters ({{count}})",
     "setting": "Indoor or outdoor",
     "settingAny": "Any",
     "filtersDone": "Show results",
-    "filtersClose": "Close filters"
+    "filtersClose": "Close filters",
+    "pickerTitle": "Which sport are you looking for?",
+    "pickerHint": "You can change this any time from above the list.",
+    "allSports": "All sports",
+    "noSportTitle": "No {{sport}} events yet",
+    "noSportBody": "Try another sport or see all of them."
   },
   "join": {
     "signInToJoin": "Sign in to request a spot",

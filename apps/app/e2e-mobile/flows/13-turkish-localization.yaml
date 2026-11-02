@@ -7,6 +7,11 @@ appId: com.example.matchup.dev
 - assertVisible: 'Etkinliklerim'
 - assertVisible: 'Oluştur'
 - assertVisible: 'Profil'
+- runFlow:
+    when:
+      visible: 'Hangi sporda.*'
+    commands:
+      - tapOn: 'Tüm sporlar'
 - assertVisible: 'Filtreler'
 - assertVisible: 'Ankara'
 - tapOn: 'Etkinliklerim'

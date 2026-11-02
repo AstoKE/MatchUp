@@ -7,7 +7,7 @@ import {
   type DiscoverFilters as Filters,
 } from '@matchup/domain';
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, useCatalog } from '@/features/catalog';
@@ -17,14 +17,16 @@ import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { Button, EmptyState, Screen, Skeleton, Text, useTheme } from '@/ui';
 import { DiscoverFilters } from '../components/DiscoverFilters';
+import { SportPicker, SportStrip } from '../components/DiscoverSports';
 import { EventListRow } from '../components/EventListRow';
+import { ALL_SPORTS, readDiscoverSport, storeDiscoverSport } from '../discover-sport-preference';
 import { formatDayHeading } from '../format';
 import { useEventSearch } from '../hooks';
 
 /**
  * Discover (FL-2), open to guests (D-09): published public events from `search_events`, soonest first.
- * Phase 3 / M3: list, filters and paging. Join requests arrive with participation (M4); distance sort and
- * the map with Phase 4.
+ * The first visit asks which sport; after that one sport, or all of them, is remembered on the device and changed
+ * from the strip above the list. Distance sort and the map arrive with Phase 4.
  */
 export function DiscoverScreen() {
   const { t } = useTranslation(['events', 'common', 'nav']);
@@ -32,33 +34,53 @@ export function DiscoverScreen() {
   const router = useRouter();
   const catalog = useCatalog();
   const profile = useMyProfile();
-  // Signed-in players open Discover on their own sports (USER_FLOWS FL-2); `chosen` is set the moment they
-  // touch a filter or clear them, and from then on it wins. Guests and people without sports see everything.
-  const [chosen, setChosen] = useState<Filters | null>(null);
-  const profileSports = useMemo(
-    () => profile.data?.sports.map((s) => s.sportId) ?? [],
-    [profile.data],
-  );
-  const filters = useMemo<Filters>(
-    () => chosen ?? { ...EMPTY_DISCOVER_FILTERS, sportIds: profileSports },
-    [chosen, profileSports],
-  );
-  const fromProfile = chosen === null && profileSports.length > 0;
-  // The first search waits for the profile, so a signed-in player never sees an unfiltered flash.
-  const ready = !profile.isPending || profile.fetchStatus === 'idle';
+  const [filters, setFilters] = useState<Filters>(EMPTY_DISCOVER_FILTERS);
+  // undefined while the device is being read; null when nothing is chosen yet.
+  const [stored, setStored] = useState<string | null | undefined>(undefined);
+  useEffect(() => {
+    let current = true;
+    void readDiscoverSport().then((value) => {
+      if (current) setStored(value);
+    });
+    return () => {
+      current = false;
+    };
+  }, []);
+  const choose = (next: string) => {
+    setStored(next);
+    void storeDiscoverSport(next);
+  };
+  // A remembered sport the catalog no longer has counts as no choice.
+  const choice =
+    stored === ALL_SPORTS || catalog.data?.sports.some((sport) => sport.id === stored)
+      ? (stored as string)
+      : null;
+  // The player's own sports come first; the order waits for the profile, so nothing moves under a finger.
+  const sports = useMemo(() => {
+    const all = catalog.data?.sports ?? [];
+    const own = new Set(profile.data?.sports.map((s) => s.sportId));
+    return [...all.filter((s) => own.has(s.id)), ...all.filter((s) => !own.has(s.id))];
+  }, [catalog.data, profile.data]);
+  const ready =
+    stored !== undefined &&
+    catalog.data !== undefined &&
+    (!profile.isPending || profile.fetchStatus === 'idle');
   // Read the clock once per visit (render must stay pure); "today" is resolved server-side bounds only.
   const [openedAt] = useState(Date.now);
   // The pilot has one city; with several, a city picker would choose it here.
   const city = catalog.data?.cities[0];
   const payload = useMemo(
     () =>
-      buildSearchPayload(filters, {
-        now: new Date(openedAt),
-        timeZone: city?.timeZone ?? 'Europe/Istanbul',
-      }),
-    [filters, openedAt, city?.timeZone],
+      buildSearchPayload(
+        { ...filters, sportIds: choice === null || choice === ALL_SPORTS ? [] : [choice] },
+        {
+          now: new Date(openedAt),
+          timeZone: city?.timeZone ?? 'Europe/Istanbul',
+        },
+      ),
+    [filters, choice, openedAt, city?.timeZone],
   );
-  const search = useEventSearch(payload, ready);
+  const search = useEventSearch(payload, ready && choice !== null);
   const items = useMemo(
     () => search.data?.pages.flatMap((page) => page.items) ?? [],
     [search.data],
@@ -67,6 +89,7 @@ export function DiscoverScreen() {
   const timeZone = city?.timeZone ?? 'Europe/Istanbul';
   const groups = useMemo(() => groupByLocalDay(items, timeZone), [items, timeZone]);
   const locale = currentLocale();
+  const chosenSport = catalog.data?.sports.find((sport) => sport.id === choice);
 
   return (
     <Screen maxWidth={720}>
@@ -80,19 +103,11 @@ export function DiscoverScreen() {
         <NotificationBell />
       </View>
 
-      {catalog.data ? (
-        <DiscoverFilters
-          filters={filters}
-          onChange={setChosen}
-          sports={catalog.data.sports}
-          city={city}
-        />
-      ) : null}
-
-      {fromProfile ? (
-        <Text variant="caption" tone="secondary">
-          {t('events:discover.fromProfile')}
-        </Text>
+      {ready && choice !== null ? (
+        <>
+          <SportStrip sports={sports} choice={choice} onChoose={choose} />
+          <DiscoverFilters filters={filters} onChange={setFilters} city={city} />
+        </>
       ) : null}
 
       {catalog.isError || search.isError ? (
@@ -105,6 +120,8 @@ export function DiscoverScreen() {
             if (search.isError) void search.refetch();
           }}
         />
+      ) : ready && choice === null ? (
+        <SportPicker sports={sports} onChoose={choose} />
       ) : search.isPending || !catalog.data || !ready ? (
         <View
           accessible
@@ -122,7 +139,16 @@ export function DiscoverScreen() {
             title={t('events:discover.noMatchTitle')}
             body={t('events:discover.noMatchBody')}
             actionLabel={t('events:discover.clear')}
-            onAction={() => setChosen(EMPTY_DISCOVER_FILTERS)}
+            onAction={() => setFilters(EMPTY_DISCOVER_FILTERS)}
+          />
+        ) : chosenSport ? (
+          <EmptyState
+            title={t('events:discover.noSportTitle', {
+              sport: localizedName(chosenSport.names, locale),
+            })}
+            body={t('events:discover.noSportBody')}
+            actionLabel={t('events:discover.allSports')}
+            onAction={() => choose(ALL_SPORTS)}
           />
         ) : (
           <EmptyState

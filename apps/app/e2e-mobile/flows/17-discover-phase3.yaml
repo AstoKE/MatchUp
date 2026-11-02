@@ -1,10 +1,14 @@
 appId: com.example.matchup.dev
 # 17 Discover on the device (Phase 3) — requires -e TITLE (a published football event). Signed-in player whose
-# profile sports are football and tennis: opens on those sports, says so, the filters sit behind a button, and the
+# profile sports are football and tennis: answers the sport question if it comes, the filters sit behind a button, and the
 # event page has its join action on the first screen.
 ---
 - launchApp
-- assertVisible: 'Showing the sports on your profile.*'
+- runFlow:
+    when:
+      visible: 'Which sport.*'
+    commands:
+      - tapOn: 'All sports'
 - assertVisible: ${TITLE}
 - takeScreenshot: 17-discover-list
 - assertVisible: 'Football'

@@ -194,12 +194,16 @@
       "TODAY": "Bugün",
       "TOMORROW": "Yarın"
     },
-    "fromProfile": "Profilindeki sporlar gösteriliyor. Daha fazlası için filtreleri değiştir ya da temizle.",
     "filtersWithCount": "Filtreler ({{count}})",
     "setting": "Mekan türü",
     "settingAny": "Fark etmez",
     "filtersDone": "Sonuçları göster",
-    "filtersClose": "Filtreleri kapat"
+    "filtersClose": "Filtreleri kapat",
+    "pickerTitle": "Hangi sporda etkinlik arıyorsun?",
+    "pickerHint": "Seçimini sonra listenin üstünden istediğin zaman değiştirebilirsin.",
+    "allSports": "Tüm sporlar",
+    "noSportTitle": "{{sport}} için henüz etkinlik yok",
+    "noSportBody": "Başka bir spora bak ya da tüm sporları gör."
   },
   "join": {
     "signInToJoin": "Giriş yap ve katılım iste",
