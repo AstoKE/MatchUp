@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, type Catalog } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
-import { Text, TimeTile, TOUCH_TARGET, useTheme } from '@/ui';
+import { StatusChip, Text, TimeTile, TOUCH_TARGET, useTheme, type StatusChipKind } from '@/ui';
 import type { EventListItem } from '../api/search-api';
 import { formatEventStart, formatEventTime } from '../format';
 import { Pill } from './SlotMeter';
@@ -12,6 +12,8 @@ import { Pill } from './SlotMeter';
 export interface CardBadge {
   label: string;
   tone: 'neutral' | 'success' | 'warning' | 'danger';
+  /** Where the person stands: a chip with an icon, instead of a plain label. */
+  chip?: StatusChipKind;
 }
 
 /**
@@ -132,7 +134,9 @@ export function EventListRow({
           }}
         >
           {allBadges.map((badge) =>
-            badge.tone === 'neutral' ? (
+            badge.chip ? (
+              <StatusChip key={badge.label} kind={badge.chip} label={badge.label} />
+            ) : badge.tone === 'neutral' ? (
               <Text key={badge.label} variant="micro">
                 {badge.label}
               </Text>

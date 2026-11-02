@@ -25,12 +25,12 @@ export function Avatar({ name, size = 64 }: { name: string; size?: number }) {
         borderRadius: radius.pill,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.surfaceOverlay,
-        borderWidth: 1,
-        borderColor: colors.borderSubtle,
+        backgroundColor: colors.selected,
       }}
     >
-      <Text variant="title">{initials}</Text>
+      <Text variant="title" style={{ color: colors.onSelected }}>
+        {initials}
+      </Text>
     </View>
   );
 }

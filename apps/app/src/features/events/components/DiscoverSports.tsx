@@ -39,7 +39,6 @@ export function SportPicker({
         variant="tertiary"
         label={t('discover.allSports')}
         onPress={() => onChoose(ALL_SPORTS)}
-        style={{ paddingHorizontal: 0 }}
       />
     </View>
   );

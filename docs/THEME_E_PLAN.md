@@ -1,6 +1,6 @@
 # Theme E plan
 
-**Status 2026-11-02: M0 to M4 merged, M5a (event page and join) built.** The other screens keep their old layouts. Phase 6 M4 starts after M6.
+**Status 2026-11-02: M0 to M4 and M5a merged, M5b (My Events, profile, sign-in) built.** The other screens keep their old layouts. Phase 6 M4 starts after M6.
 
 What and why: `docs/design.md` §3 and §13, ADR-0023. Mockup: https://claude.ai/artifact/RbEqLVCQx1pt7WYCNETM5Q.
 
@@ -41,7 +41,9 @@ The sport strip, time-tile rows, the display heading, the wide layout of the til
 
 **M5a:** event hero, facts and dots, organizer line, join summary. `SportArtwork` is gone.
 
-**Then:** My Events with `StatusChip`, profile (keeping level, reliability and badges), auth, onboarding, create, manage, player card, notifications, settings. Check ₺ wherever a cost is shown.
+**M5b:** My Events with `StatusChip`, profile (keeping level, reliability and badges), the court band on sign-in. The ₺ sign falls back to the system font and reads well (seen on the event page, light theme).
+
+Create, manage, onboarding, player card, notifications and settings get no layout of their own: they carry the tokens and shapes from M1 and M2, and the mockup does not draw them. M6 looks at each one by eye.
 
 ### M6: validation
 

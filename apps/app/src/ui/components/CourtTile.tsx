@@ -80,6 +80,7 @@ export function TimeTile({
   return (
     <View
       style={{
+        alignSelf: 'center',
         minWidth: size,
         minHeight: size,
         paddingHorizontal: spacing[1],
