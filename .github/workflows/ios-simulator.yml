@@ -80,7 +80,7 @@ jobs:
       - name: Simulator log of the app
         if: always()
         run: xcrun simctl spawn "$UDID" log show --last 15m --style compact > ios-results/simulator.log || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: ios-results
