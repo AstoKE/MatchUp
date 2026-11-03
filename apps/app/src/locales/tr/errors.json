@@ -24,5 +24,6 @@
   "WINDOW_CLOSED": "Değerlendirme süresi doldu.",
   "NETWORK": "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.",
   "TIMEOUT": "İşlem zaman aşımına uğradı. Lütfen tekrar dene.",
-  "UNKNOWN": "Bir şeyler ters gitti. Lütfen tekrar dene."
+  "UNKNOWN": "Bir şeyler ters gitti. Lütfen tekrar dene.",
+  "MFA_REQUIRED": "Bu işlem için ikinci doğrulaman gerekiyor."
 }

@@ -449,6 +449,43 @@ export type Database = {
           },
         ];
       };
+      moderation_actions: {
+        Row: {
+          action: string;
+          actor_id: string;
+          created_at: string;
+          id: number;
+          note: string | null;
+          outcome: string | null;
+          report_id: string | null;
+          target_id: string;
+          target_type: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          action: string;
+          actor_id: string;
+          created_at?: string;
+          id?: never;
+          note?: string | null;
+          outcome?: string | null;
+          report_id?: string | null;
+          target_id: string;
+          target_type: string;
+        };
+        Update: {
+          action?: string;
+          actor_id?: string;
+          created_at?: string;
+          id?: never;
+          note?: string | null;
+          outcome?: string | null;
+          report_id?: string | null;
+          target_id?: string;
+          target_type?: string;
+        };
+        Relationships: [];
+      };
       notifications: {
         Row: {
           created_at: string;
@@ -1277,6 +1314,19 @@ export type Database = {
         Args: { p_privacy_version: string; p_terms_version: string };
         Returns: undefined;
       };
+      admin_cancel_event: { Args: { p_event_id: string; p_note: string }; Returns: undefined };
+      admin_get_report: { Args: { p_report_id: string }; Returns: Json };
+      admin_get_user: { Args: { p_user_id: string }; Returns: Json };
+      admin_hide_review: { Args: { p_note: string; p_review_id: string }; Returns: undefined };
+      admin_list_actions: { Args: { p_cursor?: Json; p_limit?: number }; Returns: Json };
+      admin_list_disputes: { Args: Record<PropertyKey, never>; Returns: Json };
+      admin_list_flags: { Args: Record<PropertyKey, never>; Returns: Json };
+      admin_list_reports: {
+        Args: { p_cursor?: Json; p_limit?: number; p_status?: string };
+        Returns: Json;
+      };
+      admin_list_reviews: { Args: { p_reviewee?: string; p_reviewer?: string }; Returns: Json };
+      admin_reinstate_user: { Args: { p_note: string; p_user_id: string }; Returns: undefined };
       admin_resolve_attendance_dispute: {
         Args: {
           p_participation_id: string;
@@ -1284,6 +1334,13 @@ export type Database = {
         };
         Returns: undefined;
       };
+      admin_resolve_report: {
+        Args: { p_note?: string; p_outcome: string; p_report_id: string };
+        Returns: number;
+      };
+      admin_restore_review: { Args: { p_note: string; p_review_id: string }; Returns: undefined };
+      admin_search_users: { Args: { p_query: string }; Returns: Json };
+      admin_suspend_user: { Args: { p_note: string; p_user_id: string }; Returns: undefined };
       approve_participation: { Args: { p_participation_id: string }; Returns: undefined };
       block_user: { Args: { p_user_id: string }; Returns: undefined };
       cancel_account_deletion: { Args: Record<PropertyKey, never>; Returns: undefined };
@@ -1407,7 +1464,12 @@ export type Database = {
       booking_status: 'NOT_REQUIRED' | 'NOT_YET_BOOKED' | 'BOOKED_EXTERNALLY' | 'TO_BE_CONFIRMED';
       consent_kind: 'TERMS' | 'PRIVACY_NOTICE' | 'MARKETING';
       event_cancel_reason:
-        'WEATHER' | 'VENUE_UNAVAILABLE' | 'NOT_ENOUGH_PLAYERS' | 'ORGANIZER_UNAVAILABLE' | 'OTHER';
+        | 'WEATHER'
+        | 'VENUE_UNAVAILABLE'
+        | 'NOT_ENOUGH_PLAYERS'
+        | 'ORGANIZER_UNAVAILABLE'
+        | 'OTHER'
+        | 'MODERATION';
       event_setting: 'INDOOR' | 'OUTDOOR';
       event_status: 'DRAFT' | 'PUBLISHED' | 'CANCELED' | 'COMPLETED';
       event_type: 'COMMUNITY' | 'PARTNER';
@@ -1537,6 +1599,7 @@ export const Constants = {
         'NOT_ENOUGH_PLAYERS',
         'ORGANIZER_UNAVAILABLE',
         'OTHER',
+        'MODERATION',
       ],
       event_setting: ['INDOOR', 'OUTDOOR'],
       event_status: ['DRAFT', 'PUBLISHED', 'CANCELED', 'COMPLETED'],

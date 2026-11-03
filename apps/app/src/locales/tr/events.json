@@ -150,7 +150,8 @@
     "VENUE_UNAVAILABLE": "Saha müsait değil",
     "NOT_ENOUGH_PLAYERS": "Yeterli oyuncu yok",
     "ORGANIZER_UNAVAILABLE": "Organizatör katılamıyor",
-    "OTHER": "Diğer"
+    "OTHER": "Diğer",
+    "MODERATION": "Moderasyon kararı"
   },
   "discover": {
     "filtersTitle": "Filtreler",

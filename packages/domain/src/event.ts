@@ -44,6 +44,9 @@ export const EVENT_CANCEL_REASONS = [
   'OTHER',
 ] as const;
 export type EventCancelReason = (typeof EVENT_CANCEL_REASONS)[number];
+/** What an event can say about why it was canceled: the organizer's reasons, and MODERATION, which only an administrator gives. */
+export const EVENT_CANCEL_REASONS_SHOWN = [...EVENT_CANCEL_REASONS, 'MODERATION'] as const;
+export type EventCancelReasonShown = (typeof EVENT_CANCEL_REASONS_SHOWN)[number];
 export const EVENT_STATUSES = ['DRAFT', 'PUBLISHED', 'CANCELED', 'COMPLETED'] as const;
 export type EventStatus = (typeof EVENT_STATUSES)[number];
 

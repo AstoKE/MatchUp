@@ -165,7 +165,7 @@ Seeded via `supabase/seed/` (idempotent upserts keyed by slug). Catalog edits in
 | `notifications` | In-app inbox + future outbox | `id`, `user_id`, `type`, `payload` jsonb (ids only — no PII), `dedupe_key` UQ, `read_at`, `created_at`. Inserted inside the same transaction as the triggering change |
 | `reports` | User reports | `reporter_id`, `target_type` `USER/EVENT` (PHASE6_PLAN decision 2), `target_id`, `reason` enum, `details` ≤ 1000, `status` `OPEN/ACTIONED/DISMISSED`, `handled_by`, `handled_at`; UQ per (reporter, target) while OPEN |
 | `user_blocks` | Blocking | **(blocker_id, blocked_id)**, CK ≠ |
-| `moderation_actions` | Admin decisions | `admin_id`, `action` enum, `target_type/id`, `report_id`, `reason`, `created_at` — append-only |
+| `moderation_actions` | Admin decisions — **built (Phase 6 M4)** | `actor_id`, `action` (`REPORT_RESOLVED`, `USER_SUSPENDED`, `USER_REINSTATED`, `EVENT_CANCELED_BY_ADMIN`, `REVIEW_HIDDEN`, `REVIEW_RESTORED`), `target_type/id` (`USER`, `EVENT`, `REVIEW`), `report_id`, `outcome`, `note` ≤ 1000 (free text by an admin, so retention is a counsel item), `created_at` — append-only by trigger, no foreign keys (it outlives the accounts), no grants and no policy: only the `admin_*` functions write or read it |
 | `audit_logs` | Security-relevant events | `actor_id`, `action`, `target`, `metadata` jsonb (no secrets/PII), `created_at` — append-only, no IP stored in MVP |
 | `rate_limit_counters` | Per-user action quotas | `(user_id, action, window_start)`, `count`; pruned by cron |
 | `analytics_events` | First-party product analytics | `name` (allowlisted), `user_id` (SET NULL on anonymization), `props` jsonb (allowlisted keys), `platform`, `app_version`, `created_at`; retention 13 months. Server-side events are emitted by RPCs via `private.emit_event()` **from Phase 3** (so the table ships with the first event RPCs); the client-facing `track_event` RPC and dashboards come in Phase 7 |
@@ -363,7 +363,15 @@ All RPCs: `SECURITY DEFINER`, `SET search_path = ''`, `REVOKE ALL FROM PUBLIC, a
 | `list_my_events(bucket, cursor, limit)` | 3 — **built (M3b)**, see §0c | self | buckets `ORGANIZING / PENDING / APPROVED / WAITLISTED / PAST` |
 | `list_event_requests(event_id)` | 3 — **built (M4)** | organizer | open requests, waitlist (FIFO), approved players; max 200 |
 | `mark_attendance(participation_id, value)`, `finalize_attendance(event_id)`, `dispute_attendance(participation_id, reason)` | 5 — **built (M1)** | organizer / participant | `finalize_attendance` completes a started PUBLISHED event first; marks are PRESENT or ABSENT only; a dispute needs an ABSENT mark and a finalized event, inside 72 h |
-| `admin_resolve_attendance_dispute(participation_id, resolution)` | 5 — **built (M1)** | platform admin with MFA (`aal2`) | audited (`ATTENDANCE_DISPUTE_RESOLVED`); no screen until Phase 6 |
+| `admin_resolve_attendance_dispute(participation_id, resolution)` | 5 — **built (M1)** | platform admin with MFA (`aal2`) | audited (`ATTENDANCE_DISPUTE_RESOLVED`); screen: the console (Phase 6 M5) |
+| `admin_list_reports(status, cursor, limit)`, `admin_get_report(id)` | 6 — **built (M4)** | admin with `aal2` | `status` `OPEN` (oldest first) or `CLOSED` (newest first), 20 a page; the report carries its target, the other open reports on it and what was decided before |
+| `admin_resolve_report(id, outcome, note)` | 6 — **built (M4)** | admin with `aal2` | `ACTIONED` or `DISMISSED`; closes every open report on the same target and returns how many; the same outcome again is a no-op, another one is `INVALID_TRANSITION` |
+| `admin_suspend_user(id, note)`, `admin_reinstate_user(id, note)` | 6 — **built (M4)** | admin with `aal2` | note required; suspending sets `SUSPENDED` and deletes the person's `auth.sessions`; refused for oneself, another admin and any status but `ACTIVE`; their events are not touched |
+| `admin_cancel_event(id, note)` | 6 — **built (M4)** | admin with `aal2` | a published event that has not started; reason `MODERATION`, participants notified (`EVENT_CANCELED`). This is also the "hide event" of the plan: a canceled event is already invisible to everybody but the people in it |
+| `admin_hide_review(id, note)`, `admin_restore_review(id, note)` | 6 — **built (M4)** | admin with `aal2` | sets `HIDDEN`/`ACTIVE` and recomputes the reviewee's rating for that sport; XP already paid stays (PHASE6_PLAN decision 3) |
+| `admin_list_reviews(reviewer, reviewee)`, `admin_list_disputes()`, `admin_list_flags()`, `admin_get_user(id)`, `admin_search_users(q)`, `admin_list_actions(cursor, limit)` | 6 — **built (M4)** | admin with `aal2` | `admin_list_flags` is computed when asked, never stored: `MUTUAL_FIVE` (2+ events), `REVIEW_BOMBING` (10+ reviews, 3+ far from the others), `NO_SHOWS` (3+ in 30 days); no penalty follows |
+
+Every `admin_*` function starts with `private.assert_admin_aal2()`: signed in, verified and `ACTIVE`, then `NOT_ALLOWED` for anyone who is no administrator (also with `aal2`, so the role is not revealed), then `MFA_REQUIRED` for an administrator whose token says less than `aal2`.
 | `submit_reviews(event_id, reviews[])` | 5 — **built (M2)** | participant | `reviews` = `[{reviewee_id, skill_score 1–5, fair_play?}]`, at most 60, all or nothing; both people verified present at a finalized event, inside the 72 h window; non-participants get `NOT_FOUND`, otherwise `REVIEW_NOT_ELIGIBLE`, `ALREADY_REVIEWED`, `WINDOW_CLOSED` |
 | `mark_notifications_read(ids)` | 3 | self | |
 | `block_user(id)`, `unblock_user(id)`, `list_my_blocks()` | 6 — **built (M1)** | self | mutual and silent: neither side finds, joins or reviews the other; open requests between them are rejected without a notification; someone already approved stays approved |
@@ -396,7 +404,7 @@ RLS is **enabled on every table** (CI check fails on any table without it). Help
 | `notifications` | self | `read_at` via RPC only |
 | `reports` | reporter (own); admin | none (RPC) |
 | `user_blocks` | blocker (own), never the blocked person | none (RPC) |
-| `moderation_actions`, `audit_logs` | admin | none |
+| `moderation_actions`, `audit_logs` | none by grant; the admin reads `moderation_actions` through `admin_list_actions` and `admin_get_*` | none |
 | `rate_limit_counters`, `analytics_events` | none (service / RPC only) | none |
 
 Realtime: only `notifications` (own rows) and `events.approved_count` for the open event screen. Postgres Changes honors RLS; subscription channels are created per screen and torn down on blur.

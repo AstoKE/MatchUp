@@ -1,12 +1,13 @@
 import {
   BOOKING_STATUSES,
-  EVENT_CANCEL_REASONS,
+  EVENT_CANCEL_REASONS_SHOWN,
   EVENT_SETTINGS,
   EVENT_STATUSES,
   EVENT_VISIBILITIES,
   LOCATION_VISIBILITIES,
   mapRpcError,
   type EventCancelReason,
+  type EventCancelReasonShown,
   type EventSetting,
   type EventInputPayload,
 } from '@matchup/domain';
@@ -52,7 +53,7 @@ const eventRow = z.object({
   cost_amount_minor: z.nullable(z.number()),
   cost_note: z.nullable(z.string()),
   equipment_note: z.nullable(z.string()),
-  cancel_reason: z.nullable(z.enum(EVENT_CANCEL_REASONS)),
+  cancel_reason: z.nullable(z.enum(EVENT_CANCEL_REASONS_SHOWN)),
   cancel_message: z.nullable(z.string()),
   // What `get_event` adds for this viewer; the server decides every one of them.
   is_organizer: z.boolean(),
@@ -97,7 +98,7 @@ export interface EventDetails {
   costAmountMinor: number | null;
   costNote: string | null;
   equipmentNote: string | null;
-  cancelReason: EventCancelReason | null;
+  cancelReason: EventCancelReasonShown | null;
   cancelMessage: string | null;
   /** The secret of an invite-only event: only its organizer receives it, to build the link to share. */
   inviteToken: string | null;
