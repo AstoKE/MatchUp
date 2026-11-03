@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { Icon, Text, useTheme } from '@/ui';
 
@@ -57,11 +56,8 @@ export function SlotMeter({ approved, capacity }: { approved: number; capacity: 
 export function Pill({
   label,
   tone = 'neutral',
-  icon,
 }: {
   label: string;
-  /** Decorative leading glyph (e.g. the sport icon). */
-  icon?: ReactNode;
   tone?: 'neutral' | 'success' | 'warning' | 'danger';
 }) {
   const { colors, radius, spacing } = useTheme();
@@ -87,7 +83,6 @@ export function Pill({
       }}
     >
       {tone === 'danger' ? <Icon name="alert" color={colors.danger} size={14} /> : null}
-      {icon}
       <Text variant="micro">{label}</Text>
     </View>
   );

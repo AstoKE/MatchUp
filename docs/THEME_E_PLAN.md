@@ -1,6 +1,6 @@
 # Theme E plan
 
-**Status 2026-11-02: M0 to M4 and M5a merged, M5b (My Events, profile, sign-in) built.** The other screens keep their old layouts. Phase 6 M4 starts after M6.
+**Status 2026-11-02: M0 to M5 merged, the web half of M6 built.** iOS and Android are still to do, on the founder's word. Phase 6 M4 starts after M6.
 
 What and why: `docs/design.md` §3 and §13, ADR-0023. Mockup: https://claude.ai/artifact/RbEqLVCQx1pt7WYCNETM5Q.
 
@@ -57,3 +57,20 @@ Create, manage, onboarding, player card, notifications and settings get no layou
 - **Bundle.** See M2.
 - **Icon-only dock on a phone.** Accepted (ADR-0023); look at it again after real use.
 - **Long Turkish labels in the dock at large text sizes.** M3 tests this; the fallback is icons only.
+
+## Validation record (2026-11-02, web)
+
+**The screenshots below were taken before the default became light, with the device set to each theme; the themes themselves did not change.**
+
+**Automated, every run:** the app starts light on a dark device and a choice in Settings survives a reload. `e2e/responsive.spec.ts` at 320, 390, 820 and 1280 px, each in light and dark (eight runs): no sideways scrolling and no serious or critical axe findings on Discover (picker and list), sign-in, event, manage, create, My Events, profile, settings, notifications and the player card. The last control of the picker and the profile clears the dock. 320 px is also what 200 % browser zoom gives a 640 px window. An ESLint rule now refuses color values outside `src/ui/tokens`.
+
+**Seen by eye once, on contact sheets of 120 screenshots with real data:** 15 screens at those four sizes in both themes: Discover picker and list, sign-up, sign-in, onboarding (first step), event as organizer and as approved player, manage, create (first step), My Events, profile, settings, notifications, player card, request sent. The sheets are scaled down (0.3 to 0.62), so they show layout and color, not fine detail. They found one bug: on a small phone the list opened scrolled past its heading after a choice low on the picker. It is fixed and tested.
+
+**Not verified:**
+
+- iOS and Android devices: font loading, the dock above the home indicator and with the keyboard open, large text. Maestro flows 01, 13 and 17 were updated and not run.
+- VoiceOver and TalkBack by hand; keyboard only through the shell tests.
+- The join form and the later steps of create and onboarding at every size; attendance, reviews and the report sheet, beyond what `events.spec.ts` covers with axe at the default size.
+- Native dynamic text at large sizes.
+
+**Worth a look by the founder:** on a phone, Create shows its pinned "İleri" and the dock together, about 160 px of the screen.
