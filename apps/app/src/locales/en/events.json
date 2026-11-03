@@ -154,7 +154,6 @@
   },
   "discover": {
     "filtersTitle": "Filters",
-    "datePreset": "When",
     "date": {
       "ANY": "Any day",
       "TODAY": "Today",

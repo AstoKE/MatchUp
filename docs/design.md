@@ -27,7 +27,7 @@ These are illustrative screen examples, not a complete page inventory. Extend th
 8. Original branding: Preserve the visual mood while making MatchUp recognizably its own product.
 3. Visual language
 3.1 Color palette
-Theme E: every sport has its own court color and line drawing, on a quiet green-tinted ground, with one blue for actions. Light and dark are equal themes and the app follows the device unless the person chooses otherwise. The logo may be revisited separately; do not force a multicolor logo to dictate the entire product palette.
+Theme E: every sport has its own court color and line drawing, on a quiet green-tinted ground, with one blue for actions. The app starts in the light theme; dark and "follow the device" are choices in Settings, remembered on the device. The logo may be revisited separately; do not force a multicolor logo to dictate the entire product palette.
 
 Tokens. All pairs were measured with the WCAG formula on 2026-11-02 and tokens.test.ts enforces them. Lowest result: control border on the light page, 3.22:1 against a required 3:1.
 Token	Light	Dark	Usage
@@ -258,7 +258,7 @@ Founder's decisions:
 - Action color: blue #2F4FD0, replacing red and coral.
 - Fonts: Bricolage Grotesque and Figtree from the start, replacing Inter.
 - Navigation: floating dock on every screen size, replacing the left rail.
-- Default theme: follow the device. Light and dark are equal; dark is no longer primary.
+- Default theme: light (changed the same day from "follow the device"). Dark and "follow the device" stay in Settings; dark is no longer primary.
 
 Where the app deliberately differs from the mockup. These hold until the founder changes them:
 Mockup	App	Why

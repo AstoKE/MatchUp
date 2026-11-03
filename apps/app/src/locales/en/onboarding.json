@@ -31,7 +31,6 @@
   },
   "sports": {
     "title": "Which sports do you play?",
-    "intro": "Pick the sports you play and your level. You can change this later in your profile.",
-    "selected": "selected"
+    "intro": "Pick the sports you play and your level. You can change this later in your profile."
   }
 }

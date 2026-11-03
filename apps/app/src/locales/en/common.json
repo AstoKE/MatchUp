@@ -14,10 +14,6 @@
     "en": "English"
   },
   "logoAlt": "{{appName}} logo",
-  "welcomeTitle": "Welcome",
-  "emptyDiscoverTitle": "No events yet",
-  "emptyDiscoverBody": "Events will be listed here soon. You'll be able to create the first one.",
-  "devOnlyGallery": "Development component gallery",
   "participants_one": "{{count}} participant",
   "participants_other": "{{count}} participants"
 }

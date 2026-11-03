@@ -57,15 +57,20 @@ async function expectClearOfDock(page: Page, last: Locator) {
 
 for (const [label, width, height, colorScheme] of [
   ['smallest phone, dark', 320, 640, 'dark'],
+  ['smallest phone, light', 320, 640, 'light'],
+  ['phone, dark', 390, 800, 'dark'],
   ['phone, light', 390, 800, 'light'],
+  ['tablet, dark', 820, 1000, 'dark'],
   ['tablet, light', 820, 1000, 'light'],
   ['desktop, dark', 1280, 800, 'dark'],
+  ['desktop, light', 1280, 800, 'light'],
 ] as const) {
   test(`the main screens hold up: ${label}`, async ({ browser }) => {
     test.setTimeout(120_000);
     if (!stack) throw new Error('REQUIRE_STACK=1 but the local Supabase stack is not running');
     const email = uniqueEmail('responsive');
-    createdIds.push((await createOnboardedUser(stack, email, { displayName: 'Ece Yılmaz' })).id);
+    const user = await createOnboardedUser(stack, email, { displayName: 'Ece Yılmaz' });
+    createdIds.push(user.id);
     const eventId = await createPublishedEvent(stack, email, `Görünüm ${email.slice(11, 19)}`);
 
     const context = await browser.newContext({
@@ -73,6 +78,11 @@ for (const [label, width, height, colorScheme] of [
       colorScheme,
       locale: 'tr-TR',
     });
+    // The app starts light whatever the device says, so the dark runs choose dark as a person would.
+    await context.addInitScript(
+      (scheme) => globalThis.localStorage.setItem('matchup.theme', scheme),
+      colorScheme,
+    );
     const page = await context.newPage();
 
     await page.goto('/');
@@ -81,6 +91,8 @@ for (const [label, width, height, colorScheme] of [
     await expectClearOfDock(page, page.getByRole('button', { name: 'Tüm sporlar', exact: true }));
     await page.getByRole('button', { name: 'Tüm sporlar', exact: true }).click();
     await expect(page.getByRole('radio', { name: 'Tüm sporlar', exact: true })).toBeChecked();
+    // The choice sits low on a small phone; the list still opens at its top.
+    await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeInViewport();
     await expectSound(page, 'Discover');
 
     await page.goto('/sign-in');
@@ -98,15 +110,46 @@ for (const [label, width, height, colorScheme] of [
       ['profile', '/profile', 'İlerlemen'],
       ['settings', '/settings', 'Ayarlar'],
       ['notifications', '/notifications', 'Bildirimler'],
+      ['player card', `/u/${user.id}`, 'Ece Yılmaz'],
     ];
     for (const [name, path, marker] of screens) {
       await page.goto(path);
       await expect(page.getByText(marker).first()).toBeVisible();
       await expectSound(page, name);
     }
+    await page.goto('/profile');
+    await expectClearOfDock(page, page.getByRole('button', { name: 'Çıkış yap' }));
     await context.close();
   });
 }
+
+test('the app starts light on a dark device, and a choice in settings survives a reload', async ({
+  browser,
+}) => {
+  if (!stack) throw new Error('REQUIRE_STACK=1 but the local Supabase stack is not running');
+  const email = uniqueEmail('theme');
+  createdIds.push((await createOnboardedUser(stack, email)).id);
+  const context = await browser.newContext({ colorScheme: 'dark', locale: 'tr-TR' });
+  const page = await context.newPage();
+  const background = () =>
+    page.getByRole('main').evaluate((main) => getComputedStyle(main).backgroundColor);
+
+  await page.goto('/sign-in');
+  await expect(page.getByRole('heading', { name: 'Tekrar hoş geldin' })).toBeVisible();
+  expect(await background()).toBe('rgb(242, 245, 241)');
+
+  await page.getByLabel('E-posta', { exact: true }).fill(email);
+  await page.getByLabel('Şifre', { exact: true }).fill(PASSWORD);
+  await page.getByRole('button', { name: 'Giriş yap' }).click();
+  await expect(page.getByRole('tab', { name: 'Keşfet' })).toBeVisible();
+  await page.goto('/settings');
+  await page.getByRole('radio', { name: 'Koyu', exact: true }).click();
+  await expect.poll(background).toBe('rgb(14, 21, 18)');
+  await page.reload();
+  await expect(page.getByRole('radio', { name: 'Koyu', exact: true })).toBeChecked();
+  expect(await background()).toBe('rgb(14, 21, 18)');
+  await context.close();
+});
 
 test('on a desktop every filter chip can be reached with a mouse, without sideways scrolling', async ({
   browser,

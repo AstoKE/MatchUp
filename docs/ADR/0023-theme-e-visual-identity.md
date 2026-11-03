@@ -8,7 +8,7 @@
 
 1. **Identity.** Each sport has a court color and a line drawing of its playing area. They replace photos and the sport artwork: tiles on Discover, a time tile on event rows, a hero on the event page.
 2. **Color.** One blue action (`#2F4FD0`) on a green-tinted ground. Tokens are in `design.md` §3.1. Status always has an icon and text, because some court colors match a status color.
-3. **Theme.** Light and dark are equal, and the default follows the device. The stored preference (`system|light|dark`) and `user_settings.theme` already support this: no database change.
+3. **Theme.** The app starts light, whatever the device says (founder, 2026-11-02, replacing "follow the device" of the same day). Dark and "system" stay in Settings. The choice is kept on the device (`matchup.theme`), which it was not before: the setting was forgotten on every start. No database change: `user_settings.theme` still defaults to `system` and records what Settings saved, but the app does not read it back, so a choice does not follow a person to another device.
 4. **Fonts.** Bricolage Grotesque (700, 800) and Figtree (400, 600, 700, 800), through `@expo-google-fonts/bricolage-grotesque` and `@expo-google-fonts/figtree` (MIT and OFL-1.1), loaded at runtime like Inter today. `@expo-google-fonts/inter` goes.
 5. **Navigation.** A floating dock on every size, through React Navigation's `tabBar` option. It keeps the bottom-tabs navigator, the routes and the `tab` roles. The left rail goes. On a phone the dock hides on the event page and the join form.
 6. **No participant avatars on cards.** Lists carry no participant data and guests must not see participants. Showing them would need a new RPC and a privacy decision.

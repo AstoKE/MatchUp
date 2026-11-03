@@ -94,7 +94,8 @@ export function DiscoverScreen() {
   const asking = ready && choice === null;
 
   return (
-    <Screen maxWidth={expanded ? 1280 : 720}>
+    // A new key after the choice: the list starts at its top, not where the picker was scrolled to.
+    <Screen key={asking ? 'asking' : 'list'} maxWidth={expanded ? 1280 : 720}>
       <View
         style={{
           flexDirection: 'row',

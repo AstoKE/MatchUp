@@ -1,6 +1,6 @@
 # Performance: web bundle analysis and plan
 
-Status 2026-10-25. **Web bundle size only.** Nothing here measures runtime speed, time-to-interactive, memory or the native (Hermes) app on a real device; those are not measured yet and no claim is made about them.
+Status 2026-11-02. **Web bundle size only.** Nothing here measures runtime speed, time-to-interactive, memory or the native (Hermes) app on a real device; those are not measured yet and no claim is made about them.
 
 ## 1. How it was measured
 
@@ -49,6 +49,8 @@ Correction to an earlier reading: Sentry is about a third of the *total* but **n
 6. **Sentry replay and feedback left out of the web bundle** (`apps/app/metro.config.js`, `apps/app/metro/sentry-unused-stub.js`). `@sentry/browser` re-exports `@sentry/replay` and `@sentry/feedback`, so ~57 kB gzip of code the app never calls shipped in the lazily loaded Sentry chunk (only with a DSN). **TOTAL 939 → 882 kB; the Sentry chunk 373 → 316 kB; INITIAL unchanged (560).** An *empty* module is not enough: `@sentry/browser` calls `buildFeedbackIntegration` while loading, and a first attempt with the empty module broke Sentry's initialization (`buildFeedbackIntegration is not a function`). A browser probe with a dummy DSN (build with `EXPO_PUBLIC_SENTRY_DSN=https://abc@o1.ingest.sentry.io/2`, serve, load in Chromium, throw an error containing an email address) now shows: no console errors from init, `window.__SENTRY__` present, one error envelope sent, the email address absent from it (our `beforeSend` scrubbing still applies). The stub throws if replay/feedback is ever used, so enabling either means removing the entry first. Ratchet: TOTAL 940 → 900. Not covered: the native app (Hermes) never loaded these browser packages.
 
 7. **Supabase Realtime and Storage left out of the web bundle** (`apps/app/metro.config.js`, `apps/app/metro/supabase-unused-stub.js`). supabase-js constructs the realtime and storage clients eagerly, so `@supabase/realtime-js` (+ phoenix) and `@supabase/storage-js` (~23 kB gzip) shipped in the **initial** chunk although the app uses neither: notifications are polled (ADR-0019) and there are no uploads yet. On web only (the native build keeps the real packages, it is what the device suite validated) they resolve to small stand-ins: `setAuth` is a no-op promise, anything else throws a clear error. **TOTAL 888 → 863 kB, INITIAL 565 → 541 kB.** Checked by the full web E2E (sign-up, sign-in, session survives a reload, token refresh path, join flow, notifications, 47 tests). Remove the entries before using Realtime or Storage on web. Ratchets: TOTAL 900 → 885, INITIAL 570 → 555.
+
+8. **Theme E (2026-11-02, ADR-0023), no ratchet raised.** Font files fell from 1,027 kB (Inter, three weights) to 343 kB (Bricolage Grotesque and Figtree, six weights); they are not in the JavaScript ratchets. Ten court drawings and the dock were paid for by removing the sport glyphs, the filled icon set, the tab bar options and `SportArtwork`. Result: **885 of 885 kB total, 554 of 555 kB initial. There is no margin:** new shared code needs something removed first, or a raise with its reason recorded in `scripts/check-bundle-size.mjs`. Phase 6's admin console has to load lazily.
 
 ## 4. Plan, in order of measured benefit
 

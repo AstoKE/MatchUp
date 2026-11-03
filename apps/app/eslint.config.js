@@ -76,6 +76,20 @@ module.exports = [
     },
   },
   {
+    // Colors come from the tokens (docs/design.md §3.1), so a theme change stays one change.
+    files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}'],
+    ignores: ['src/ui/tokens/**', '**/*.test.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Literal[value=/^(#[0-9a-fA-F]{3,8}$|rgba?[(])/]',
+          message: 'Use a semantic color from useTheme(): color values live in src/ui/tokens.',
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.test.{ts,tsx}', 'jest.setup.js', 'e2e/**'],
     rules: { 'no-console': 'off', 'no-restricted-imports': 'off' },
   },

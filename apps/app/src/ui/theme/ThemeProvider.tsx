@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { useColorScheme, useWindowDimensions } from 'react-native';
 import {
   breakpointForWidth,
@@ -11,8 +11,9 @@ import {
   type Breakpoint,
   type SemanticColors,
 } from '../tokens';
+import { readStoredScheme, storeScheme, type SchemePreference } from './scheme-preference';
 
-export type SchemePreference = 'system' | 'light' | 'dark';
+export type { SchemePreference };
 
 export interface Theme {
   scheme: 'light' | 'dark';
@@ -35,14 +36,21 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({
   children,
-  initialPreference = 'system',
+  initialPreference,
 }: {
   children: ReactNode;
   initialPreference?: SchemePreference;
 }) {
   const systemScheme = useColorScheme();
   const { width } = useWindowDimensions();
-  const [preference, setPreference] = useState<SchemePreference>(initialPreference);
+  // The app starts light (docs/design.md §13); a choice made on this device wins.
+  const [preference, setPreferenceState] = useState<SchemePreference>(
+    () => initialPreference ?? readStoredScheme() ?? 'light',
+  );
+  const setPreference = useCallback((next: SchemePreference) => {
+    setPreferenceState(next);
+    storeScheme(next);
+  }, []);
 
   const value = useMemo<ThemeContextValue>(() => {
     const scheme: 'light' | 'dark' =
@@ -61,7 +69,7 @@ export function ThemeProvider({
         breakpoint: breakpointForWidth(width),
       },
     };
-  }, [preference, systemScheme, width]);
+  }, [preference, setPreference, systemScheme, width]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

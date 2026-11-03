@@ -14,10 +14,6 @@
     "en": "English"
   },
   "logoAlt": "Logo: {{appName}}",
-  "welcomeTitle": "Hoş geldin",
-  "emptyDiscoverTitle": "Henüz etkinlik yok",
-  "emptyDiscoverBody": "Etkinlikler yakında burada listelenecek. İlk etkinliği sen oluşturabileceksin.",
-  "devOnlyGallery": "Geliştirme bileşen galerisi",
   "participants_one": "{{count}} katılımcı",
   "participants_other": "{{count}} katılımcı"
 }
