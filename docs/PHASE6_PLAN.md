@@ -1,6 +1,6 @@
 # Phase 6 plan: trust, moderation and admin
 
-Status 2026-11-01: **M1, M2 and M3 built**, the rest not started. Scope: ROADMAP F-27, F-28, the rest of F-19 and F-30, plus what Phase 5 left here. Sources of truth stay `docs/PRD.md` §4.9, `docs/DATABASE.md` §3.6, `docs/SECURITY.md`, `docs/USER_FLOWS.md` FL-9 and FL-11. This file sequences the work and lists what a decision is needed for.
+Status 2026-11-01: **M1 to M4 built** (M4 is waiting for its merge), the rest not started. Scope: ROADMAP F-27, F-28, the rest of F-19 and F-30, plus what Phase 5 left here. Sources of truth stay `docs/PRD.md` §4.9, `docs/DATABASE.md` §3.6, `docs/SECURITY.md`, `docs/USER_FLOWS.md` FL-9 and FL-11. This file sequences the work and lists what a decision is needed for.
 
 **Why now.** The pilot has real people meeting strangers and rating each other. Without reporting, blocking and someone able to act on them it cannot start, and the app stores require them for user-generated content (SECURITY §8). Today a dispute can only be resolved by a SQL function nobody has a screen for.
 
@@ -39,7 +39,17 @@ Not there: `user_blocks`, `reports`, `moderation_actions`, any `admin_*` RPC but
 
 ### M4: admin, in the database
 
-**Waits for Theme E** (`docs/THEME_E_PLAN.md`), by the founder's decision of 2026-11-02.
+**Status 2026-11-03: built** in `20261103100000_moderation_enums.sql` and `20261103110000_admin_moderation.sql`: `moderation_actions` (append-only), the guard `private.assert_admin_aal2()`, and 14 `admin_*` functions (DATABASE §9). New error code `MFA_REQUIRED`. pgTAP `23_admin_moderation` (92 tests, 27 mutations of the functions all caught except one that is equivalent: the check against suspending oneself is also covered by the admin check), `admin-api` (5, with a real TOTP second factor through the Auth API).
+
+Deviations from the list below, on purpose:
+
+- **No separate `admin_hide_event`:** a canceled event is already invisible to everybody but the people in it, and a lifecycle state may not be added. `admin_cancel_event` (reason `MODERATION`) does both.
+- **Flags are computed, not stored.** Nothing profiles a person between two visits; the three rules are in DATABASE §9. The "10 reviews" of review-bombing is read as the reviewer's total.
+- **A suspension does not cancel the person's events.** They leave discovery by themselves (the organizer must be `ACTIVE`), the participants did nothing wrong, and an administrator decides about each event.
+- **The organizer is not told that an administrator canceled their event** and a suspended person is not told why: M6.
+- **A hidden review does not revoke a badge** (decision 3).
+
+**Needs you before it can be used on hosted:** TOTP enabled for the project (Auth › Multi-factor), and the first administrator (below).
 
 - `moderation_actions` (append-only), `admin_list_reports`, `admin_get_report`, `admin_resolve_report`, `admin_suspend_user` / `admin_reinstate_user`, `admin_hide_event`, `admin_cancel_event`, `admin_hide_review`, `admin_list_disputes`. All check `is_admin()` and `aal2` (S-14) and write the audit log.
 - **Suspension:** writes refused with `ACCOUNT_RESTRICTED` (S-13), sessions ended, profile and events hidden; verify what a suspended organizer's upcoming events do.

@@ -150,7 +150,8 @@
     "VENUE_UNAVAILABLE": "Venue unavailable",
     "NOT_ENOUGH_PLAYERS": "Not enough players",
     "ORGANIZER_UNAVAILABLE": "Organizer can't make it",
-    "OTHER": "Other"
+    "OTHER": "Other",
+    "MODERATION": "Decision by a moderator"
   },
   "discover": {
     "filtersTitle": "Filters",

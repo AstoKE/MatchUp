@@ -192,7 +192,7 @@ Where the text above left room, the code does this (the TypeScript reference and
 7. **`REVIEWS_SUBMITTED` and `FAIR_PLAY_RECEIVED` are not capped** (§5.2 caps attendance and organizer XP) and count `ACTIVE` reviews only.
 8. **Account purge deletes the snapshot**; it is derived and useless without the account. Reviews of a deleted account keep counting for the others (anonymous, §10.6). The tombstone earns nothing and gets no rating.
 9. **Other people cannot read a rating yet**: `user_sport_ratings` is select-own, like `user_progress`. Showing it on a profile (visibility flags, DATABASE RLS table) comes with the screens milestone, through an RPC.
-10. **Not built yet:** the mutual-5 and review-bombing flags and hiding a review from a screen (§3.5, moderation queue, Phase 6). Recompute already skips `HIDDEN` reviews.
+10. **Built in Phase 6 M4:** the mutual-5, review-bombing and no-show flags (`admin_list_flags`, computed when asked) and hiding or restoring a review (`admin_hide_review`, which recomputes the rating). The screens come with the console (M5).
 
 ## 12. Decisions made while building M4 (2026-10-31)
 
