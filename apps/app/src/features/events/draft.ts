@@ -2,9 +2,9 @@ import { utcToZonedParts, type EventDraft } from '@matchup/domain';
 import type { Catalog } from '@/features/catalog';
 import type { EventDetails } from './api/events-api';
 
-/** A new event: the first city (the pilot has one), tomorrow 19:00, 90 minutes, nothing chosen yet. */
-export function emptyDraft(catalog: Catalog, now: Date): EventDraft {
-  const city = catalog.cities[0];
+/** A new event in the given province (see `startingCityId`), tomorrow 19:00, 90 minutes, nothing chosen yet. */
+export function emptyDraft(catalog: Catalog, now: Date, cityId: string | null): EventDraft {
+  const city = catalog.cities.find((c) => c.id === cityId);
   const today = utcToZonedParts(now.toISOString(), city?.timeZone ?? 'Europe/Istanbul').date;
   const [y, m, d] = today.split('-').map(Number) as [number, number, number];
   return {

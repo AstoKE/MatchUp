@@ -5,10 +5,12 @@ import { ActivityIndicator, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useCatalog, type Catalog } from '@/features/catalog';
 import { RequireOnboarded } from '@/features/onboarding';
+import { useMyProfile } from '@/features/profile';
 import { errorText } from '@/lib/error-text';
 import { newRequestId } from '@/lib/request-id';
 import { EmptyState, Screen, useTheme, useToast } from '@/ui';
-import { EventStepper } from '../components/EventStepper';
+import { readStoredCity, startingCityId } from '../city-preference';
+import { LazyEventStepper } from '../components/LazyEventStepper';
 import { emptyDraft } from '../draft';
 import { useCreateEvent } from '../hooks';
 
@@ -24,7 +26,9 @@ function CreateEvent() {
   const { t } = useTranslation(['events', 'common']);
   const { colors } = useTheme();
   const catalog = useCatalog();
-  if (catalog.isPending) {
+  const profile = useMyProfile();
+  // The starting province comes from the profile, so the form waits for it (it is cached after onboarding).
+  if (catalog.isPending || (profile.isPending && profile.fetchStatus !== 'idle')) {
     return (
       <Screen maxWidth={640}>
         <View accessible accessibilityRole="progressbar" accessibilityLabel={t('common:loading')}>
@@ -45,22 +49,30 @@ function CreateEvent() {
       </Screen>
     );
   }
-  return <CreateForm catalog={catalog.data} />;
+  return <CreateForm catalog={catalog.data} profileCityId={profile.data?.cityId ?? null} />;
 }
 
-function CreateForm({ catalog }: { catalog: Catalog }) {
+function CreateForm({
+  catalog,
+  profileCityId,
+}: {
+  catalog: Catalog;
+  profileCityId: string | null;
+}) {
   const { t } = useTranslation('events');
   const router = useRouter();
   const toast = useToast();
   const create = useCreateEvent();
   // One id per form: a retry after a lost response returns the same event instead of a duplicate.
   const [clientRequestId] = useState(newRequestId);
-  const [initial] = useState(() => emptyDraft(catalog, new Date()));
+  const [initial] = useState(() =>
+    emptyDraft(catalog, new Date(), startingCityId(catalog, profileCityId, readStoredCity())),
+  );
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [busy, setBusy] = useState<'draft' | 'publish' | null>(null);
 
   return (
-    <EventStepper
+    <LazyEventStepper
       catalog={catalog}
       initial={initial}
       title={t('create.title')}

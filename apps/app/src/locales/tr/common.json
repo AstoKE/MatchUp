@@ -15,5 +15,7 @@
   },
   "logoAlt": "Logo: {{appName}}",
   "participants_one": "{{count}} katılımcı",
-  "participants_other": "{{count}} katılımcı"
+  "participants_other": "{{count}} katılımcı",
+  "search": "Ara",
+  "noMatch": "Eşleşen sonuç yok"
 }

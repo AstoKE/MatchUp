@@ -68,7 +68,23 @@ const mockApi = {
   deleteDraft: jest.fn(),
   fetchCatalog: jest.fn(),
   fetchMyAccount: jest.fn(),
+  fetchMyProfile: jest.fn(),
 };
+jest.mock('@/features/profile/api/profile-api', () => ({
+  fetchMyProfile: (...a: unknown[]) => mockApi.fetchMyProfile(...a),
+}));
+// The form is loaded on demand in the app (LazyEventStepper); here it is rendered directly, and Playwright covers the
+// lazy load on the web.
+jest.mock('./components/LazyEventStepper', () => ({
+  LazyEventStepper: jest.requireActual<typeof import('./components/EventStepper')>(
+    './components/EventStepper',
+  ).EventStepper,
+}));
+jest.mock('./city-preference', () => ({
+  ...jest.requireActual<typeof import('./city-preference')>('./city-preference'),
+  readStoredCity: () => null,
+  storeCity: jest.fn(),
+}));
 jest.mock('./api/events-api', () => ({
   fetchEvent: (...a: unknown[]) => mockApi.fetchEvent(...a),
   createEvent: (...a: unknown[]) => mockApi.createEvent(...a),
@@ -163,6 +179,15 @@ beforeEach(() => {
   mockParams = {};
   mockRouter.canGoBack.mockReturnValue(false);
   mockApi.fetchCatalog.mockResolvedValue(catalog);
+  mockApi.fetchMyProfile.mockResolvedValue({
+    userId: ME,
+    displayName: 'Ayşe A',
+    bio: null,
+    cityId: null,
+    districtId: null,
+    settings: {},
+    sports: [],
+  });
   mockApi.fetchMyAccount.mockResolvedValue({
     userId: ME,
     status: 'ACTIVE',
@@ -199,6 +224,49 @@ describe('CreateEventScreen', () => {
       await screen.findByText('Gözden geçir ve yayınla');
     }
   }
+
+  it('starts in the organizer’s province, whose districts can be searched', async () => {
+    const IZMIR = '00000000-0000-4000-8000-0000000000c2';
+    const KARSIYAKA = '00000000-0000-4000-8000-0000000000d2';
+    const BORNOVA = '00000000-0000-4000-8000-0000000000d3';
+    mockApi.fetchCatalog.mockResolvedValue({
+      ...catalog,
+      cities: [
+        ...catalog.cities,
+        {
+          id: IZMIR,
+          slug: 'izmir',
+          names: { tr: 'İzmir', en: 'İzmir' },
+          timeZone: 'Europe/Istanbul',
+          districts: [
+            { id: BORNOVA, slug: 'bornova', names: { tr: 'Bornova', en: 'Bornova' } },
+            { id: KARSIYAKA, slug: 'karsiyaka', names: { tr: 'Karşıyaka', en: 'Karşıyaka' } },
+          ],
+        },
+      ],
+    });
+    mockApi.fetchMyProfile.mockResolvedValue({
+      userId: ME,
+      displayName: 'Ayşe A',
+      bio: null,
+      cityId: IZMIR,
+      districtId: null,
+      settings: {},
+      sports: [],
+    });
+    await renderApp(<CreateEventScreen />, { session: signedIn });
+    await screen.findByText('Ne oynanacak?');
+    await choose(/^Spor:/, 'Futbol');
+    await press('İleri');
+    await press('İleri');
+    await screen.findByText('Nerede?');
+    expect(screen.getByRole('button', { name: 'İl: İzmir' })).toBeTruthy();
+    await press(/^İlçe:/);
+    await fireEvent.changeText(screen.getByLabelText('Ara'), 'karsi');
+    expect(screen.queryByRole('radio', { name: 'Bornova' })).toBeNull();
+    await fireEvent.press(screen.getByRole('radio', { name: 'Karşıyaka' }));
+    expect(screen.getByRole('button', { name: 'İlçe: Karşıyaka' })).toBeTruthy();
+  });
 
   it('does not leave step 1 without a sport and a format', async () => {
     await renderApp(<CreateEventScreen />, { session: signedIn });
@@ -237,7 +305,7 @@ describe('CreateEventScreen', () => {
       input: Record<string, unknown>;
       publish: boolean;
     };
-    const expectedDate = emptyDraft(catalog, new Date()).date;
+    const expectedDate = emptyDraft(catalog, new Date(), ANKARA).date;
     expect(call.publish).toBe(true);
     expect(call.clientRequestId).toMatch(
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,

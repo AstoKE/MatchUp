@@ -36,7 +36,7 @@
     "tomorrow": "Yarın",
     "duration": "Süre",
     "minutes": "{{count}} dk",
-    "city": "Şehir",
+    "city": "İl",
     "district": "İlçe",
     "place": "Yer",
     "placeHint": "Örn. ODTÜ Halı Saha 2",
@@ -203,7 +203,10 @@
     "pickerHint": "Bir spor seç, açık etkinlikleri gör. Seçimini sonra listenin üstünden değiştirebilirsin.",
     "allSports": "Tüm sporlar",
     "noSportTitle": "{{sport}} için henüz etkinlik yok",
-    "noSportBody": "Başka bir spora bak ya da tüm sporları gör."
+    "noSportBody": "Başka bir spora bak ya da tüm sporları gör.",
+    "cityButton": "İl: {{city}}. Değiştir",
+    "cityPick": "İl seç",
+    "cityTitle": "İl seç"
   },
   "join": {
     "signInToJoin": "Giriş yap ve katılım iste",

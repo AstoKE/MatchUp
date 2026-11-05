@@ -158,6 +158,8 @@ export async function createPublishedEvent(
     capacity?: number;
     sportSlug?: string;
     formatSlug?: string;
+    citySlug?: string;
+    districtSlug?: string;
   } = {},
 ): Promise<string> {
   const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
@@ -176,9 +178,11 @@ export async function createPublishedEvent(
   const format = await get<{ id: string }>(
     `sport_formats?select=id&slug=eq.${options.formatSlug ?? '5v5'}&sport_id=eq.${sport.id}`,
   );
-  const city = await get<{ id: string }>('cities?select=id&slug=eq.ankara');
+  const city = await get<{ id: string }>(
+    `cities?select=id&slug=eq.${options.citySlug ?? 'ankara'}`,
+  );
   const district = await get<{ id: string }>(
-    `districts?select=id&slug=eq.cankaya&city_id=eq.${city.id}`,
+    `districts?select=id&slug=eq.${options.districtSlug ?? 'cankaya'}&city_id=eq.${city.id}`,
   );
   const response = await fetch(`${stack.apiUrl}/rest/v1/rpc/create_event`, {
     method: 'POST',

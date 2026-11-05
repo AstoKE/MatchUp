@@ -8,7 +8,7 @@ import { RequireOnboarded } from '@/features/onboarding';
 import { errorText } from '@/lib/error-text';
 import { EmptyState, Screen, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
-import { EventStepper } from '../components/EventStepper';
+import { LazyEventStepper } from '../components/LazyEventStepper';
 import { draftFromEvent } from '../draft';
 import { useEvent, useUpdateEvent } from '../hooks';
 
@@ -78,7 +78,7 @@ function EditForm({ event, catalog }: { event: EventDetails; catalog: Catalog })
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   return (
-    <EventStepper
+    <LazyEventStepper
       catalog={catalog}
       initial={initial}
       title={t('edit.title')}

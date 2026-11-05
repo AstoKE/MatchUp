@@ -6,7 +6,7 @@ export function intlLocale(locale: Locale): string {
   return INTL_LOCALE[locale];
 }
 
-/** Date/time is always rendered in the market timezone (events happen in Ankara), not the device's. */
+/** Date/time is always rendered in the market timezone (all of Turkey is on Europe/Istanbul), not the device's. */
 export function formatDateTime(
   value: Date | string | number,
   locale: Locale,

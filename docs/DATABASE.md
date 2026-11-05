@@ -8,6 +8,10 @@ Related: [ARCHITECTURE](ARCHITECTURE.md) · [SECURITY](SECURITY.md) · [RATING_S
 
 Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `profiles`, `user_settings`, `user_consents`, `platform_admins`, `app_config`; enums `account_status`, `profile_visibility`, `consent_kind`; `private.set_updated_at`, `private.is_admin`, `private.assert_active_verified_user`, `private.handle_new_user` (trigger on `auth.users`); RPC `public.get_my_account`. Default privileges are revoked so every grant is explicit; **no table has any write grant or policy for API roles**; the only guest-readable object is `app_config`. Not yet created: sport/geo/event/progression/safety tables, PostGIS, `user_sport_profiles`/positions, rate-limit and analytics tables (Phases 2–7). The profile row has no FK to `auth.users` (ADR-0003). pgTAP tests assert all of the above (`supabase/tests/database`).
 
+## 0a. As built in Phase 4 (catalog of Turkey)
+
+- `20261106100000_turkey_catalog.sql` (M1): PostGIS 3.3 in schema `extensions`; `cities` and `districts` gain `wikidata_id` and `centroid geography(Point, 4326)`; all **81 provinces and 973 districts** are loaded from `supabase/seed/catalog/tr-provinces-districts.json` (built by `scripts/catalog/build-tr-catalog.mjs`, ADR-0024). Ankara's existing rows keep their ids. `public.catalog_places()` returns every active province with its active districts as one jsonb (security invoker, so the read policies still apply), since a table read stops at PostgREST `max_rows`; granted to `anon` and `authenticated`. pgTAP `25_turkey_catalog`; `scripts/catalog/catalog-migration.test.mjs` keeps the JSON and the migration in step.
+
 ## 0b. As built in Phase 2 (identity, catalog, onboarding)
 
 - `20261025100000_reference_catalog.sql`: `sports` (10), `sport_formats` (19), `sport_positions` (20), `cities` (Ankara), `districts` (Ankara's 25), loaded idempotently **by the migration** (hosted `db push` does not run seed files). The catalog is the only table family besides `app_config` that guests (`anon`) may read (ADR-0013; pgTAP asserts the exact whitelist). Inactive rows are hidden by RLS. Names are `jsonb {tr,en}`. PostGIS/centroids arrive with Phase 3/4.
@@ -95,7 +99,7 @@ Seeded via `supabase/seed/` (idempotent upserts keyed by slug). Catalog edits in
 
 | Table | Phase | Key columns |
 |---|---|---|
-| `cities` | 3 | **id**, `slug` UQ, `names` jsonb, `timezone` (IANA), `country_code`, `centroid` geography, `is_active` — Ankara seeded; multi-city ready |
+| `cities` | 3 | **id**, `slug` UQ, `names` jsonb, `timezone` (IANA), `country_code`, `centroid` geography, `wikidata_id`, `is_active` — all 81 provinces since Phase 4 (§0a) |
 | `districts` | 3 | **id**, *city_id*, `slug` UQ(city_id, slug), `names` jsonb, `centroid` geography |
 | `venues` | 4 | **id**, `kind` enum `PUBLIC_SPACE/COMMERCIAL_FACILITY`, `name`, `name_search` (generated via `private.normalize_tr`), *city_id*, *district_id*, `location` geography(Point), `address_text`, `provenance` enum `ADMIN_CURATED/USER_SUBMITTED/OSM_IMPORT/PARTNER_SUBMITTED/LICENSED_DATASET`, `source_ref` (external id), `verification_status` enum `UNVERIFIED/VERIFIED`, `listing_status` enum `ACTIVE/HIDDEN`, `submitted_by`, `created_at` |
 | `venue_sports` | 4 | **(venue_id, sport_id)** |

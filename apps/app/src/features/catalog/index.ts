@@ -10,4 +10,5 @@ export type {
 export { useCatalog } from './hooks';
 export { LocationFields } from './LocationFields';
 export { localizedName } from './localized';
+export { usePlaceSearch } from './place-search';
 export { SportPicker } from './SportPicker';

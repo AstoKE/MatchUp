@@ -45,7 +45,7 @@ export function EventStepper({
   const format = catalog.sports
     .find((s) => s.id === draft.sportId)
     ?.formats.find((f) => f.id === draft.formatId);
-  const city = catalog.cities.find((c) => c.id === draft.cityId) ?? catalog.cities[0];
+  const city = catalog.cities.find((c) => c.id === draft.cityId);
   const timeZone = city?.timeZone ?? 'Europe/Istanbul';
 
   const validate = (publishing: boolean) =>
