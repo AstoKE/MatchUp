@@ -67,7 +67,7 @@ Deviations from the list below, on purpose:
 
 ### M6: closing the phase
 
-**Status 2026-11-05: built**, in `20261104100000_moderation_notifications_abuse.sql` (generated from the live definitions of the functions it changes). pgTAP `24_abuse_and_notifications` (39) with 17 mutations of the new code all caught after four tests were added; `display-name-equivalence` (32 names, domain against database); components and Playwright.
+**Status 2026-11-05: built**, in `20261104100000_moderation_notifications_abuse.sql` (generated from the live definitions of the functions it changes). pgTAP `24_abuse_and_notifications` (39) with 18 mutations of the new code, all caught after four tests were added; `display-name-equivalence` (32 names, domain against database); components and Playwright.
 
 - **Notifications:** `REPORT_OUTCOME` to every reporter whose report was closed, generic, never the decision; `ACCOUNT_REINSTATED`; `EVENT_CANCELED_BY_ADMIN` to the organizer; `ATTENDANCE_REMINDER` to the organizer at the end of the event and a day later (`private.send_attendance_reminders`, every 15 minutes, events of the last three days with an approved player and no final attendance). **A suspended person gets no notification but a page**: "Hesabın askıya alındı", with a way to sign out and no reason (counsel decides what more it must say, SECURITY §8).
 - **New accounts:** under seven days old, at most 2 events a day and 10 open requests (`private.account_quota`, `quota.new_account_*` in `app_config`); a tighter value never loosens the usual one.
