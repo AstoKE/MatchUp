@@ -1,0 +1,144 @@
+{
+  "title": "Administration",
+  "subtitle": "Reports, flags and decisions. Every action is recorded.",
+  "section": {
+    "label": "Section",
+    "reports": "Reports",
+    "flags": "Flags",
+    "disputes": "Disputes",
+    "users": "People",
+    "audit": "Record"
+  },
+  "mfa": {
+    "enrollTitle": "Set up the second step",
+    "enrollBody": "Administration needs an authenticator app. Scan the QR code or type the key by hand, then enter the 6-digit code from the app.",
+    "qrAlt": "QR code for an authenticator app",
+    "secret": "Key",
+    "code": "6-digit code",
+    "verify": "Verify",
+    "challengeTitle": "Second step",
+    "challengeBody": "Enter the 6-digit code from your authenticator app.",
+    "wrongCode": "The code is wrong or has expired. Look for the new one in the app.",
+    "setupFailed": "Setup could not start."
+  },
+  "reports": {
+    "open": "Open",
+    "closed": "Closed",
+    "status": "Report status",
+    "emptyOpen": "No open reports.",
+    "emptyClosed": "No closed reports.",
+    "loadMore": "Show more",
+    "loadFailed": "Reports could not be loaded",
+    "kind": {
+      "USER": "Person",
+      "EVENT": "Event"
+    },
+    "by": "Reported by {{name}}",
+    "openForTarget_one": "{{count}} open report",
+    "openForTarget_other": "{{count}} open reports",
+    "unknown": "Unknown",
+    "back": "Back to the list",
+    "detailsLabel": "Details",
+    "noDetails": "No details were written.",
+    "others": "Other open reports on the same target",
+    "history": "Earlier decisions",
+    "noteLabel": "Decision note",
+    "noteHint": "Required for suspending and canceling. At most 1000 characters.",
+    "dismiss": "Dismiss",
+    "close": "Close, action taken",
+    "suspendClose": "Suspend and close",
+    "cancelClose": "Cancel the event and close",
+    "sure": "Are you sure?",
+    "yes": "Yes",
+    "no": "Cancel",
+    "done": "Decision recorded.",
+    "targetGone": "The target no longer exists.",
+    "target": "Target",
+    "starts": "Starts",
+    "places": "Going {{approved}}/{{capacity}}",
+    "organizer": "Organizer: {{name}}",
+    "openTarget": "Open the person"
+  },
+  "reason": {
+    "SPAM": "Spam",
+    "HARASSMENT": "Harassment",
+    "UNSAFE": "Unsafe behavior",
+    "FAKE_EVENT": "Fake event",
+    "INAPPROPRIATE": "Inappropriate content",
+    "OTHER": "Other"
+  },
+  "users": {
+    "searchLabel": "Find a person",
+    "searchHint": "At least 2 letters.",
+    "search": "Search",
+    "none": "Nobody found.",
+    "status": "Status",
+    "admin": "Administrator",
+    "joined": "Events joined: {{count}}",
+    "organized": "Events organized: {{count}}",
+    "reports": "Reports about them: {{open}} open, {{total}} in all",
+    "noShows": "No-shows in the last 30 days: {{count}}",
+    "blockedBy": "People who blocked them: {{count}}",
+    "since": "Joined {{date}}",
+    "suspend": "Suspend",
+    "reinstate": "Reinstate",
+    "suspendNote": "Reason",
+    "sure": "Are you sure?",
+    "yes": "Yes",
+    "no": "Cancel",
+    "done": "Saved.",
+    "history": "Earlier decisions",
+    "written": "Reviews they wrote",
+    "received": "Reviews they got",
+    "noReviews": "No reviews.",
+    "hide": "Hide",
+    "restore": "Restore",
+    "hidden": "Hidden",
+    "score": "Score {{score}}",
+    "fairPlay": "fair play",
+    "reviewNote": "Note (required)",
+    "state": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "PENDING_DELETION": "Pending deletion",
+      "DELETED": "Deleted"
+    },
+    "back": "Back to search"
+  },
+  "flags": {
+    "empty": "No flags.",
+    "count_one": "{{count}} time",
+    "count_other": "{{count}} times",
+    "kind": {
+      "MUTUAL_FIVE": "Mutual top scores",
+      "REVIEW_BOMBING": "Scores far from everyone else's",
+      "NO_SHOWS": "No-shows in the last 30 days"
+    },
+    "note": "A flag is not a decision: nothing is penalized automatically."
+  },
+  "disputes": {
+    "empty": "No disputes waiting.",
+    "present": "Was there",
+    "absent": "Was not there",
+    "reason": "Reason: {{reason}}",
+    "done": "Decision recorded."
+  },
+  "audit": {
+    "empty": "No decisions yet.",
+    "loadMore": "Show more",
+    "by": "{{name}}",
+    "action": {
+      "REPORT_RESOLVED": "Report closed",
+      "USER_SUSPENDED": "Person suspended",
+      "USER_REINSTATED": "Person reinstated",
+      "EVENT_CANCELED_BY_ADMIN": "Event canceled",
+      "REVIEW_HIDDEN": "Review hidden",
+      "REVIEW_RESTORED": "Review restored"
+    },
+    "outcome": {
+      "ACTIONED": "action taken",
+      "DISMISSED": "dismissed"
+    }
+  },
+  "open": "Administration"
+}

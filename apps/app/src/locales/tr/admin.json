@@ -1,0 +1,144 @@
+{
+  "title": "Yönetim",
+  "subtitle": "Bildirimler, işaretler ve kararlar. Her işlem kayda geçer.",
+  "section": {
+    "label": "Bölüm",
+    "reports": "Bildirimler",
+    "flags": "İşaretler",
+    "disputes": "İtirazlar",
+    "users": "Kişiler",
+    "audit": "Kayıt"
+  },
+  "mfa": {
+    "enrollTitle": "İkinci doğrulamayı kur",
+    "enrollBody": "Yönetim için bir doğrulama uygulaması gerekir. QR kodu okut ya da anahtarı elle gir, sonra uygulamadaki 6 haneli kodu yaz.",
+    "qrAlt": "Doğrulama uygulaması için QR kodu",
+    "secret": "Anahtar",
+    "code": "6 haneli kod",
+    "verify": "Doğrula",
+    "challengeTitle": "İkinci doğrulama",
+    "challengeBody": "Doğrulama uygulamandaki 6 haneli kodu yaz.",
+    "wrongCode": "Kod yanlış ya da süresi dolmuş. Uygulamadaki yeni koda bak.",
+    "setupFailed": "Kurulum başlatılamadı."
+  },
+  "reports": {
+    "open": "Açık",
+    "closed": "Kapalı",
+    "status": "Bildirim durumu",
+    "emptyOpen": "Açık bildirim yok.",
+    "emptyClosed": "Kapalı bildirim yok.",
+    "loadMore": "Daha fazla göster",
+    "loadFailed": "Bildirimler yüklenemedi",
+    "kind": {
+      "USER": "Kişi",
+      "EVENT": "Etkinlik"
+    },
+    "by": "Bildiren: {{name}}",
+    "openForTarget_one": "{{count}} açık bildirim",
+    "openForTarget_other": "{{count}} açık bildirim",
+    "unknown": "Bilinmiyor",
+    "back": "Listeye dön",
+    "detailsLabel": "Ayrıntı",
+    "noDetails": "Ayrıntı yazılmamış.",
+    "others": "Aynı hedefe gelen diğer açık bildirimler",
+    "history": "Önceki kararlar",
+    "noteLabel": "Karar notu",
+    "noteHint": "Askıya alma ve iptal için zorunlu. En fazla 1000 karakter.",
+    "dismiss": "Reddet",
+    "close": "Kapat, işlem yapıldı",
+    "suspendClose": "Askıya al ve kapat",
+    "cancelClose": "Etkinliği iptal et ve kapat",
+    "sure": "Emin misin?",
+    "yes": "Evet",
+    "no": "Vazgeç",
+    "done": "Karar kaydedildi.",
+    "targetGone": "Hedef artık yok.",
+    "target": "Hedef",
+    "starts": "Başlangıç",
+    "places": "Katılım {{approved}}/{{capacity}}",
+    "organizer": "Düzenleyen: {{name}}",
+    "openTarget": "Kişiyi aç"
+  },
+  "reason": {
+    "SPAM": "Spam",
+    "HARASSMENT": "Taciz",
+    "UNSAFE": "Güvensiz davranış",
+    "FAKE_EVENT": "Sahte etkinlik",
+    "INAPPROPRIATE": "Uygunsuz içerik",
+    "OTHER": "Diğer"
+  },
+  "users": {
+    "searchLabel": "Kişi ara",
+    "searchHint": "En az 2 harf.",
+    "search": "Ara",
+    "none": "Kimse bulunamadı.",
+    "status": "Durum",
+    "admin": "Yönetici",
+    "joined": "Katılınan etkinlik: {{count}}",
+    "organized": "Düzenlediği etkinlik: {{count}}",
+    "reports": "Hakkında bildirim: {{open}} açık, {{total}} toplam",
+    "noShows": "Son 30 günde gelmeme: {{count}}",
+    "blockedBy": "Engelleyen kişi: {{count}}",
+    "since": "Üye olma: {{date}}",
+    "suspend": "Askıya al",
+    "reinstate": "Geri aç",
+    "suspendNote": "Askıya alma nedeni",
+    "sure": "Emin misin?",
+    "yes": "Evet",
+    "no": "Vazgeç",
+    "done": "Kaydedildi.",
+    "history": "Önceki kararlar",
+    "written": "Yazdığı değerlendirmeler",
+    "received": "Aldığı değerlendirmeler",
+    "noReviews": "Değerlendirme yok.",
+    "hide": "Gizle",
+    "restore": "Geri getir",
+    "hidden": "Gizli",
+    "score": "Puan {{score}}",
+    "fairPlay": "adil oyun",
+    "reviewNote": "Not (zorunlu)",
+    "state": {
+      "ACTIVE": "Etkin",
+      "SUSPENDED": "Askıda",
+      "PENDING_DELETION": "Silinme bekliyor",
+      "DELETED": "Silindi"
+    },
+    "back": "Aramaya dön"
+  },
+  "flags": {
+    "empty": "İşaret yok.",
+    "count_one": "{{count}} kez",
+    "count_other": "{{count}} kez",
+    "kind": {
+      "MUTUAL_FIVE": "Karşılıklı 5 puan",
+      "REVIEW_BOMBING": "Başkalarından çok uzak puanlar",
+      "NO_SHOWS": "Son 30 günde gelmeme"
+    },
+    "note": "İşaret karar değildir: hiçbir ceza kendiliğinden verilmez."
+  },
+  "disputes": {
+    "empty": "Bekleyen itiraz yok.",
+    "present": "Oradaydı",
+    "absent": "Yoktu",
+    "reason": "Gerekçe: {{reason}}",
+    "done": "Karar kaydedildi."
+  },
+  "audit": {
+    "empty": "Henüz karar yok.",
+    "loadMore": "Daha fazla göster",
+    "by": "{{name}}",
+    "action": {
+      "REPORT_RESOLVED": "Bildirim kapatıldı",
+      "USER_SUSPENDED": "Kişi askıya alındı",
+      "USER_REINSTATED": "Kişi geri açıldı",
+      "EVENT_CANCELED_BY_ADMIN": "Etkinlik iptal edildi",
+      "REVIEW_HIDDEN": "Değerlendirme gizlendi",
+      "REVIEW_RESTORED": "Değerlendirme geri getirildi"
+    },
+    "outcome": {
+      "ACTIONED": "işlem yapıldı",
+      "DISMISSED": "reddedildi"
+    }
+  },
+  "open": "Yönetim"
+}

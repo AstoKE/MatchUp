@@ -23,11 +23,16 @@
 // and hooks across four routes, and Metro's web splitting puts code used by more than one route into
 // __common, which index.html always loads (app code in __common 102 -> 158 kB minified, +14 kB gzip).
 // Structural follow-up in docs/PERFORMANCE.md §4 (item 5) before the next raise.
+//
+// TOTAL raised 885 -> 897 on purpose (2026-11-05, Phase 6 / M5): the administration console is one lazy, web-only chunk
+// (AdminGate, 10 kB gzip: second-factor screens, the queue, people, flags, disputes and the record, with their server calls
+// and copy). Nobody but an administrator downloads it, and INITIAL did not move (554 kB). A change that lifts the total
+// beyond this needs its own reason here.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 885;
+const TOTAL_RATCHET_KB = 897;
 const INITIAL_RATCHET_KB = 555;
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';
 

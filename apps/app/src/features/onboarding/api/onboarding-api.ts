@@ -18,6 +18,8 @@ export interface MyAccount {
   userId: string;
   status: z.infer<typeof accountRow>['account_status'];
   emailVerified: boolean;
+  /** UX only: the administration screens use it to show or hide themselves. The server decides every call. */
+  isAdmin: boolean;
   adultConfirmed: boolean;
   onboarded: boolean;
   /** False after new Terms/Privacy versions were published and not yet accepted (re-consent gate). */
@@ -35,6 +37,7 @@ export async function fetchMyAccount(): Promise<MyAccount> {
     userId: row.user_id,
     status: row.account_status,
     emailVerified: row.email_verified,
+    isAdmin: row.is_admin,
     adultConfirmed: row.adult_confirmed,
     onboarded: row.onboarded,
     legalConsentCurrent: row.legal_consent_current,

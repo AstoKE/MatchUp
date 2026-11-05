@@ -5,6 +5,7 @@ import type { defaultNS, resources } from './resources';
 declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: typeof defaultNS;
-    resources: (typeof resources)['tr'];
+    // The administration copy is loaded with the console (features/admin), so it is a type here and not a bundled resource.
+    resources: (typeof resources)['tr'] & { admin: typeof import('@/locales/tr/admin.json') };
   }
 }
