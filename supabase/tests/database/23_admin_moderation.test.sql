@@ -1,6 +1,8 @@
 -- Phase 6 / M4: what an administrator can do (F-28, S-13, S-14): who may call it, what it changes, what it records.
 begin;
 select plan(92);
+-- Local integration and E2E runs leave reports behind, and the queue counts below are about this file's only (rolled back).
+delete from public.reports;
 
 create function pg_temp.act_as(p_uid uuid, p_aal text default 'aal2')
 returns void language plpgsql as $$
@@ -147,10 +149,10 @@ reset role;
 select is((select array_agg(status order by id) from public.reports where target_id = pg_temp.u(6)), array['ACTIONED', 'ACTIONED'],
           'both are marked');
 select is((select count(*)::int from public.reports where target_id = pg_temp.u(6) and handled_by = pg_temp.u(1)), 2, 'by the administrator');
-select is((select note from public.moderation_actions where action = 'REPORT_RESOLVED'), 'Askıya alındı', 'the note is trimmed and kept');
+select is((select note from public.moderation_actions where action = 'REPORT_RESOLVED' and actor_id = pg_temp.u(1)), 'Askıya alındı', 'the note is trimmed and kept');
 select is((select count(*)::int from private.audit_logs where action = 'REPORT_RESOLVED' and actor_id = pg_temp.u(1)), 1,
           'and the audit trail has it, without the note');
-select ok((select metadata::text from private.audit_logs where action = 'REPORT_RESOLVED') !~ 'Askıya', 'no free text in the audit trail');
+select ok((select metadata::text from private.audit_logs where action = 'REPORT_RESOLVED' and actor_id = pg_temp.u(1)) !~ 'Askıya', 'no free text in the audit trail');
 
 -- ---- suspending ---------------------------------------------------------------------------------------------------------
 insert into auth.sessions (id, user_id, created_at, updated_at) values (gen_random_uuid(), pg_temp.u(6), now(), now());
@@ -168,7 +170,7 @@ reset role;
 delete from public.platform_admins where user_id = pg_temp.u(7);
 select is((select account_status::text from public.profiles where id = pg_temp.u(6)), 'SUSPENDED', 'the status changed');
 select is((select count(*)::int from auth.sessions where user_id = pg_temp.u(6)), 0, 'their sessions ended');
-select is((select count(*)::int from public.moderation_actions where action = 'USER_SUSPENDED'), 1, 'recorded once');
+select is((select count(*)::int from public.moderation_actions where action = 'USER_SUSPENDED' and actor_id = pg_temp.u(1)), 1, 'recorded once');
 select pg_temp.act_as(pg_temp.u(6));
 select throws_ok(format($$select public.request_join(%L)$$, pg_temp.id('ev')), 'P0001', 'ACCOUNT_RESTRICTED', 'they cannot act');
 select pg_temp.act_as(pg_temp.u(4));
@@ -201,7 +203,7 @@ select is((select count(*)::int from public.notifications where type = 'EVENT_CA
           'the participant is told');
 select is((select count(*)::int from public.notifications where type = 'EVENT_CANCELED' and user_id = pg_temp.u(3)), 0,
           'the organizer is not yet (M6)');
-select is((select count(*)::int from public.moderation_actions where action = 'EVENT_CANCELED_BY_ADMIN'), 1, 'recorded once');
+select is((select count(*)::int from public.moderation_actions where action = 'EVENT_CANCELED_BY_ADMIN' and actor_id = pg_temp.u(1)), 1, 'recorded once');
 
 -- ---- reviews, disputes and flags ----------------------------------------------------------------------------------------
 -- Direct inserts: these tests are about what an administrator sees, not about how a review gets written.
@@ -250,7 +252,7 @@ select lives_ok($$select public.admin_hide_review('00000000-0000-4000-8000-00000
 reset role;
 select is((select status from public.skill_reviews where id = '00000000-0000-4000-8000-000000002301'), 'HIDDEN', 'it is hidden');
 select is((select count(*)::int from public.user_sport_ratings where user_id = pg_temp.u(8)), 0, 'the rating was computed again');
-select is((select count(*)::int from public.moderation_actions where action = 'REVIEW_HIDDEN'), 1, 'recorded once');
+select is((select count(*)::int from public.moderation_actions where action = 'REVIEW_HIDDEN' and actor_id = pg_temp.u(1)), 1, 'recorded once');
 select pg_temp.act_as(pg_temp.u(1), 'aal2');
 select is((select count(*)::int from jsonb_array_elements(public.admin_list_flags()) f where f ->> 'kind' = 'MUTUAL_FIVE'),
           0, 'a hidden review no longer counts towards a flag: one event is not a pattern');

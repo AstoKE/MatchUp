@@ -97,54 +97,66 @@ export type Database = {
       };
       cities: {
         Row: {
+          centroid: unknown;
           country_code: string;
           id: string;
           is_active: boolean;
           names: NonNullable<Json>;
           slug: string;
           timezone: string;
+          wikidata_id: string | null;
         };
         ComputedFields: never;
         Insert: {
+          centroid?: unknown;
           country_code: string;
           id?: string;
           is_active?: boolean;
           names: NonNullable<Json>;
           slug: string;
           timezone: string;
+          wikidata_id?: string | null;
         };
         Update: {
+          centroid?: unknown;
           country_code?: string;
           id?: string;
           is_active?: boolean;
           names?: NonNullable<Json>;
           slug?: string;
           timezone?: string;
+          wikidata_id?: string | null;
         };
         Relationships: [];
       };
       districts: {
         Row: {
+          centroid: unknown;
           city_id: string;
           id: string;
           is_active: boolean;
           names: NonNullable<Json>;
           slug: string;
+          wikidata_id: string | null;
         };
         ComputedFields: never;
         Insert: {
+          centroid?: unknown;
           city_id: string;
           id?: string;
           is_active?: boolean;
           names: NonNullable<Json>;
           slug: string;
+          wikidata_id?: string | null;
         };
         Update: {
+          centroid?: unknown;
           city_id?: string;
           id?: string;
           is_active?: boolean;
           names?: NonNullable<Json>;
           slug?: string;
+          wikidata_id?: string | null;
         };
         Relationships: [
           {
@@ -1349,6 +1361,7 @@ export type Database = {
         Returns: undefined;
       };
       cancel_participation: { Args: { p_event_id: string }; Returns: undefined };
+      catalog_places: { Args: Record<PropertyKey, never>; Returns: Json };
       complete_event: { Args: { p_event_id: string }; Returns: undefined };
       complete_onboarding: {
         Args: {

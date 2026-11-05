@@ -11,7 +11,7 @@ import {
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { localizedName, type Catalog } from '@/features/catalog';
+import { localizedName, usePlaceSearch, type Catalog } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
 import {
   Button,
@@ -126,7 +126,7 @@ function WhenStep({ catalog, draft, onChange, errors, locked, now }: EventFormPr
   const { t } = useTranslation('events');
   const { spacing } = useTheme();
   const locale = currentLocale();
-  const city = catalog.cities.find((c) => c.id === draft.cityId) ?? catalog.cities[0];
+  const city = catalog.cities.find((c) => c.id === draft.cityId);
   const timeZone = city?.timeZone ?? 'Europe/Istanbul';
   const today = utcToZonedParts(now.toISOString(), timeZone).date;
   const [dateText, setDateText] = useState(formatTypedDate(draft.date));
@@ -242,6 +242,7 @@ function WhereStep({ catalog, draft, onChange, errors }: EventFormProps) {
   const { t } = useTranslation('events');
   const { spacing } = useTheme();
   const locale = currentLocale();
+  const search = usePlaceSearch();
   return (
     <View style={{ gap: spacing[4] }}>
       <Text variant="title" heading={2}>
@@ -251,6 +252,7 @@ function WhereStep({ catalog, draft, onChange, errors }: EventFormProps) {
         label={t('fields.city')}
         placeholder={t('fields.city')}
         value={draft.cityId}
+        search={search}
         options={catalog.cities.map((c) => ({
           value: c.id,
           label: localizedName(c.names, locale),
@@ -264,6 +266,7 @@ function WhereStep({ catalog, draft, onChange, errors }: EventFormProps) {
         placeholder={t('fields.district')}
         value={draft.districtId}
         disabled={!draft.cityId}
+        search={search}
         options={(catalog.cities.find((c) => c.id === draft.cityId)?.districts ?? []).map((d) => ({
           value: d.id,
           label: localizedName(d.names, locale),

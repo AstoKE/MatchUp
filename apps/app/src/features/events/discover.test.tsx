@@ -71,6 +71,13 @@ jest.mock('./discover-sport-preference', () => ({
   storeDiscoverSport: (...a: unknown[]) => mockPreference.store(...a),
 }));
 
+const mockCity = { stored: null as string | null, store: jest.fn() };
+jest.mock('./city-preference', () => ({
+  ...jest.requireActual<typeof import('./city-preference')>('./city-preference'),
+  readStoredCity: () => mockCity.stored,
+  storeCity: (...a: unknown[]) => mockCity.store(...a),
+}));
+
 const mockRouter = { replace: jest.fn(), push: jest.fn(), back: jest.fn() };
 jest.mock('expo-router', () => ({
   useRouter: () => mockRouter,
@@ -112,6 +119,7 @@ const page = (items: EventListItem[], nextCursor: EventListPage['nextCursor'] = 
 beforeEach(() => {
   jest.clearAllMocks();
   mockPreference.stored = 'ALL';
+  mockCity.stored = null;
   mockApi.fetchCatalog.mockResolvedValue(catalog);
   mockApi.searchEvents.mockResolvedValue(page([item()]));
 });
@@ -181,7 +189,7 @@ describe('DiscoverScreen', () => {
     await fireEvent.press(screen.getByRole('radio', { name: 'Kapalı salon' }));
     await waitFor(() => expect(lastPayload()).toMatchObject({ setting: 'INDOOR' }));
     await fireEvent.press(screen.getByRole('radio', { name: 'Fark etmez', checked: false }));
-    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20 }));
+    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA }));
   });
 
   it('opens the event when its card is pressed', async () => {
@@ -196,7 +204,7 @@ describe('DiscoverScreen', () => {
   it('sends the chosen filters to the server', async () => {
     await renderApp(<DiscoverScreen />);
     await screen.findByText('Perşembe maçı');
-    expect(lastPayload()).toEqual({ limit: 20 });
+    expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA });
 
     await fireEvent.press(screen.getByRole('radio', { name: 'Tenis' }));
     await waitFor(() => expect(lastPayload()).toMatchObject({ sport_ids: [TENNIS] }));
@@ -241,7 +249,7 @@ describe('DiscoverScreen', () => {
     await fireEvent.press(screen.getByRole('checkbox', { name: 'Bugün' }));
     await waitFor(() => expect(lastPayload()).toMatchObject({ to: expect.any(String) }));
     await fireEvent.press(screen.getByRole('checkbox', { name: 'Bugün' }));
-    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20 }));
+    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA }));
   });
 
   it('says so when nothing exists yet and offers to create the first event', async () => {
@@ -267,7 +275,7 @@ describe('DiscoverScreen', () => {
     mockApi.searchEvents.mockResolvedValue(page([item()]));
     await fireEvent.press(screen.getAllByRole('button', { name: 'Filtreleri temizle' })[0]!);
     expect(await screen.findByText('Perşembe maçı')).toBeTruthy();
-    expect(lastPayload()).toEqual({ limit: 20, sport_ids: [TENNIS] });
+    expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA, sport_ids: [TENNIS] });
     expect(screen.getByRole('radio', { name: 'Tenis', checked: true })).toBeTruthy();
   });
 
@@ -277,7 +285,7 @@ describe('DiscoverScreen', () => {
     await renderApp(<DiscoverScreen />);
     await screen.findByText('Tenis için henüz etkinlik yok');
     await fireEvent.press(screen.getByRole('button', { name: 'Tüm sporlar' }));
-    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20 }));
+    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA }));
     expect(mockPreference.store).toHaveBeenLastCalledWith('ALL');
   });
 
@@ -334,7 +342,7 @@ describe('DiscoverScreen: choosing a sport', () => {
     await renderApp(<DiscoverScreen />);
     await fireEvent.press(await screen.findByRole('button', { name: 'Tenis' }));
     await screen.findByText('Perşembe maçı');
-    expect(lastPayload()).toEqual({ limit: 20, sport_ids: [TENNIS] });
+    expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA, sport_ids: [TENNIS] });
     expect(mockPreference.store).toHaveBeenCalledWith(TENNIS);
     expect(screen.getByRole('radio', { name: 'Tenis', checked: true })).toBeTruthy();
     expect(screen.queryByRole('heading', { name: /Hangi sahada/ })).toBeNull();
@@ -345,7 +353,7 @@ describe('DiscoverScreen: choosing a sport', () => {
     await renderApp(<DiscoverScreen />);
     await fireEvent.press(await screen.findByRole('button', { name: 'Tüm sporlar' }));
     await screen.findByText('Perşembe maçı');
-    expect(lastPayload()).toEqual({ limit: 20 });
+    expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA });
     expect(mockPreference.store).toHaveBeenCalledWith('ALL');
   });
 
@@ -354,15 +362,17 @@ describe('DiscoverScreen: choosing a sport', () => {
     await renderApp(<DiscoverScreen />);
     await screen.findByText('Perşembe maçı');
     expect(mockApi.searchEvents).toHaveBeenCalledTimes(1);
-    expect(lastPayload()).toEqual({ limit: 20, sport_ids: [SPORT] });
+    expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA, sport_ids: [SPORT] });
 
     await fireEvent.press(screen.getByRole('radio', { name: 'Tenis' }));
-    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20, sport_ids: [TENNIS] }));
+    await waitFor(() =>
+      expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA, sport_ids: [TENNIS] }),
+    );
     expect(screen.getByRole('radio', { name: 'Futbol', checked: false })).toBeTruthy();
     expect(mockPreference.store).toHaveBeenLastCalledWith(TENNIS);
 
     await fireEvent.press(screen.getByRole('radio', { name: 'Tüm sporlar' }));
-    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20 }));
+    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA }));
   });
 
   it('keeps the other filters when the sport changes', async () => {
@@ -475,7 +485,7 @@ describe('DiscoverScreen: days, urgency and the order of sports', () => {
       await renderApp(<DiscoverScreen />, { session: player });
       await screen.findByText('Perşembe maçı');
       expect(names('radio')).toEqual(['Tüm sporlar', 'Tenis', 'Futbol']);
-      expect(lastPayload()).toEqual({ limit: 20 });
+      expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA });
     });
 
     it('still asks when the profile cannot be read', async () => {
@@ -484,5 +494,97 @@ describe('DiscoverScreen: days, urgency and the order of sports', () => {
       await renderApp(<DiscoverScreen />, { session: player });
       expect(await screen.findByRole('heading', { name: /Hangi sahada/ })).toBeTruthy();
     });
+  });
+});
+
+describe('DiscoverScreen: the province', () => {
+  const IZMIR = '00000000-0000-4000-8000-0000000000c2';
+  const KARSIYAKA = '00000000-0000-4000-8000-0000000000d2';
+  const country = {
+    ...catalog,
+    cities: [
+      ...catalog.cities,
+      {
+        id: IZMIR,
+        slug: 'izmir',
+        names: { tr: 'İzmir', en: 'İzmir' },
+        timeZone: 'Europe/Istanbul',
+        districts: [
+          { id: KARSIYAKA, slug: 'karsiyaka', names: { tr: 'Karşıyaka', en: 'Karşıyaka' } },
+        ],
+      },
+    ],
+  };
+  beforeEach(() => mockApi.fetchCatalog.mockResolvedValue(country));
+
+  it('starts in Ankara for a guest who never picked one', async () => {
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    expect(screen.getByRole('button', { name: 'İl: Ankara. Değiştir' })).toBeTruthy();
+    expect(lastPayload()).toMatchObject({ city_id: ANKARA });
+  });
+
+  it('starts in the province picked last on this device', async () => {
+    mockCity.stored = IZMIR;
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    expect(lastPayload()).toMatchObject({ city_id: IZMIR });
+  });
+
+  it('a remembered province the catalog no longer has falls back to Ankara', async () => {
+    mockCity.stored = '00000000-0000-4000-8000-0000000000c9';
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    expect(lastPayload()).toMatchObject({ city_id: ANKARA });
+  });
+
+  it('starts in the profile province for a player, over the device', async () => {
+    mockCity.stored = ANKARA;
+    mockApi.fetchMyProfile.mockResolvedValue({
+      userId: '00000000-0000-4000-8000-0000000000aa',
+      displayName: 'Oyuncu',
+      bio: null,
+      cityId: IZMIR,
+      districtId: null,
+      settings: {},
+      sports: [],
+    });
+    await renderApp(<DiscoverScreen />, {
+      session: {
+        status: 'authenticated',
+        userId: '00000000-0000-4000-8000-0000000000aa',
+        email: 'p@example.com',
+        emailVerified: true,
+      },
+    });
+    await screen.findByText('Perşembe maçı');
+    expect(lastPayload()).toMatchObject({ city_id: IZMIR });
+  });
+
+  it('is changed from the top, found without Turkish letters, remembered, and drops the old district', async () => {
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    await openFilters();
+    await fireEvent.press(screen.getByRole('button', { name: /^İlçe:/ }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Çankaya' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Sonuçları göster' }));
+    await waitFor(() => expect(lastPayload()).toMatchObject({ district_ids: [CANKAYA] }));
+
+    await fireEvent.press(screen.getByRole('button', { name: 'İl: Ankara. Değiştir' }));
+    await fireEvent.changeText(screen.getByLabelText('Ara'), 'izm');
+    expect(screen.queryByRole('radio', { name: 'Ankara' })).toBeNull();
+    await fireEvent.press(screen.getByRole('radio', { name: 'İzmir' }));
+
+    await waitFor(() => expect(lastPayload()).toEqual({ limit: 20, city_id: IZMIR }));
+    expect(mockCity.store).toHaveBeenCalledWith(IZMIR);
+    expect(screen.getByRole('button', { name: 'İl: İzmir. Değiştir' })).toBeTruthy();
+  });
+
+  it('says so when nothing matches the search', async () => {
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    await fireEvent.press(screen.getByRole('button', { name: 'İl: Ankara. Değiştir' }));
+    await fireEvent.changeText(screen.getByLabelText('Ara'), 'zzz');
+    expect(screen.getByText('Eşleşen sonuç yok')).toBeTruthy();
   });
 });

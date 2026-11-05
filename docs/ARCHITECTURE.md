@@ -296,7 +296,7 @@ scripts/   .github/workflows/ci.yml   docs/
 | Data / forms / i18n | @supabase/supabase-js 2.118.0 · @tanstack/react-query 5.104.5 · zod 4.6.7 · react-hook-form 7.91.0 + @hookform/resolvers 6.0.0 · i18next 26.5.10 + react-i18next 17.1.8 |
 | Observability | @sentry/react-native 8.28.0 (Expo-pinned; lazily imported, active only with a DSN) |
 | Tests | Vitest 5.0.5 (+ coverage-v8) · **Jest 30.5.2** + jest-expo 58.0.12 + @react-native/jest-preset 0.88.0 + RNTL 14.1.0 + test-renderer 1.3.1 · Playwright 1.64.1 + @axe-core/playwright 4.14.0 · pg 8.23.1 · pgTAP (Supabase `pg_prove` 3.36) |
-| Backend (local) | Supabase CLI 2.122.0 · PostgreSQL **17.11** (Supabase image) · PostGIS **not installed yet** (Phase 3/4) · Edge runtime: Deno 2 |
+| Backend (local) | Supabase CLI 2.122.0 · PostgreSQL **17.11** (Supabase image) · PostGIS **3.3.7** in schema `extensions` (Phase 4, `20261106100000`) · Edge runtime: Deno 2 |
 
 Pinned build-script policy: `pnpm-workspace.yaml` denies dependency build scripts except the reviewed `supabase` CLI download. `@expo/cli>zod` is overridden to ≥ 4.6.7; one scoped audit ignore exists (node-forge, dev tooling) — see PHASE1_REPORT §4.
 

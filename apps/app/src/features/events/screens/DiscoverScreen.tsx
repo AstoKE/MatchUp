@@ -16,6 +16,8 @@ import { useMyProfile } from '@/features/profile';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { Button, EmptyState, Screen, Skeleton, Text, TOUCH_TARGET, useTheme } from '@/ui';
+import { readStoredCity, startingCityId, storeCity } from '../city-preference';
+import { CityPicker } from '../components/CityPicker';
 import { DiscoverFilters } from '../components/DiscoverFilters';
 import { SportPicker, SportStrip } from '../components/DiscoverSports';
 import { EventListRow } from '../components/EventListRow';
@@ -26,7 +28,8 @@ import { useEventSearch } from '../hooks';
 /**
  * Discover (FL-2), open to guests (D-09): published public events from `search_events`, soonest first.
  * The first visit asks which sport; after that one sport, or all of them, is remembered on the device and changed
- * from the strip above the list. Distance sort and the map arrive with Phase 4.
+ * from the strip above the list. The province is the profile's, else the last one picked here, else Ankara, and is
+ * changed from the top (ADR-0024 §6). Distance sort and the map arrive later in Phase 4.
  */
 export function DiscoverScreen() {
   const { t } = useTranslation(['events', 'common', 'nav']);
@@ -68,8 +71,18 @@ export function DiscoverScreen() {
     (!profile.isPending || profile.fetchStatus === 'idle');
   // Read the clock once per visit (render must stay pure); "today" is resolved server-side bounds only.
   const [openedAt] = useState(Date.now);
-  // The pilot has one city; with several, a city picker would choose it here.
-  const city = catalog.data?.cities[0];
+  // A pick made here wins over the profile for the rest of the visit; it is remembered for the next one.
+  const [pickedCityId, setPickedCityId] = useState<string | null>(null);
+  const cityId =
+    pickedCityId ??
+    (catalog.data ? startingCityId(catalog.data, profile.data?.cityId, readStoredCity()) : null);
+  const city = catalog.data?.cities.find((c) => c.id === cityId);
+  const chooseCity = (next: string) => {
+    setPickedCityId(next);
+    storeCity(next);
+    // A district of the previous province means nothing in the new one.
+    setFilters((current) => ({ ...current, districtId: null }));
+  };
   const payload = useMemo(
     () =>
       buildSearchPayload(
@@ -77,9 +90,10 @@ export function DiscoverScreen() {
         {
           now: new Date(openedAt),
           timeZone: city?.timeZone ?? 'Europe/Istanbul',
+          cityId: city?.id ?? null,
         },
       ),
-    [filters, choice, openedAt, city?.timeZone],
+    [filters, choice, openedAt, city?.timeZone, city?.id],
   );
   const search = useEventSearch(payload, ready && choice !== null);
   const items = useMemo(
@@ -105,10 +119,12 @@ export function DiscoverScreen() {
           minHeight: TOUCH_TARGET,
         }}
       >
-        {city ? (
-          <Text variant="label" tone="secondary">
-            {localizedName(city.names, locale)}
-          </Text>
+        {catalog.data ? (
+          <CityPicker
+            cities={catalog.data.cities}
+            cityId={city?.id ?? null}
+            onChange={chooseCity}
+          />
         ) : (
           <View />
         )}

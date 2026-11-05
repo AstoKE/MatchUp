@@ -36,7 +36,7 @@
     "tomorrow": "Tomorrow",
     "duration": "Duration",
     "minutes": "{{count}} min",
-    "city": "City",
+    "city": "Province",
     "district": "District",
     "place": "Place",
     "placeHint": "E.g. METU Pitch 2",
@@ -203,7 +203,10 @@
     "pickerHint": "Pick a sport to see open events. You can change it later from above the list.",
     "allSports": "All sports",
     "noSportTitle": "No {{sport}} events yet",
-    "noSportBody": "Try another sport or see all of them."
+    "noSportBody": "Try another sport or see all of them.",
+    "cityButton": "Province: {{city}}. Change",
+    "cityPick": "Pick a province",
+    "cityTitle": "Pick a province"
   },
   "join": {
     "signInToJoin": "Sign in to request a spot",

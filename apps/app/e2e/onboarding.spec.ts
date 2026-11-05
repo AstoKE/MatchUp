@@ -166,7 +166,7 @@ test.describe('profile screens', () => {
     await page.getByRole('button', { name: 'Profili düzenle' }).click();
     await page.getByLabel('Görünen ad', { exact: true }).fill('Yeni Ad');
     await page.getByLabel('Hakkında', { exact: true }).fill('Hafta sonları halı saha.');
-    await page.getByRole('button', { name: /^Şehir: / }).click();
+    await page.getByRole('button', { name: /^İl: / }).click();
     await page.getByRole('radio', { name: 'Ankara' }).click();
     await page.getByRole('button', { name: /^İlçe: / }).click();
     await page.getByRole('radio', { name: 'Çankaya' }).click();
@@ -224,7 +224,7 @@ test.describe('accessibility of onboarding, legal and profile screens (axe, WCAG
     await termsBox(page).click();
     await next(page).click();
     await expect(page.getByText('Seni tanıyalım')).toBeVisible();
-    await page.getByRole('button', { name: /^Şehir: / }).click(); // open the select as well
+    await page.getByRole('button', { name: /^İl: / }).click(); // open the select as well
     await expectNoBlocking(page);
 
     await page.getByLabel('Görünen ad', { exact: true }).fill('Axe Test');

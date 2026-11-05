@@ -205,6 +205,45 @@ test.describe('discovering events (Phase 3 / M3)', () => {
   });
 });
 
+test.describe('the province of Discover (Phase 4 / M2)', () => {
+  test('a guest starts in Ankara, finds İzmir without Turkish letters, and it is remembered', async ({
+    page,
+  }) => {
+    const s = requireStack();
+    const email = uniqueEmail('province');
+    createdIds.push(
+      (await createOnboardedUser(s, email, { displayName: 'İzmirli Düzenleyen' })).id,
+    );
+    const title = `E2E il ${email.slice(9, 17)}`;
+    await createPublishedEvent(s, email, title, { citySlug: 'izmir', districtSlug: 'karsiyaka' });
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Futbol', exact: true }).click();
+    const card = page.getByRole('link', { name: new RegExp(title) });
+    const province = page.getByRole('button', { name: /^İl: .*\. Değiştir$/ });
+    await expect(province).toHaveAccessibleName('İl: Ankara. Değiştir');
+    await expect(page.getByRole('heading', { name: 'Keşfet', level: 1 })).toBeVisible();
+    await expect(card).toHaveCount(0);
+
+    await province.click();
+    const sheet = page.getByRole('dialog', { name: 'İl seç' });
+    await expect(sheet.getByRole('radio')).toHaveCount(81);
+    await expectNoBlocking(page);
+    await sheet.getByLabel('Ara', { exact: true }).fill('izm');
+    await expect(sheet.getByRole('radio')).toHaveCount(1);
+    await sheet.getByRole('radio', { name: 'İzmir', exact: true }).click();
+    await expect(sheet).toHaveCount(0);
+    await expect(province).toHaveAccessibleName('İl: İzmir. Değiştir');
+    await expect(card).toBeVisible();
+    await expect(card).toContainText('Karşıyaka');
+
+    // The pick is remembered on this device.
+    await page.reload();
+    await expect(province).toHaveAccessibleName('İl: İzmir. Değiştir');
+    await expect(card).toBeVisible();
+  });
+});
+
 test.describe('My Events (Phase 3 / M3b)', () => {
   test('the organizer finds their draft and published event; someone else does not', async ({
     page,

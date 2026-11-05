@@ -15,5 +15,7 @@
   },
   "logoAlt": "{{appName}} logo",
   "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants"
+  "participants_other": "{{count}} participants",
+  "search": "Search",
+  "noMatch": "Nothing matches"
 }

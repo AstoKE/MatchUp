@@ -3,7 +3,7 @@
   "displayNameHint": "Diğer oyuncular bunu görür. 2–40 karakter.",
   "bio": "Hakkında",
   "bioHint": "İsteğe bağlı, en fazla {{max}} karakter.",
-  "city": "Şehir",
+  "city": "İl",
   "district": "İlçe",
   "locationHint": "Konum isteğe bağlıdır; yalnızca sana yakın etkinlikleri göstermek için kullanılır.",
   "notSet": "Seçilmedi",

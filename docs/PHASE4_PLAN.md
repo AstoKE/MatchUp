@@ -1,6 +1,6 @@
 # Phase 4 plan: all of Turkey, places, venues and the map
 
-Status 2026-11-05: **plan, nothing built.** Scope: ROADMAP F-20 (the pin, postponed from Phase 3 by ADR-0019), F-21, F-22, plus all 81 provinces and their districts, a decision of 2026-11-05 recorded in [ADR-0024](ADR/0024-turkey-wide-catalog-and-phase-4-providers.md). Sources of truth stay `docs/PRD.md` §4.4 and §4.6, `docs/DATABASE.md` §3, `docs/SECURITY.md`, ADR-0011. This file sequences the work and lists the decisions it needs.
+Status 2026-11-06: **M1 and M2 built** (one PR), M3 to M6 not started. Scope: ROADMAP F-20 (the pin, postponed from Phase 3 by ADR-0019), F-21, F-22, plus all 81 provinces and their districts, a decision of 2026-11-05 recorded in [ADR-0024](ADR/0024-turkey-wide-catalog-and-phase-4-providers.md). Sources of truth stay `docs/PRD.md` §4.4 and §4.6, `docs/DATABASE.md` §3, `docs/SECURITY.md`, ADR-0011. This file sequences the work and lists the decisions it needs.
 
 **Why now.** The launch offers every province, and the catalog, the city picker and the pin are hard to add once real events exist in places the schema does not know. Phase 7 starts after this.
 
@@ -21,6 +21,8 @@ Not there:
 
 ### M1: the catalog of Turkey
 
+**Status 2026-11-06: built** in `20261106100000_turkey_catalog.sql`: 81 provinces, 973 districts, centroids, `wikidata_id`, PostGIS (moved here from M3 so the points load with the rows), `catalog_places()`. Deviations from the plan below: the list of which districts exist comes from the official count as tabulated on Turkish Wikipedia (the Wikidata class holds 1038 items), and no per-province counts file was needed (ADR-0024 §2, revised). The 973 districts arrive in one RPC, not per province: about 120 kB of JSON once per session, cached for an hour. pgTAP `25_turkey_catalog` (20), script tests for slugs and for the migration matching the JSON, the integration catalog test.
+
 - **Script** `scripts/catalog/build-tr-catalog.mjs` (run by hand, not in CI): it queries Wikidata, writes `supabase/seed/catalog/tr-provinces-districts.json` with ids, Turkish and English names, slugs, centroids and the Wikidata QID, and checks each province against the official count in `scripts/catalog/official-counts.json`. It stops on any difference not listed in `scripts/catalog/exceptions.json` with a reason. The JSON is committed and reviewed in the PR.
 - **Migration:** it inserts the 80 new provinces and their districts, keeps Ankara's rows and ids, and adds the `wikidata_id` columns. Centroids stay in the file until M3 adds PostGIS and the column, then they are loaded from it. Slugs are made with the `tr` locale (İ/ı) and are unique per province.
 - **Catalog reads:** it is no longer one request with every district (973 rows). Cities come in one request; a city's districts come when it is chosen, with a long cache. A new `get_districts(city_id)` is not needed if the RLS read with a filter stays fast. It is measured.
@@ -30,6 +32,8 @@ Not there:
 - **Acceptance:** `db:reset` loads the full country. The hosted push loads it once (`on conflict do nothing`), and existing events and profiles still point at the same rows.
 
 ### M2: choosing a province and a district everywhere
+
+**Status 2026-11-06: built.** `Select` gained a search box (Turkish letters fold: "izm" finds İzmir), used for province and district in onboarding, the profile, the event form and the district filter. Discover has a province button at the top (a sheet with search, 81 provinces), remembered as `matchup.city`, and now sends `city_id` to `search_events` (before, it listed every city). A new event starts in the profile's province, else the last pick, else Ankara (`defaultCityId` in the domain package). No `cities[0]` is left. The Turkish label is now "İl" (English "Province"). The event form became a lazy chunk to make room in the first load (`docs/PERFORMANCE.md` §4 item 5). Tests: domain, components (Discover, create flow), a Playwright flow with axe.
 
 - A searchable picker for the 81 provinces (Turkish-aware matching: "izmir" finds İzmir) and then for the district. The same component is used in onboarding, the profile, the event form and Discover.
 - Discover default: the province on the profile; otherwise the last one picked on this device (`matchup.city`, read in try/catch); otherwise Ankara. It can be changed from the top. An event's city and timezone come from what was picked, not from `cities[0]`.

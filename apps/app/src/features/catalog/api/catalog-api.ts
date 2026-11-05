@@ -26,17 +26,12 @@ const formatRow = z.object({
   default_capacity: z.number(),
   max_participants: z.number(),
 });
-const cityRow = z.object({
+const placeRow = z.object({
   id: z.uuid(),
   slug: z.string(),
   names: localized,
   timezone: z.string(),
-});
-const districtRow = z.object({
-  id: z.uuid(),
-  city_id: z.uuid(),
-  slug: z.string(),
-  names: localized,
+  districts: z.array(z.object({ id: z.uuid(), slug: z.string(), names: localized })),
 });
 
 export interface CatalogPosition {
@@ -81,9 +76,16 @@ export interface Catalog {
   cities: CatalogCity[];
 }
 
-/** Guest-readable reference data (ADR-0013), fetched in five small queries and joined here. */
+/** Turkish alphabetical order (Ç after C, İ after I), whatever the UI language: the names are Turkish. */
+const byTurkishName = (a: { names: LocalizedName }, b: { names: LocalizedName }) =>
+  a.names.tr.localeCompare(b.names.tr, 'tr');
+
+/**
+ * Guest-readable reference data (ADR-0013), fetched in four requests and joined here. Provinces and districts come from
+ * `catalog_places` in one piece: 973 districts are more than a table read returns (PostgREST max_rows).
+ */
 export async function fetchCatalog(): Promise<Catalog> {
-  const [sports, positions, formats, cities, districts] = await Promise.all([
+  const [sports, positions, formats, places] = await Promise.all([
     supabase
       .from('sports')
       .select('id, slug, names, is_team_sport, skill_descriptors')
@@ -93,18 +95,16 @@ export async function fetchCatalog(): Promise<Catalog> {
       .from('sport_formats')
       .select('id, sport_id, slug, names, min_participants, default_capacity, max_participants')
       .order('sort_order'),
-    supabase.from('cities').select('id, slug, names, timezone').order('slug'),
-    supabase.from('districts').select('id, city_id, slug, names').order('slug'),
+    supabase.rpc('catalog_places'),
   ]);
-  for (const result of [sports, positions, formats, cities, districts]) {
+  for (const result of [sports, positions, formats, places]) {
     if (result.error) throw result.error;
   }
 
   const sportRows = z.array(sportRow).parse(sports.data);
   const positionRows = z.array(positionRow).parse(positions.data);
   const formatRows = z.array(formatRow).parse(formats.data);
-  const cityRows = z.array(cityRow).parse(cities.data);
-  const districtRows = z.array(districtRow).parse(districts.data);
+  const placeRows = z.array(placeRow).parse(places.data);
 
   return {
     sports: sportRows.map((s) => ({
@@ -127,14 +127,14 @@ export async function fetchCatalog(): Promise<Catalog> {
           maxParticipants: f.max_participants,
         })),
     })),
-    cities: cityRows.map((c) => ({
-      id: c.id,
-      slug: c.slug,
-      names: c.names,
-      timeZone: c.timezone,
-      districts: districtRows
-        .filter((d) => d.city_id === c.id)
-        .map((d) => ({ id: d.id, slug: d.slug, names: d.names })),
-    })),
+    cities: placeRows
+      .map((c) => ({
+        id: c.id,
+        slug: c.slug,
+        names: c.names,
+        timeZone: c.timezone,
+        districts: c.districts.sort(byTurkishName),
+      }))
+      .sort(byTurkishName),
   };
 }

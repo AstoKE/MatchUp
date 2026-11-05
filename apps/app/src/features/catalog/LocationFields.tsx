@@ -3,6 +3,7 @@ import { currentLocale } from '@/lib/i18n';
 import { Select, Text } from '@/ui';
 import type { CatalogCity } from './api/catalog-api';
 import { localizedName } from './localized';
+import { usePlaceSearch } from './place-search';
 
 /** Optional city + district. Choosing another city clears the district (it must belong to the city). */
 export function LocationFields({
@@ -21,6 +22,7 @@ export function LocationFields({
   const { t } = useTranslation('profile');
   const locale = currentLocale();
   const city = cities.find((c) => c.id === cityId);
+  const search = usePlaceSearch();
   return (
     <>
       <Select
@@ -28,6 +30,7 @@ export function LocationFields({
         placeholder={t('notSet')}
         noneLabel={t('notSet')}
         value={cityId}
+        search={search}
         options={cities.map((c) => ({ value: c.id, label: localizedName(c.names, locale) }))}
         onChange={(next) =>
           onChange({ cityId: next, districtId: next === cityId ? districtId : null })
@@ -39,6 +42,7 @@ export function LocationFields({
         noneLabel={t('notSet')}
         value={districtId}
         disabled={!city}
+        search={search}
         options={(city?.districts ?? []).map((d) => ({
           value: d.id,
           label: localizedName(d.names, locale),

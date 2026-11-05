@@ -3,7 +3,7 @@
   "displayNameHint": "Other players will see this. 2–40 characters.",
   "bio": "About you",
   "bioHint": "Optional, up to {{max}} characters.",
-  "city": "City",
+  "city": "Province",
   "district": "District",
   "locationHint": "Location is optional and only used to show you games near you.",
   "notSet": "Not set",

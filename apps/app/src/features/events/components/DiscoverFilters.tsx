@@ -9,7 +9,7 @@ import {
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { localizedName, type CatalogCity } from '@/features/catalog';
+import { localizedName, usePlaceSearch, type CatalogCity } from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
 import { Button, SegmentedChoice, Select, Sheet, Text, ToggleChip, useTheme } from '@/ui';
 
@@ -35,6 +35,7 @@ export function DiscoverFilters({
   const compact = breakpoint === 'compact';
   const [open, setOpen] = useState(false);
   const locale = currentLocale();
+  const search = usePlaceSearch();
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch });
   const count = activeFilterCount(filters);
   const chips = (
@@ -126,6 +127,7 @@ export function DiscoverFilters({
               label={t('discover.district')}
               placeholder={t('discover.districtPlaceholder')}
               noneLabel={t('discover.districtAny')}
+              search={search}
               options={city.districts.map((d) => ({
                 value: d.id,
                 label: localizedName(d.names, locale),

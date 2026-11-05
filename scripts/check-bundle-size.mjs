@@ -32,11 +32,16 @@
 // TOTAL raised 897 -> 898 (2026-11-05, Phase 6 / M6): four notification texts in two languages, the suspended-account
 // page and the display-name check are in the main bundle, since every signed-in person needs them. INITIAL stays 555 and
 // is now exactly on it: nothing more can join the first load without something leaving it.
+//
+// TOTAL raised 898 -> 901 (2026-11-06, Phase 4 / M1-M2): the province picker of Discover, the search box of the province
+// and district fields, the Turkish name matching and the nested catalog read (+2 kB), and the event form moved into its
+// own lazy chunk (EventStepper, 4 kB gzip; about 1 kB of that is the cost of splitting). The move is what made room for
+// the picker in the first load: INITIAL went 557 -> 554 kB and stays under 555.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 898;
+const TOTAL_RATCHET_KB = 901;
 const INITIAL_RATCHET_KB = 555;
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';
 

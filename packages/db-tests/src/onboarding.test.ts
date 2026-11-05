@@ -82,7 +82,14 @@ describe('reference catalog over the Data API', () => {
     const rows = (await response.json()) as { slug: string; names: { tr: string; en: string } }[];
     expect(rows).toHaveLength(10);
     expect(rows[0]).toMatchObject({ slug: 'football', names: { tr: 'Futbol', en: 'Football' } });
-    expect((await (await rest('/districts?select=id')).json()) as unknown[]).toHaveLength(25);
+    // A table read stops at PostgREST's max_rows; the app reads the 973 districts through catalog_places.
+    expect((await (await rest('/districts?select=id')).json()) as unknown[]).toHaveLength(100);
+    const places = (await (
+      await rest('/rpc/catalog_places', { method: 'POST', body: '{}' })
+    ).json()) as { slug: string; districts: unknown[] }[];
+    expect(places).toHaveLength(81);
+    expect(places.reduce((sum, c) => sum + c.districts.length, 0)).toBe(973);
+    expect(places.find((c) => c.slug === 'ankara')?.districts).toHaveLength(25);
   });
 
   it.each(['sports', 'sport_formats', 'sport_positions', 'cities', 'districts'])(
