@@ -212,6 +212,37 @@ export function deleteEventsOf(userId: string) {
   ]);
 }
 
+/** TEST-ONLY: an administrator is a row written with service credentials; no client can do it. */
+export function makeAdmin(userId: string) {
+  if (!/^[0-9a-f-]{36}$/.test(userId)) throw new Error('not a uuid');
+  execFileSync('docker', [
+    'exec',
+    'supabase_db_matchup',
+    'psql',
+    '-U',
+    'postgres',
+    '-v',
+    'ON_ERROR_STOP=1',
+    '-c',
+    `insert into public.platform_admins (user_id) values ('${userId}') on conflict do nothing`,
+  ]);
+}
+
+/** TEST-ONLY: a report through the real RPC, as that user. */
+export async function reportAs(
+  stack: LocalStack,
+  email: string,
+  target: { type: 'USER' | 'EVENT'; id: string },
+  reason = 'SPAM',
+) {
+  await rpcAs(stack, email, 'report', {
+    p_target_type: target.type,
+    p_target_id: target.id,
+    p_reason: reason,
+    p_details: 'Deneme bildirimi',
+  });
+}
+
 async function rpcAs(stack: LocalStack, email: string, name: string, body: unknown) {
   const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
   const tokenResponse = await fetch(`${stack.apiUrl}/auth/v1/token?grant_type=password`, {

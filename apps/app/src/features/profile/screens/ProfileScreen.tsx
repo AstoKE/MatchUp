@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { signOut, useSession, VerifyEmailBanner } from '@/features/auth';
 import { localizedName, type Catalog } from '@/features/catalog';
+import { useMyAccount } from '@/features/onboarding';
 import { currentLocale } from '@/lib/i18n';
 import { Avatar, Button, Icon, Screen, SportDot, Text, useTheme } from '@/ui';
 import type { MyProfile } from '../api/profile-api';
@@ -74,6 +75,9 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
   const { t } = useTranslation(['profile', 'auth', 'common', 'nav', 'notifications']);
   const router = useRouter();
   const session = useSession();
+  // The console exists on the web only, and only an administrator is shown the way in (the server decides every call).
+  const account = useMyAccount();
+  const showAdmin = Platform.OS === 'web' && account.data?.isAdmin === true;
   const { spacing, colors, radius } = useTheme();
   const locale = currentLocale();
   // After signing out, land on the guest home page rather than a sign-in prompt.
@@ -187,6 +191,12 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
           onPress={() => router.push('/notifications')}
         />
         <AccountRow label={t('profile:openSettings')} onPress={() => router.push('/settings')} />
+        {showAdmin ? (
+          <AccountRow
+            label={t('profile:openAdmin')}
+            onPress={() => router.push('/admin' as Href)}
+          />
+        ) : null}
         <AccountRow
           label={t('auth:signOut')}
           disabled={logout.isPending}

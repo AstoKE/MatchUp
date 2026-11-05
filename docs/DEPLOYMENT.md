@@ -104,3 +104,21 @@ Applied 2026-10-25 without the dashboard, by pulling the hosted config into a sc
 `@matchupproject/matchup`, project ID `6c20128e-275c-4b45-babd-869e6a1dd5df`, owned by the Expo account `matchupproject`. Owner and ID live in `packages/config` (`brand.identifiers.expoOwner`, `easProjectId`) and reach Expo through `app.config.ts` (`owner`, `extra.eas.projectId`); `eas init` cannot edit a dynamic config, so this was done by hand and checked with `eas project:info`.
 
 EAS CLI evaluates `app.config.ts` without loading `apps/app/.env.local`, so our fail-fast env validation stops it. For tooling-only runs set `SKIP_ENV_VALIDATION=1` (PowerShell: `$env:SKIP_ENV_VALIDATION='1'`), e.g. `npx eas-cli@25.3.0 project:info` from `apps/app`. Real EAS **builds** must instead receive the `EXPO_PUBLIC_*` values as EAS environment variables (not set up yet). Nothing is built on EAS yet: native dev builds still come from the pinned container (ADR-0015), and the identifiers are the temporary, unpublishable `com.example.matchup.dev` (ADR-0010).
+
+## 11. The administration console and the first administrator (Phase 6 M5)
+
+The console is the web route `/admin` (`apps/app/app/admin/index.web.tsx`); the phone app has no such route. Nobody can open it by being an administrator in a token: **an administrator is a row in `platform_admins`**, written with service credentials, and every `admin_*` function needs a token with a second factor (`aal2`).
+
+Before the first use on hosted, **you** do this once, from the Supabase dashboard (never from the app, never with the service-role key in a client):
+
+1. **Auth › Multi-factor: turn on TOTP** (enroll and verify). Without it the console cannot set up the second step.
+2. The person signs up and finishes onboarding like anybody else. Hosted sign-up stays disabled for the public (LAUNCH_CHECKLIST), so for the very first administrator use an account you already have.
+3. In the SQL editor, with that person's id from Auth › Users:
+   ```sql
+   insert into public.platform_admins (user_id) values ('<the user id>');
+   ```
+4. On the web, sign in, open **Profil › Yönetim** (or `/admin`), scan the QR code with an authenticator app, and enter the code. Later sign-ins ask for the code again.
+
+To remove an administrator: `update public.platform_admins set revoked_at = now() where user_id = '<id>';`. An administrator cannot be suspended through the console; revoke first.
+
+What the console shows and who may see it is in docs/PHASE6_PLAN.md M5 and docs/SECURITY.md S-14. Reports and the decisions made are personal data; how long they are kept is a counsel question (SECURITY §8).

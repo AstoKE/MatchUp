@@ -82,5 +82,6 @@
     "badgesTitle": "Badges",
     "noBadges": "No badges yet. You earn them by playing.",
     "barLabel": "Progress to level {{level}}"
-  }
+  },
+  "openAdmin": "Administration"
 }

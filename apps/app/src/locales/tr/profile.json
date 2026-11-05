@@ -82,5 +82,6 @@
     "badgesTitle": "Rozetler",
     "noBadges": "Henüz rozetin yok. Maçlara katıldıkça kazanırsın.",
     "barLabel": "Seviye {{level}} için ilerleme"
-  }
+  },
+  "openAdmin": "Yönetim"
 }
