@@ -55,7 +55,7 @@ select pg_temp.u(n), 'u11-' || n || '@test.invalid', now(), 'authenticated', 'au
 update public.profiles set display_name = case right(id::text, 2)
     when '01' then 'Düzenleyen D' when '02' then 'Onaylı O' when '03' then 'İstekçi İ'
     when '04' then 'Yabancı Y' when '05' then 'Davetli D' else 'Silinen S' end,
-  adult_confirmed_at = now(), onboarded_at = now()
+  adult_confirmed_at = now(), created_at = now() - interval '30 days', onboarded_at = now()
  where id::text like '00000000-0000-4000-8000-0000000011%';
 insert into public.user_consents (user_id, kind, version)
 select p.id, k.kind::public.consent_kind, (select c.value #>> '{}' from public.app_config c where c.key = k.key)

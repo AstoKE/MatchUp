@@ -162,7 +162,7 @@ Seeded via `supabase/seed/` (idempotent upserts keyed by slug). Catalog edits in
 
 | Table | Purpose | Notes |
 |---|---|---|
-| `notifications` | In-app inbox + future outbox | `id`, `user_id`, `type`, `payload` jsonb (ids only — no PII), `dedupe_key` UQ, `read_at`, `created_at`. Inserted inside the same transaction as the triggering change |
+| `notifications` | In-app inbox + future outbox | `id`, `user_id`, `type`, `payload` jsonb (ids only — no PII), `dedupe_key` UQ, `read_at`, `created_at`. Inserted inside the same transaction as the triggering change. Types so far: `JOIN_REQUESTED`, `REQUEST_APPROVED/REJECTED/WAITLISTED`, `PARTICIPANT_REMOVED/CANCELED`, `SPOT_OPENED`, `EVENT_CANCELED`, `EVENT_CHANGED`, `ATTENDANCE_FINALIZED`, `REPORT_OUTCOME`, `ACCOUNT_REINSTATED`, `EVENT_CANCELED_BY_ADMIN`, `ATTENDANCE_REMINDER` |
 | `reports` | User reports | `reporter_id`, `target_type` `USER/EVENT` (PHASE6_PLAN decision 2), `target_id`, `reason` enum, `details` ≤ 1000, `status` `OPEN/ACTIONED/DISMISSED`, `handled_by`, `handled_at`; UQ per (reporter, target) while OPEN |
 | `user_blocks` | Blocking | **(blocker_id, blocked_id)**, CK ≠ |
 | `moderation_actions` | Admin decisions — **built (Phase 6 M4)** | `actor_id`, `action` (`REPORT_RESOLVED`, `USER_SUSPENDED`, `USER_REINSTATED`, `EVENT_CANCELED_BY_ADMIN`, `REVIEW_HIDDEN`, `REVIEW_RESTORED`), `target_type/id` (`USER`, `EVENT`, `REVIEW`), `report_id`, `outcome`, `note` ≤ 1000 (free text by an admin, so retention is a counsel item), `created_at` — append-only by trigger, no foreign keys (it outlives the accounts), no grants and no policy: only the `admin_*` functions write or read it |

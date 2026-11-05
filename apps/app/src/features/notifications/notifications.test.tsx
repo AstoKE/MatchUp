@@ -85,6 +85,21 @@ describe('NotificationsScreen', () => {
     expect(screen.getByTestId('icon-alert', { includeHiddenElements: true })).toBeTruthy();
   });
 
+  it('words what an administrator did and what is left to do, without a decision', async () => {
+    mockApi.fetchNotifications.mockResolvedValue([
+      note({ id: 'a', type: 'REPORT_OUTCOME', eventId: null }),
+      note({ id: 'b', type: 'ACCOUNT_REINSTATED', eventId: null }),
+      note({ id: 'c', type: 'EVENT_CANCELED_BY_ADMIN' }),
+      note({ id: 'd', type: 'ATTENDANCE_REMINDER' }),
+    ]);
+    await renderApp(<NotificationsScreen />, { session: signedIn });
+    expect(await screen.findByText('Bildirimini inceledik. Teşekkürler.')).toBeTruthy();
+    expect(screen.getByText('Hesabın yeniden açıldı.')).toBeTruthy();
+    expect(screen.getByText('Perşembe maçı bir yönetici tarafından iptal edildi.')).toBeTruthy();
+    expect(screen.getByText(/Perşembe maçı bitti\. Yoklamayı işaretle/)).toBeTruthy();
+    expect(screen.getByTestId('icon-alert', { includeHiddenElements: true })).toBeTruthy();
+  });
+
   it('lists what happened in plain words, newest first, with the event title', async () => {
     mockApi.fetchNotifications.mockResolvedValue([
       note({ id: 'a', type: 'REQUEST_APPROVED' }),

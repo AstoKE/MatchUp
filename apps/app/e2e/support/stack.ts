@@ -55,7 +55,20 @@ export async function createVerifiedUser(stack: LocalStack, email: string, passw
     body: JSON.stringify({ email, password, email_confirm: true }),
   });
   if (!response.ok) throw new Error(`createVerifiedUser failed: ${response.status}`);
-  return (await response.json()) as { id: string };
+  const user = (await response.json()) as { id: string };
+  // Not a new account: accounts under 7 days get tighter quotas (PHASE6_PLAN M6), and tests create many events.
+  execFileSync('docker', [
+    'exec',
+    'supabase_db_matchup',
+    'psql',
+    '-U',
+    'postgres',
+    '-v',
+    'ON_ERROR_STOP=1',
+    '-c',
+    `update public.profiles set created_at = now() - interval '30 days' where id = '${user.id}'`,
+  ]);
+  return user;
 }
 
 /**

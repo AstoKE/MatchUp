@@ -126,6 +126,10 @@ describe('rating under concurrency', () => {
 
   it('six simultaneous finalizations of one event: signals and XP are created once', async () => {
     const { organizer, players, eventId, participations } = await startedEvent(c, 3);
+    // Test users are aged by the helper; this one is about an organizer under 24 hours old (no ORGANIZED_EVENT XP).
+    await db().query(`update public.profiles set created_at = now() where id = $1`, [
+      organizer.user.id,
+    ]);
     for (const id of participations) {
       expect(
         (

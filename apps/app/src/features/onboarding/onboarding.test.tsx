@@ -144,6 +144,16 @@ describe('RequireOnboarded', () => {
     expect(screen.queryByText('gizli içerik')).toBeNull();
   });
 
+  it('tells a suspended person only that, with a way out, and shows nothing of the app', async () => {
+    mockApi.fetchMyAccount.mockResolvedValue(
+      account({ onboarded: true, adultConfirmed: true, status: 'SUSPENDED' }),
+    );
+    await renderApp(gated(), { session: signedIn() });
+    expect(await screen.findByText('Hesabın askıya alındı')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Çıkış yap' })).toBeTruthy();
+    expect(screen.queryByText('gizli içerik')).toBeNull();
+  });
+
   it('shows the content once the server says the user is onboarded', async () => {
     mockApi.fetchMyAccount.mockResolvedValue(account({ onboarded: true, adultConfirmed: true }));
     await renderApp(gated(), { session: signedIn() });

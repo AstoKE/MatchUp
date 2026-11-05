@@ -99,7 +99,12 @@ function lookOf(type: AppNotification['type']): {
   color: 'success' | 'danger' | 'textSecondary';
 } {
   if (type === 'REQUEST_APPROVED') return { icon: 'check', color: 'success' };
-  if (type === 'REQUEST_REJECTED' || type === 'PARTICIPANT_REMOVED' || type === 'EVENT_CANCELED') {
+  if (
+    type === 'REQUEST_REJECTED' ||
+    type === 'PARTICIPANT_REMOVED' ||
+    type === 'EVENT_CANCELED' ||
+    type === 'EVENT_CANCELED_BY_ADMIN'
+  ) {
     return { icon: 'alert', color: 'danger' };
   }
   return { icon: 'calendar', color: 'textSecondary' };

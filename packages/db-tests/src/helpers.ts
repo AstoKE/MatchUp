@@ -39,7 +39,9 @@ export interface TestUser {
 const created: string[] = [];
 
 /** Creates a user through the Auth admin API (bypasses email delivery). */
-export async function createUser(options: { confirmed?: boolean } = {}): Promise<TestUser> {
+export async function createUser(
+  options: { confirmed?: boolean; fresh?: boolean } = {},
+): Promise<TestUser> {
   const email = uniqueEmail();
   const { data, error } = await adminClient().auth.admin.createUser({
     email,
@@ -48,6 +50,14 @@ export async function createUser(options: { confirmed?: boolean } = {}): Promise
   });
   if (error || !data.user) throw error ?? new Error('createUser failed');
   created.push(data.user.id);
+  // Not a new account (docs/PHASE6_PLAN.md M6: accounts under 7 days get tighter quotas): most tests create many events.
+  // Tests about the new-account limits start from a fresh one on purpose.
+  if (options.fresh !== true) {
+    await db().query(
+      `update public.profiles set created_at = now() - interval '30 days' where id = $1`,
+      [data.user.id],
+    );
+  }
   return { id: data.user.id, email, password: STRONG_PASSWORD };
 }
 

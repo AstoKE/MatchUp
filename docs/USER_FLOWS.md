@@ -112,11 +112,12 @@ Admin signs in with MFA → queue of open reports sorted by age/severity → det
 | `spot_opened` | organizer | approved participant cancels / capacity raised with waitlist non-empty |
 | `event_canceled` | all active participants | event canceled |
 | `event_changed` | active participants | material change |
-| `attendance_reminder` | organizer | `ends_at`, `+24 h` |
+| `attendance_reminder` | organizer | `ends_at`, `+24 h` — **built (Phase 6 M6)**, `ATTENDANCE_REMINDER`, payload `stage` `DUE`/`LATE` |
 | `attendance_finalized` / `dispute_resolved` | participants | finalization / admin resolution |
 | `review_window_open` | present participants | finalization |
 | `badge_earned` / `level_up` | user | finalization / window close |
-| `report_outcome` | reporter (generic) | report closed |
+| `report_outcome` | reporter (generic) | report closed — **built (Phase 6 M6)**, `REPORT_OUTCOME`, nothing of the decision |
+| `event_canceled_by_admin` / `account_reinstated` | organizer / person | an administrator canceled the event / reinstated the account — **built (Phase 6 M6)**; a suspension is shown as a page, not sent |
 | `account_deletion_scheduled` / `_completed` | user | deletion flow |
 
 Payloads carry ids only; copy is rendered client-side in the user's locale. De-duplicated by `dedupe_key`.

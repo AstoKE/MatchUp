@@ -67,9 +67,13 @@ Deviations from the list below, on purpose:
 
 ### M6: closing the phase
 
-- Notifications left: `report_outcome` and what a suspension or a hidden event tells people, reminders to finalize (RATING_SYSTEM §9); the list is in USER_FLOWS.
-- Abuse controls (F-30): the quotas of SECURITY for reports, younger accounts; display name checks. Whether the CAPTCHA token reaches the server from web and native (LAUNCH_CHECKLIST).
-- Report from a review stays out: see decision 2.
+**Status 2026-11-05: built**, in `20261104100000_moderation_notifications_abuse.sql` (generated from the live definitions of the functions it changes). pgTAP `24_abuse_and_notifications` (39) with 17 mutations of the new code all caught after four tests were added; `display-name-equivalence` (32 names, domain against database); components and Playwright.
+
+- **Notifications:** `REPORT_OUTCOME` to every reporter whose report was closed, generic, never the decision; `ACCOUNT_REINSTATED`; `EVENT_CANCELED_BY_ADMIN` to the organizer; `ATTENDANCE_REMINDER` to the organizer at the end of the event and a day later (`private.send_attendance_reminders`, every 15 minutes, events of the last three days with an approved player and no final attendance). **A suspended person gets no notification but a page**: "Hesabın askıya alındı", with a way to sign out and no reason (counsel decides what more it must say, SECURITY §8).
+- **New accounts:** under seven days old, at most 2 events a day and 10 open requests (`private.account_quota`, `quota.new_account_*` in `app_config`); a tighter value never loosens the usual one.
+- **Display names:** no link, e-mail address or phone number (`private.clean_display_name`, mirrored in `@matchup/domain`). **Profanity is not checked:** it needs a word list somebody owns and keeps (false positives on Turkish names are likely).
+- **CAPTCHA:** the app already sends `captchaToken` on sign-in, sign-up, reset and resend (unit tests in `captcha.test.tsx`; web verified on the auth lab with test keys, AUTH_ABUSE §5). The native WebView widget has not been run on a device, and hosted is not configured, so LAUNCH_CHECKLIST keeps both open. The old line saying the token was "not built" was stale and is corrected.
+- **Report from a review** stays out (decision 2).
 
 ## Decisions (defaults used unless you change them)
 

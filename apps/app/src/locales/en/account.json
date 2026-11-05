@@ -24,5 +24,10 @@
     "body": "Your account will be deleted permanently on {{date}}. Until then you can change your mind.",
     "meanwhile": "Meanwhile your profile is hidden and nothing new can be done with your account.",
     "cancel": "Cancel the deletion request"
+  },
+  "suspended": {
+    "title": "Your account is suspended",
+    "body": "You cannot do anything with this account right now. If you think this is a mistake, get in touch.",
+    "signOut": "Sign out"
   }
 }
