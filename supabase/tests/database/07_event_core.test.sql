@@ -44,7 +44,7 @@ select ('00000000-0000-4000-8000-0000000007' || lpad(n::text, 2, '0'))::uuid, 'u
        now(), 'authenticated', 'authenticated', now(), now()
   from generate_series(1, 16) n;
 -- 01 = O, 02 = P, 03 = Q, 04 = X (not onboarded), 05..16 = E1..E12
-update public.profiles set display_name = 'Oyuncu', adult_confirmed_at = now(), onboarded_at = now()
+update public.profiles set display_name = 'Oyuncu', adult_confirmed_at = now(), created_at = now() - interval '30 days', onboarded_at = now()
  where id::text like '00000000-0000-4000-8000-0000000007%' and id <> '00000000-0000-4000-8000-000000000704';
 insert into public.user_consents (user_id, kind, version)
 select p.id, k.kind::public.consent_kind, (select c.value #>> '{}' from public.app_config c where c.key = k.key)

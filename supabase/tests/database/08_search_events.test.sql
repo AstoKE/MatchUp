@@ -79,7 +79,7 @@ update public.profiles set display_name = case id::text
     when '00000000-0000-4000-8000-000000000802' then 'Berk B'
     when '00000000-0000-4000-8000-000000000803' then 'Ceren C'
     else 'Deniz D' end,
-  adult_confirmed_at = now(), onboarded_at = now()
+  adult_confirmed_at = now(), created_at = now() - interval '30 days', onboarded_at = now()
  where id::text like '00000000-0000-4000-8000-0000000008%';
 insert into public.user_consents (user_id, kind, version)
 select p.id, k.kind::public.consent_kind, (select c.value #>> '{}' from public.app_config c where c.key = k.key)

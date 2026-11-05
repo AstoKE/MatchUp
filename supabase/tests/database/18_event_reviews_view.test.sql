@@ -43,7 +43,7 @@ $$;
 insert into auth.users (id, email, email_confirmed_at, aud, role, created_at, updated_at)
 select pg_temp.u(n), 'u18-' || n || '@test.invalid', now(), 'authenticated', 'authenticated', now(), now()
   from generate_series(1, 7) n;
-update public.profiles set display_name = 'Kişi ' || right(id::text, 2), adult_confirmed_at = now(), onboarded_at = now()
+update public.profiles set display_name = 'Kişi ' || right(id::text, 2), adult_confirmed_at = now(), created_at = now() - interval '30 days', onboarded_at = now()
  where id::text like '00000000-0000-4000-8000-0000000018%';
 insert into public.user_consents (user_id, kind, version)
 select p.id, k.kind::public.consent_kind, (select c.value #>> '{}' from public.app_config c where c.key = k.key)

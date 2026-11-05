@@ -48,11 +48,22 @@ const CONTROL_CHARS = /[\u0000-\u001F\u007F]/;
 // eslint-disable-next-line no-control-regex -- see above
 const BIO_FORBIDDEN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/;
 
+// A name is not a place to advertise: no link, address or phone number. The database check is authoritative
+// (private.clean_display_name) and an equivalence test keeps the two the same. Profanity is not checked: it needs a list
+// somebody owns (docs/PHASE6_PLAN.md M6).
+const NAME_CONTACT = /(https?:|www\.|@|\.(com|net|org|ru|xyz|io|me|info|tr)(?![\p{L}\p{N}_]))/iu;
+const NAME_PHONE = /\d{7,}/;
+/** True when the name carries a link, an address or a phone number. */
+export function nameCarriesContact(value: string): boolean {
+  return NAME_CONTACT.test(value) || NAME_PHONE.test(value.replace(/[ ().-]/g, ''));
+}
+
 export const displayNameSchema = z.string().check(
   z.trim(),
   z.minLength(DISPLAY_NAME_MIN, 'NAME_TOO_SHORT'),
   z.maxLength(DISPLAY_NAME_MAX, 'NAME_TOO_LONG'),
   z.refine((value) => !CONTROL_CHARS.test(value), 'NAME_INVALID'),
+  z.refine((value) => !nameCarriesContact(value), 'NAME_INVALID'),
 );
 
 /** Empty input means "no bio"; the result is trimmed text or null. */

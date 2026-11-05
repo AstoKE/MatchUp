@@ -1,10 +1,10 @@
-import { Redirect, usePathname } from 'expo-router';
+import { Redirect, useRouter, usePathname } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { RequireAuth } from '@/features/auth';
+import { RequireAuth, signOut } from '@/features/auth';
 import { errorText } from '@/lib/error-text';
-import { EmptyState, useTheme } from '@/ui';
+import { EmptyState, Screen, useTheme } from '@/ui';
 import { useMyAccount } from './hooks';
 
 /**
@@ -48,6 +48,10 @@ function OnboardedGate({ children }: { children: ReactNode }) {
       />
     );
   }
+  // A suspended person is told that, and nothing else: no reason, and no way to use the app (the server refuses every write).
+  if (account.data.status === 'SUSPENDED') {
+    return <SuspendedPage />;
+  }
   // A pending deletion outranks everything: the only things left to do are cancel or sign out.
   if (account.data.status === 'PENDING_DELETION') {
     return <Redirect href="/account-deletion" />;
@@ -59,4 +63,19 @@ function OnboardedGate({ children }: { children: ReactNode }) {
     return <Redirect href={{ pathname: '/consent-update', params: { returnTo: pathname } }} />;
   }
   return <>{children}</>;
+}
+
+function SuspendedPage() {
+  const { t } = useTranslation('account');
+  const router = useRouter();
+  return (
+    <Screen>
+      <EmptyState
+        title={t('suspended.title')}
+        body={t('suspended.body')}
+        actionLabel={t('suspended.signOut')}
+        onAction={() => void signOut().then(() => router.replace('/'))}
+      />
+    </Screen>
+  );
 }

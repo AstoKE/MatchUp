@@ -17,7 +17,8 @@ Status 2026-10-25. A hosted development/staging project now exists (DEPLOYMENT �
 - [ ] Leaked-password protection (HaveIBeenPwned check) enabled on the hosted project; the Supabase advisor flags it as off (2026-10-27). Check whether the current plan offers it before launch.
 - [ ] Email sending through a real SMTP provider with SPF/DKIM; hosted default SMTP is rate limited and not for production.
 - [ ] Re-run `node scripts/auth-probe.mjs --url … --anon-key … --service-key …` against the hosted project and record the numbers in `docs/AUTH_ABUSE.md`. **Known from local measurement (ADR-0016): all three endpoints leak** (sign-up 422 vs 200; sign-in timing; reset cooldown 429). We do not claim to prevent enumeration; counsel confirms the residual risk is acceptable (⚖).
-- [ ] CAPTCHA token is actually sent by the app (web widget + native WebView) — **not built**; the server side was verified on the lab stack only.
+- [ ] CAPTCHA token sent by the app: **built and unit-tested** for sign-in, sign-up, reset and resend, and the web widget was verified on the auth lab with test keys (AUTH_ABUSE §5). **Still open:** the native WebView widget on a device, and hosted configuration with real keys.
+- [ ] Phase 6 operations: who answers reports and how fast (SECURITY says 24 h); a way for a suspended person to reach us (the page says "bize ulaş" and names no address yet); the first administrator and TOTP on hosted (DEPLOYMENT §11); a profanity list for display names if wanted; retention of reports and moderation notes (⚖).
 - [ ] Decision on a closed / invite-only pilot with public sign-up disabled. An Edge proxy is **not** recommended (ADR-0016): the Auth API stays reachable without it.
 
 ## 3. Platform

@@ -28,11 +28,15 @@
 // (AdminGate, 10 kB gzip: second-factor screens, the queue, people, flags, disputes and the record, with their server calls
 // and copy). Nobody but an administrator downloads it, and INITIAL did not move (554 kB). A change that lifts the total
 // beyond this needs its own reason here.
+//
+// TOTAL raised 897 -> 898 (2026-11-05, Phase 6 / M6): four notification texts in two languages, the suspended-account
+// page and the display-name check are in the main bundle, since every signed-in person needs them. INITIAL stays 555 and
+// is now exactly on it: nothing more can join the first load without something leaving it.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 897;
+const TOTAL_RATCHET_KB = 898;
 const INITIAL_RATCHET_KB = 555;
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';
 

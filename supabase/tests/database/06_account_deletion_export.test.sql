@@ -43,12 +43,12 @@ insert into auth.users (id, email, email_confirmed_at, aud, role, created_at, up
   ('00000000-0000-4000-8000-0000000006c1', 's6@test.invalid', now(), 'authenticated', 'authenticated', now(), now()),
   ('00000000-0000-4000-8000-0000000006d1', 'v6@test.invalid', now(), 'authenticated', 'authenticated', now(), now());
 update public.profiles
-   set display_name = 'Silinecek Kişi', bio = 'kişisel bir not', adult_confirmed_at = now(), onboarded_at = now(),
+   set display_name = 'Silinecek Kişi', bio = 'kişisel bir not', adult_confirmed_at = now(), created_at = now() - interval '30 days', onboarded_at = now(),
        city_id = (select id from public.cities where slug = 'ankara'),
        district_id = (select id from public.districts where slug = 'cankaya')
  where id = '00000000-0000-4000-8000-0000000006a1';
 update public.profiles
-   set display_name = 'Kalan Kişi', adult_confirmed_at = now(), onboarded_at = now()
+   set display_name = 'Kalan Kişi', adult_confirmed_at = now(), created_at = now() - interval '30 days', onboarded_at = now()
  where id in ('00000000-0000-4000-8000-0000000006b1', '00000000-0000-4000-8000-0000000006d1');
 update public.profiles set account_status = 'SUSPENDED' where id = '00000000-0000-4000-8000-0000000006c1';
 update public.user_settings set profile_visibility = 'EVERYONE' where user_id = '00000000-0000-4000-8000-0000000006a1';

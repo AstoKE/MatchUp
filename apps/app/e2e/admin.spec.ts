@@ -122,6 +122,7 @@ test.describe('the administration console', () => {
   });
 
   test('an administrator sets up the second step, answers it again later, and decides a report in three taps', async ({
+    browser,
     page,
   }) => {
     test.setTimeout(120_000);
@@ -156,6 +157,13 @@ test.describe('the administration console', () => {
       page.getByRole('button', { name: new RegExp(`Etkinlik · ${t.title}`) }),
     ).toHaveCount(0);
 
+    // The reporter is thanked, and told nothing of what was decided.
+    const reporter = await (await browser.newContext()).newPage();
+    await signIn(reporter, t.reporterEmail);
+    await reporter.goto('/notifications');
+    await expect(reporter.getByText('Bildirimini inceledik. Teşekkürler.')).toBeVisible();
+    await reporter.context().close();
+
     await page.getByRole('radio', { name: 'Kayıt', exact: true }).click();
     await expect(page.getByText('Bildirim kapatıldı').first()).toBeVisible();
     await expect(page.getByText(/^Yönetici Ada · /).first()).toBeVisible();
@@ -173,6 +181,7 @@ test.describe('the administration console', () => {
   });
 
   test('suspends a person and closes the report, and the person can no longer act', async ({
+    browser,
     page,
   }) => {
     test.setTimeout(120_000);
@@ -213,5 +222,14 @@ test.describe('the administration console', () => {
       body: JSON.stringify({ p_event_id: t.eventId }),
     });
     expect(((await refused.json()) as { message: string }).message).toBe('ACCOUNT_RESTRICTED');
+
+    // And the app tells them that, and only that.
+    const suspended = await (await browser.newContext()).newPage();
+    await signIn(suspended, t.organizerEmail);
+    await suspended.getByRole('tab', { name: 'Profil' }).click();
+    await expect(suspended.getByText('Hesabın askıya alındı')).toBeVisible();
+    await expect(suspended.getByRole('button', { name: 'Çıkış yap' })).toBeVisible();
+    await expectNoBlocking(suspended);
+    await suspended.context().close();
   });
 });

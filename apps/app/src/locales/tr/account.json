@@ -24,5 +24,10 @@
     "body": "Hesabın {{date}} tarihinde kalıcı olarak silinecek. O zamana kadar fikrini değiştirebilirsin.",
     "meanwhile": "Bu süre içinde profilin gizli ve hesabınla yeni işlem yapılamaz.",
     "cancel": "Silme talebini iptal et"
+  },
+  "suspended": {
+    "title": "Hesabın askıya alındı",
+    "body": "Bu hesapla şu an işlem yapamazsın. Bir hata olduğunu düşünüyorsan bize ulaş.",
+    "signOut": "Çıkış yap"
   }
 }

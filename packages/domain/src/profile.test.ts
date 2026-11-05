@@ -48,6 +48,8 @@ describe('onboardingSchema', () => {
     ['displayName', '   ', 'NAME_TOO_SHORT'],
     ['displayName', 'x'.repeat(DISPLAY_NAME_MAX + 1), 'NAME_TOO_LONG'],
     ['displayName', 'Ali\u0007Veli', 'NAME_INVALID'],
+    ['displayName', 'ali.com', 'NAME_INVALID'],
+    ['displayName', 'Ara 0532 123 45 67', 'NAME_INVALID'],
     ['sports', [], 'SPORTS_REQUIRED'],
   ] as const)('rejects %s = %j with %s', (field, value, key) => {
     const result = onboardingSchema.safeParse({ ...validOnboarding, [field]: value });

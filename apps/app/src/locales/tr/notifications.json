@@ -20,7 +20,11 @@
     "SPOT_OPENED": "{{event}} için bir yer açıldı; yedek listede oyuncu var.",
     "EVENT_CANCELED": "{{event}} iptal edildi.",
     "EVENT_CHANGED": "{{event}} etkinliğinin zamanı veya yeri değişti.",
-    "ATTENDANCE_FINALIZED": "{{event}} için yoklama kesinleşti. Katılımını kontrol et, birlikte oynadıklarını değerlendir."
+    "ATTENDANCE_FINALIZED": "{{event}} için yoklama kesinleşti. Katılımını kontrol et, birlikte oynadıklarını değerlendir.",
+    "REPORT_OUTCOME": "Bildirimini inceledik. Teşekkürler.",
+    "ACCOUNT_REINSTATED": "Hesabın yeniden açıldı.",
+    "EVENT_CANCELED_BY_ADMIN": "{{event}} bir yönetici tarafından iptal edildi.",
+    "ATTENDANCE_REMINDER": "{{event}} bitti. Yoklamayı işaretle ve kesinleştir; yapmazsan sistem yarın kendiliğinden kesinleştirir."
   },
   "unknown": "Yeni bir bildirimin var.",
   "emptyAction": "Etkinlikleri keşfet"

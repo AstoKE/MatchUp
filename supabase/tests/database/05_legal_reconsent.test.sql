@@ -22,7 +22,7 @@ insert into auth.users (id, email, email_confirmed_at, aud, role, created_at, up
   ('00000000-0000-4000-8000-0000000005c1', 'u@test.invalid', null,  'authenticated', 'authenticated', now(), now()),
   ('00000000-0000-4000-8000-0000000005d1', 'o@test.invalid', now(), 'authenticated', 'authenticated', now(), now());
 update public.profiles
-   set display_name = 'Test User', adult_confirmed_at = now(), onboarded_at = now()
+   set display_name = 'Test User', adult_confirmed_at = now(), created_at = now() - interval '30 days', onboarded_at = now()
  where id in ('00000000-0000-4000-8000-0000000005a1', '00000000-0000-4000-8000-0000000005d1');
 insert into public.user_consents (user_id, kind, version)
 select u.id, k.kind::public.consent_kind, (select c.value #>> '{}' from public.app_config c where c.key = k.key)

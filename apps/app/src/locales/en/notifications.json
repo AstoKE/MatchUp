@@ -20,7 +20,11 @@
     "SPOT_OPENED": "A spot opened in {{event}}; players are waiting.",
     "EVENT_CANCELED": "{{event}} was canceled.",
     "EVENT_CHANGED": "The time or place of {{event}} changed.",
-    "ATTENDANCE_FINALIZED": "Attendance for {{event}} is final. Check your attendance and review the people you played with."
+    "ATTENDANCE_FINALIZED": "Attendance for {{event}} is final. Check your attendance and review the people you played with.",
+    "REPORT_OUTCOME": "We looked at your report. Thank you.",
+    "ACCOUNT_REINSTATED": "Your account is open again.",
+    "EVENT_CANCELED_BY_ADMIN": "{{event}} was canceled by a moderator.",
+    "ATTENDANCE_REMINDER": "{{event}} has ended. Mark attendance and finalize it; if you do not, the system finalizes it for you soon."
   },
   "unknown": "You have a new notification.",
   "emptyAction": "Discover events"
