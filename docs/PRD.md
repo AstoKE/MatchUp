@@ -1,6 +1,6 @@
 # Product Requirements Document (PRD)
 
-Status: Phase 0 draft · Scope: MVP = first publicly testable version (Ankara pilot)
+Status: Phase 0 draft · Scope: MVP = first publicly testable version (Ankara pilot; all of Turkey in the catalog from Phase 4, ADR-0024)
 
 Related: [PRODUCT_VISION](PRODUCT_VISION.md) · [USER_FLOWS](USER_FLOWS.md) · [DATABASE](DATABASE.md) · [ROADMAP](ROADMAP.md)
 
@@ -9,7 +9,7 @@ Related: [PRODUCT_VISION](PRODUCT_VISION.md) · [USER_FLOWS](USER_FLOWS.md) · [
 | Item | Value |
 |---|---|
 | Platforms | Web (Expo Web), iOS, Android — one codebase |
-| Market / pilot city | Turkey / Ankara |
+| Market / pilot city | Turkey, all 81 provinces and their districts (ADR-0024) / Ankara as the default and first community |
 | Languages | `tr-TR` default, `en-US` secondary (i18n from day 1) |
 | Timezone / currency | `Europe/Istanbul` / TRY (informational only in MVP) |
 | Audience | 18+, self-declared age confirmation at onboarding (see SECURITY §3, §8) |
@@ -61,7 +61,7 @@ The 31 MVP items from the product brief map 1-to-1 to feature IDs. Detailed back
 | 3 | User profile | F-08 | 2 |
 | 4 | Sport selection and preferences | F-07, F-08 | 2 |
 | 5 | Basic sport-specific player profile | F-09 | 2 |
-| 6 | Ankara-based event discovery | F-12 | 3 |
+| 6 | Event discovery by province and district (Ankara by default) | F-12 | 3–4 |
 | 7 | Event filters | F-12 | 3 (geo in 4) |
 | 8 | Event detail pages | F-13 | 3 |
 | 9 | Event creation | F-11 | 3 |
@@ -98,7 +98,7 @@ The 31 MVP items from the product brief map 1-to-1 to feature IDs. Detailed back
 
 ### 4.1 Account and profile (F-06…F-09)
 - Email + password registration; email must be verified before creating events or requesting to join. Password reset via email. Sessions persist securely per platform.
-- Onboarding: confirm 18+, accept Terms and Privacy Notice (versioned, stored), choose city (Ankara only, list-driven), pick sports, self-assess level per picked sport, optional positions, optional avatar/bio. Location permission is **never required**.
+- Onboarding: confirm 18+, accept Terms and Privacy Notice (versioned, stored), choose province, optionally district (all of Turkey from Phase 4, list-driven; ADR-0024), pick sports, self-assess level per picked sport, optional positions, optional avatar/bio. Location permission is **never required**.
 - Profile: display name (unique-not-required, 2–40 chars, moderation-checked), avatar, city/district, bio (≤ 280), preferred sports, sport profiles, history, reliability, XP/level, badges.
 - Privacy settings: `profile_visibility` (`EVERYONE` = any signed-in user, `EVENT_PEERS` = only people sharing an event with you, plus organizers evaluating your request), show/hide reliability and badges on profile, marketing consent (default off).
 - Join-request disclosure: requesting to join shares a minimal game-relevant profile (display name, avatar, level for that sport, reliability, badges) with the organizer regardless of profile visibility. Shown in UI at request time.
@@ -130,7 +130,7 @@ Tabs: *Organizing*, *Pending*, *Approved*, *Waitlisted*, *Past* (completed/cance
 
 ### 4.6 Locations & venues (F-20, F-21)
 - Phase 3: event location = district + place label + optional street address chosen by the organizer; **no coordinates or map pin until Phase 4** (ADR-0019). With "approved only" location, others see just the district until approved.
-- Phase 4: venue directory (public/community spaces and commercial facilities), data provenance and verification kept as separate fields, per-event **booking status** labels (`NOT_REQUIRED`, `NOT_YET_BOOKED`, `BOOKED_EXTERNALLY`, `TO_BE_CONFIRMED`) always labeled "declared by the organizer". The app never claims availability or reservation.
+- Phase 4: a pin per event, exact for `PUBLIC`, snapped to a 500 m grid for `APPROVED_ONLY` (ADR-0024); venue directory (public/community spaces and commercial facilities), data provenance and verification kept as separate fields, per-event **booking status** labels (`NOT_REQUIRED`, `NOT_YET_BOOKED`, `BOOKED_EXTERNALLY`, `TO_BE_CONFIRMED`) always labeled "declared by the organizer". The app never claims availability or reservation.
 - Cost information is informational; MatchUp does not collect or hold money in the MVP.
 
 ### 4.7 Attendance, reviews, progression (F-23…F-26)
