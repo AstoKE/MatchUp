@@ -1,6 +1,6 @@
 # Phase 4 plan: all of Turkey, places, venues and the map
 
-Status 2026-11-07: **M1 to M5 built** (M1–M2 #72, M3–M4 #73, M5 in review), M6 not started. Scope: ROADMAP F-20 (the pin, postponed from Phase 3 by ADR-0019), F-21, F-22, plus all 81 provinces and their districts, a decision of 2026-11-05 recorded in [ADR-0024](ADR/0024-turkey-wide-catalog-and-phase-4-providers.md). Sources of truth stay `docs/PRD.md` §4.4 and §4.6, `docs/DATABASE.md` §3, `docs/SECURITY.md`, ADR-0011. This file sequences the work and lists the decisions it needs.
+Status 2026-11-07: **Phase 4 built** (M1–M2 #72, M3–M4 #73, M5 #74, M6 in review): see [PHASE4_REPORT](PHASE4_REPORT.md). Native map not verified on a device yet. Scope: ROADMAP F-20 (the pin, postponed from Phase 3 by ADR-0019), F-21, F-22, plus all 81 provinces and their districts, a decision of 2026-11-05 recorded in [ADR-0024](ADR/0024-turkey-wide-catalog-and-phase-4-providers.md). Sources of truth stay `docs/PRD.md` §4.4 and §4.6, `docs/DATABASE.md` §3, `docs/SECURITY.md`, ADR-0011. This file sequences the work and lists the decisions it needs.
 
 **Why now.** The launch offers every province, and the catalog, the city picker and the pin are hard to add once real events exist in places the schema does not know. Phase 7 starts after this.
 
@@ -121,6 +121,8 @@ Verified:
 - **Acceptance:** works on web and on the Android emulator (the user says "koş"); iOS on the simulator via EAS.
 
 ### M6: validation and the report
+
+**Status 2026-11-07: done** locally: 5000 events, the slowest search (whole country, nearest) 12 ms median inside the database, the catalog read 7 ms and 50 kB gzipped; [PHASE4_REPORT](PHASE4_REPORT.md) with the privacy wording for counsel. The hosted push and the native run are the founder's.
 
 - Performance of distance search and of the catalog read on hosted-like data.
 - `docs/PHASE4_REPORT.md`: what is verified where (web, Android emulator, iOS simulator) and what is not.
