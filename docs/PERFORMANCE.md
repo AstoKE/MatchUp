@@ -66,6 +66,33 @@ Correction to an earlier reading: Sentry is about a third of the *total* but **n
 
 **Honest statement about the 350 kB initial-route target (ARCHITECTURE §8).** The framework floor alone (`entry`, 287 kB) leaves ~60 kB for *everything else* (Supabase auth, query cache, forms, i18n, zod, app code: today ~235 kB). Items 1–4 do not change that, because they affect lazy chunks. The target is therefore **not reachable on the current stack by trimming**, and this document does not claim otherwise. Options for the founder, none decided yet: (a) keep 350 kB as a long-term goal and accept ~520 kB initial for the MVP web build, (b) re-baseline the budget to "initial ≤ 500 kB gzip, first tabbed screen ≤ 650 kB" after item 1, (c) treat web as secondary (the product is mobile-first) and spend the effort on measured native start time instead. The ratchets stop regressions meanwhile.
 
+## 4b. Load at pilot scale (Phase 7 M3, 2026-11-06)
+
+`node scripts/load/run.mjs --fresh`:
+- resets the **local** database;
+- seeds 3 000 players, 110 004 events (half upcoming, across all provinces, 60 % with a pin) and 553 339 participations (`scripts/load/seed.sql`, 35 s);
+- runs the ARCHITECTURE §8 scenarios in the pinned `grafana/k6:1.3.0` container (`scripts/load/scenarios.js`).
+
+Tokens are signed with the local JWT secret, so Auth's sign-in limits are not what is measured. Everything (gateway, PostgREST, Postgres, k6) shares one laptop (16 threads, 15 GB): the latencies include contention a hosted database would not have, and none of the network to Paris.
+
+| Scenario | Load | p50 | p95 | p99 | Budget (ARCH §8) | Result |
+|---|---|---|---|---|---|---|
+| Discovery (`search_events`, random province/sport/open filters, a third near a point with a 5–25 km radius, half also page 2) | 100 users, 1–3 s between screens (~45 req/s, three times the pilot's evening peak) | 4 ms | 219 ms | 621 ms | p95 < 800 ms | met |
+| Join storm (`request_join` on one event) | 200 players in 20 s (ARCH: within 60 s) | 9 ms | 16 ms | 17 ms | p95 < 500 ms | met; 200 requests stored |
+| Last-slot race (`approve_participation`) | 50 approvals at once for 1 place | 33 ms | 42 ms | 42 ms | p95 < 500 ms, no overbooking | met: exactly 1 approved, 49 `EVENT_FULL`, no event over capacity |
+| Organizer dashboard (`list_event_requests` with 500 requests, `list_my_events`) | 20 users | 6 ms | 10 ms | 27 ms | p95 < 500 ms | met |
+| Fan-out (`cancel_event` with 99 approved players) | 1 call | 13 ms | | | < 1 s for the notifications | met: 99 notifications |
+| Cron sweep (`complete_due_events`, 10 000 due) | 1 run | 20 ms | | | | **processes 500 per run** (see below) |
+| *Burst (no budget): 200 joins at the same instant* | 200 at once | 308 ms | 588 ms | 601 ms | | the event row lock queues them, by design |
+| *Stress (no budget): discovery without pauses* | 100 users, ~165 req/s | 378 ms | 1.75 s | 2.7 s | | the laptop's ceiling, not a query's |
+
+Further findings:
+- **Query plans:** during the run, `events`, `event_participations`, `event_private_details` and `notifications` saw **no sequential scans** (128 795, 6 284 and 143 181 index scans). A single search at this size takes 2–4 ms with a province filter and 28 ms for "nearest within 10 km" across the country.
+- **Cron sweep:** `complete_due_events` completes at most 500 events per run, every 10 minutes, so it keeps up with 3 000 events ending per hour. The pilot assumes 800 live events in total. No change.
+- **Catalog:** now kept on the device for a day (`features/catalog/load-catalog.ts`). It is read from the server at most once a day instead of at every start, and an older copy is used when offline.
+
+Not measured: hosted (the founder can run the same scenarios against a staging project with its own URL and keys; the runner refuses non-local URLs on purpose), and network latency from Turkey to Paris.
+
 ## 5. Not measured
 
 - Hermes bytecode size and native cold-start time (the debug build with Metro is not representative).

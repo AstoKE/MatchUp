@@ -80,8 +80,10 @@ async function get(path, init = {}) {
   const { status, body } = await get('/rest/v1/', {
     headers: { Accept: 'application/openapi+json' },
   });
-  if (status !== 200 || !body?.paths)
-    report('WARN', 'OpenAPI root', `HTTP ${status} (not served: nothing to list)`);
+  // New publishable keys get no OpenAPI document at all (401/403): nothing is listed to a stranger.
+  if (status === 401 || status === 403)
+    report('PASS', 'OpenAPI root not served to the public key', `HTTP ${status}`);
+  else if (status !== 200 || !body?.paths) report('WARN', 'OpenAPI root', `HTTP ${status}`);
   else {
     const rpcs = Object.keys(body.paths)
       .filter((p) => p.startsWith('/rpc/'))
