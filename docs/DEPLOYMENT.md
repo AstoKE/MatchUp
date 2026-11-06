@@ -97,6 +97,10 @@ Applied 2026-10-25 without the dashboard, by pulling the hosted config into a sc
 
 **Third push, 2026-11-01 (Phase 5, by the founder from their terminal):** the nine migrations from `20261031100000_attendance` to `20261031170000_event_reviews_view`; the dry-run listed exactly these, a later one reported up to date. The founder tested web and iOS against it. This also starts the jobs `complete-due-events`, `auto-finalize-attendance` and `close-review-windows`. `20261031180000_attendance_finalized_notification` is not pushed yet.
 
+**Fourth push, 2026-11-07 (Phase 6 M4–M6 and Phase 4, by the founder), stopped half way.** Applied: `20261103100000_moderation_enums`, `20261103110000_admin_moderation`, `20261104100000_moderation_notifications_abuse`, `20261106100000_turkey_catalog`. **Failed and rolled back:** `20261107100000_points_and_venues`, at its backfill `update public.events set public_point = …`, with `INVALID_TRANSITION`: hosted has canceled and completed events, and `events_before_write` refuses any update to them (I-7). Local and CI databases start empty, so no test met a frozen event. The migration was never applied anywhere that keeps data, so it was corrected in place (the trigger is off for that one statement, and only empty points are filled) and rehearsed before the retry (see below). `20261108100000_catalog_centers` waits for it.
+
+**Rehearse a migration that touches existing rows before pushing it.** CI applies migrations to an empty database, which proves nothing about backfills. Before a push that updates or constrains existing data: `supabase db reset --local --version <the last migration hosted has>`, create the kinds of rows hosted holds (including canceled and completed events, which are frozen), then `supabase migration up --local` and check the result.
+
 **Not verified on the hosted project yet:** the purge job actually running at 03:17 UTC (check `cron.job_run_details` after the first night), email delivery with the default SMTP (rate-limited), latency from Ankara.
 
 ## 10. Expo / EAS project (linked 2026-10-25)
