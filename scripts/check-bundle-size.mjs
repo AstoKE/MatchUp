@@ -37,11 +37,15 @@
 // and district fields, the Turkish name matching and the nested catalog read (+2 kB), and the event form moved into its
 // own lazy chunk (EventStepper, 4 kB gzip; about 1 kB of that is the cost of splitting). The move is what made room for
 // the picker in the first load: INITIAL went 557 -> 554 kB and stays under 555.
+//
+// TOTAL raised 901 -> 905 (2026-11-07, Phase 4 / M3-M4): the console's venues section (AdminGate 11 -> 13 kB, lazy, admins
+// only), the venue field of the event form (in the lazy EventStepper chunk) and the parsing of points and venues in the
+// event and search reads. INITIAL is 555 again, exactly on its limit: the map (M5) must arrive as its own lazy chunk.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 901;
+const TOTAL_RATCHET_KB = 905;
 const INITIAL_RATCHET_KB = 555;
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';
 

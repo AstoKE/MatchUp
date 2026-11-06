@@ -80,9 +80,10 @@ select is(
    join pg_catalog.pg_namespace n on n.oid = p.pronamespace
    where n.nspname in ('public', 'private')
      and has_function_privilege('anon', p.oid, 'EXECUTE')),
-  -- catalog_places (Phase 4) is security invoker over the catalog tables guests could already read.
-  array['public.catalog_places', 'public.get_event', 'public.search_events']::text[],
-  'anon can execute only the guest whitelist: catalog_places, get_event and search_events (D-09)'
+  -- catalog_places (Phase 4) is security invoker over the catalog tables guests could already read; search_venues
+  -- (Phase 4) lists listed venues only, without who suggested them.
+  array['public.catalog_places', 'public.get_event', 'public.search_events', 'public.search_venues']::text[],
+  'anon can execute only the guest whitelist: catalog_places, get_event, search_events and search_venues (D-09)'
 );
 
 -- 8. Admin helper is not usable by anon, usable by authenticated policies

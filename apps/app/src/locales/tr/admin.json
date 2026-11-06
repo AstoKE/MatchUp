@@ -7,7 +7,8 @@
     "flags": "İşaretler",
     "disputes": "İtirazlar",
     "users": "Kişiler",
-    "audit": "Kayıt"
+    "audit": "Kayıt",
+    "venues": "Mekânlar"
   },
   "mfa": {
     "enrollTitle": "İkinci doğrulamayı kur",
@@ -31,7 +32,8 @@
     "loadFailed": "Bildirimler yüklenemedi",
     "kind": {
       "USER": "Kişi",
-      "EVENT": "Etkinlik"
+      "EVENT": "Etkinlik",
+      "VENUE": "Mekân"
     },
     "by": "Bildiren: {{name}}",
     "openForTarget_one": "{{count}} açık bildirim",
@@ -57,7 +59,12 @@
     "starts": "Başlangıç",
     "places": "Katılım {{approved}}/{{capacity}}",
     "organizer": "Düzenleyen: {{name}}",
-    "openTarget": "Kişiyi aç"
+    "openTarget": "Kişiyi aç",
+    "hideVenueClose": "Mekânı gizle ve kapat",
+    "venueState": {
+      "ACTIVE": "Listede",
+      "HIDDEN": "Gizli"
+    }
   },
   "reason": {
     "SPAM": "Spam",
@@ -133,12 +140,57 @@
       "USER_REINSTATED": "Kişi geri açıldı",
       "EVENT_CANCELED_BY_ADMIN": "Etkinlik iptal edildi",
       "REVIEW_HIDDEN": "Değerlendirme gizlendi",
-      "REVIEW_RESTORED": "Değerlendirme geri getirildi"
+      "REVIEW_RESTORED": "Değerlendirme geri getirildi",
+      "VENUE_ADDED": "Mekân eklendi",
+      "VENUE_VERIFIED": "Mekân doğrulandı",
+      "VENUE_HIDDEN": "Mekân gizlendi",
+      "VENUE_RESTORED": "Mekân geri getirildi"
     },
     "outcome": {
       "ACTIONED": "işlem yapıldı",
       "DISMISSED": "reddedildi"
     }
   },
-  "open": "Yönetim"
+  "open": "Yönetim",
+  "venues": {
+    "status": "Mekân durumu",
+    "UNVERIFIED": "Onay bekleyen",
+    "VERIFIED": "Doğrulanmış",
+    "HIDDEN": "Gizli",
+    "empty": "Bu listede mekân yok.",
+    "loadFailed": "Mekânlar yüklenemedi",
+    "loadMore": "Daha fazla göster",
+    "kind": {
+      "PUBLIC_SPACE": "Kamuya açık alan",
+      "COMMERCIAL_FACILITY": "İşletme"
+    },
+    "by": "Öneren: {{name}}",
+    "byAdmin": "Yönetici ekledi",
+    "events_one": "{{count}} etkinlikte",
+    "events_other": "{{count}} etkinlikte",
+    "reports_one": "{{count}} açık bildirim",
+    "reports_other": "{{count}} açık bildirim",
+    "verify": "Doğrula",
+    "hide": "Gizle",
+    "restore": "Geri getir",
+    "done": "Karar kaydedildi.",
+    "noteLabel": "Karar notu (isteğe bağlı)",
+    "openMap": "Konum: {{lat}}, {{lon}}",
+    "add": "Mekân ekle",
+    "addTitle": "Yeni mekân (doğrulanmış olarak eklenir)",
+    "name": "Ad",
+    "kindLabel": "Tür",
+    "point": "Koordinat (enlem, boylam)",
+    "pointHint": "Örn. 39.8950, 32.7795. Bir haritadan kopyala; ilçeye 75 km’den yakın olmalı.",
+    "pointInvalid": "Enlem ve boylamı virgülle ayırarak yaz.",
+    "address": "Adres (isteğe bağlı)",
+    "sports": "Sporlar",
+    "source": "Kaynak notu (isteğe bağlı)",
+    "sourceHint": "Örn. yerinde görüldü, belediye sitesi.",
+    "save": "Ekle",
+    "added": "Mekân eklendi.",
+    "missing": "Ad, il, ilçe, koordinat ve en az bir spor gerekli.",
+    "city": "İl",
+    "district": "İlçe"
+  }
 }

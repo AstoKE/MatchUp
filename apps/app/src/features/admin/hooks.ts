@@ -11,7 +11,10 @@ import {
   fetchUser,
   searchUsers,
   verifyTotp,
+  fetchVenues,
   type ReportCursor,
+  type VenueCursor,
+  type VenueStatus,
 } from './api/admin-api';
 
 export const useAdminSecurity = (enabled: boolean) =>
@@ -74,3 +77,11 @@ export function useDecision<T>(run: (input: T) => Promise<unknown>) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin'] }),
   });
 }
+
+export const useAdminVenues = (status: VenueStatus) =>
+  useInfiniteQuery({
+    queryKey: ['admin', 'venues', status],
+    queryFn: ({ pageParam }) => fetchVenues(status, pageParam),
+    initialPageParam: null as VenueCursor | null,
+    getNextPageParam: (last) => last.next_cursor,
+  });

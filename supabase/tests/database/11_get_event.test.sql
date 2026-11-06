@@ -99,8 +99,9 @@ select is((select array_agg(k order by k) from jsonb_object_keys(public.get_even
   array['approved_count', 'auto_approve', 'booking_status', 'cancel_message', 'cancel_reason', 'capacity', 'city_id',
         'cost_amount_minor', 'cost_note', 'description', 'district_id', 'duration_minutes', 'ends_at', 'equipment_note',
         'id', 'invite_token', 'is_organizer', 'location_visibility', 'my_status', 'organizer_name', 'organizer_plays',
-        'participants', 'participants_visible', 'private', 'public_location_label', 'setting', 'skill_max', 'skill_min',
-        'sport_format_id', 'sport_id', 'starts_at', 'status', 'title', 'visibility', 'waitlist_enabled'],
+        'participants', 'participants_visible', 'private', 'public_location_label', 'public_point', 'public_point_precision',
+        'setting', 'skill_max', 'skill_min', 'sport_format_id', 'sport_id', 'starts_at', 'status', 'title', 'venue',
+        'visibility', 'waitlist_enabled'],
   'the page has exactly this field list: no organizer id, no email');
 select is(public.get_event(pg_temp.ev('pub')) ->> 'organizer_name', 'Düzenleyen D', 'the organizer''s display name is shown');
 select is(public.get_event(pg_temp.ev('pub')) -> 'private', 'null'::jsonb, 'a guest gets no private details');

@@ -5,13 +5,16 @@ import {
   createPublishedEvent,
   deleteEventsOf,
   deleteUser,
+  deleteVenuesOf,
   finalizeAllPresent,
   getLocalStack,
   joinApproved,
+  letterTag,
   PASSWORD,
   requestToJoin,
   setFootballRating,
   startEvent,
+  suggestVenueAs,
   uniqueEmail,
   type LocalStack,
 } from './support/stack';
@@ -23,6 +26,7 @@ test.skip(!stack && process.env.REQUIRE_STACK !== '1', 'local Supabase stack is 
 const createdIds: string[] = [];
 test.afterAll(async () => {
   for (const id of createdIds) deleteEventsOf(id);
+  for (const id of createdIds) deleteVenuesOf(id);
   if (stack) await Promise.all(createdIds.map((id) => deleteUser(stack, id)));
 });
 
@@ -241,6 +245,28 @@ test.describe('the province of Discover (Phase 4 / M2)', () => {
     await page.reload();
     await expect(province).toHaveAccessibleName('İl: İzmir. Değiştir');
     await expect(card).toBeVisible();
+  });
+});
+
+test.describe('venues on the event page (Phase 4 / M4)', () => {
+  test('a guest sees the venue, that it is unverified, and that booking is the organizer’s word', async ({
+    page,
+  }) => {
+    const s = requireStack();
+    const email = uniqueEmail('venue');
+    createdIds.push(
+      (await createOnboardedUser(s, email, { displayName: 'Mekanlı Düzenleyen' })).id,
+    );
+    const name = `Deneme Mekân ${letterTag(email.slice(9, 17))}`;
+    const venueId = await suggestVenueAs(s, email, name);
+    const title = `E2E mekânlı ${email.slice(9, 17)}`;
+    const eventId = await createPublishedEvent(s, email, title, { venueId });
+
+    await page.goto(`/e/${eventId}`);
+    await expect(page.getByRole('heading', { name: title, level: 1 })).toBeVisible();
+    await expect(page.getByText(`${name} · doğrulanmamış mekân`)).toBeVisible();
+    await expect(page.getByText('Gerekmiyor (organizatörün beyanı)')).toBeVisible();
+    await expectNoBlocking(page);
   });
 });
 

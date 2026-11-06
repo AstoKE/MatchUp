@@ -16,6 +16,7 @@ import {
 } from './api/participation-api';
 import { fetchEventReviews, submitReviews } from './api/reviews-api';
 import { searchEvents, type SearchCursor } from './api/search-api';
+import { searchVenues, type VenueFilters } from './api/venues-api';
 import {
   cancelEvent,
   completeEvent,
@@ -27,6 +28,16 @@ import {
 } from './api/events-api';
 
 export const eventQueryKey = (id: string) => ['event', id] as const;
+
+/** Listed venues of a district for the event form; they change rarely, so a few minutes of cache is fine. */
+export function useVenues(filters: VenueFilters | null) {
+  return useQuery({
+    queryKey: ['venues', filters],
+    queryFn: () => searchVenues(filters!),
+    enabled: filters !== null,
+    staleTime: 5 * 60 * 1000,
+  });
+}
 
 export function useEvent(id: string, inviteToken?: string | null) {
   return useQuery({

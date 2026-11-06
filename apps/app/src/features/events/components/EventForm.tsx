@@ -24,6 +24,7 @@ import {
   useTheme,
 } from '@/ui';
 import { eventValidationMessage } from '../format';
+import { useVenues } from '../hooks';
 
 export const EVENT_FORM_STEPS = 5;
 
@@ -257,9 +258,9 @@ function WhereStep({ catalog, draft, onChange, errors }: EventFormProps) {
           value: c.id,
           label: localizedName(c.names, locale),
         }))}
-        onChange={(cityId) =>
-          onChange({ cityId, districtId: cityId === draft.cityId ? draft.districtId : null })
-        }
+        onChange={(cityId) => {
+          if (cityId !== draft.cityId) onChange({ cityId, districtId: null, venueId: null });
+        }}
       />
       <Select
         label={t('fields.district')}
@@ -271,9 +272,12 @@ function WhereStep({ catalog, draft, onChange, errors }: EventFormProps) {
           value: d.id,
           label: localizedName(d.names, locale),
         }))}
-        onChange={(districtId) => onChange({ districtId })}
+        onChange={(districtId) =>
+          onChange(districtId === draft.districtId ? {} : { districtId, venueId: null })
+        }
         error={eventValidationMessage(errors.districtId)}
       />
+      <VenueField draft={draft} onChange={onChange} />
       <TextField
         label={t('fields.place')}
         hint={t('fields.placeHint')}
@@ -560,6 +564,57 @@ function ReviewStep({ catalog, draft, onGoTo }: EventFormProps) {
           {t('fields.costHint')}
         </Text>
       ) : null}
+    </View>
+  );
+}
+
+/**
+ * A listed venue of the district (Phase 4), optional. Choosing one fills an empty place and address; the venue's point
+ * becomes the event's on the server. An unverified venue was suggested by players and says so.
+ */
+function VenueField({
+  draft,
+  onChange,
+}: {
+  draft: EventDraft;
+  onChange: (patch: Partial<EventDraft>) => void;
+}) {
+  const { t } = useTranslation('events');
+  const { spacing } = useTheme();
+  const search = usePlaceSearch();
+  const venues = useVenues(
+    draft.cityId && draft.districtId
+      ? { cityId: draft.cityId, districtId: draft.districtId }
+      : null,
+  );
+  const list = venues.data ?? [];
+  if (!draft.districtId || (venues.isSuccess && list.length === 0 && !draft.venueId)) return null;
+  return (
+    <View style={{ gap: spacing[1] }}>
+      <Select
+        label={t('fields.venue')}
+        placeholder={venues.isPending ? t('fields.venueLoading') : t('fields.venueNone')}
+        noneLabel={t('fields.venueNone')}
+        value={draft.venueId}
+        search={list.length > 8 ? search : undefined}
+        options={list.map((v) => ({
+          value: v.id,
+          label: v.verified ? v.name : t('fields.venueUnverified', { name: v.name }),
+        }))}
+        onChange={(venueId) => {
+          const venue = list.find((v) => v.id === venueId);
+          onChange({
+            venueId,
+            ...(venue && draft.placeLabel.trim() === '' ? { placeLabel: venue.name } : {}),
+            ...(venue?.addressText && draft.addressText.trim() === ''
+              ? { addressText: venue.addressText }
+              : {}),
+          });
+        }}
+      />
+      <Text variant="caption" tone="secondary">
+        {t('fields.venueHint')}
+      </Text>
     </View>
   );
 }

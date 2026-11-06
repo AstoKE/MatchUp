@@ -263,6 +263,17 @@ function Detail({
               : t('events:detail.whereHidden', { district: districtName })
           }
         />
+        {event.venue ? (
+          <Fact
+            label={t('events:detail.venue')}
+            value={t(
+              event.venue.verified
+                ? 'events:detail.venueVerified'
+                : 'events:detail.venueUnverified',
+              { name: event.venue.name },
+            )}
+          />
+        ) : null}
         <Fact
           label={t('events:detail.skill')}
           value={
@@ -301,7 +312,9 @@ function Detail({
         </Fact>
         <Fact
           label={t('events:detail.booking')}
-          value={t(`events:booking.${event.bookingStatus}`)}
+          value={t('events:detail.bookingValue', {
+            status: t(`events:booking.${event.bookingStatus}`),
+          })}
         />
         {event.setting ? (
           <Fact label={t('events:detail.setting')} value={t(`events:setting.${event.setting}`)} />

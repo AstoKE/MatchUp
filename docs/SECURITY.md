@@ -78,7 +78,7 @@ Boundaries: **client (untrusted)** ⇄ Supabase API (PostgREST/Auth/Realtime/Sto
 ## 7. Privacy by design
 
 - Private by default: `profile_visibility = EVENT_PEERS`; location optional; marketing consent off.
-- **User location** is never stored or shared; discovery queries pass a transient point or a district. **Event locations** may be hidden until approval. Pins for hidden-location events are snapped to a ≥ 300 m grid.
+- **User location** is never stored or shared; discovery queries pass a transient point or a district. *(Phase 4: an exact event pin lives only in `event_private_details`; everybody else gets `events.public_point`, the pin for public locations, the centre of its ~500 m cell for hidden ones, the district centre without a pin. Search distances are measured from that public point. A venue reveals the place, so it is shown only where the address may be.)* **Event locations** may be hidden until approval. Pins for hidden-location events are snapped to a ≥ 300 m grid.
 - Minimal collection: no phone number, no DOB (only `adult_confirmed_at`), no government id, no gender (post-MVP inclusion features, if any, will be opt-in and need a purpose review).
 - Join requests disclose a minimal game-relevant profile to the organizer, stated at request time.
 - Participants see each other only after approval.

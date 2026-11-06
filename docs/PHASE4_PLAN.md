@@ -1,6 +1,6 @@
 # Phase 4 plan: all of Turkey, places, venues and the map
 
-Status 2026-11-06: **M1 and M2 built** (one PR), M3 to M6 not started. Scope: ROADMAP F-20 (the pin, postponed from Phase 3 by ADR-0019), F-21, F-22, plus all 81 provinces and their districts, a decision of 2026-11-05 recorded in [ADR-0024](ADR/0024-turkey-wide-catalog-and-phase-4-providers.md). Sources of truth stay `docs/PRD.md` §4.4 and §4.6, `docs/DATABASE.md` §3, `docs/SECURITY.md`, ADR-0011. This file sequences the work and lists the decisions it needs.
+Status 2026-11-07: **M1 to M4 built** (M1–M2 merged in #72, M3–M4 in one PR), M5 and M6 not started. Scope: ROADMAP F-20 (the pin, postponed from Phase 3 by ADR-0019), F-21, F-22, plus all 81 provinces and their districts, a decision of 2026-11-05 recorded in [ADR-0024](ADR/0024-turkey-wide-catalog-and-phase-4-providers.md). Sources of truth stay `docs/PRD.md` §4.4 and §4.6, `docs/DATABASE.md` §3, `docs/SECURITY.md`, ADR-0011. This file sequences the work and lists the decisions it needs.
 
 **Why now.** The launch offers every province, and the catalog, the city picker and the pin are hard to add once real events exist in places the schema does not know. Phase 7 starts after this.
 
@@ -45,6 +45,14 @@ Not there:
 
 ### M3: points: PostGIS, the pin and distance
 
+**Status 2026-11-07: built** in `20261107100000_points_and_venues.sql` (with M4). `event_private_details.exact_point`, `events.public_point` and `public_point_precision` (`EXACT`, `APPROXIMATE`, `DISTRICT`), `create_event`/`update_event` take an optional `point`, `get_event` gives the pin in `private` only, `search_events` takes `near`, `radius_km`, `sort: NEAREST` and returns `point`, `point_precision`, `distance_m`. pgTAP `26_event_points` (45). Deviations from the plan below:
+
+- **What the snap guarantees, stated correctly.** The plan's acceptance ("nobody can get within 300 m of the pin") is not what snapping gives: a pin near the centre of its cell is snapped close to itself. What it gives is that whoever cannot see the address learns only the ~500 m × ~500 m cell, never where in it the pin is; distances are measured from that cell centre, so search adds nothing. The tests check exactly this.
+- **No pin, no fake one.** An event without a pin is shown at its district centre with precision `DISTRICT`, so a map can draw an area, not a pin. Old apps keep working without sending one.
+- **No screens yet.** Placing a pin and "near me" both need the map and the location permission, native dependencies that ship with M5. The API is ready and the app already parses the new fields.
+
+Six mutations of the location code are caught (snap removed, the "inside" rule widened, the district guard removed, a moved pin not counted as a change...).
+
 - PostGIS in `extensions`.
 - `cities.centroid` and `districts.centroid` are filled from the M1 file.
 - `event_private_details.exact_point` holds the exact pin; `events.public_point` holds the exact pin for `PUBLIC` events and a 500 m grid snap for `APPROVED_ONLY` ones, computed by the server.
@@ -60,6 +68,8 @@ Not there:
 - **Acceptance:** nobody who could not see the address can get within 300 m of the pin from any RPC.
 
 ### M4: venues
+
+**Status 2026-11-07: built**, same migration. `venues` and `venue_sports` (text checks rather than enums, like `reports`), closed to the API roles (who suggested a venue stays private), `search_venues` (guests too), `suggest_venue` (5 a day, 1 for a new account, the same name within 300 m in the district returns the existing venue), `admin_add_venue`, `admin_set_venue_status` (verify, hide, restore; aal2; recorded), `admin_list_venues`. The venue is stored with the pin in `event_private_details`, because a venue gives the place away: a hidden location shows no venue to those who may not see the address. Reports take `VENUE`. Export lists one's pins and suggestions; purge keeps the venue without its author. pgTAP `27_venues` (58), `venues-concurrency` (2). Screens: the event form offers the district's venues (choosing one fills an empty place and address), the event page names the venue and whether it is verified, the booking status now reads "(organizatörün beyanı)" on the page as PRD §4.6 asks, and the console has a **Mekânlar** section (queue, verify, hide, restore, add with typed coordinates) and can hide a reported venue. **"Suggest a venue" in the app waits for M5**: a venue needs a point, and choosing one needs the map.
 
 - `venues` and `venue_sports` as in DATABASE §3, plus `name_search` with `private.normalize_tr` and a trigram index.
 - RPCs:

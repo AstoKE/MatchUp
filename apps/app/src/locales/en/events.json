@@ -71,7 +71,12 @@
     "participantNotesHint": "Only players you approve can see it (e.g. meeting point).",
     "immutableHint": "After publishing, sport, format and whether you play cannot change.",
     "setting": "Indoor or outdoor",
-    "settingNone": "Not stated"
+    "settingNone": "Not stated",
+    "venue": "Venue (optional)",
+    "venueNone": "No venue",
+    "venueLoading": "Loading venues…",
+    "venueUnverified": "{{name}} · unverified",
+    "venueHint": "Unverified venues were suggested by players. The booking status is always what the organizer declares."
   },
   "booking": {
     "NOT_REQUIRED": "Not needed",
@@ -128,7 +133,11 @@
     "participantsNone": "No other approved players yet.",
     "participantsHidden": "The list of players is shown to approved players.",
     "started": "Started",
-    "reportEvent": "Report this event"
+    "reportEvent": "Report this event",
+    "venue": "Venue",
+    "venueVerified": "{{name}} · verified venue",
+    "venueUnverified": "{{name}} · unverified venue",
+    "bookingValue": "{{status}} (declared by the organizer)"
   },
   "edit": {
     "title": "Edit event",

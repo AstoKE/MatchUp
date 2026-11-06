@@ -42,6 +42,8 @@ export function getLocalStack(): LocalStack | null {
 
 export const uniqueEmail = (label: string) => `${label}-${randomUUID().slice(0, 8)}@test.invalid`;
 export const PASSWORD = 'correct-horse-battery-staple';
+/** Digits to letters: a venue name with seven digits reads as a phone number, which suggest_venue refuses on purpose. */
+export const letterTag = (text: string) => text.replace(/\d/g, (d) => 'ghijklmnop'[Number(d)]!);
 
 /** A pre-verified account created via the admin API (skips the email step for unrelated tests). */
 export async function createVerifiedUser(stack: LocalStack, email: string, password = PASSWORD) {
@@ -160,6 +162,7 @@ export async function createPublishedEvent(
     formatSlug?: string;
     citySlug?: string;
     districtSlug?: string;
+    venueId?: string;
   } = {},
 ): Promise<string> {
   const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
@@ -202,6 +205,7 @@ export async function createPublishedEvent(
         capacity: options.capacity ?? 12,
         auto_approve: options.autoApprove ?? false,
         visibility: options.inviteOnly ? 'INVITE_ONLY' : 'PUBLIC',
+        ...(options.venueId ? { venue_id: options.venueId } : {}),
       },
     }),
   });
@@ -227,6 +231,45 @@ export function deleteEventsOf(userId: string) {
     '-c',
     `delete from public.events where organizer_id = '${userId}'`,
   ]);
+}
+
+/** TEST-ONLY: venues have no delete path (they are hidden, never removed), so later runs would list these. */
+export function deleteVenuesOf(userId: string) {
+  if (!/^[0-9a-f-]{36}$/.test(userId)) throw new Error('not a uuid');
+  execFileSync('docker', [
+    'exec',
+    'supabase_db_matchup',
+    'psql',
+    '-U',
+    'postgres',
+    '-v',
+    'ON_ERROR_STOP=1',
+    '-c',
+    `update public.event_private_details set venue_id = null where venue_id in (select id from public.venues where submitted_by = '${userId}'); delete from public.venues where submitted_by = '${userId}'`,
+  ]);
+}
+
+/** TEST-ONLY: a player suggests a venue in Ankara/Çankaya through the real RPC; returns its id. */
+export async function suggestVenueAs(stack: LocalStack, email: string, name: string) {
+  const anon = { apikey: stack.anonKey };
+  const one = async <T>(path: string) =>
+    ((await (await fetch(`${stack.apiUrl}/rest/v1/${path}`, { headers: anon })).json()) as T[])[0]!;
+  const city = await one<{ id: string }>('cities?select=id&slug=eq.ankara');
+  const district = await one<{ id: string }>(
+    `districts?select=id&slug=eq.cankaya&city_id=eq.${city.id}`,
+  );
+  const sport = await one<{ id: string }>('sports?select=id&slug=eq.football');
+  const response = await rpcAs(stack, email, 'suggest_venue', {
+    p_input: {
+      kind: 'COMMERCIAL_FACILITY',
+      name,
+      city_id: city.id,
+      district_id: district.id,
+      point: { lat: 39.895, lon: 32.7795 },
+      sport_ids: [sport.id],
+    },
+  });
+  return (await response.json()) as string;
 }
 
 /** TEST-ONLY: an administrator is a row written with service credentials; no client can do it. */

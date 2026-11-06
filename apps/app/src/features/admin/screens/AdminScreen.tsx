@@ -6,8 +6,9 @@ import { Screen, ScreenHeader, SegmentedChoice, Text, useTheme } from '@/ui';
 import { AuditPanel, DisputesPanel, FlagsPanel } from '../components/ListPanels';
 import { PeoplePanel } from '../components/PeoplePanel';
 import { ReportsPanel } from '../components/ReportsPanel';
+import { VenuesPanel } from '../components/VenuesPanel';
 
-const SECTIONS = ['reports', 'flags', 'disputes', 'users', 'audit'] as const;
+const SECTIONS = ['reports', 'flags', 'disputes', 'users', 'venues', 'audit'] as const;
 type Section = (typeof SECTIONS)[number];
 
 /** The console (docs/PHASE6_PLAN.md M5). Only reached through the gate; the server checks every call again. */
@@ -40,6 +41,7 @@ export default function AdminScreen() {
         {section === 'flags' ? <FlagsPanel onOpenUser={openUser} /> : null}
         {section === 'disputes' ? <DisputesPanel /> : null}
         {section === 'users' ? <PeoplePanel userId={person} onSelect={setPerson} /> : null}
+        {section === 'venues' ? <VenuesPanel /> : null}
         {section === 'audit' ? <AuditPanel /> : null}
       </View>
     </Screen>

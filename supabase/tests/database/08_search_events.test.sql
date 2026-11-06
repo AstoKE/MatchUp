@@ -144,9 +144,11 @@ select is((select count(*)::int from jsonb_array_elements(public.search_events(p
 select is((select array_agg(k order by k) from (
     select distinct jsonb_object_keys(i) k
       from jsonb_array_elements(public.search_events(pg_temp.win()) -> 'items') i) s),
-  array['approved_count', 'booking_status', 'capacity', 'city_id', 'cost_amount_minor', 'cost_note', 'district_id',
-        'duration_minutes', 'ends_at', 'id', 'open_slots', 'organizer_name', 'place_label', 'registration_open',
-        'setting', 'skill_max', 'skill_min', 'sport_format_id', 'sport_id', 'starts_at', 'title', 'waitlist_enabled'],
+  -- point, point_precision, venue and distance_m (Phase 4): the public point only, the venue of public locations only.
+  array['approved_count', 'booking_status', 'capacity', 'city_id', 'cost_amount_minor', 'cost_note', 'distance_m', 'district_id',
+        'duration_minutes', 'ends_at', 'id', 'open_slots', 'organizer_name', 'place_label', 'point', 'point_precision',
+        'registration_open', 'setting', 'skill_max', 'skill_min', 'sport_format_id', 'sport_id', 'starts_at', 'title', 'venue',
+        'waitlist_enabled'],
   'items carry exactly the public field list (no invite token, address, notes, organizer id)');
 select is((select i -> 'place_label' from jsonb_array_elements(public.search_events(pg_temp.win()) -> 'items') i
             where i ->> 'title' = 'S8 Sabah tenis'), 'null'::jsonb, 'a hidden place has no label');

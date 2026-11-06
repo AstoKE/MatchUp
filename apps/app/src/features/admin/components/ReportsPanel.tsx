@@ -13,7 +13,13 @@ import {
   useTheme,
   useToast,
 } from '@/ui';
-import { cancelEvent, resolveReport, suspendUser, type ReportItem } from '../api/admin-api';
+import {
+  cancelEvent,
+  resolveReport,
+  setVenueStatus,
+  suspendUser,
+  type ReportItem,
+} from '../api/admin-api';
 import { useDecision, useReport, useReports } from '../hooks';
 import { Confirmed, formatWhen, Panel } from './Pieces';
 
@@ -179,6 +185,10 @@ function ReportDetail({
         <Text variant="label">{t('admin:reports.target')}</Text>
         {target === null ? (
           <Text tone="secondary">{t('admin:reports.targetGone')}</Text>
+        ) : r.target_type === 'VENUE' ? (
+          <Text>
+            {target.name} · {t(`admin:reports.venueState.${target.listing_status ?? 'ACTIVE'}`)}
+          </Text>
         ) : r.target_type === 'USER' ? (
           <>
             <Text>
@@ -267,6 +277,14 @@ function ReportDetail({
                 disabled={!noteReady}
                 pending={resolve.isPending}
                 onConfirm={() => run('ACTIONED', () => suspendUser(target.id, note))}
+              />
+            ) : null}
+            {target && r.target_type === 'VENUE' && target.listing_status !== 'HIDDEN' ? (
+              <Confirmed
+                variant="destructive"
+                label={t('admin:reports.hideVenueClose')}
+                pending={resolve.isPending}
+                onConfirm={() => run('ACTIONED', () => setVenueStatus(target.id, 'HIDE', note))}
               />
             ) : null}
             {target && r.target_type === 'EVENT' ? (

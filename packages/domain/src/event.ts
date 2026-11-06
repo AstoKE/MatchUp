@@ -90,6 +90,8 @@ export interface EventDraft {
   durationMinutes: number;
   cityId: string | null;
   districtId: string | null;
+  /** A listed venue in the district (Phase 4); its point becomes the event's when there is no pin. */
+  venueId: string | null;
   locationVisibility: LocationVisibility;
   placeLabel: string;
   addressText: string;
@@ -312,6 +314,7 @@ export function toEventInput(draft: EventDraft, timeZone: string): EventInputPay
     duration_minutes: draft.durationMinutes,
     city_id: draft.cityId,
     district_id: draft.districtId,
+    venue_id: draft.venueId,
     location_visibility: draft.locationVisibility,
     location_label: collapse(draft.placeLabel),
     address_text: text(draft.addressText),

@@ -1,4 +1,4 @@
-import { mapRpcError } from '@matchup/domain';
+import { mapRpcError, VENUE_KINDS, type VenueKind } from '@matchup/domain';
 import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 
@@ -57,7 +57,7 @@ export async function verifyTotp(factorId: string, code: string): Promise<void> 
 // ---- reports ---------------------------------------------------------------------------------------------------------
 const reportItem = z.object({
   id: z.uuid(),
-  target_type: z.enum(['USER', 'EVENT']),
+  target_type: z.enum(['USER', 'EVENT', 'VENUE']),
   target_id: z.uuid(),
   target_label: z.nullable(z.string()),
   reason: z.string(),
@@ -89,6 +89,8 @@ const reportDetailRow = z.extend(reportItem, {
       approved_count: z.optional(z.number()),
       capacity: z.optional(z.number()),
       is_admin: z.optional(z.boolean()),
+      listing_status: z.optional(z.enum(['ACTIVE', 'HIDDEN'])),
+      verified: z.optional(z.boolean()),
     }),
   ),
   others: z.array(
@@ -255,3 +257,74 @@ const actionPage = z.object({
 export type AdminAction = z.infer<typeof actionPage>['items'][number];
 export const fetchActions = (cursor: { id: number } | null) =>
   call('admin_list_actions', cursor ? { p_cursor: cursor } : {}, (data) => actionPage.parse(data));
+
+// ---- venues (Phase 4) ------------------------------------------------------------------------------------------------
+const venuePage = z.object({
+  items: z.array(
+    z.object({
+      id: z.uuid(),
+      name: z.string(),
+      kind: z.enum(VENUE_KINDS),
+      city_id: z.uuid(),
+      district_id: z.uuid(),
+      address_text: z.nullable(z.string()),
+      point: z.object({ lat: z.number(), lon: z.number() }),
+      verified: z.boolean(),
+      sport_ids: z.array(z.uuid()),
+      provenance: z.string(),
+      hidden: z.boolean(),
+      created_at: z.string(),
+      submitted_by: z.nullable(z.uuid()),
+      submitter_name: z.nullable(z.string()),
+      open_reports: z.number(),
+      events: z.number(),
+    }),
+  ),
+  next_cursor: z.nullable(z.object({ created_at: z.string(), id: z.uuid() })),
+});
+export type AdminVenue = z.infer<typeof venuePage>['items'][number];
+export type VenueStatus = 'UNVERIFIED' | 'VERIFIED' | 'HIDDEN';
+export type VenueCursor = { created_at: string; id: string };
+
+export const fetchVenues = (status: VenueStatus, cursor: VenueCursor | null) =>
+  call(
+    'admin_list_venues',
+    { p_status: status, ...(cursor ? { p_cursor: cursor } : null) },
+    (data) => venuePage.parse(data),
+  );
+
+export const setVenueStatus = (id: string, action: 'VERIFY' | 'HIDE' | 'RESTORE', note?: string) =>
+  call(
+    'admin_set_venue_status',
+    { p_venue_id: id, p_action: action, ...(note?.trim() ? { p_note: note.trim() } : null) },
+    (data) => z.boolean().parse(data),
+  );
+
+export interface NewVenue {
+  kind: VenueKind;
+  name: string;
+  cityId: string;
+  districtId: string;
+  point: { lat: number; lon: number };
+  addressText: string;
+  sportIds: string[];
+  sourceRef: string;
+}
+
+export const addVenue = (v: NewVenue) =>
+  call(
+    'admin_add_venue',
+    {
+      p_input: {
+        kind: v.kind,
+        name: v.name,
+        city_id: v.cityId,
+        district_id: v.districtId,
+        point: v.point,
+        address_text: v.addressText.trim() || null,
+        sport_ids: v.sportIds,
+      },
+      ...(v.sourceRef.trim() ? { p_source_ref: v.sourceRef.trim() } : null),
+    },
+    (data) => z.uuid().parse(data),
+  );
