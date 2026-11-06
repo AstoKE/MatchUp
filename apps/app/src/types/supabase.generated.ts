@@ -267,24 +267,30 @@ export type Database = {
         Row: {
           address_text: string | null;
           event_id: string;
+          exact_point: unknown;
           location_label: string;
           participant_notes: string | null;
           updated_at: string;
+          venue_id: string | null;
         };
         ComputedFields: never;
         Insert: {
           address_text?: string | null;
           event_id: string;
+          exact_point?: unknown;
           location_label: string;
           participant_notes?: string | null;
           updated_at?: string;
+          venue_id?: string | null;
         };
         Update: {
           address_text?: string | null;
           event_id?: string;
+          exact_point?: unknown;
           location_label?: string;
           participant_notes?: string | null;
           updated_at?: string;
+          venue_id?: string | null;
         };
         Relationships: [
           {
@@ -292,6 +298,13 @@ export type Database = {
             columns: ['event_id'];
             isOneToOne: true;
             referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_private_details_venue_id_fkey';
+            columns: ['venue_id'];
+            isOneToOne: false;
+            referencedRelation: 'venues';
             referencedColumns: ['id'];
           },
         ];
@@ -326,6 +339,8 @@ export type Database = {
           organizer_id: string;
           organizer_plays: boolean;
           public_location_label: string | null;
+          public_point: unknown;
+          public_point_precision: string;
           published_at: string | null;
           registration_closes_at: string | null;
           review_window_closes_at: string | null;
@@ -371,6 +386,8 @@ export type Database = {
           organizer_id: string;
           organizer_plays?: boolean;
           public_location_label?: string | null;
+          public_point?: unknown;
+          public_point_precision?: string;
           published_at?: string | null;
           registration_closes_at?: string | null;
           review_window_closes_at?: string | null;
@@ -415,6 +432,8 @@ export type Database = {
           organizer_id?: string;
           organizer_plays?: boolean;
           public_location_label?: string | null;
+          public_point?: unknown;
+          public_point_precision?: string;
           published_at?: string | null;
           registration_closes_at?: string | null;
           review_window_closes_at?: string | null;
@@ -1272,6 +1291,107 @@ export type Database = {
           },
         ];
       };
+      venue_sports: {
+        Row: {
+          sport_id: string;
+          venue_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          sport_id: string;
+          venue_id: string;
+        };
+        Update: {
+          sport_id?: string;
+          venue_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'venue_sports_sport_id_fkey';
+            columns: ['sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sports';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'venue_sports_venue_id_fkey';
+            columns: ['venue_id'];
+            isOneToOne: false;
+            referencedRelation: 'venues';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      venues: {
+        Row: {
+          address_text: string | null;
+          city_id: string;
+          created_at: string;
+          district_id: string;
+          id: string;
+          kind: string;
+          listing_status: string;
+          location: unknown;
+          name: string;
+          name_search: string;
+          provenance: string;
+          source_ref: string | null;
+          submitted_by: string | null;
+          verification_status: string;
+          verified_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          address_text?: string | null;
+          city_id: string;
+          created_at?: string;
+          district_id: string;
+          id?: string;
+          kind: string;
+          listing_status?: string;
+          location: unknown;
+          name: string;
+          name_search?: never;
+          provenance: string;
+          source_ref?: string | null;
+          submitted_by?: string | null;
+          verification_status?: string;
+          verified_at?: string | null;
+        };
+        Update: {
+          address_text?: string | null;
+          city_id?: string;
+          created_at?: string;
+          district_id?: string;
+          id?: string;
+          kind?: string;
+          listing_status?: string;
+          location?: unknown;
+          name?: string;
+          name_search?: never;
+          provenance?: string;
+          source_ref?: string | null;
+          submitted_by?: string | null;
+          verification_status?: string;
+          verified_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'venues_district_in_city';
+            columns: ['district_id', 'city_id'];
+            isOneToOne: false;
+            referencedRelation: 'districts';
+            referencedColumns: ['id', 'city_id'];
+          },
+          {
+            foreignKeyName: 'venues_submitted_by_fkey';
+            columns: ['submitted_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       xp_transactions: {
         Row: {
           amount: number;
@@ -1326,6 +1446,7 @@ export type Database = {
         Args: { p_privacy_version: string; p_terms_version: string };
         Returns: undefined;
       };
+      admin_add_venue: { Args: { p_input: Json; p_source_ref?: string }; Returns: string };
       admin_cancel_event: { Args: { p_event_id: string; p_note: string }; Returns: undefined };
       admin_get_report: { Args: { p_report_id: string }; Returns: Json };
       admin_get_user: { Args: { p_user_id: string }; Returns: Json };
@@ -1338,6 +1459,10 @@ export type Database = {
         Returns: Json;
       };
       admin_list_reviews: { Args: { p_reviewee?: string; p_reviewer?: string }; Returns: Json };
+      admin_list_venues: {
+        Args: { p_cursor?: Json; p_limit?: number; p_status?: string };
+        Returns: Json;
+      };
       admin_reinstate_user: { Args: { p_note: string; p_user_id: string }; Returns: undefined };
       admin_resolve_attendance_dispute: {
         Args: {
@@ -1352,6 +1477,10 @@ export type Database = {
       };
       admin_restore_review: { Args: { p_note: string; p_review_id: string }; Returns: undefined };
       admin_search_users: { Args: { p_query: string }; Returns: Json };
+      admin_set_venue_status: {
+        Args: { p_action: string; p_note?: string; p_venue_id: string };
+        Returns: boolean;
+      };
       admin_suspend_user: { Args: { p_note: string; p_user_id: string }; Returns: undefined };
       approve_participation: { Args: { p_participation_id: string }; Returns: undefined };
       block_user: { Args: { p_user_id: string }; Returns: undefined };
@@ -1447,12 +1576,14 @@ export type Database = {
         Returns: string;
       };
       search_events: { Args: { p_cursor?: Json; p_filters?: Json }; Returns: Json };
+      search_venues: { Args: { p_filters: Json }; Returns: Json };
       set_marketing_consent: { Args: { p_granted: boolean }; Returns: undefined };
       set_sport_profile: {
         Args: { p_level: number; p_position_ids: string[]; p_sport_id: string };
         Returns: undefined;
       };
       submit_reviews: { Args: { p_event_id: string; p_reviews: Json }; Returns: number };
+      suggest_venue: { Args: { p_input: Json }; Returns: string };
       unblock_user: { Args: { p_user_id: string }; Returns: undefined };
       update_event: { Args: { p_event_id: string; p_input: Json }; Returns: undefined };
       update_my_profile: {

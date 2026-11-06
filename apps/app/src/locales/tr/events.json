@@ -71,7 +71,12 @@
     "participantNotesHint": "Sadece onayladığın katılımcılar görür (örn. buluşma yeri).",
     "immutableHint": "Yayınlandıktan sonra spor, format ve oynama durumu değiştirilemez.",
     "setting": "Mekan türü",
-    "settingNone": "Belirtmeyeceğim"
+    "settingNone": "Belirtmeyeceğim",
+    "venue": "Mekân (isteğe bağlı)",
+    "venueNone": "Mekân seçme",
+    "venueLoading": "Mekânlar yükleniyor…",
+    "venueUnverified": "{{name}} · doğrulanmamış",
+    "venueHint": "Doğrulanmamış mekânları oyuncular önerdi. Rezervasyon durumu her zaman organizatörün beyanıdır."
   },
   "booking": {
     "NOT_REQUIRED": "Gerekmiyor",
@@ -128,7 +133,11 @@
     "participantsNone": "Henüz onaylanmış başka oyuncu yok.",
     "participantsHidden": "Katılımcı listesi onaylanan oyunculara gösterilir.",
     "started": "Başladı",
-    "reportEvent": "Bu etkinliği bildir"
+    "reportEvent": "Bu etkinliği bildir",
+    "venue": "Mekân",
+    "venueVerified": "{{name}} · doğrulanmış mekân",
+    "venueUnverified": "{{name}} · doğrulanmamış mekân",
+    "bookingValue": "{{status}} (organizatörün beyanı)"
   },
   "edit": {
     "title": "Etkinliği düzenle",

@@ -69,7 +69,7 @@ select function_privs_are('private', 'can_report_user', array['uuid', 'uuid'], '
 
 -- ---- validation ----------------------------------------------------------------------------------------------------------
 select pg_temp.act_as(pg_temp.u(1));
-select throws_ok(format($$select public.report('VENUE', %L, 'SPAM')$$, pg_temp.ev('pub')), 'P0001', 'VALIDATION_FAILED', 'venues wait for Phase 4');
+select throws_ok(format($$select public.report('VENUE', %L, 'SPAM')$$, pg_temp.ev('pub')), 'P0001', 'NOT_FOUND', 'a venue report needs a listed venue (Phase 4)');
 select throws_ok(format($$select public.report('EVENT', %L, 'BAD')$$, pg_temp.ev('pub')), 'P0001', 'VALIDATION_FAILED', 'an unknown reason');
 select throws_ok(format($$select public.report('EVENT', %L, 'OTHER', repeat('x', 1001))$$, pg_temp.ev('pub')), 'P0001', 'VALIDATION_FAILED', 'details too long');
 select throws_ok(format($$select public.report('USER', %L, 'SPAM')$$, pg_temp.u(1)), 'P0001', 'VALIDATION_FAILED', 'not yourself');

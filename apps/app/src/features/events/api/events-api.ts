@@ -6,6 +6,11 @@ import {
   EVENT_VISIBILITIES,
   LOCATION_VISIBILITIES,
   mapRpcError,
+  POINT_PRECISIONS,
+  VENUE_KINDS,
+  type GeoPoint,
+  type PointPrecision,
+  type VenueBrief,
   type EventCancelReason,
   type EventCancelReasonShown,
   type EventSetting,
@@ -14,10 +19,20 @@ import {
 import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 
+export const pointRow = z.object({ lat: z.number(), lon: z.number() });
+export const venueBriefRow = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  kind: z.enum(VENUE_KINDS),
+  verified: z.boolean(),
+});
+
+// The Phase 4 fields are optional: an app may meet a hosted database that does not have that migration yet.
 const privateRow = z.object({
   location_label: z.string(),
   address_text: z.nullable(z.string()),
   participant_notes: z.nullable(z.string()),
+  point: z.optional(z.nullable(pointRow)),
 });
 
 // Optional: a hosted database without the latest migration does not send the id yet; the name is then plain text.
@@ -41,6 +56,9 @@ const eventRow = z.object({
   district_id: z.uuid(),
   location_visibility: z.enum(LOCATION_VISIBILITIES),
   public_location_label: z.nullable(z.string()),
+  public_point: z.optional(z.nullable(pointRow)),
+  public_point_precision: z.optional(z.enum(POINT_PRECISIONS)),
+  venue: z.optional(z.nullable(venueBriefRow)),
   capacity: z.number(),
   approved_count: z.number(),
   waitlist_enabled: z.boolean(),
@@ -85,6 +103,11 @@ export interface EventDetails {
   locationVisibility: z.infer<typeof eventRow>['location_visibility'];
   /** Shown to everyone only when the location is public. */
   publicPlaceLabel: string | null;
+  /** What everybody may see of the location (Phase 4): the pin, its ~500 m cell, or the district centre. */
+  publicPoint?: GeoPoint | null;
+  publicPointPrecision?: PointPrecision | null;
+  /** The venue, when the viewer may know the place (public location, or organizer and approved players). */
+  venue?: VenueBrief | null;
   capacity: number;
   approvedCount: number;
   waitlistEnabled: boolean;
@@ -107,6 +130,8 @@ export interface EventDetails {
     placeLabel: string;
     addressText: string | null;
     participantNotes: string | null;
+    /** The organizer's pin. */
+    point?: GeoPoint | null;
   } | null;
   /** Approved players (display names), for the organizer and approved players; null when not visible. */
   participants: { userId: string | null; displayName: string | null }[] | null;
@@ -146,6 +171,9 @@ export async function fetchEvent(
     districtId: row.district_id,
     locationVisibility: row.location_visibility,
     publicPlaceLabel: row.public_location_label,
+    publicPoint: row.public_point ?? null,
+    publicPointPrecision: row.public_point_precision ?? null,
+    venue: row.venue ?? null,
     capacity: row.capacity,
     approvedCount: row.approved_count,
     waitlistEnabled: row.waitlist_enabled,
@@ -166,6 +194,7 @@ export async function fetchEvent(
           placeLabel: row.private.location_label,
           addressText: row.private.address_text,
           participantNotes: row.private.participant_notes,
+          point: row.private.point ?? null,
         }
       : null,
     participants: row.participants_visible

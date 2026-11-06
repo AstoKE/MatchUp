@@ -58,3 +58,24 @@ export function defaultCityId(
     null
   );
 }
+
+/** A point as the server sends it (WGS 84, 6 decimals). */
+export interface GeoPoint {
+  lat: number;
+  lon: number;
+}
+
+/** How a public point relates to the place: the pin itself, its ~500 m cell (location hidden), or only the district. */
+export const POINT_PRECISIONS = ['EXACT', 'APPROXIMATE', 'DISTRICT'] as const;
+export type PointPrecision = (typeof POINT_PRECISIONS)[number];
+
+export const VENUE_KINDS = ['PUBLIC_SPACE', 'COMMERCIAL_FACILITY'] as const;
+export type VenueKind = (typeof VENUE_KINDS)[number];
+
+/** A venue as an event or a list shows it. "verified" is an administrator's check, never a booking. */
+export interface VenueBrief {
+  id: string;
+  name: string;
+  kind: VenueKind;
+  verified: boolean;
+}

@@ -6,10 +6,13 @@ import {
   createPublishedEvent,
   deleteEventsOf,
   deleteUser,
+  deleteVenuesOf,
   getLocalStack,
   makeAdmin,
   PASSWORD,
+  letterTag,
   reportAs,
+  suggestVenueAs,
   uniqueEmail,
   type LocalStack,
 } from './support/stack';
@@ -21,6 +24,7 @@ test.skip(!stack && process.env.REQUIRE_STACK !== '1', 'local Supabase stack is 
 const createdIds: string[] = [];
 test.afterAll(async () => {
   for (const id of createdIds) deleteEventsOf(id);
+  for (const id of createdIds) deleteVenuesOf(id);
   if (stack) await Promise.all(createdIds.map((id) => deleteUser(stack, id)));
 });
 function requireStack(): LocalStack {
@@ -231,5 +235,26 @@ test.describe('the administration console', () => {
     await expect(suspended.getByRole('button', { name: 'Çıkış yap' })).toBeVisible();
     await expectNoBlocking(suspended);
     await suspended.context().close();
+  });
+
+  test('verifies a suggested venue, which then leaves the queue (Phase 4)', async ({ page }) => {
+    test.setTimeout(120_000);
+    const t = await setup('venue');
+    const name = `Deneme Saha ${letterTag(t.organizerEmail.slice(-20, -14))}`;
+    await suggestVenueAs(t.s, t.organizerEmail, name);
+
+    await signIn(page, t.adminEmail);
+    await enterConsole(page, t.adminEmail);
+    await page.getByRole('radio', { name: 'Mekânlar', exact: true }).click();
+    const row = page.getByRole('listitem').filter({ hasText: name });
+    await expect(row).toBeVisible();
+    await expect(row).toContainText(`Öneren: ${t.organizerName}`);
+    await expectNoBlocking(page);
+    await row.getByRole('button', { name: 'Doğrula', exact: true }).click();
+    await row.getByRole('button', { name: 'Evet', exact: true }).click();
+    await expect(page.getByText('Karar kaydedildi.')).toBeVisible();
+    await expect(row).toHaveCount(0);
+    await page.getByRole('radio', { name: 'Doğrulanmış', exact: true }).click();
+    await expect(page.getByRole('listitem').filter({ hasText: name })).toBeVisible();
   });
 });

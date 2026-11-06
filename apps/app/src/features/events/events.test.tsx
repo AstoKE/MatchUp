@@ -70,6 +70,10 @@ const mockApi = {
   fetchMyAccount: jest.fn(),
   fetchMyProfile: jest.fn(),
 };
+const mockVenues = { search: jest.fn() };
+jest.mock('./api/venues-api', () => ({
+  searchVenues: (...a: unknown[]) => mockVenues.search(...a),
+}));
 jest.mock('@/features/profile/api/profile-api', () => ({
   fetchMyProfile: (...a: unknown[]) => mockApi.fetchMyProfile(...a),
 }));
@@ -179,6 +183,7 @@ beforeEach(() => {
   mockParams = {};
   mockRouter.canGoBack.mockReturnValue(false);
   mockApi.fetchCatalog.mockResolvedValue(catalog);
+  mockVenues.search.mockResolvedValue([]);
   mockApi.fetchMyProfile.mockResolvedValue({
     userId: ME,
     displayName: 'Ayşe A',
@@ -266,6 +271,48 @@ describe('CreateEventScreen', () => {
     expect(screen.queryByRole('radio', { name: 'Bornova' })).toBeNull();
     await fireEvent.press(screen.getByRole('radio', { name: 'Karşıyaka' }));
     expect(screen.getByRole('button', { name: 'İlçe: Karşıyaka' })).toBeTruthy();
+  });
+
+  it('offers the district’s venues, fills the place from one, and sends it', async () => {
+    const VENUE = '00000000-0000-4000-8000-0000000000b1';
+    mockVenues.search.mockResolvedValue([
+      {
+        id: VENUE,
+        name: 'Yıldız Halı Saha',
+        kind: 'COMMERCIAL_FACILITY',
+        verified: false,
+        cityId: ANKARA,
+        districtId: CANKAYA,
+        addressText: 'Üniversiteler Mh.',
+        point: { lat: 39.895, lon: 32.7795 },
+        sportIds: [SPORT],
+      },
+    ]);
+    mockApi.createEvent.mockResolvedValue(EVENT);
+    await renderApp(<CreateEventScreen />, { session: signedIn });
+    await screen.findByText('Ne oynanacak?');
+    await choose(/^Spor:/, 'Futbol');
+    await press('İleri');
+    await press('İleri');
+    await screen.findByText('Nerede?');
+    expect(screen.queryByRole('button', { name: /^Mekân/ })).toBeNull();
+    await choose(/^İlçe:/, 'Çankaya');
+    await waitFor(() =>
+      expect(mockVenues.search).toHaveBeenCalledWith({ cityId: ANKARA, districtId: CANKAYA }),
+    );
+    await choose(/^Mekân \(isteğe bağlı\):/, 'Yıldız Halı Saha · doğrulanmamış');
+    expect(screen.getByLabelText('Yer').props.value).toBe('Yıldız Halı Saha');
+    await press('İleri');
+    await fireEvent.changeText(screen.getByLabelText('Başlık'), 'Cuma maçı');
+    await press('İleri');
+    await press('Yayınla');
+    await waitFor(() => expect(mockApi.createEvent).toHaveBeenCalledTimes(1));
+    const call = mockApi.createEvent.mock.calls[0]?.[0] as { input: Record<string, unknown> };
+    expect(call.input).toMatchObject({
+      venue_id: VENUE,
+      location_label: 'Yıldız Halı Saha',
+      address_text: 'Üniversiteler Mh.',
+    });
   });
 
   it('does not leave step 1 without a sport and a format', async () => {
@@ -507,6 +554,7 @@ describe('EventDetailScreen', () => {
     expect(screen.getByText('Çankaya · ODTÜ Halı Saha 2 · Üniversiteler Mh.')).toBeTruthy();
     expect(screen.getByText('1/12 kişi')).toBeTruthy();
     expect(screen.getByText('~150 ₺ · bilgilendirme')).toBeTruthy();
+    expect(screen.getByText('Gerekmiyor (organizatörün beyanı)')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Düzenle' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Etkinliği iptal et' })).toBeNull();
     await press('Etkinliği yönet');
@@ -514,6 +562,22 @@ describe('EventDetailScreen', () => {
       pathname: '/e/[id]/manage',
       params: { id: EVENT },
     });
+  });
+
+  it('names the venue and whether an administrator verified it', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(
+      event({
+        venue: {
+          id: '00000000-0000-4000-8000-0000000000b1',
+          name: 'Yıldız Halı Saha',
+          kind: 'COMMERCIAL_FACILITY',
+          verified: true,
+        },
+      }),
+    );
+    await renderApp(<EventDetailScreen />, { session: signedIn });
+    expect(await screen.findByText('Yıldız Halı Saha · doğrulanmış mekân')).toBeTruthy();
   });
 
   it('the manage page sends anyone but the organizer back, showing no tools', async () => {

@@ -7,7 +7,8 @@
     "flags": "Flags",
     "disputes": "Disputes",
     "users": "People",
-    "audit": "Record"
+    "audit": "Record",
+    "venues": "Venues"
   },
   "mfa": {
     "enrollTitle": "Set up the second step",
@@ -31,7 +32,8 @@
     "loadFailed": "Reports could not be loaded",
     "kind": {
       "USER": "Person",
-      "EVENT": "Event"
+      "EVENT": "Event",
+      "VENUE": "Venue"
     },
     "by": "Reported by {{name}}",
     "openForTarget_one": "{{count}} open report",
@@ -57,7 +59,12 @@
     "starts": "Starts",
     "places": "Going {{approved}}/{{capacity}}",
     "organizer": "Organizer: {{name}}",
-    "openTarget": "Open the person"
+    "openTarget": "Open the person",
+    "hideVenueClose": "Hide the venue and close",
+    "venueState": {
+      "ACTIVE": "Listed",
+      "HIDDEN": "Hidden"
+    }
   },
   "reason": {
     "SPAM": "Spam",
@@ -133,12 +140,57 @@
       "USER_REINSTATED": "Person reinstated",
       "EVENT_CANCELED_BY_ADMIN": "Event canceled",
       "REVIEW_HIDDEN": "Review hidden",
-      "REVIEW_RESTORED": "Review restored"
+      "REVIEW_RESTORED": "Review restored",
+      "VENUE_ADDED": "Venue added",
+      "VENUE_VERIFIED": "Venue verified",
+      "VENUE_HIDDEN": "Venue hidden",
+      "VENUE_RESTORED": "Venue restored"
     },
     "outcome": {
       "ACTIONED": "action taken",
       "DISMISSED": "dismissed"
     }
   },
-  "open": "Administration"
+  "open": "Administration",
+  "venues": {
+    "status": "Venue status",
+    "UNVERIFIED": "Waiting",
+    "VERIFIED": "Verified",
+    "HIDDEN": "Hidden",
+    "empty": "No venues in this list.",
+    "loadFailed": "Venues could not be loaded",
+    "loadMore": "Show more",
+    "kind": {
+      "PUBLIC_SPACE": "Public space",
+      "COMMERCIAL_FACILITY": "Business"
+    },
+    "by": "Suggested by {{name}}",
+    "byAdmin": "Added by an administrator",
+    "events_one": "In {{count}} event",
+    "events_other": "In {{count}} events",
+    "reports_one": "{{count}} open report",
+    "reports_other": "{{count}} open reports",
+    "verify": "Verify",
+    "hide": "Hide",
+    "restore": "Restore",
+    "done": "Decision saved.",
+    "noteLabel": "Decision note (optional)",
+    "openMap": "Location: {{lat}}, {{lon}}",
+    "add": "Add a venue",
+    "addTitle": "New venue (added as verified)",
+    "name": "Name",
+    "kindLabel": "Kind",
+    "point": "Coordinates (latitude, longitude)",
+    "pointHint": "E.g. 39.8950, 32.7795. Copy them from a map; within 75 km of the district.",
+    "pointInvalid": "Write latitude and longitude separated by a comma.",
+    "address": "Address (optional)",
+    "sports": "Sports",
+    "source": "Source note (optional)",
+    "sourceHint": "E.g. seen in person, the municipality’s site.",
+    "save": "Add",
+    "added": "Venue added.",
+    "missing": "Name, province, district, coordinates and at least one sport are needed.",
+    "city": "Province",
+    "district": "District"
+  }
 }

@@ -105,9 +105,10 @@ select is(
   -- user_achievements (Phase 5): exported; deleted on purge, for the same reason.
   -- user_blocks (Phase 6): exported; deleted on purge, both directions.
   -- reports (Phase 6): the ones written are exported; details removed on purge, the rows stay for moderators.
+  -- venues (Phase 4): suggestions are exported; on purge they stay listed, without their author.
   array['event_participations', 'events', 'notifications', 'platform_admins', 'reliability_events', 'reports', 'skill_reviews',
         'user_achievements', 'user_blocks', 'user_consents', 'user_progress', 'user_settings', 'user_sport_positions', 'user_sport_profiles',
-        'user_sport_ratings', 'xp_transactions'],
+        'user_sport_ratings', 'venues', 'xp_transactions'],
   'per-user tables are exactly the ones export_my_data and purge_account handle'
 );
 
