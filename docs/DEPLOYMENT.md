@@ -126,3 +126,32 @@ Before the first use on hosted, **you** do this once, from the Supabase dashboar
 To remove an administrator: `update public.platform_admins set revoked_at = now() where user_id = '<id>';`. An administrator cannot be suspended through the console; revoke first.
 
 What the console shows and who may see it is in docs/PHASE6_PLAN.md M5 and docs/SECURITY.md S-14. Reports and the decisions made are personal data; how long they are kept is a counsel question (SECURITY §8).
+
+## 12. Hardening the hosted project and the web host (Phase 7 M2)
+
+Founder actions; none of them can be checked from the repository. After each, `node scripts/security/hosted-surface.mjs` (docs/SECURITY_REVIEW.md §3) shows what a stranger sees.
+
+**Supabase dashboard (project `wmgeugsqblwnhnqnczab`):**
+1. *Authentication → Sign In / Providers → Email:* "Confirm email" on, "Secure email change" on. Minimum password length 10 is already set. Turn on "Prevent use of leaked passwords" if the plan offers it (the advisor flags it as off).
+2. *Authentication → Sign In / Providers:* public sign-up stays **off** until the pilot account decision (PHASE7_PLAN). Every other provider stays off; anonymous sign-ins off.
+3. *Authentication → Rate Limits:* review the numbers for email sending, token refresh, verifications, and sign-ups and sign-ins per IP. The defaults are reasonable for a pilot. With the built-in SMTP, email sending is limited to a few per hour, which a pilot outgrows at once: see 4.
+4. *Authentication → SMTP Settings:* a real provider (for example Resend, Postmark or Brevo) on a domain you control, with SPF and DKIM records at the DNS host. The sender is a no-reply address on that domain.
+5. *Authentication → URL Configuration:* Site URL = the production web origin. Redirect URLs = only that origin's `/auth/callback` and the app's deep-link scheme. No wildcards, no localhost.
+6. *Database → Extensions:* if `pg_graphql` is enabled (the surface check warns), disable it; the app does not use GraphQL.
+7. *Project Settings → API keys:* the app ships only the publishable key. Rotate the secret keys if they were ever pasted anywhere outside the dashboard.
+
+**Web host (when chosen): response headers for every path.** The app is a single-page export with its JavaScript, CSS, fonts and the MapLibre worker on the same origin.
+
+```
+Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.maptiler.com; font-src 'self'; connect-src 'self' https://wmgeugsqblwnhnqnczab.supabase.co wss://wmgeugsqblwnhnqnczab.supabase.co https://api.maptiler.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io; worker-src 'self' blob:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=()
+```
+
+Notes on the headers:
+- `style-src 'unsafe-inline'` is needed by React Native Web, which writes its styles inline.
+- The Sentry host is only needed with a DSN.
+- The MapTiler host must match the style URL.
+- Before switching the CSP on, run the production build once with the policy in **report-only** mode (`Content-Security-Policy-Report-Only`) and check the browser console on Discover, the map, the event form, sign-in with CAPTCHA and the console.

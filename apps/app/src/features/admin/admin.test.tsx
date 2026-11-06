@@ -309,7 +309,8 @@ describe('venues', () => {
     await openVenues();
     expect(await screen.findByText('Yıldız Halı Saha · İşletme')).toBeTruthy();
     expect(mockApi.fetchVenues).toHaveBeenCalledWith('UNVERIFIED', null);
-    expect(screen.getByText('Çankaya, Ankara · Üniversiteler Mh.')).toBeTruthy();
+    // The district line waits for the catalog, which may arrive after the venue list.
+    expect(await screen.findByText('Çankaya, Ankara · Üniversiteler Mh.')).toBeTruthy();
     expect(screen.getByText(/Öneren: Deniz Kaya/)).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Doğrula' }));
     expect(mockApi.setVenueStatus).not.toHaveBeenCalled();
@@ -336,16 +337,16 @@ describe('venues', () => {
     expect(mockApi.addVenue).not.toHaveBeenCalled();
     await fireEvent.changeText(screen.getByLabelText('Ad'), 'Belediye Spor Kompleksi');
     await fireEvent.press(screen.getByRole('button', { name: /^İl:/ }));
-    await fireEvent.press(screen.getByRole('radio', { name: 'Ankara' }));
+    await fireEvent.press(await screen.findByRole('radio', { name: 'Ankara' }));
     await fireEvent.press(screen.getByRole('button', { name: /^İlçe:/ }));
-    await fireEvent.press(screen.getByRole('radio', { name: 'Çankaya' }));
+    await fireEvent.press(await screen.findByRole('radio', { name: 'Çankaya' }));
     await fireEvent.changeText(screen.getByLabelText('Koordinat (enlem, boylam)'), 'kuzey');
     expect(screen.getByText('Enlem ve boylamı virgülle ayırarak yaz.')).toBeTruthy();
     await fireEvent.changeText(
       screen.getByLabelText('Koordinat (enlem, boylam)'),
       '39.8950, 32.7795',
     );
-    await fireEvent.press(screen.getByRole('checkbox', { name: 'Futbol' }));
+    await fireEvent.press(await screen.findByRole('checkbox', { name: 'Futbol' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Ekle' }));
     await waitFor(() =>
       expect(mockApi.addVenue).toHaveBeenCalledWith({

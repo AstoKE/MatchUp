@@ -1,6 +1,6 @@
 # Phase 7 plan: hardening and the Turkey pilot
 
-Status 2026-11-07: **plan; M1 built** (in review). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
+Status 2026-11-07: **M1 merged (#77), M2 built** (in review). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
 
 **Why.** Phases 2–6 and 4 built the product and tested it locally and on the web. A pilot puts it in front of strangers across the country: the remaining risks are operational (who answers reports, backups, email, abuse), unverified platforms (native Phase 4–6, iOS, release builds) and scale (indexes and budgets beyond 5000 events).
 
@@ -36,6 +36,13 @@ Not there:
 - **Docs:** ROADMAP, PRD and CLAUDE.md say "Turkey pilot".
 
 ### M2: security review
+
+**Status 2026-11-07: built** (docs/SECURITY_REVIEW.md).
+- **Inventory:** the database API surface (142 functions, 32 tables) is a reviewed snapshot that CI compares (`security-inventory.test.ts`), with invariants on guards, `search_path`, RLS and grants.
+- **Findings:** eight, none allowing access to another person's data. S7-1 (the dispute resolution's guard) is fixed in `20261109100000`. The others are accepted, or are founder settings with exact steps (DEPLOYMENT §12).
+- **From outside:** `scripts/security/hosted-surface.mjs` shows what a stranger sees of hosted (the founder runs it).
+- **Web headers:** CSP and the other headers are written for whichever static host is chosen.
+- **Changed from the plan:** the inventory is a test in the integration suite (it needs the database), not a script.
 
 - **RPC and RLS audit.** Every `public` function, with:
   - who may call it;
