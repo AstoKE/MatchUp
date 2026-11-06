@@ -47,6 +47,12 @@ export const envSchema = z.object({
     z.transform((value) => (value === '' ? undefined : value)),
     z.optional(z.string().check(z.regex(/^[0-9A-Za-z_-]{10,64}$/, 'not a Turnstile site key'))),
   ),
+  // MapLibre style URL of the tile provider (ADR-0024 §3), with its key restricted to the app's origins and bundle ids;
+  // public by design. Empty = no map: Discover stays a list and the pin picker is not offered.
+  EXPO_PUBLIC_MAP_STYLE_URL: z.pipe(
+    z.transform((value) => (value === '' ? undefined : value)),
+    z.optional(z.url().check(z.refine((url) => url.startsWith('https://'), 'must be https'))),
+  ),
 });
 
 export type Env = z.infer<typeof envSchema>;

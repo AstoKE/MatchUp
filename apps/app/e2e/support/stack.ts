@@ -163,6 +163,7 @@ export async function createPublishedEvent(
     citySlug?: string;
     districtSlug?: string;
     venueId?: string;
+    point?: { lat: number; lon: number };
   } = {},
 ): Promise<string> {
   const base = { apikey: stack.anonKey, 'content-type': 'application/json' };
@@ -206,6 +207,7 @@ export async function createPublishedEvent(
         auto_approve: options.autoApprove ?? false,
         visibility: options.inviteOnly ? 'INVITE_ONLY' : 'PUBLIC',
         ...(options.venueId ? { venue_id: options.venueId } : {}),
+        ...(options.point ? { point: options.point } : {}),
       },
     }),
   });

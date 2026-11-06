@@ -270,6 +270,43 @@ test.describe('venues on the event page (Phase 4 / M4)', () => {
   });
 });
 
+test.describe('near me (Phase 4 / M5)', () => {
+  test('a guest who shares a location sees the nearest event first, with its distance', async ({
+    browser,
+  }) => {
+    const s = requireStack();
+    const email = uniqueEmail('near');
+    createdIds.push((await createOnboardedUser(s, email, { displayName: 'Yakın Düzenleyen' })).id);
+    const tag = email.slice(5, 13);
+    // One event at ODTÜ, one at the far end of Çankaya; the browser stands at ODTÜ.
+    await createPublishedEvent(s, email, `E2E yakın ${tag}`, {
+      point: { lat: 39.895, lon: 32.7795 },
+    });
+    await createPublishedEvent(s, email, `E2E uzak ${tag}`, { point: { lat: 39.83, lon: 32.88 } });
+    const context = await browser.newContext({
+      geolocation: { latitude: 39.8952, longitude: 32.7797 },
+      permissions: ['geolocation'],
+      locale: 'tr-TR',
+      timezoneId: 'Europe/Istanbul',
+    });
+    const page = await context.newPage();
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Futbol', exact: true }).click();
+    await page.getByRole('checkbox', { name: 'Yakınımdakiler', exact: true }).click();
+    await expect(page.getByText(/etkinlik, en yakın önce$/)).toBeVisible();
+    const near = page.getByRole('link', { name: new RegExp(`E2E yakın ${tag}`) });
+    const far = page.getByRole('link', { name: new RegExp(`E2E uzak ${tag}`) });
+    await expect(near).toContainText('100 m');
+    await expect(far).toContainText(/1[01](,\d)? km/);
+    // Cards sit in a grid on a wide screen, so the order is read from the list, not from positions.
+    const titles = await page.getByRole('listitem').allInnerTexts();
+    const at = (text: string) => titles.findIndex((t) => t.includes(text));
+    expect(at(`E2E yakın ${tag}`)).toBeLessThan(at(`E2E uzak ${tag}`));
+    await expectNoBlocking(page);
+    await context.close();
+  });
+});
+
 test.describe('My Events (Phase 3 / M3b)', () => {
   test('the organizer finds their draft and published event; someone else does not', async ({
     page,

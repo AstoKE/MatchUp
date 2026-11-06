@@ -5,6 +5,7 @@ import {
   groupByLocalDay,
   relativeDay,
   type DiscoverFilters as Filters,
+  type GeoPoint,
 } from '@matchup/domain';
 import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
@@ -15,15 +16,29 @@ import { NotificationBell } from '@/features/notifications';
 import { useMyProfile } from '@/features/profile';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
-import { Button, EmptyState, Screen, Skeleton, Text, TOUCH_TARGET, useTheme } from '@/ui';
+import { mapStyleUrl } from '@/lib/map-config';
+import {
+  Button,
+  EmptyState,
+  Screen,
+  SegmentedChoice,
+  Skeleton,
+  Text,
+  ToggleChip,
+  TOUCH_TARGET,
+  useTheme,
+  useToast,
+} from '@/ui';
 import { readStoredCity, startingCityId, storeCity } from '../city-preference';
 import { CityPicker } from '../components/CityPicker';
 import { DiscoverFilters } from '../components/DiscoverFilters';
 import { SportPicker, SportStrip } from '../components/DiscoverSports';
 import { EventListRow } from '../components/EventListRow';
+import { LazyEventsMap } from '../components/LazyEventsMap';
 import { ALL_SPORTS, readDiscoverSport, storeDiscoverSport } from '../discover-sport-preference';
 import { formatDayHeading } from '../format';
 import { useEventSearch } from '../hooks';
+import { locateMe } from '../near-me';
 
 /**
  * Discover (FL-2), open to guests (D-09): published public events from `search_events`, soonest first.
@@ -38,7 +53,23 @@ export function DiscoverScreen() {
   const router = useRouter();
   const catalog = useCatalog();
   const profile = useMyProfile();
+  const toast = useToast();
   const [filters, setFilters] = useState<Filters>(EMPTY_DISCOVER_FILTERS);
+  const [view, setView] = useState<'list' | 'map'>('list');
+  // The device's position for "near me": kept in memory for this visit only.
+  const [near, setNear] = useState<GeoPoint | null>(null);
+  const [locating, setLocating] = useState(false);
+  const toggleNear = async () => {
+    if (near) {
+      setNear(null);
+      return;
+    }
+    setLocating(true);
+    const result = await locateMe();
+    setLocating(false);
+    if ('point' in result) setNear(result.point);
+    else toast.show(t(`events:discover.near.${result.error}`), 'danger');
+  };
   // undefined while the device is being read; null when nothing is chosen yet.
   const [stored, setStored] = useState<string | null | undefined>(undefined);
   useEffect(() => {
@@ -91,9 +122,10 @@ export function DiscoverScreen() {
           now: new Date(openedAt),
           timeZone: city?.timeZone ?? 'Europe/Istanbul',
           cityId: city?.id ?? null,
+          near,
         },
       ),
-    [filters, choice, openedAt, city?.timeZone, city?.id],
+    [filters, choice, openedAt, city?.timeZone, city?.id, near],
   );
   const search = useEventSearch(payload, ready && choice !== null);
   const items = useMemo(
@@ -146,6 +178,34 @@ export function DiscoverScreen() {
         <>
           <SportStrip sports={sports} choice={choice} onChoose={choose} />
           <DiscoverFilters filters={filters} onChange={setFilters} city={city} />
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: spacing[2],
+            }}
+          >
+            {mapStyleUrl ? (
+              <SegmentedChoice
+                label={t('events:discover.view.label')}
+                value={view}
+                onChange={setView}
+                options={[
+                  { value: 'list', label: t('events:discover.view.list') },
+                  { value: 'map', label: t('events:discover.view.map') },
+                ]}
+              />
+            ) : null}
+            <ToggleChip
+              label={
+                locating ? t('events:discover.near.locating') : t('events:discover.near.label')
+              }
+              selected={near !== null}
+              disabled={locating}
+              onPress={() => void toggleNear()}
+            />
+          </View>
         </>
       ) : null}
 
@@ -200,34 +260,56 @@ export function DiscoverScreen() {
       ) : (
         <View style={{ gap: spacing[3] }}>
           <Text variant="caption" tone="secondary" accessibilityLiveRegion="polite">
-            {t('events:discover.resultCount', { count: items.length })}
+            {near
+              ? t('events:discover.resultCountNear', { count: items.length })
+              : t('events:discover.resultCount', { count: items.length })}
           </Text>
-          {groups.map((group) => {
-            const named = relativeDay(group.date, new Date(openedAt), timeZone);
-            return (
-              <View key={group.date} style={{ gap: spacing[3] }}>
-                <Text variant="title" heading={2}>
-                  {named ? t(`events:discover.day.${named}`) : formatDayHeading(group.date, locale)}
-                </Text>
+          {view === 'map' && catalog.data ? (
+            <LazyEventsMap items={items} city={city} near={near} catalog={catalog.data} />
+          ) : near ? (
+            // Nearest first: one list, since days would cut the order apart.
+            <View role="list" style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[3] }}>
+              {items.map((event) => (
                 <View
-                  role="list"
-                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[3] }}
+                  key={event.id}
+                  role="listitem"
+                  style={{ width: expanded ? '32.6%' : breakpoint === 'medium' ? '49%' : '100%' }}
                 >
-                  {group.items.map((event) => (
-                    <View
-                      key={event.id}
-                      role="listitem"
-                      style={{
-                        width: expanded ? '32.6%' : breakpoint === 'medium' ? '49%' : '100%',
-                      }}
-                    >
-                      <EventListRow event={event} catalog={catalog.data} showDate={false} />
-                    </View>
-                  ))}
+                  <EventListRow event={event} catalog={catalog.data} showDate />
                 </View>
-              </View>
-            );
-          })}
+              ))}
+            </View>
+          ) : null}
+          {view === 'map' || near
+            ? null
+            : groups.map((group) => {
+                const named = relativeDay(group.date, new Date(openedAt), timeZone);
+                return (
+                  <View key={group.date} style={{ gap: spacing[3] }}>
+                    <Text variant="title" heading={2}>
+                      {named
+                        ? t(`events:discover.day.${named}`)
+                        : formatDayHeading(group.date, locale)}
+                    </Text>
+                    <View
+                      role="list"
+                      style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[3] }}
+                    >
+                      {group.items.map((event) => (
+                        <View
+                          key={event.id}
+                          role="listitem"
+                          style={{
+                            width: expanded ? '32.6%' : breakpoint === 'medium' ? '49%' : '100%',
+                          }}
+                        >
+                          <EventListRow event={event} catalog={catalog.data} showDate={false} />
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                );
+              })}
           {search.hasNextPage ? (
             <Button
               label={t('events:discover.loadMore')}

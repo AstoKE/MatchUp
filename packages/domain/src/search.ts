@@ -1,4 +1,8 @@
 import { utcToZonedParts, zonedTimeToUtc, type EventSetting } from './event';
+import type { GeoPoint } from './place';
+
+/** ~1 m: the device's position is sent no more precisely than search needs. */
+const round5 = (n: number) => Math.round(n * 1e5) / 1e5;
 
 /**
  * Discovery filters as the Discover screen holds them, and their translation to the `search_events`
@@ -52,6 +56,9 @@ export type SearchPayload = {
   only_open?: true;
   from?: string;
   to?: string;
+  /** Phase 4: a point from the device (never stored) and the order it allows. */
+  near?: GeoPoint;
+  sort?: 'NEAREST';
   limit: number;
 };
 
@@ -75,10 +82,14 @@ function addDays(date: string, days: number): string {
 
 export function buildSearchPayload(
   filters: DiscoverFilters,
-  options: { now: Date; timeZone: string; cityId?: string | null },
+  options: { now: Date; timeZone: string; cityId?: string | null; near?: GeoPoint | null },
 ): SearchPayload {
   const payload: SearchPayload = { limit: SEARCH_PAGE_SIZE };
   if (options.cityId) payload.city_id = options.cityId;
+  if (options.near) {
+    payload.near = { lat: round5(options.near.lat), lon: round5(options.near.lon) };
+    payload.sort = 'NEAREST';
+  }
   if (filters.districtId) payload.district_ids = [filters.districtId];
   if (filters.sportIds.length > 0) payload.sport_ids = [...filters.sportIds];
   if (filters.timeOfDay.length > 0) payload.time_of_day = [...filters.timeOfDay];

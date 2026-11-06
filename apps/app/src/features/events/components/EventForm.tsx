@@ -25,6 +25,7 @@ import {
 } from '@/ui';
 import { eventValidationMessage } from '../format';
 import { useVenues } from '../hooks';
+import { PinField, SuggestVenue } from './PlaceOnMap';
 
 export const EVENT_FORM_STEPS = 5;
 
@@ -277,7 +278,8 @@ function WhereStep({ catalog, draft, onChange, errors }: EventFormProps) {
         }
         error={eventValidationMessage(errors.districtId)}
       />
-      <VenueField draft={draft} onChange={onChange} />
+      <VenueField catalog={catalog} draft={draft} onChange={onChange} />
+      <PinField catalog={catalog} draft={draft} onChange={onChange} />
       <TextField
         label={t('fields.place')}
         hint={t('fields.placeHint')}
@@ -573,9 +575,11 @@ function ReviewStep({ catalog, draft, onGoTo }: EventFormProps) {
  * becomes the event's on the server. An unverified venue was suggested by players and says so.
  */
 function VenueField({
+  catalog,
   draft,
   onChange,
 }: {
+  catalog: Catalog;
   draft: EventDraft;
   onChange: (patch: Partial<EventDraft>) => void;
 }) {
@@ -588,33 +592,42 @@ function VenueField({
       : null,
   );
   const list = venues.data ?? [];
-  if (!draft.districtId || (venues.isSuccess && list.length === 0 && !draft.venueId)) return null;
+  if (!draft.districtId) return null;
+  // One tree whatever the list holds: the suggestion sheet must not lose its state when the list arrives.
+  const showList = !(venues.isSuccess && list.length === 0 && !draft.venueId);
   return (
     <View style={{ gap: spacing[1] }}>
-      <Select
-        label={t('fields.venue')}
-        placeholder={venues.isPending ? t('fields.venueLoading') : t('fields.venueNone')}
-        noneLabel={t('fields.venueNone')}
-        value={draft.venueId}
-        search={list.length > 8 ? search : undefined}
-        options={list.map((v) => ({
-          value: v.id,
-          label: v.verified ? v.name : t('fields.venueUnverified', { name: v.name }),
-        }))}
-        onChange={(venueId) => {
-          const venue = list.find((v) => v.id === venueId);
-          onChange({
-            venueId,
-            ...(venue && draft.placeLabel.trim() === '' ? { placeLabel: venue.name } : {}),
-            ...(venue?.addressText && draft.addressText.trim() === ''
-              ? { addressText: venue.addressText }
-              : {}),
-          });
-        }}
-      />
-      <Text variant="caption" tone="secondary">
-        {t('fields.venueHint')}
-      </Text>
+      {showList ? (
+        <>
+          <Select
+            label={t('fields.venue')}
+            placeholder={venues.isPending ? t('fields.venueLoading') : t('fields.venueNone')}
+            noneLabel={t('fields.venueNone')}
+            value={draft.venueId}
+            search={list.length > 8 ? search : undefined}
+            options={list.map((v) => ({
+              value: v.id,
+              label: v.verified ? v.name : t('fields.venueUnverified', { name: v.name }),
+            }))}
+            onChange={(venueId) => {
+              const venue = list.find((v) => v.id === venueId);
+              onChange({
+                venueId,
+                // The venue's point becomes the pin; clearing the venue keeps whatever pin there is.
+                ...(venue ? { point: venue.point } : {}),
+                ...(venue && draft.placeLabel.trim() === '' ? { placeLabel: venue.name } : {}),
+                ...(venue?.addressText && draft.addressText.trim() === ''
+                  ? { addressText: venue.addressText }
+                  : {}),
+              });
+            }}
+          />
+          <Text variant="caption" tone="secondary">
+            {t('fields.venueHint')}
+          </Text>
+        </>
+      ) : null}
+      <SuggestVenue catalog={catalog} draft={draft} onChange={onChange} />
     </View>
   );
 }

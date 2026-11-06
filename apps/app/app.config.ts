@@ -29,9 +29,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     bundleIdentifier: brand.identifiers.appId,
     supportsTablet: true,
+    // "Near me" needs only an approximate position (SECURITY §7): iOS gives the reduced one unless the person changes it.
+    infoPlist: { NSLocationDefaultAccuracyReduced: true },
   },
   android: {
     package: brand.identifiers.appId,
+    // Approximate location only: the precise permission is never requested.
+    blockedPermissions: ['android.permission.ACCESS_FINE_LOCATION'],
     adaptiveIcon: {
       backgroundColor: '#F2F5F1',
       foregroundImage: './assets/android-icon-foreground.png',
@@ -46,6 +50,23 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     output: 'single',
     favicon: './assets/favicon.png',
   },
-  plugins: ['expo-router', 'expo-localization', 'expo-secure-store'],
+  plugins: [
+    'expo-router',
+    'expo-localization',
+    'expo-secure-store',
+    // Phase 4 / M5: the map is native code (a new development build is needed after this change).
+    '@maplibre/maplibre-react-native',
+    // "Near me" only: asked when the person taps it, never in the background, never stored (SECURITY §7).
+    [
+      'expo-location',
+      {
+        locationWhenInUsePermission:
+          'Yakınındaki etkinlikleri sıralamak için, yalnızca sen istediğinde kullanılır. / Used only when you ask, to sort nearby events.',
+        isIosBackgroundLocationEnabled: false,
+        isAndroidBackgroundLocationEnabled: false,
+        isAndroidForegroundServiceEnabled: false,
+      },
+    ],
+  ],
   experiments: { typedRoutes: true },
 });

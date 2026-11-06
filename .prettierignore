@@ -12,3 +12,4 @@ docs/
 *.png
 settings.json
 expo-env.d.ts
+apps/app/public/vendor

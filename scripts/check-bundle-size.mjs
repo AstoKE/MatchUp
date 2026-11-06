@@ -41,12 +41,22 @@
 // TOTAL raised 901 -> 905 (2026-11-07, Phase 4 / M3-M4): the console's venues section (AdminGate 11 -> 13 kB, lazy, admins
 // only), the venue field of the event form (in the lazy EventStepper chunk) and the parsing of points and venues in the
 // event and search reads. INITIAL is 555 again, exactly on its limit: the map (M5) must arrive as its own lazy chunk.
+//
+// MAP is a third ratchet (2026-11-07, Phase 4 / M5): MapLibre GL JS is about 286 kB gzip on its own, loaded only when
+// someone opens the map or the pin picker (MapCanvas chunk; its worker is a separate file in public/vendor, not counted).
+// It is measured on its own and left out of TOTAL, so TOTAL keeps meaning "the app's code". TOTAL 905 -> 913 for M5: the
+// map view of Discover, the pin picker and the venue suggestion form (lazy chunks), the lazy-loading glue of each split.
+// INITIAL raised 555 -> 556 for M5, with the reason: "near me" and the list/map switch sit on Discover (+2.9 kB), and the
+// event page's request, attendance and review panels moved out of the first load to pay for them (-2.3 kB). Measured
+// 555.26 kB on main before, 555.6 kB after.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 905;
-const INITIAL_RATCHET_KB = 555;
+const TOTAL_RATCHET_KB = 913;
+const INITIAL_RATCHET_KB = 556;
+const MAP_RATCHET_KB = 290;
+const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';
 
 if (!existsSync(dir)) {
@@ -57,12 +67,14 @@ if (!existsSync(dir)) {
 const gzipSize = (path) => gzipSync(readFileSync(path), { level: 9 }).length;
 
 let totalGz = 0;
+let mapGz = 0;
 const rows = [];
 for (const name of readdirSync(dir)) {
   const path = join(dir, name);
   if (!name.endsWith('.js') || !statSync(path).isFile()) continue;
   const gz = gzipSize(path);
-  totalGz += gz;
+  if (isMapChunk(name)) mapGz += gz;
+  else totalGz += gz;
   rows.push([name.slice(0, 40), Math.round(gz / 1024)]);
 }
 rows.sort((a, b) => b[1] - a[1]);
@@ -84,6 +96,8 @@ if (existsSync(indexHtml)) {
 }
 
 const totalKb = Math.round(totalGz / 1024);
+const mapKb = Math.round(mapGz / 1024);
+console.log(`map chunk: ${mapKb} kB gzip (ratchet ${MAP_RATCHET_KB} kB)`);
 const initialKb = Math.round(initialGz / 1024);
 console.log(`total web JS: ${totalKb} kB gzip (ratchet ${TOTAL_RATCHET_KB} kB)`);
 if (initialGz > 0)
@@ -99,6 +113,12 @@ if (totalKb > TOTAL_RATCHET_KB) {
 if (initialGz > 0 && initialKb > INITIAL_RATCHET_KB) {
   console.error(
     'Initial-load JS grew beyond the recorded baseline. Investigate or justify before merging.',
+  );
+  failed = true;
+}
+if (mapKb > MAP_RATCHET_KB) {
+  console.error(
+    'The map chunk grew beyond the recorded baseline. Investigate or justify before merging.',
   );
   failed = true;
 }

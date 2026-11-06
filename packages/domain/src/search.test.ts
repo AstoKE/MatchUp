@@ -27,6 +27,22 @@ describe('buildSearchPayload', () => {
     expect(payload()).toEqual({ limit: SEARCH_PAGE_SIZE, city_id: CITY });
   });
 
+  it('a point from the device sorts by distance, sent to about a metre', () => {
+    expect(
+      buildSearchPayload(filters(), {
+        now: NOW,
+        timeZone: IST,
+        cityId: CITY,
+        near: { lat: 39.895012345, lon: 32.779498765 },
+      }),
+    ).toEqual({
+      limit: SEARCH_PAGE_SIZE,
+      city_id: CITY,
+      near: { lat: 39.89501, lon: 32.7795 },
+      sort: 'NEAREST',
+    });
+  });
+
   it('omits the city for guests who have not chosen one', () => {
     expect(buildSearchPayload(filters(), { now: NOW, timeZone: IST })).toEqual({
       limit: SEARCH_PAGE_SIZE,

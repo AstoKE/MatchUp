@@ -3,7 +3,18 @@ const expoConfig = require('eslint-config-expo/flat');
 
 module.exports = [
   ...expoConfig,
-  { ignores: ['dist/*', 'dist-*/**', '.expo/*', 'android/**', 'ios/**', 'expo-env.d.ts'] },
+  {
+    ignores: [
+      'dist/*',
+      'dist-*/**',
+      '.expo/*',
+      'android/**',
+      'ios/**',
+      'expo-env.d.ts',
+      // MapLibre's worker, copied from node_modules (scripts/copy-map-worker.mjs).
+      'public/vendor/**',
+    ],
+  },
   {
     files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}'],
     rules: {

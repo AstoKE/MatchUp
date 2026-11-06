@@ -77,13 +77,6 @@ jest.mock('./api/venues-api', () => ({
 jest.mock('@/features/profile/api/profile-api', () => ({
   fetchMyProfile: (...a: unknown[]) => mockApi.fetchMyProfile(...a),
 }));
-// The form is loaded on demand in the app (LazyEventStepper); here it is rendered directly, and Playwright covers the
-// lazy load on the web.
-jest.mock('./components/LazyEventStepper', () => ({
-  LazyEventStepper: jest.requireActual<typeof import('./components/EventStepper')>(
-    './components/EventStepper',
-  ).EventStepper,
-}));
 jest.mock('./city-preference', () => ({
   ...jest.requireActual<typeof import('./city-preference')>('./city-preference'),
   readStoredCity: () => null,

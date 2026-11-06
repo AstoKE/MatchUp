@@ -21,10 +21,9 @@ import {
   useTheme,
 } from '@/ui';
 import type { EventDetails } from '../api/events-api';
-import { AttendancePanel } from '../components/AttendancePanel';
 import { JoinPanel } from '../components/JoinPanel';
-import { ReviewPanel } from '../components/ReviewPanel';
 import { Pill, SlotMeter } from '../components/SlotMeter';
+import { LazyAttendancePanel, LazyReviewPanel } from '../components/LazyPanels';
 import { formatCost, formatEventStart } from '../format';
 import { useEvent } from '../hooks';
 
@@ -415,10 +414,10 @@ function Detail({
       !isOrganizer &&
       (event.status === 'PUBLISHED' || event.status === 'COMPLETED') &&
       event.participants !== null ? (
-        <AttendancePanel eventId={event.id} isOrganizer={false} />
+        <LazyAttendancePanel eventId={event.id} isOrganizer={false} />
       ) : null}
       {event.status === 'COMPLETED' && (isOrganizer || event.participants !== null) ? (
-        <ReviewPanel
+        <LazyReviewPanel
           eventId={event.id}
           timeZone={timeZone}
           descriptors={sport?.skillDescriptors ?? {}}

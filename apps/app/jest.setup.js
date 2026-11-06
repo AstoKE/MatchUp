@@ -13,3 +13,20 @@ jest.mock('react-native-webview', () => {
   const WebView = (props) => require('react').createElement(View, { ...props, testID: 'webview' });
   return { WebView, default: WebView };
 });
+
+// React.lazy chunks (docs/PERFORMANCE.md) are rendered directly in component tests: what is tested is the screen, and
+// Playwright covers the lazy loading on the web.
+jest.mock('./src/features/events/components/LazyPanels', () => ({
+  LazyRequestsPanel: jest.requireActual('./src/features/events/components/RequestsPanel')
+    .RequestsPanel,
+  LazyAttendancePanel: jest.requireActual('./src/features/events/components/AttendancePanel')
+    .AttendancePanel,
+  LazyReviewPanel: jest.requireActual('./src/features/events/components/ReviewPanel').ReviewPanel,
+}));
+jest.mock('./src/features/events/components/LazyEventsMap', () => ({
+  LazyEventsMap: jest.requireActual('./src/features/events/components/EventsMap').EventsMap,
+}));
+jest.mock('./src/features/events/components/LazyEventStepper', () => ({
+  LazyEventStepper: jest.requireActual('./src/features/events/components/EventStepper')
+    .EventStepper,
+}));
