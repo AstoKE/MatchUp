@@ -1,0 +1,1489 @@
+{
+  "functions": [
+    {
+      "fn": "private.account_quota(p_uid uuid, p_key text, p_default integer, p_new_key text, p_new_default integer)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.achievement_facts(p_uid uuid, p_at timestamp with time zone)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.achievement_rule_met(p_rule jsonb, f jsonb)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.admin_note(p_note text, p_required boolean)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.apply_attendance_outcome(p_participation uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.apply_finalization(p_event uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.apply_sport_selection(p_user uuid, p_sports jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.assert_active_verified_user()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_active_verified_user"
+    },
+    {
+      "fn": "private.assert_admin_aal2()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "private.assert_location(p_city_id uuid, p_district_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.assert_onboarded_user()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "private.assert_recent_auth(p_max_age interval)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.audit_logs_append_only()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.auto_finalize_attendance()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.award_attendance_xp(p_event uuid, p_user uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.award_organizer_xp(p_event uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.award_xp(p_user uuid, p_amount integer, p_reason text, p_source_type text, p_source uuid, p_dedupe text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.can_report_user(p_uid uuid, p_target uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.clean_display_name(p_name text)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.close_review_windows(p_at timestamp with time zone)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.complete_due_events()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.config_int(p_key text, p_default integer)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.evaluate_achievements(p_uid uuid, p_event uuid, p_at timestamp with time zone)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.event_participations_block_guard()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.events_before_write()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.export_event_data(p_uid uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.export_place_data(p_uid uuid)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.finalize_event_row(p_event uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.fold_tr(p text)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.grant_achievement(p_uid uuid, p_code text, p_sport uuid, p_event uuid, p_bonus integer)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.handle_new_user()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.is_admin()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "private.is_approved_participant(p_event uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "private.is_blocked_pair(p_a uuid, p_b uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.is_blocked_with_me(p_other uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "private.is_event_organizer(p_event uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "private.is_event_participant(p_event uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "private.is_event_peer(p_a uuid, p_b uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.is_late_cancel(p_starts timestamp with time zone, p_approved timestamp with time zone, p_canceled timestamp with time zone)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.legal_consent_current(p_uid uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.lock_organizer(p_uid uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.lock_participation_for_attendance(p_uid uuid, p_participation uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.lock_participation_for_organizer(p_uid uuid, p_participation uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.lock_rating_user(p_user uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.lock_requester(p_uid uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.moderation_actions_append_only()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.new_invite_token()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.notify(p_user uuid, p_type text, p_payload jsonb, p_dedupe text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.parse_event_input(p jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.parse_point(p jsonb)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.parse_venue_input(p jsonb)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.parse_venue_sports(p jsonb)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.participations_before_write()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.participations_sync_approved_count()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.point_in_district(p geography, p_district uuid)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.point_json(p geography)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.process_deletion_queue()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.profile_is_public(p_user uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "none"
+    },
+    {
+      "fn": "private.public_point_of(r private.event_input)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.publish_event_row(p_uid uuid, p_event uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.purge_account(p_uid uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.purge_event_data(p_uid uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.rating_const(p_key text)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.recompute_user_progress(p_uid uuid, p_at timestamp with time zone)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.recompute_user_sport_rating(p_uid uuid, p_sport uuid, p_at timestamp with time zone)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.record_moderation(p_actor uuid, p_action text, p_target_type text, p_target_id uuid, p_report uuid, p_outcome text, p_note text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.reliability_events_guard()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.reliability_score(p_values double precision[], p_ages double precision[])",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.report_item(r reports)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.send_attendance_reminders(p_at timestamp with time zone)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.set_review_status(p_review uuid, p_status text, p_action text, p_note text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "private.set_updated_at()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.skill_reviews_before_insert()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.skill_stats(p_prior double precision, p_sport uuid, p_events uuid[], p_sports uuid[], p_reviewers uuid[], p_scores double precision[], p_starts timestamp with time zone[], p_at timestamp with time zone)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.snap_point(p geography)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.upsert_sport_profile(p_user uuid, p_sport uuid, p_level numeric, p_positions uuid[])",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.venue_brief(p_venue uuid)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.venue_item(v venues)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.verified_attendances_by_sport(p_uid uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.void_reliability_event(p_participation uuid, p_reason text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.xp_transactions_immutable()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "public.accept_current_legal_terms(p_terms_version text, p_privacy_version text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_active_verified_user"
+    },
+    {
+      "fn": "public.admin_add_venue(p_input jsonb, p_source_ref text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_cancel_event(p_event_id uuid, p_note text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_get_report(p_report_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_get_user(p_user_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_hide_review(p_review_id uuid, p_note text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_list_actions(p_cursor jsonb, p_limit integer)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_list_disputes()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_list_flags()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_list_reports(p_status text, p_cursor jsonb, p_limit integer)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_list_reviews(p_reviewer uuid, p_reviewee uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_list_venues(p_status text, p_cursor jsonb, p_limit integer)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_reinstate_user(p_user_id uuid, p_note text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_resolve_attendance_dispute(p_participation_id uuid, p_resolution attendance_status)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_resolve_report(p_report_id uuid, p_outcome text, p_note text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_restore_review(p_review_id uuid, p_note text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_search_users(p_query text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_set_venue_status(p_venue_id uuid, p_action text, p_note text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_suspend_user(p_user_id uuid, p_note text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.approve_participation(p_participation_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.block_user(p_user_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.cancel_account_deletion()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.cancel_event(p_event_id uuid, p_reason text, p_message text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.cancel_participation(p_event_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.catalog_places()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": true,
+      "authenticated": true,
+      "guard": "none"
+    },
+    {
+      "fn": "public.complete_event(p_event_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.complete_onboarding(p_adult_confirmed boolean, p_terms_version text, p_privacy_version text, p_marketing_consent boolean, p_display_name text, p_city_id uuid, p_district_id uuid, p_sports jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_active_verified_user"
+    },
+    {
+      "fn": "public.create_event(p_client_request_id uuid, p_input jsonb, p_publish boolean)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.delete_draft(p_event_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.dispute_attendance(p_participation_id uuid, p_reason text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.export_my_data()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.finalize_attendance(p_event_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.get_event(p_event_id uuid, p_invite_token text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": true,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.get_event_attendance(p_event_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.get_event_reviews(p_event_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.get_my_account()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.get_player_card(p_user_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.list_event_requests(p_event_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.list_my_blocks()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.list_my_events(p_bucket text, p_cursor jsonb, p_limit integer)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.mark_attendance(p_participation_id uuid, p_value attendance_status)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.mark_notifications_read(p_ids uuid[])",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.publish_event(p_event_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.reject_participation(p_participation_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.remove_participant(p_participation_id uuid, p_reason text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.remove_sport_profile(p_sport_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.replace_my_sport_profiles(p_sports jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.report(p_target_type text, p_target_id uuid, p_reason text, p_details text, p_invite_token text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.request_account_deletion()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.request_join(p_event_id uuid, p_message text, p_position_id uuid, p_invite_token text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.search_events(p_filters jsonb, p_cursor jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": true,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.search_venues(p_filters jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": true,
+      "authenticated": true,
+      "guard": "none"
+    },
+    {
+      "fn": "public.set_marketing_consent(p_granted boolean)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.set_sport_profile(p_sport_id uuid, p_level numeric, p_position_ids uuid[])",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.submit_reviews(p_event_id uuid, p_reviews jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.suggest_venue(p_input jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.unblock_user(p_user_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.update_event(p_event_id uuid, p_input jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.update_my_profile(p_display_name text, p_bio text, p_city_id uuid, p_district_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.update_my_settings(p_locale text, p_theme text, p_profile_visibility profile_visibility, p_show_reliability boolean, p_show_badges boolean)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.waitlist_participation(p_participation_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    }
+  ],
+  "tables": [
+    {
+      "table": "private.audit_logs",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "private.closed_review_windows",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "private.rating_config",
+      "rls": false,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.achievement_definitions",
+      "rls": true,
+      "policies": [
+        "achievement_definitions_select_all r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.app_config",
+      "rls": true,
+      "policies": [
+        "app_config_select_all r anon,authenticated"
+      ],
+      "anon": [
+        "SELECT"
+      ],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.attendance_disputes",
+      "rls": true,
+      "policies": [
+        "attendance_disputes_select r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.cities",
+      "rls": true,
+      "policies": [
+        "cities_select_active r anon,authenticated"
+      ],
+      "anon": [
+        "SELECT"
+      ],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.districts",
+      "rls": true,
+      "policies": [
+        "districts_select_active r anon,authenticated"
+      ],
+      "anon": [
+        "SELECT"
+      ],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.event_participations",
+      "rls": true,
+      "policies": [
+        "event_participations_select r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.event_private_details",
+      "rls": true,
+      "policies": [
+        "event_private_details_select r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.events",
+      "rls": true,
+      "policies": [
+        "events_select_involved r authenticated",
+        "events_select_not_blocked r authenticated restrictive",
+        "events_select_public r anon,authenticated"
+      ],
+      "anon": [
+        "SELECT"
+      ],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.moderation_actions",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.notifications",
+      "rls": true,
+      "policies": [
+        "notifications_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.platform_admins",
+      "rls": true,
+      "policies": [
+        "platform_admins_select_admin r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.profiles",
+      "rls": true,
+      "policies": [
+        "profiles_select_admin r authenticated",
+        "profiles_select_not_blocked r authenticated restrictive",
+        "profiles_select_own r authenticated",
+        "profiles_select_public r authenticated"
+      ],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.reliability_events",
+      "rls": true,
+      "policies": [
+        "reliability_events_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.reports",
+      "rls": true,
+      "policies": [
+        "reports_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.skill_reviews",
+      "rls": true,
+      "policies": [
+        "skill_reviews_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.sport_formats",
+      "rls": true,
+      "policies": [
+        "sport_formats_select_active r anon,authenticated"
+      ],
+      "anon": [
+        "SELECT"
+      ],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.sport_positions",
+      "rls": true,
+      "policies": [
+        "sport_positions_select_active r anon,authenticated"
+      ],
+      "anon": [
+        "SELECT"
+      ],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.sports",
+      "rls": true,
+      "policies": [
+        "sports_select_active r anon,authenticated"
+      ],
+      "anon": [
+        "SELECT"
+      ],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.user_achievements",
+      "rls": true,
+      "policies": [
+        "user_achievements_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.user_blocks",
+      "rls": true,
+      "policies": [
+        "user_blocks_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.user_consents",
+      "rls": true,
+      "policies": [
+        "user_consents_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.user_progress",
+      "rls": true,
+      "policies": [
+        "user_progress_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.user_settings",
+      "rls": true,
+      "policies": [
+        "user_settings_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.user_sport_positions",
+      "rls": true,
+      "policies": [
+        "user_sport_positions_select_not_blocked r authenticated restrictive",
+        "user_sport_positions_select_own r authenticated",
+        "user_sport_positions_select_public r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.user_sport_profiles",
+      "rls": true,
+      "policies": [
+        "user_sport_profiles_select_not_blocked r authenticated restrictive",
+        "user_sport_profiles_select_own r authenticated",
+        "user_sport_profiles_select_public r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.user_sport_ratings",
+      "rls": true,
+      "policies": [
+        "user_sport_ratings_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    },
+    {
+      "table": "public.venue_sports",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.venues",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.xp_transactions",
+      "rls": true,
+      "policies": [
+        "xp_transactions_select_own r authenticated"
+      ],
+      "anon": [],
+      "authenticated": [
+        "SELECT"
+      ]
+    }
+  ]
+}

@@ -38,7 +38,9 @@ It also names the Phase 7 milestone where it is handled.
 - [ ] **founder, M2:** re-run `node scripts/auth-probe.mjs` against hosted and record the numbers in AUTH_ABUSE.
   - Known locally (ADR-0016): all three endpoints leak (sign-up 422 vs 200, sign-in timing, reset cooldown 429).
   - We do not claim to prevent enumeration; counsel confirms the residual risk (⚖).
-- [ ] **code, M2:** security review of every RPC and RLS policy, kept as a reviewed inventory that CI compares, so no function appears unreviewed; findings fixed with negative tests.
+- [x] **code, M2:** security review of every RPC and RLS policy, kept as a reviewed inventory that CI compares (docs/SECURITY_REVIEW.md); S7-1 fixed with its test.
+- [ ] **founder, M2:** run `scripts/security/hosted-surface.mjs` against hosted and act on any FAIL/WARN (pg_graphql, sign-up).
+- [ ] **founder, when hosting the web:** the response headers of DEPLOYMENT §12 (CSP report-only first).
 
 ## 3. Operations
 

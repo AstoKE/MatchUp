@@ -233,7 +233,7 @@ select throws_ok($$select public.admin_resolve_attendance_dispute(pg_temp.part('
 select pg_temp.act_as(pg_temp.u(3), 'aal2');
 select throws_ok($$select public.admin_resolve_attendance_dispute(pg_temp.part('m', 3), 'PRESENT')$$, 'P0001', 'NOT_ALLOWED', 'the disputing player cannot resolve their own dispute');
 select pg_temp.act_as(pg_temp.u(10), 'aal1');
-select throws_ok($$select public.admin_resolve_attendance_dispute(pg_temp.part('m', 3), 'PRESENT')$$, 'P0001', 'NOT_ALLOWED', 'an admin without MFA (aal2) is refused');
+select throws_ok($$select public.admin_resolve_attendance_dispute(pg_temp.part('m', 3), 'PRESENT')$$, 'P0001', 'MFA_REQUIRED', 'an admin without MFA (aal2) is told to use it (Phase 7 M2, S7-1)');
 select pg_temp.act_as(pg_temp.u(10), 'aal2');
 select throws_ok($$select public.admin_resolve_attendance_dispute(pg_temp.part('m', 3), 'DISPUTED')$$, 'P0001', 'VALIDATION_FAILED', 'the resolution must be PRESENT or ABSENT');
 select throws_ok($$select public.admin_resolve_attendance_dispute(pg_temp.part('m', 2), 'ABSENT')$$, 'P0001', 'INVALID_TRANSITION', 'only a DISPUTED row can be resolved');
