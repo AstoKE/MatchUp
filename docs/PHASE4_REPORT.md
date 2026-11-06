@@ -19,7 +19,7 @@ Decisions: ADR-0024 (all of Turkey, Wikidata plus the official list, MapTiler, P
 
 | Level | Result |
 |---|---|
-| pgTAP (all phases) | **1279 pass** in 27 files. Phase 4: `25_turkey_catalog` (21), `26_event_points` (45: every viewer kind × visibility, the snap, distance search, paging by distance, input guards, edits that move or drop the pin, export), `27_venues` (58: access, suggestions and their quotas, search, admin aal2, venues in events, hidden venues, reports, export and purge) |
+| pgTAP (all phases) | **1280 pass** in 27 files. Phase 4: `25_turkey_catalog` (21), `26_event_points` (46: every viewer kind × visibility, the snap, distance search, paging by distance, input guards, edits that move or drop the pin, export), `27_venues` (58: access, suggestions and their quotas, search, admin aal2, venues in events, hidden venues, reports, export and purge) |
 | Mutation checks | 11 deliberate breakages of the new SQL, all caught: snap removed, the "inside" rule widened, the district guard removed, a moved pin not counted as a change, venues leaking for hidden locations (page and search), hidden venues found, the quota removed, the admin check removed, duplicate folding broken; plus the per-user lock removed (caught by the concurrency test) |
 | API integration | **189 pass**, including `venues-concurrency`: six identical suggestions at once store one; six different ones at the daily limit store five |
 | Component / domain / scripts | **562** / **155** / slug and catalog-migration tests pass; the map paths run against a stand-in map (`map-flows.test.tsx`) |
@@ -56,7 +56,7 @@ The event form, the event page's request/attendance/review panels and the map vi
 
 - **Native map, pin picker and near me on a device.** The new native modules need new development builds (Android in the Linux container, iOS on EAS); NATIVE_VALIDATION "Next" 0 lists what to check. Nothing native of Phase 4 has run.
 - **MapTiler tiles with the founder's key.** No automated test uses the key; the founder checks it on the web once the key is in `.env.local`.
-- **Hosted.** The Phase 4 migrations are on `main` only. The founder pushes them (dry run, then advisors), in order: `20261106100000_turkey_catalog`, `20261107100000_points_and_venues`, `20261108100000_catalog_centers` (and the Phase 6 ones before them if not pushed yet).
+- **Hosted.** The first push (2026-11-07) applied the Phase 6 migrations and `20261106100000`, then stopped at `20261107100000`: its backfill met canceled and completed events, which no local test had (#76, DEPLOYMENT §9 fourth push). Corrected and rehearsed over frozen events; the founder retries `20261107100000` and `20261108100000` after #76.
 - **Accessibility of the map itself.** Markers are buttons with names on the web and the list carries the same content, but placing a pin needs a pointer: someone who cannot use the map can still choose a venue or leave the pin out (it is optional). A typed-address alternative would need geocoding, which ADR-0011 rules out for the MVP.
 - **District boundaries.** Only centres are stored; "75 km from the district seat" guards against mistakes but does not prove a pin is inside the district.
 
