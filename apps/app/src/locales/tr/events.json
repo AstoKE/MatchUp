@@ -76,7 +76,28 @@
     "venueNone": "Mekân seçme",
     "venueLoading": "Mekânlar yükleniyor…",
     "venueUnverified": "{{name}} · doğrulanmamış",
-    "venueHint": "Doğrulanmamış mekânları oyuncular önerdi. Rezervasyon durumu her zaman organizatörün beyanıdır."
+    "venueHint": "Doğrulanmamış mekânları oyuncular önerdi. Rezervasyon durumu her zaman organizatörün beyanıdır.",
+    "pin": "Haritada yer (isteğe bağlı)",
+    "pinNone": "İşaretlenmedi",
+    "pinSet": "İşaretlendi: {{lat}}, {{lon}}",
+    "pinChoose": "Haritada işaretle",
+    "pinChange": "Değiştir",
+    "pinRemove": "Kaldır",
+    "pinTitle": "Yeri haritada işaretle",
+    "pinHelp": "Haritaya dokun. Yer gizliyse onaylanmayanlar sadece yaklaşık 500 metrelik bir alan görür.",
+    "pinSave": "Bu yeri kullan",
+    "pinMapLabel": "Yer seçme haritası",
+    "pinChoice": "Seçilen yer",
+    "suggestOpen": "Listede yok mu? Mekân öner",
+    "suggestTitle": "Mekân öner",
+    "suggestHelp": "Önerin hemen listelenir, bir yönetici doğrulayana kadar \"doğrulanmamış\" görünür.",
+    "suggestName": "Mekânın adı",
+    "suggestKind": "Türü",
+    "suggestSports": "Sporlar",
+    "suggestPin": "Haritada yeri (zorunlu)",
+    "suggestSave": "Öner",
+    "suggestDone": "Mekân önerildi ve seçildi.",
+    "suggestMissing": "Ad (en az 3 harf), en az bir spor ve haritada bir yer gerekli."
   },
   "booking": {
     "NOT_REQUIRED": "Gerekmiyor",
@@ -215,7 +236,26 @@
     "noSportBody": "Başka bir spora bak ya da tüm sporları gör.",
     "cityButton": "İl: {{city}}. Değiştir",
     "cityPick": "İl seç",
-    "cityTitle": "İl seç"
+    "cityTitle": "İl seç",
+    "view": {
+      "label": "Görünüm",
+      "list": "Liste",
+      "map": "Harita"
+    },
+    "near": {
+      "label": "Yakınımdakiler",
+      "locating": "Konum alınıyor…",
+      "DENIED": "Konum izni verilmedi. Liste ilin etkinliklerini göstermeye devam ediyor.",
+      "UNAVAILABLE": "Konumun şu an alınamadı."
+    },
+    "resultCountNear_one": "{{count}} etkinlik, en yakın önce",
+    "resultCountNear_other": "{{count}} etkinlik, en yakın önce",
+    "map": {
+      "label_one": "Etkinlik haritası, {{count}} yer",
+      "label_other": "Etkinlik haritası, {{count}} yer",
+      "hint": "Bir işarete dokun, kartı aşağıda açılsın. Gizli konumlar yaklaşık bir alan olarak gösterilir.",
+      "someMissing": "{{count}} etkinlikten {{shown}} tanesi haritada. Tümü listede."
+    }
   },
   "join": {
     "signInToJoin": "Giriş yap ve katılım iste",
@@ -430,5 +470,9 @@
     "open": "Etkinliği yönet",
     "pending": "Bekleyen istek",
     "spotsLeft": "Kalan yer"
+  },
+  "venueKind": {
+    "PUBLIC_SPACE": "Kamuya açık alan",
+    "COMMERCIAL_FACILITY": "İşletme"
   }
 }

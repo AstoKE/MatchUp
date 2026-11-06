@@ -1,6 +1,6 @@
 -- Phase 4 / M1: the catalog of Turkey and its single read.
 begin;
-select plan(20);
+select plan(21);
 
 create function pg_temp.act_as(p_role text) returns void language plpgsql as $$
 begin
@@ -41,8 +41,10 @@ select pg_temp.act_as('anon');
 select is(jsonb_array_length(public.catalog_places()), 81, 'a guest gets 81 provinces');
 select is((select sum(jsonb_array_length(c -> 'districts'))::int from jsonb_array_elements(public.catalog_places()) c),
   973, 'with all their districts');
-select ok((select bool_and(c ?& array['id', 'slug', 'names', 'timezone', 'districts'] and not c ? 'centroid'
+select ok((select bool_and(c ?& array['id', 'slug', 'names', 'timezone', 'center', 'districts'] and not c ? 'centroid'
   and not c ? 'wikidata_id') from jsonb_array_elements(public.catalog_places()) c), 'only the fields the app reads');
+select is((select d -> 'center' from jsonb_array_elements(public.catalog_places()) c, jsonb_array_elements(c -> 'districts') d
+            where d ->> 'slug' = 'cankaya'), '[39.9083, 32.8461]'::jsonb, 'a district''s centre, for the map (Phase 4 M5)');
 reset role;
 -- RLS still decides: a deactivated district is gone from the read.
 update public.districts set is_active = false where slug = 'evren';

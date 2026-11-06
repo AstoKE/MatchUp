@@ -16,7 +16,7 @@ import {
 } from './api/participation-api';
 import { fetchEventReviews, submitReviews } from './api/reviews-api';
 import { searchEvents, type SearchCursor } from './api/search-api';
-import { searchVenues, type VenueFilters } from './api/venues-api';
+import { searchVenues, suggestVenue, type VenueFilters } from './api/venues-api';
 import {
   cancelEvent,
   completeEvent,
@@ -211,5 +211,13 @@ export function useEventRequests(eventId: string, enabled: boolean) {
     queryKey: requestsKey(eventId),
     queryFn: () => fetchEventRequests(eventId),
     enabled,
+  });
+}
+
+export function useSuggestVenue() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: suggestVenue,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['venues'] }),
   });
 }

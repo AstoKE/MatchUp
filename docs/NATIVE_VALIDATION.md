@@ -134,6 +134,7 @@ Not covered even then: other iPhones and iOS versions, push notifications (not b
 
 ## Next
 
+0. **Phase 4 / M5 added native code** (`@maplibre/maplibre-react-native`, `expo-location`): the Android development build (Linux container, ADR-0015) and the iOS simulator build (EAS, ADR-0022) must be rebuilt before the next device run, with `EXPO_PUBLIC_MAP_STYLE_URL` set. To check on the emulator: Discover → Harita shows tiles and markers; the event form's pin picker takes a tap; "Yakınımdakiler" asks for approximate location once and sorts by distance (emulator location set to Ankara).
 1. Physical Android device pass; TalkBack walk-through on the real screen reader.
 2. iOS: the data flows (needs a backend the macOS runner can reach), VoiceOver, a physical iPhone (Apple Developer account is in place; final identifiers are needed first, ADR-0010).
 3. Re-run this suite against the hosted Supabase project before any public launch.

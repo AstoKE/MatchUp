@@ -1,3 +1,4 @@
+import { formatDistance } from '@matchup/domain';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
@@ -71,9 +72,14 @@ export function EventListRow({
       ? [{ label: t('discover.card.paid'), tone: 'neutral' as const }]
       : []),
   ];
-  const where = event.placeLabel
+  const place = event.placeLabel
     ? [districtName, event.placeLabel].filter(Boolean).join(' · ')
     : t('discover.card.placeHidden', { district: districtName });
+  // Searched near a point: how far, measured from what everybody may see of the place (Phase 4).
+  const where =
+    event.distanceM === null || event.distanceM === undefined
+      ? place
+      : `${place} · ${formatDistance(event.distanceM, locale)}`;
 
   return (
     <Pressable

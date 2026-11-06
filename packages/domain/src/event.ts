@@ -1,3 +1,4 @@
+import type { GeoPoint } from './place';
 /**
  * Event form rules. They mirror `private.parse_event_input` and the publish guards in migration
  * 20261027100000_event_core.sql so the app can reject early; the database stays the authority (it
@@ -92,6 +93,8 @@ export interface EventDraft {
   districtId: string | null;
   /** A listed venue in the district (Phase 4); its point becomes the event's when there is no pin. */
   venueId: string | null;
+  /** The organizer's pin (Phase 4), or null. Only the organizer and approved players ever get it back exactly. */
+  point: GeoPoint | null;
   locationVisibility: LocationVisibility;
   placeLabel: string;
   addressText: string;
@@ -296,7 +299,7 @@ export function validateEventDraft(
 }
 
 /** Flat JSON object: what create_event / update_event accept as `p_input`. */
-export type EventInputPayload = Record<string, string | number | boolean | null>;
+export type EventInputPayload = Record<string, string | number | boolean | GeoPoint | null>;
 
 /** The jsonb payload for create_event / update_event (keys as the server's parse_event_input reads them). */
 export function toEventInput(draft: EventDraft, timeZone: string): EventInputPayload {
@@ -315,6 +318,7 @@ export function toEventInput(draft: EventDraft, timeZone: string): EventInputPay
     city_id: draft.cityId,
     district_id: draft.districtId,
     venue_id: draft.venueId,
+    point: draft.point,
     location_visibility: draft.locationVisibility,
     location_label: collapse(draft.placeLabel),
     address_text: text(draft.addressText),

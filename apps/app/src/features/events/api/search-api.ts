@@ -13,7 +13,12 @@ import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 import { pointRow, venueBriefRow } from './events-api';
 
-const cursorSchema = z.object({ starts_at: z.string(), id: z.string() });
+// Soonest first pages by (starts_at, id), nearest first by (distance, id).
+const cursorSchema = z.object({
+  id: z.string(),
+  starts_at: z.optional(z.string()),
+  distance: z.optional(z.number()),
+});
 export type SearchCursor = z.infer<typeof cursorSchema>;
 
 export const itemRow = z.object({

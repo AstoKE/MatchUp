@@ -5,9 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { errorText } from '@/lib/error-text';
 import { Banner, Button, EmptyState, Screen, ScreenHeader, Text, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
-import { AttendancePanel } from '../components/AttendancePanel';
 import { InvitePanel } from '../components/InvitePanel';
-import { RequestsPanel } from '../components/RequestsPanel';
+import { LazyAttendancePanel, LazyRequestsPanel } from '../components/LazyPanels';
 import { useCompleteEvent, useDeleteDraft, useEvent, usePublishEvent } from '../hooks';
 
 /**
@@ -104,9 +103,9 @@ function Manage({ event }: { event: EventDetails }) {
       </ScreenHeader>
       {error ? <Banner kind="danger" message={error} /> : null}
 
-      {event.status === 'PUBLISHED' ? <RequestsPanel event={event} /> : null}
+      {event.status === 'PUBLISHED' ? <LazyRequestsPanel event={event} /> : null}
       {started && (event.status === 'PUBLISHED' || event.status === 'COMPLETED') ? (
-        <AttendancePanel eventId={event.id} isOrganizer />
+        <LazyAttendancePanel eventId={event.id} isOrganizer />
       ) : null}
       {event.inviteToken ? <InvitePanel eventId={event.id} token={event.inviteToken} /> : null}
 

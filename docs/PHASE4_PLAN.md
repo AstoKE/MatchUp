@@ -1,6 +1,6 @@
 # Phase 4 plan: all of Turkey, places, venues and the map
 
-Status 2026-11-07: **M1 to M4 built** (M1–M2 merged in #72, M3–M4 in one PR), M5 and M6 not started. Scope: ROADMAP F-20 (the pin, postponed from Phase 3 by ADR-0019), F-21, F-22, plus all 81 provinces and their districts, a decision of 2026-11-05 recorded in [ADR-0024](ADR/0024-turkey-wide-catalog-and-phase-4-providers.md). Sources of truth stay `docs/PRD.md` §4.4 and §4.6, `docs/DATABASE.md` §3, `docs/SECURITY.md`, ADR-0011. This file sequences the work and lists the decisions it needs.
+Status 2026-11-07: **M1 to M5 built** (M1–M2 #72, M3–M4 #73, M5 in review), M6 not started. Scope: ROADMAP F-20 (the pin, postponed from Phase 3 by ADR-0019), F-21, F-22, plus all 81 provinces and their districts, a decision of 2026-11-05 recorded in [ADR-0024](ADR/0024-turkey-wide-catalog-and-phase-4-providers.md). Sources of truth stay `docs/PRD.md` §4.4 and §4.6, `docs/DATABASE.md` §3, `docs/SECURITY.md`, ADR-0011. This file sequences the work and lists the decisions it needs.
 
 **Why now.** The launch offers every province, and the catalog, the city picker and the pin are hard to add once real events exist in places the schema does not know. Phase 7 starts after this.
 
@@ -89,6 +89,24 @@ Six mutations of the location code are caught (snap removed, the "inside" rule w
 - **Acceptance:** a suggestion is usable at once, labeled unverified; only an administrator at aal2 changes that.
 
 ### M5: the map
+
+**Status 2026-11-07: built, web verified; native not built yet.**
+- `features/map`: one `MapCanvas` interface, MapLibre Native on phones (`MapCanvas.tsx`) and MapLibre GL JS 6 on the web (`MapCanvas.web.tsx`, its own lazy chunk of ~286 kB gzip with a separate ratchet; the module worker is copied to `public/vendor`).
+- Discover: a list ⇄ map switch (exact places are pins, hidden or district-only ones are areas; a marker opens its card) and **Yakınımdakiler** (near me: one position, nearest first, distances on the cards).
+- The event form: a pin picker (opens on the district, writes the chosen coordinates out too), a venue now brings its point, and **"Listede yok mu? Mekân öner"** suggests a venue with a point and chooses it.
+- `catalog_places` gains centres (`20261108100000`).
+- `EXPO_PUBLIC_MAP_STYLE_URL` (optional, https).
+- Location is approximate only (Android precise permission blocked, iOS reduced accuracy).
+- To make room in the first load, the event page's request, attendance and review panels became lazy (INITIAL 555.26 → 555.6 kB, ratchet 556 with the reason in the script).
+
+Verified:
+- component tests for every path with the map stood in;
+- Playwright: near me with a granted browser position, distances and order, axe;
+- a one-off headless Chromium run that rendered the real web map with MapLibre's demo tiles, markers and no console errors.
+
+**Not verified:**
+- the native map: it needs new Android and iOS development builds (the founder's "koş" for Android, EAS for iOS);
+- MapTiler's own tiles with the founder's key (no automated test uses that key).
 
 - **Configuration:** `EXPO_PUBLIC_MAP_STYLE_URL` (MapTiler style with the restricted key) in `packages/config` validation. Without it the app shows the list only and says why in development.
 - **Web:** `maplibre-gl` as one lazy chunk, loaded when someone opens the map or the pin picker. It gets a separate ratchet in `scripts/check-bundle-size.mjs`; INITIAL must not move.

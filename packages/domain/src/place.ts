@@ -59,11 +59,8 @@ export function defaultCityId(
   );
 }
 
-/** A point as the server sends it (WGS 84, 6 decimals). */
-export interface GeoPoint {
-  lat: number;
-  lon: number;
-}
+/** A point as the server sends it (WGS 84, 6 decimals). A type alias, so it fits the generated `Json` argument type. */
+export type GeoPoint = { lat: number; lon: number };
 
 /** How a public point relates to the place: the pin itself, its ~500 m cell (location hidden), or only the district. */
 export const POINT_PRECISIONS = ['EXACT', 'APPROXIMATE', 'DISTRICT'] as const;
@@ -78,4 +75,11 @@ export interface VenueBrief {
   name: string;
   kind: VenueKind;
   verified: boolean;
+}
+
+/** A distance for a card: "850 m" under a kilometre, "1,2 km" / "1.2 km" up to 10 km, whole kilometres beyond. */
+export function formatDistance(meters: number, locale: string): string {
+  if (meters < 1000) return `${Math.max(100, Math.round(meters / 100) * 100)} m`;
+  const km = meters / 1000;
+  return `${new Intl.NumberFormat(locale, { maximumFractionDigits: km < 10 ? 1 : 0 }).format(km)} km`;
 }

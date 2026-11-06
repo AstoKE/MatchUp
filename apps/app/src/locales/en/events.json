@@ -76,7 +76,28 @@
     "venueNone": "No venue",
     "venueLoading": "Loading venues…",
     "venueUnverified": "{{name}} · unverified",
-    "venueHint": "Unverified venues were suggested by players. The booking status is always what the organizer declares."
+    "venueHint": "Unverified venues were suggested by players. The booking status is always what the organizer declares.",
+    "pin": "Place on the map (optional)",
+    "pinNone": "Not marked",
+    "pinSet": "Marked: {{lat}}, {{lon}}",
+    "pinChoose": "Mark on the map",
+    "pinChange": "Change",
+    "pinRemove": "Remove",
+    "pinTitle": "Mark the place on the map",
+    "pinHelp": "Tap the map. If the place is hidden, people not yet approved only see an area of about 500 metres.",
+    "pinSave": "Use this place",
+    "pinMapLabel": "Map to choose the place",
+    "pinChoice": "Chosen place",
+    "suggestOpen": "Not in the list? Suggest a venue",
+    "suggestTitle": "Suggest a venue",
+    "suggestHelp": "Your suggestion is listed at once and shown as \"unverified\" until an administrator checks it.",
+    "suggestName": "Venue name",
+    "suggestKind": "Kind",
+    "suggestSports": "Sports",
+    "suggestPin": "Place on the map (required)",
+    "suggestSave": "Suggest",
+    "suggestDone": "Venue suggested and chosen.",
+    "suggestMissing": "A name (at least 3 letters), at least one sport and a place on the map are needed."
   },
   "booking": {
     "NOT_REQUIRED": "Not needed",
@@ -215,7 +236,26 @@
     "noSportBody": "Try another sport or see all of them.",
     "cityButton": "Province: {{city}}. Change",
     "cityPick": "Pick a province",
-    "cityTitle": "Pick a province"
+    "cityTitle": "Pick a province",
+    "view": {
+      "label": "View",
+      "list": "List",
+      "map": "Map"
+    },
+    "near": {
+      "label": "Near me",
+      "locating": "Finding you…",
+      "DENIED": "Location permission was not given. The list keeps showing the province’s events.",
+      "UNAVAILABLE": "Your location could not be read right now."
+    },
+    "resultCountNear_one": "{{count}} event, nearest first",
+    "resultCountNear_other": "{{count}} events, nearest first",
+    "map": {
+      "label_one": "Map of events, {{count}} place",
+      "label_other": "Map of events, {{count}} places",
+      "hint": "Tap a marker to open its card below. Hidden locations are shown as an approximate area.",
+      "someMissing": "{{shown}} of {{count}} events are on the map. All are in the list."
+    }
   },
   "join": {
     "signInToJoin": "Sign in to request a spot",
@@ -430,5 +470,9 @@
     "open": "Manage event",
     "pending": "Pending requests",
     "spotsLeft": "Spots left"
+  },
+  "venueKind": {
+    "PUBLIC_SPACE": "Public space",
+    "COMMERCIAL_FACILITY": "Business"
   }
 }

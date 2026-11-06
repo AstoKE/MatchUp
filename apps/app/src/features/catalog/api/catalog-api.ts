@@ -1,3 +1,4 @@
+import type { GeoPoint } from '@matchup/domain';
 import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 
@@ -26,13 +27,18 @@ const formatRow = z.object({
   default_capacity: z.number(),
   max_participants: z.number(),
 });
+// [lat, lon]; optional until the hosted database has 20261108100000.
+const center = z.optional(z.array(z.number()));
 const placeRow = z.object({
   id: z.uuid(),
   slug: z.string(),
   names: localized,
   timezone: z.string(),
-  districts: z.array(z.object({ id: z.uuid(), slug: z.string(), names: localized })),
+  center,
+  districts: z.array(z.object({ id: z.uuid(), slug: z.string(), names: localized, center })),
 });
+const toPoint = (c: number[] | undefined): GeoPoint | null =>
+  c && c.length === 2 ? { lat: c[0]!, lon: c[1]! } : null;
 
 export interface CatalogPosition {
   id: string;
@@ -62,6 +68,8 @@ export interface CatalogDistrict {
   id: string;
   slug: string;
   names: LocalizedName;
+  /** The district seat, where the map opens (Phase 4). */
+  center?: GeoPoint | null;
 }
 export interface CatalogCity {
   id: string;
@@ -69,6 +77,7 @@ export interface CatalogCity {
   names: LocalizedName;
   /** IANA zone; event times are entered and shown in the city's local time. */
   timeZone: string;
+  center?: GeoPoint | null;
   districts: CatalogDistrict[];
 }
 export interface Catalog {
@@ -133,7 +142,10 @@ export async function fetchCatalog(): Promise<Catalog> {
         slug: c.slug,
         names: c.names,
         timeZone: c.timezone,
-        districts: c.districts.sort(byTurkishName),
+        center: toPoint(c.center),
+        districts: c.districts
+          .map((d) => ({ id: d.id, slug: d.slug, names: d.names, center: toPoint(d.center) }))
+          .sort(byTurkishName),
       }))
       .sort(byTurkishName),
   };
