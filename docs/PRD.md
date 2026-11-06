@@ -1,6 +1,6 @@
 # Product Requirements Document (PRD)
 
-Status: Phase 0 draft · Scope: MVP = first publicly testable version (Ankara pilot; all of Turkey in the catalog from Phase 4, ADR-0024)
+Status: Phase 0 draft · Scope: MVP = first publicly testable version (pilot for all of Turkey: the catalog since Phase 4, ADR-0024; the pilot area since 2026-11-07, PHASE7_PLAN)
 
 Related: [PRODUCT_VISION](PRODUCT_VISION.md) · [USER_FLOWS](USER_FLOWS.md) · [DATABASE](DATABASE.md) · [ROADMAP](ROADMAP.md)
 
@@ -9,7 +9,7 @@ Related: [PRODUCT_VISION](PRODUCT_VISION.md) · [USER_FLOWS](USER_FLOWS.md) · [
 | Item | Value |
 |---|---|
 | Platforms | Web (Expo Web), iOS, Android — one codebase |
-| Market / pilot city | Turkey, all 81 provinces and their districts (ADR-0024) / Ankara as the default and first community |
+| Market / pilot area | Turkey, all 81 provinces and their districts (ADR-0024); the pilot is open across Turkey (founder, 2026-11-07); Ankara is only the default province when nothing else is known |
 | Languages | `tr-TR` default, `en-US` secondary (i18n from day 1) |
 | Timezone / currency | `Europe/Istanbul` / TRY (informational only in MVP) |
 | Audience | 18+, self-declared age confirmation at onboarding (see SECURITY §3, §8) |
