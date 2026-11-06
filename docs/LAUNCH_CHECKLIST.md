@@ -60,7 +60,7 @@ It also names the Phase 7 milestone where it is handled.
 - [ ] **founder:** the service-role key only in server-side secret stores, never in the app or `app_config` (the bundle secret scan guards the app side).
 - [ ] **founder, M2:** the MapTiler key restricted to the production web origin(s), the bundle id and the package name; set in EAS environment variables and on the web host, never committed.
 - [ ] **founder + code, M6:** Android signed release build on a physical device; native run of Phases 4–6 (map, pin, venues, admin, report/block); iOS on EAS with the data flows and a physical iPhone (needs final identifiers, ADR-0010).
-- [ ] **code, M3:** load scenarios (ARCHITECTURE §8) at 100k events / 500k participations within budget, or a signed-off waiver.
+- [x] **code, M3:** load scenarios (ARCHITECTURE §8) at 100k events / 500k participations within budget, on the local stack (PERFORMANCE §4b). Not run against hosted.
 
 ## 5. Product
 

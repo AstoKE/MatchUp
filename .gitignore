@@ -48,3 +48,4 @@ supabase-lab/
 # Third-party design reference screenshots: local only, never production assets (docs/design.md §11).
 docs/references/
 apps/app/public/vendor/
+scripts/load/out/

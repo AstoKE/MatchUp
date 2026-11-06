@@ -1,6 +1,6 @@
 # Phase 7 plan: hardening and the Turkey pilot
 
-Status 2026-11-07: **M1 merged (#77), M2 built** (in review). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
+Status 2026-11-07: **M1 (#77) and M2 (#78) merged, M3 built** (in review). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
 
 **Why.** Phases 2–6 and 4 built the product and tested it locally and on the web. A pilot puts it in front of strangers across the country: the remaining risks are operational (who answers reports, backups, email, abuse), unverified platforms (native Phase 4–6, iOS, release builds) and scale (indexes and budgets beyond 5000 events).
 
@@ -62,6 +62,12 @@ Not there:
   - re-running `auth-probe` against hosted.
 
 ### M3: performance and load
+
+**Status 2026-11-07: built.**
+- Load test: every ARCHITECTURE §8 budget met at 110k events and 553k participations on the local stack. Discovery p95 219 ms, join storm 16 ms, last-slot race 42 ms with exactly one winner, dashboard 10 ms.
+- No sequential scans on the big tables, so no index changes were needed.
+- The catalog is kept on the device for a day.
+- Numbers and method in PERFORMANCE §4b; the runner is `node scripts/load/run.mjs --fresh`.
 
 - **k6 scenarios** of ARCHITECTURE §8, run against the **local** stack seeded with 100k events and 500k participations:
   - discovery with radius;

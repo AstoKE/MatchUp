@@ -31,6 +31,15 @@ No finding allowed reading or changing another person's data, bypassing a quota,
 
 ## 3. Checking hosted from the outside (founder)
 
+**Hosted result, 2026-11-06 (founder's run):**
+- Sign-up disabled, email confirmation on, no other providers, phone off.
+- GraphQL not enabled, so S7-2 does not apply to hosted.
+- The OpenAPI root is not served to the publishable key (401), so S7-8 does not apply to hosted either. The script now counts this as a PASS.
+- A guest reads nothing from the six private tables.
+- **The `health` function is not deployed on hosted (404).** That is not a security issue, but M4's external monitor needs it: `pnpm exec supabase functions deploy health --project-ref wmgeugsqblwnhnqnczab` (founder).
+- `20261109100000` is applied.
+
+
 ```bash
 node scripts/security/hosted-surface.mjs --url https://wmgeugsqblwnhnqnczab.supabase.co --anon-key <publishable key>
 ```

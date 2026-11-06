@@ -30,3 +30,9 @@ jest.mock('./src/features/events/components/LazyEventStepper', () => ({
   LazyEventStepper: jest.requireActual('./src/features/events/components/EventStepper')
     .EventStepper,
 }));
+// The catalog kept on the device (load-catalog.ts) would carry one test's catalog into the next; component tests always
+// start without it, and load-catalog.test.ts tests the keeping itself.
+jest.mock('./src/features/catalog/catalog-cache', () => ({
+  readCachedCatalog: () => Promise.resolve(null),
+  writeCachedCatalog: () => Promise.resolve(),
+}));

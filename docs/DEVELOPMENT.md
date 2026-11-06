@@ -28,6 +28,8 @@ pnpm --filter @matchup/app e2e:install   # one-time Playwright browser download
 
 **The map (Phase 4, optional).** Add `EXPO_PUBLIC_MAP_STYLE_URL=https://api.maptiler.com/maps/streets-v2/style.json?key=<key>` to `apps/app/.env.local` yourself; `env:local` and `env:hosted` keep that line when they rewrite the file. Without it the app has no map: Discover stays a list and the pin picker and "suggest a venue" are not offered. On the web, `pnpm --filter @matchup/app web` (and `start`, `export:web`) first copies MapLibre's worker into `apps/app/public/vendor/` (git-ignored, `scripts/copy-map-worker.mjs`). On a phone the map is native code: after this dependency arrived, the Android and iOS development builds must be rebuilt (docs/NATIVE_VALIDATION.md).
 
+**Load test (Phase 7).** `node scripts/load/run.mjs --fresh` resets the local database, seeds 110k events and 553k participations, and runs the k6 scenarios in Docker (about 3 minutes; PERFORMANCE §4b). Run `pnpm db:reset` afterwards. It refuses any non-local URL.
+
 `apps/app/.env.local` is git-ignored. The service-role/secret keys printed by `supabase status` are never read or written by our tooling, and the app **refuses to start** if a `service_role`/`sb_secret_` key is placed in `EXPO_PUBLIC_*` (`src/lib/env.schema.ts`).
 
 ## 3. Everyday commands
