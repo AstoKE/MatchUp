@@ -2,7 +2,7 @@
 
 Status: Phase 0 · Source of scope: [PRD](PRD.md) · Priorities: **P0** launch-blocking · **P1** launch-critical, may slip one iteration · **P2** first post-MVP · **P3** later · Complexity: S (≤ 2 d) · M (≤ 1 wk) · L (1–2 wk) · XL (> 2 wk) for a solo developer working with Claude Code (rough, for ordering not scheduling).
 
-> **Status 2026-11-07: Phase 4 is built** (all of Turkey, pins, venues, the map: [PHASE4_REPORT](PHASE4_REPORT.md)); its native run and the hosted push are pending. Phase 7 starts on instruction.
+> **Status 2026-11-07: Phase 4 is built and on hosted** ([PHASE4_REPORT](PHASE4_REPORT.md)); its native run is pending. **Phase 7 has started** ([PHASE7_PLAN](PHASE7_PLAN.md)): hardening and a pilot for all of Turkey.
 >
 > **Status 2026-11-05: Phase 6 is merged; Phase 4 is next**, widened to all of Turkey ([PHASE4_PLAN](PHASE4_PLAN.md), ADR-0024), then Phase 7.
 >
@@ -23,7 +23,7 @@ Status: Phase 0 · Source of scope: [PRD](PRD.md) · Priorities: **P0** launch-b
 | 4 | Location & venues | Map/geo discovery, venue directory, booking-status labels |
 | 5 | Player progression | Attendance → reviews → skill/reliability/XP/badges |
 | 6 | Trust, notifications, admin | Reporting, blocking, moderation, full notifications, deletion/export |
-| 7 | Hardening & pilot | Perf, security, a11y, load, ops → Ankara pilot release candidate |
+| 7 | Hardening & pilot | Perf, security, a11y, load, ops → **Turkey-wide** pilot release candidate (founder, 2026-11-07; [PHASE7_PLAN](PHASE7_PLAN.md)) |
 | Later | Push (P-01), community, recurring, QR, partners, payments … | per demand |
 
 Sequencing note: basic in-app notifications arrive with Phase 3 (the event engine is unusable without them); Phase 6 completes the catalogue. Account deletion/export were planned for Phase 6 but were built in Phase 2 at the founder's request (ADR-0017); every later phase that adds per-user data must extend export and purge (enforced by a pgTAP inventory test).
@@ -103,7 +103,7 @@ Likelihood/impact: H/M/L. "Owner decision" = needs the founder's explicit call (
 
 | # | Risk / decision | L | I | Why it matters | Mitigation / plan |
 |---|---|---|---|---|---|
-| R-1 | **Marketplace liquidity in Ankara** — no games ⇒ no users ⇒ no games | H | H | Product value requires density; MVP quality is irrelevant without supply | Seed with real organizers (existing WhatsApp groups) pre-launch; start with 2–3 sports and 3–4 districts; measure fill rate; "Be the first organizer" empty states; founder-led community ops |
+| R-1 | **Marketplace liquidity** (sharper with a Turkey-wide pilot: supply spread over 81 provinces) — no games ⇒ no users ⇒ no games | H | H | Product value requires density; MVP quality is irrelevant without supply | Seed with real organizers (existing WhatsApp groups) pre-launch; start with 2–3 sports and 3–4 districts; measure fill rate; "Be the first organizer" empty states; founder-led community ops |
 | R-2 | **Legal/compliance & safety**: KVKK basis for scoring/profiling, cross-border transfer (Frankfurt), UGC liability (5651), injury/meeting-strangers risk, 18+ self-declaration | M | H | Launch blocker and personal liability | Lawyer review of SECURITY §8 list before pilot; conservative ToS; reporting/blocking/approved-only locations; safety tips; incident process |
 | R-3 | **Expo SDK 58 / toolchain maturity** (new Expo Go not yet released, TS 7/ESLint 10 churn, pnpm+Metro) | M | M | Stalls Phase 1 or forces mid-project upgrade | M0 compatibility spike with SDK 57 fallback; pin versions; dev builds from the start; don't adopt TS 7/ESLint 10 yet |
 | R-4 | **SQL-centric logic + Supabase coupling**: bugs in RPC/RLS = security/integrity failures; PL/pgSQL maintainability for solo dev; platform limits (Realtime, PostgREST) | M | H | Core of capacity, auth, scoring | Small functions, conventions, pgTAP + multi-connection tests as merge gates, TS reference specs, security advisor in CI; plain Postgres keeps an exit path (self-host) |

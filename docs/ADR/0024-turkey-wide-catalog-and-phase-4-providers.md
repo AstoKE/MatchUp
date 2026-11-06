@@ -16,7 +16,7 @@
 
 **Consequences.**
 
-- PRD §1, §3 (row 6), §4.1 and §4.6 change from "Ankara" to "Turkey, Ankara by default". The pilot city becomes an operational choice, not a product rule.
+- PRD §1, §3 (row 6), §4.1 and §4.6 change from "Ankara" to "Turkey, Ankara by default". The pilot city becomes an operational choice, not a product rule. *(2026-11-07: the founder chose a pilot for all of Turkey, PHASE7_PLAN; Ankara stays only the fallback default province.)*
 - Moderation and support cover the whole country from the first day. This is a risk for a solo operator (ROADMAP R-9): the quotas for new accounts (Phase 6 M6) and reports apply everywhere. Hosted public sign-up stays disabled until the launch checklist is done (ADR-0016).
 - MapTiler is a recurring cost and a third party that sees tile requests (approximate area, IP address). It has to be named in the privacy notice (SECURITY §8, needs counsel).
 - The catalog file is a reviewed artifact. A change to districts (law, merger) is a new migration that updates names or deactivates rows. Rows are never deleted.

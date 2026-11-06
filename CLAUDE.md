@@ -1,6 +1,6 @@
 # CLAUDE.md — MatchUp engineering rules
 
-Durable rules only. Details live in `docs/` (read the relevant doc before changing its area). Product: sports-event community app, Ankara/Turkey pilot, 18+, real users — treat it as production software.
+Durable rules only. Details live in `docs/` (read the relevant doc before changing its area). Product: sports-event community app, pilot across all of Turkey (81 provinces), 18+, real users — treat it as production software.
 
 ## Where truth lives
 

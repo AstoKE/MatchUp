@@ -1,39 +1,71 @@
-# Public registration checklist
+# Pilot launch checklist
 
-Status 2026-10-25. A hosted development/staging project now exists (DEPLOYMENT §9) and holds the schema only; none of the items below is done for it. Public sign-up must stay **disabled** on any hosted Supabase project (`[auth] enable_signup = false` in the project's Auth settings) until every item below is checked. This is not legal advice; items marked ⚖ need a qualified lawyer.
+Status 2026-11-07, rewritten for the **Turkey-wide pilot** ([PHASE7_PLAN](PHASE7_PLAN.md)). Hosted Supabase (Paris, ADR-0018) holds every migration up to Phase 4 and no real users. Public sign-up must stay **disabled** on any hosted project (`[auth] enable_signup = false`) until every item below is checked. This is not legal advice; items marked ⚖ need a qualified lawyer.
+
+Each open item names its **owner**:
+- **code** is done in the repository, with tests;
+- **founder** is a dashboard, account or device action, for which the milestone gives exact steps;
+- **counsel** is the lawyer.
+
+It also names the Phase 7 milestone where it is handled.
 
 ## 1. Legal (⚖ blocks launch)
 
-- [ ] Terms of Use and Privacy Notice reviewed and approved by counsel (`apps/app/src/locales/{tr,en}/legal.json` are drafts).
-- [ ] Data controller identity, contact, retention periods, deletion/export procedure and KVKK information duties added to the Privacy Notice (SECURITY §8).
-- [ ] The map provider (MapTiler, ADR-0024) named in the Privacy Notice: it receives tile requests (approximate map area, IP address) from everyone who opens a map. "Near me" uses the device position only for one search and never stores it.
-- [ ] MapTiler key restricted to the production web origin(s) and the app's bundle id / package name; a separate key per environment if the plan allows. The key is set in EAS environment variables and the web host, never committed.
-- [ ] Decide whether a separate explicit-consent text is needed for any processing beyond the Terms; marketing stays a separate, optional, revocable consent (built).
-- [ ] Publish new text as a **new version**: change `legal.terms_version` / `legal.privacy_version` in `app_config` through a migration and set `legal.draft` to `false`. New users accept the new versions in onboarding (`complete_onboarding` only accepts the current versions, `CONSENT_VERSION_MISMATCH`); **already-onboarded users are re-prompted** by the re-consent gate (built: writes return `CONSENT_REQUIRED` and the app shows the re-consent screen until they accept, DATABASE §2). Decide with counsel whether a user who declines may keep browsing guest-readable content (current behaviour) and whether the re-consent wording is sufficient.
-- [ ] 18+ is a self-declaration (checkbox + server-recorded timestamp). Decide with counsel whether that is sufficient for the product.
+- [ ] **counsel, M7:** Terms of Use and Privacy Notice reviewed and approved (`apps/app/src/locales/{tr,en}/legal.json` are drafts).
+- [ ] **counsel, M7:** data controller identity, contact, retention periods, deletion/export procedure and KVKK information duties in the Privacy Notice (SECURITY §8).
+- [ ] **counsel, M7:** the map provider named in the Privacy Notice. Proposed wording in PHASE4_REPORT §6: MapTiler receives tile requests (approximate area, IP address); "near me" reads the position once and never stores it. Also MapTiler's role and the transfer to Switzerland.
+- [ ] **counsel, M4:** whether product analytics (M4) and any processing beyond the Terms need separate explicit consent. Marketing is already a separate, optional, revocable consent.
+- [ ] **code, M7 (after counsel):** publish the texts as a **new version**: a migration changes `legal.terms_version` / `legal.privacy_version` in `app_config` and sets `legal.draft` to `false`.
+  - New users accept the new versions in onboarding (`CONSENT_VERSION_MISMATCH` otherwise).
+  - Already-onboarded users are re-prompted by the re-consent gate (built: writes return `CONSENT_REQUIRED`).
+  - Counsel decides whether someone who declines may keep browsing guest-readable content (current behaviour).
+- [ ] **counsel, M7:** whether the 18+ self-declaration (checkbox + server timestamp) is sufficient.
 
-## 2. Abuse and enumeration (decision 7 — app-side CAPTCHA built, hosted configuration open)
+## 2. Accounts, abuse and enumeration
 
-- [ ] CAPTCHA on sign-up, sign-in and password reset (Supabase Auth Attack Protection with Cloudflare Turnstile). **App side built** (`EXPO_PUBLIC_TURNSTILE_SITE_KEY`, web widget + native WebView, verified on the auth lab with test keys, AUTH_ABUSE §5). Still to do: Turnstile account + site key with the production web hostname allowed, the secret in the hosted Auth settings, the site key in the production build (enable both together — a mismatch blocks every sign-in), a check on a real device, counsel on Turnstile as a processor (⚖).
-- [ ] Auth rate limits reviewed on the hosted project (sign-in, sign-up, email send, token verification, anonymous IP limits); the local `config.toml` values are developer defaults.
-- [ ] Leaked-password protection (HaveIBeenPwned check) enabled on the hosted project; the Supabase advisor flags it as off (2026-10-27). Check whether the current plan offers it before launch.
-- [ ] Email sending through a real SMTP provider with SPF/DKIM; hosted default SMTP is rate limited and not for production.
-- [ ] Re-run `node scripts/auth-probe.mjs --url … --anon-key … --service-key …` against the hosted project and record the numbers in `docs/AUTH_ABUSE.md`. **Known from local measurement (ADR-0016): all three endpoints leak** (sign-up 422 vs 200; sign-in timing; reset cooldown 429). We do not claim to prevent enumeration; counsel confirms the residual risk is acceptable (⚖).
-- [ ] CAPTCHA token sent by the app: **built and unit-tested** for sign-in, sign-up, reset and resend, and the web widget was verified on the auth lab with test keys (AUTH_ABUSE §5). **Still open:** the native WebView widget on a device, and hosted configuration with real keys.
-- [ ] Phase 6 operations: who answers reports and how fast (SECURITY says 24 h); a way for a suspended person to reach us (the page says "bize ulaş" and names no address yet); the first administrator and TOTP on hosted (DEPLOYMENT §11); a profanity list for display names if wanted; retention of reports and moderation notes (⚖).
-- [ ] Decision on a closed / invite-only pilot with public sign-up disabled. An Edge proxy is **not** recommended (ADR-0016): the Auth API stays reachable without it.
+- [ ] **founder, M7: how pilot users get accounts** while public sign-up is disabled (PHASE7_PLAN, decision needed):
+  - (a) invitations;
+  - (b) invite codes checked by an Auth hook;
+  - (c) open sign-up with CAPTCHA.
 
-## 3. Platform
+  An Edge proxy is **not** recommended (ADR-0016).
+- [ ] **founder + code, M2:** CAPTCHA on sign-up, sign-in and password reset (Turnstile).
+  - **App side built and unit-tested** (`EXPO_PUBLIC_TURNSTILE_SITE_KEY`, web widget and native WebView, AUTH_ABUSE §5).
+  - Open: the Turnstile account and site key with the production hostname; the secret in hosted Auth; the site key in the production build (enable both together: a mismatch blocks every sign-in); the native widget on a device; counsel on Turnstile as a processor (⚖).
+- [ ] **founder, M2:** Auth rate limits reviewed on hosted (sign-in, sign-up, email send, token verification, anonymous IP limits).
+- [ ] **founder, M2:** leaked-password protection (HaveIBeenPwned) enabled on hosted, if the plan offers it (the advisor flags it as off).
+- [ ] **founder, M2:** email through a real SMTP provider with SPF/DKIM (the hosted default is rate limited and not for production).
+- [ ] **founder, M2:** re-run `node scripts/auth-probe.mjs` against hosted and record the numbers in AUTH_ABUSE.
+  - Known locally (ADR-0016): all three endpoints leak (sign-up 422 vs 200, sign-in timing, reset cooldown 429).
+  - We do not claim to prevent enumeration; counsel confirms the residual risk (⚖).
+- [ ] **code, M2:** security review of every RPC and RLS policy, kept as a reviewed inventory that CI compares, so no function appears unreviewed; findings fixed with negative tests.
 
-- [ ] Hosted project region chosen by the founder (data residency question for counsel); project created; migrations applied with `supabase db push`; types regenerated and checked in CI.
-- [ ] Redirect URL allow-list contains only the real web origin and the app's deep-link scheme (no wildcards); site URL set.
-- [ ] Service-role key stored only in server-side secret stores; never in the app or in `app_config`.
-- [ ] Backups / point-in-time recovery enabled and a restore rehearsed.
-- [ ] Android: signed release build tested on physical devices; iOS: not started (needs macOS or EAS + Apple Developer account).
-- [ ] Error reporting DSN configured; the redaction rules reviewed against real events.
+## 3. Operations
 
-## 4. Product
+- [ ] **founder, M7:** who answers reports and how fast (SECURITY says 24 h). The admin runbook (`docs/OPERATIONS.md`, code, M7) covers reports, suspensions, the venue queue, disputes, deletion requests and incidents.
+- [ ] **founder + code, M7:** a support contact reachable from the app and from the suspended-account page (it says "bize ulaş" and names no address yet).
+- [ ] **founder, M2:** the first administrator and TOTP on hosted (DEPLOYMENT §11).
+- [ ] **founder + code, M2:** a profanity list for display names, if wanted.
+- [ ] **counsel, M7:** retention of reports and moderation notes (⚖).
+- [ ] **founder, M4:** backups / point-in-time recovery enabled and **a restore rehearsed**.
+- [ ] **founder, M4:** the health endpoint watched by an external monitor.
+- [ ] **founder + code, M4:** the error reporting DSN set for hosted builds, and the redaction rules reviewed against real events.
 
-- [ ] Account deletion and data export exist in the app (SECURITY §8 core features) — **built** (ADR-0017: 30-day grace, password re-entry, daily purge, JSON export). Still open: retention of consent evidence and whether suspended accounts may self-delete (⚖), event effects of a deletion request (Phase 3), storage cleanup (with avatars), `pg_cron` enabled and the job verified on the hosted project, a device check of the native share sheet.
-- [ ] Report / block flows exist before any user-to-user content — **not built** (Phase 6 per roadmap).
-- [ ] Support contact reachable from the app.
+## 4. Platform
+
+- [x] Hosted project region chosen (Paris, ADR-0018), migrations applied with `supabase db push` (last on 2026-11-07, DEPLOYMENT §9), types checked for drift in CI. Data residency stays a question for counsel (⚖).
+- [ ] **founder, M2:** the redirect URL allow-list holds only the real web origin and the app's deep-link scheme (no wildcards); site URL set.
+- [ ] **founder:** the service-role key only in server-side secret stores, never in the app or `app_config` (the bundle secret scan guards the app side).
+- [ ] **founder, M2:** the MapTiler key restricted to the production web origin(s), the bundle id and the package name; set in EAS environment variables and on the web host, never committed.
+- [ ] **founder + code, M6:** Android signed release build on a physical device; native run of Phases 4–6 (map, pin, venues, admin, report/block); iOS on EAS with the data flows and a physical iPhone (needs final identifiers, ADR-0010).
+- [ ] **code, M3:** load scenarios (ARCHITECTURE §8) at 100k events / 500k participations within budget, or a signed-off waiver.
+
+## 5. Product
+
+- [x] Report and block flows exist before any user-to-user content (Phase 6: reports, blocks, admin moderation with a second factor).
+- [x] Account deletion and data export in the app (ADR-0017: 30-day grace, password re-entry, daily purge, JSON export; event, review, report, block and venue data included).
+  - Still open: retention of consent evidence and whether suspended accounts may self-delete (counsel ⚖); storage cleanup when avatars arrive; `pg_cron` and the purge job verified on hosted (founder, M4); the native share sheet on a device (M6).
+- [ ] **code, M1:** the whole life of an event in one end-to-end flow, green in CI (F-35).
+- [ ] **code, M5:** accessibility: axe on every route at two widths; a keyboard pass; a manual VoiceOver/TalkBack checklist filled in on devices (M6).
+- [ ] **founder, M5:** the Turkish copy read by a native speaker from the exported list (F-32).
+- [ ] **founder, M7:** store listings and identifiers decided. Nothing is published without the founder's go.
