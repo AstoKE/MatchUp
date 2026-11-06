@@ -2,6 +2,8 @@
 
 Status: Phase 0 · Source of scope: [PRD](PRD.md) · Priorities: **P0** launch-blocking · **P1** launch-critical, may slip one iteration · **P2** first post-MVP · **P3** later · Complexity: S (≤ 2 d) · M (≤ 1 wk) · L (1–2 wk) · XL (> 2 wk) for a solo developer working with Claude Code (rough, for ordering not scheduling).
 
+> **Status 2026-11-07: Phase 4 is built** (all of Turkey, pins, venues, the map: [PHASE4_REPORT](PHASE4_REPORT.md)); its native run and the hosted push are pending. Phase 7 starts on instruction.
+>
 > **Status 2026-11-05: Phase 6 is merged; Phase 4 is next**, widened to all of Turkey ([PHASE4_PLAN](PHASE4_PLAN.md), ADR-0024), then Phase 7.
 >
 > **Status 2026-11-01: Phases 0–3 and 5 are built** (Phase 5: Maestro smoke of its screens not done); the redesign of `docs/design.md` is in progress; Phase 4 was skipped for now and Phase 6 (trust, moderation and admin) is built and waiting for hosted: M1 to M6 are merged or in review, see `docs/PHASE6_PLAN.md`.
