@@ -146,7 +146,14 @@ alter table public.events
   add column public_point extensions.geography(Point, 4326),
   add column public_point_precision text not null default 'DISTRICT'
     check (public_point_precision in ('EXACT', 'APPROXIMATE', 'DISTRICT'));
-update public.events e set public_point = d.centroid from public.districts d where d.id = e.district_id;
+-- Existing events get their district centre. Canceled and completed events are frozen by events_before_write (I-7),
+-- which refuses any update, so the trigger is off for this one statement only: it fills a derived column and changes
+-- nothing an organizer or a player chose (not even updated_at). Found on the hosted push of 2026-11-07, where this
+-- statement failed with INVALID_TRANSITION; local and CI databases start empty, so they never hit it.
+alter table public.events disable trigger events_before_write;
+update public.events e set public_point = d.centroid
+  from public.districts d where d.id = e.district_id and e.public_point is null;
+alter table public.events enable trigger events_before_write;
 create index events_public_point_idx on public.events using gist (public_point) where status = 'PUBLISHED';
 
 alter type private.event_input add attribute point extensions.geography;

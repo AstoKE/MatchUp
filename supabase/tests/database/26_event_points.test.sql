@@ -1,6 +1,6 @@
 -- Phase 4 / M3: the pin, who sees it exactly, what everybody else sees, and distance in search.
 begin;
-select plan(45);
+select plan(46);
 
 create function pg_temp.act_as(p_uid uuid) returns void language plpgsql as $$
 begin
@@ -185,6 +185,10 @@ select public.update_event(pg_temp.ev('pub'), '{"location_visibility": "APPROVED
 reset role;
 select is((select public_point_precision from public.events where id = pg_temp.ev('pub')), 'APPROXIMATE',
           'hiding the location afterwards snaps the public point');
+
+-- ---- the backfill left the frozen-event guard on ---------------------------------------------------------------------------
+select is((select tgenabled::text from pg_trigger where tgname = 'events_before_write' and tgrelid = 'public.events'::regclass), 'O',
+          'events_before_write is enabled again after the migration''s backfill');
 
 -- ---- export -----------------------------------------------------------------------------------------------------------------
 select pg_temp.act_as(pg_temp.u(1));
