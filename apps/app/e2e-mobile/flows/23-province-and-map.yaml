@@ -1,0 +1,34 @@
+appId: com.example.matchup.dev
+# 23 Province and map on the device (Phase 4) — requires -e TITLE (a published football event with a pin in
+# Ankara/Çankaya) and a build with EXPO_PUBLIC_MAP_STYLE_URL. Signed-in player: the province sheet searches without
+# Turkish letters, Discover switches to the map, the event's marker is there and opens its card.
+---
+- launchApp
+- runFlow:
+    when:
+      visible: 'Which court.*'
+    commands:
+      - tapOn: 'All sports'
+- assertVisible: ${TITLE}
+- tapOn: 'Province: Ankara. Change'
+- assertVisible: 'Pick a province'
+- tapOn: 'Search'
+- inputText: 'izm'
+- assertVisible: 'İzmir'
+- assertNotVisible: 'Bayburt'
+- takeScreenshot: 23-province-search
+- tapOn: 'İzmir'
+- assertVisible: 'Province: İzmir. Change'
+- tapOn: 'Province: İzmir. Change'
+- tapOn: 'Search'
+- inputText: 'ankara'
+- tapOn: 'Ankara'
+- assertVisible: 'Province: Ankara. Change'
+- tapOn: 'Map'
+# The native map is drawn and the event is a marker named after it.
+- extendedWaitUntil:
+    visible: 'pin.*|${TITLE}'
+    timeout: 20000
+- takeScreenshot: 23-map
+- tapOn: 'List'
+- assertVisible: ${TITLE}

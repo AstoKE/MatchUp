@@ -493,6 +493,73 @@ if (!ONLY.length || ONLY.some((id) => /^N(1[7-9]|2[0-2])/.test(id))) {
   }
 }
 
+// ---- Phase 4–6 on the device: province search, the native map, near me with the OS permission, and reporting an
+// event. Self-contained: its own organizer and player (created through the real RPCs), so it runs with --only too.
+if (!ONLY.length || ONLY.some((id) => /^N2[3-6]/.test(id))) {
+  const fixtures = phase3Fixtures(stack);
+  const tag = randomUUID().slice(0, 6);
+  const title = `Native Harita ${tag}`;
+  let host = null;
+  let player = null;
+  try {
+    host = await fixtures.createOrganizer('Native Harita Duzenleyen');
+    player = await fixtures.createOrganizer('Native Harita Oyuncu');
+    // A pin at ODTÜ, a public place: drawn as a pin, a few hundred metres from where the emulator will stand.
+    const eventId = await host.publish(title, { point: { lat: 39.895, lon: 32.7795 } });
+    const signedIn = await flow('N23a', 'Phase 4 player signs in', '06-sign-in.yaml', {
+      EMAIL: player.email,
+      PASSWORD: 'correct-horse-battery-staple',
+    });
+    if (signedIn) {
+      await flow(
+        'N23',
+        'Province sheet searches without Turkish letters; Discover switches to the native map with the event marker',
+        '23-province-and-map.yaml',
+        { TITLE: title },
+      );
+      await flow(
+        'N24',
+        'Near me: the OS asks once (approximate), the list is sorted by distance with the distance shown',
+        '24-near-me.yaml',
+        { TITLE: title },
+        async () => {
+          // The emulator's position, a few hundred metres from the pin (longitude first for geo fix).
+          adb('emu', 'geo', 'fix', '32.7810', '39.8960');
+          await sleep(1500);
+        },
+      );
+      const reported = await flow('N25', 'Report an event from its page', '25-report-event.yaml', {
+        TITLE: title,
+      });
+      if (reported) {
+        const n = dbScalar(
+          `select count(*) from public.reports where target_type = 'EVENT' and target_id = '${eventId}' and reason = 'FAKE_EVENT' and reporter_id = '${player.id}'`,
+        );
+        record(
+          'N25b',
+          'Server state matches: one FAKE_EVENT report by that player',
+          n === '1' ? 'PASS' : 'FAIL',
+          n === '1' ? '' : `database has ${n}`,
+        );
+      }
+    } else {
+      record('N23', 'depends on N23a', 'SKIP', 'not signed in');
+    }
+  } catch (error) {
+    record('N23', 'Phase 4–6 fixtures', 'FAIL', String(error.message ?? error));
+  } finally {
+    for (const who of [host, player]) {
+      if (!who) continue;
+      try {
+        dbScalar(`delete from public.events where organizer_id = '${who.id}' returning 1`);
+      } catch {
+        /* test data on the local stack only */
+      }
+      await fixtures.deleteUser(who.id);
+    }
+  }
+}
+
 // Deep links: COLD start (process dead) for each
 await flow(
   'N10',

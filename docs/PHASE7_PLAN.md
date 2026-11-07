@@ -1,6 +1,6 @@
 # Phase 7 plan: hardening and the Turkey pilot
 
-Status 2026-11-07: **M1–M5 merged (#77–#81), M6 in review (#82), M7 built** (in review; the go/no-go list is in [PHASE7_REPORT](PHASE7_REPORT.md)). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
+Status 2026-11-07: **M1–M5 and M7 merged (#77–#81, #83); M6 partly done (#82)**: iOS checked by hand on a real iPhone, Android not run on this machine. The go/no-go list is in [PHASE7_REPORT](PHASE7_REPORT.md). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
 
 **Why.** Phases 2–6 and 4 built the product and tested it locally and on the web. A pilot puts it in front of strangers across the country: the remaining risks are operational (who answers reports, backups, email, abuse), unverified platforms (native Phase 4–6, iOS, release builds) and scale (indexes and budgets beyond 5000 events).
 
@@ -132,6 +132,12 @@ Not there:
 - **Turkish copy review list** (F-32): every screen's strings exported in one file for a native speaker's review; İ/ı and plural checks in tests.
 
 ### M6: devices and release builds
+
+**Status 2026-11-07: partly done.**
+- **Done:** the founder checked the iOS `device` build by hand on a real iPhone against hosted; no problems.
+- **Not run:** Android. The container APK build froze the 15 GB development laptop (system-wide out of memory), and the founder decided to keep Android builds and the emulator off it. Maestro flows N23–N25 are written but unrun.
+- **Proposed instead:** EAS Build plus an emulator on a GitHub Linux runner, and the founder's own Android phone (NATIVE_VALIDATION, "Phase 4–7 on devices").
+- **Still open:** VoiceOver and TalkBack (A11Y_CHECKLIST), signed release builds, final identifiers (ADR-0010).
 
 - **Android:**
   - new development build in the Linux container;

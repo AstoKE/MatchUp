@@ -57,7 +57,7 @@ export function phase3Fixtures(stack) {
       id,
       email,
       /** A football 5v5 in Ankara/Cankaya two days ahead, published. Returns the event id. */
-      async publish(title, { autoApprove = false, inviteOnly = false } = {}) {
+      async publish(title, { autoApprove = false, inviteOnly = false, point = null } = {}) {
         return rpc('create_event', {
           p_client_request_id: randomUUID(),
           p_publish: true,
@@ -73,6 +73,7 @@ export function phase3Fixtures(stack) {
             capacity: 12,
             auto_approve: autoApprove,
             visibility: inviteOnly ? 'INVITE_ONLY' : 'PUBLIC',
+            ...(point ? { point } : {}),
           },
         });
       },
