@@ -8,6 +8,9 @@ const cardRow = z.object({
   user_id: z.uuid(),
   display_name: z.nullable(z.string()),
   bio: z.nullable(z.string()),
+  // Phase 8 / M3 (optional: an older server does not send them).
+  avatar_key: z.optional(z.nullable(z.string())),
+  avatar_path: z.optional(z.nullable(z.string())),
   is_me: z.boolean(),
   sports: z.array(
     z.object({ sport_id: z.uuid(), level: z.number(), rating: z.nullable(z.number()) }),
@@ -28,6 +31,9 @@ export interface PlayerCard {
   userId: string;
   displayName: string | null;
   bio: string | null;
+  avatarKey: string | null;
+  /** A photo the viewer may or may not be allowed to see; the storage policy decides when it is signed. */
+  avatarPath: string | null;
   isMe: boolean;
   sports: { sportId: string; level: number; rating: number | null }[];
   /** Null below three signals or when the player hides it. */
@@ -51,6 +57,8 @@ export async function fetchPlayerCard(userId: string): Promise<PlayerCard> {
     userId: row.user_id,
     displayName: row.display_name,
     bio: row.bio,
+    avatarKey: row.avatar_key ?? null,
+    avatarPath: row.avatar_path ?? null,
     isMe: row.is_me,
     sports: row.sports.map((s) => ({ sportId: s.sport_id, level: s.level, rating: s.rating })),
     reliability: row.reliability,

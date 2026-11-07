@@ -151,6 +151,19 @@ Not covered even then: other iPhones and iOS versions, push notifications (not b
 - Run the existing suite plus N23–N25.
 - Also: a pass on the founder's own Android phone with the `device`-style build.
 
+## Phase 8 / M3 on devices: not run (2026-11-07)
+
+`expo-image-picker` and `expo-image-manipulator` are new native modules, so a **new build** is needed (iOS `device` profile on EAS).
+
+What to check by hand on the iPhone:
+- onboarding asks for gender, then shows the avatar screen on the first sport's drawing;
+- the drawings show in the header beside the province, on the profile, the player card and the event roster;
+- "Fotoğraf yükle" opens the photo library (no camera, no permission prompt on iOS 14+ for the system picker), and the crop square works;
+- the uploaded photo shows within a few seconds;
+- "Fotoğrafı kaldır" brings the drawing back.
+
+The native upload sends the file as a form part (`features/profile/api/avatar-api.ts`). The web sends raw bytes, and only the web path is verified (E2E `avatars.spec.ts`).
+
 ## Next
 
 0. **Phase 4 / M5 added native code** (`@maplibre/maplibre-react-native`, `expo-location`): the Android development build (Linux container, ADR-0015) and the iOS simulator build (EAS, ADR-0022) must be rebuilt before the next device run, with `EXPO_PUBLIC_MAP_STYLE_URL` set. To check on the emulator: Discover → Harita shows tiles and markers; the event form's pin picker takes a tap; "Yakınımdakiler" asks for approximate location once and sorts by distance (emulator location set to Ankara).

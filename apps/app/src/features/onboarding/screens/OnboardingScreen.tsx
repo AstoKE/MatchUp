@@ -1,6 +1,8 @@
 import {
+  automaticAvatarKey,
   displayNameSchema,
   onboardingSchema,
+  type Gender,
   type OnboardingInput,
   type SportSelection,
 } from '@matchup/domain';
@@ -15,12 +17,15 @@ import { profileValidationMessage } from '@/lib/profile-validation';
 import { Banner, Button, EmptyState, Screen, Text, TextField, useTheme } from '@/ui';
 import { useCompleteOnboarding, useLegalVersions, useMyAccount } from '../hooks';
 import { ConsentStep, type ConsentDraft } from '../components/ConsentStep';
+import { GenderChoice } from '../components/GenderChoice';
 import { destination } from '../destination';
 
 const STEPS = 3;
 
 interface Draft extends ConsentDraft {
   displayName: string;
+  /** Phase 8 / M3: private, it picks the avatar set (ADR-0027). Required here, "rather not say" included. */
+  gender: Gender | null;
   cityId: string | null;
   districtId: string | null;
   sports: SportSelection[];
@@ -31,6 +36,7 @@ const initialDraft: Draft = {
   terms: false,
   marketing: false,
   displayName: '',
+  gender: null,
   cityId: null,
   districtId: null,
   sports: [],
@@ -59,10 +65,15 @@ function Flow() {
   const [draft, setDraft] = useState<Draft>(initialDraft);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Once onboarding succeeds the avatar screen comes next, then the original destination.
+  const [finished, setFinished] = useState(false);
 
   const returnTo = destination(sanitizeReturnTo(params.returnTo));
+  const avatarStep = { pathname: '/avatar', params: { first: '1', next: returnTo } } as const;
 
-  if (account.data?.onboarded) return <Redirect href={returnTo as '/'} />;
+  if (account.data?.onboarded) {
+    return <Redirect href={finished ? avatarStep : (returnTo as '/')} />;
+  }
 
   if (session.status === 'authenticated' && !session.emailVerified) {
     return (
@@ -113,6 +124,7 @@ function Flow() {
       const name = displayNameSchema.safeParse(draft.displayName);
       if (!name.success) found.displayName = name.error.issues[0]?.message ?? 'NAME_INVALID';
       if (draft.districtId && !draft.cityId) found.district = 'DISTRICT_NEEDS_CITY';
+      if (draft.gender === null) found.gender = 'GENDER_REQUIRED';
     } else {
       const all = onboardingSchema.safeParse(toInput(draft));
       if (!all.success) {
@@ -136,11 +148,19 @@ function Flow() {
     const parsed = onboardingSchema.safeParse(toInput(draft));
     if (!parsed.success) return;
     setSubmitError(null);
+    const gender = draft.gender ?? 'UNDISCLOSED';
+    const firstSport = catalog.data.sports.find((s) => s.id === draft.sports[0]?.sportId);
+    setFinished(true);
     complete.mutate(
-      { input: parsed.data, versions },
       {
-        onSuccess: () => router.replace(returnTo as '/'),
+        input: parsed.data,
+        versions,
+        avatar: { gender, key: automaticAvatarKey(gender, firstSport?.slug ?? null) },
+      },
+      {
+        onSuccess: () => router.replace(avatarStep),
         onError: (error) => {
+          setFinished(false);
           setSubmitError(errorText(error));
           // The server moved to new legal versions while the form was open: fetch them for the retry.
           void legal.refetch();
@@ -205,6 +225,11 @@ function Flow() {
             districtId={draft.districtId}
             onChange={(location) => edit(location, 'district')}
             districtError={message(errors.district)}
+          />
+          <GenderChoice
+            value={draft.gender}
+            onChange={(gender) => edit({ gender }, 'gender')}
+            error={errors.gender ? t('profile:gender.required') : undefined}
           />
         </View>
       ) : null}

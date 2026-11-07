@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { OnboardingInput } from '@matchup/domain';
+import type { AvatarKey, Gender, OnboardingInput } from '@matchup/domain';
 import { useSession } from '@/features/auth';
 import {
   acceptCurrentLegalTerms,
   completeOnboarding,
   fetchLegalVersions,
   fetchMyAccount,
+  saveGenderAndAvatar,
 } from './api/onboarding-api';
 
 export const accountQueryKey = (userId: string) => ['account', userId] as const;
@@ -35,18 +36,26 @@ export function useCompleteOnboarding() {
   const queryClient = useQueryClient();
   const session = useSession();
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       input,
       versions,
+      avatar,
     }: {
       input: OnboardingInput;
       versions: { termsVersion: string; privacyVersion: string };
-    }) => completeOnboarding(input, versions),
+      /** Phase 8 / M3: saved before the account is re-read, so the avatar screen opens on it. */
+      avatar?: { gender: Gender; key: AvatarKey };
+    }) => {
+      await completeOnboarding(input, versions);
+      if (avatar) await saveGenderAndAvatar(avatar.gender, avatar.key).catch(() => undefined);
+    },
     onSuccess: async () => {
       if (session.status === 'authenticated') {
         await queryClient.invalidateQueries({ queryKey: accountQueryKey(session.userId) });
       }
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
+      // The account may have been re-read (and the avatar screen opened) before the gender and drawing were saved.
+      await queryClient.invalidateQueries({ queryKey: ['my-avatar'] });
     },
   });
 }

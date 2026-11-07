@@ -79,7 +79,14 @@ Boundaries: **client (untrusted)** ⇄ Supabase API (PostgREST/Auth/Realtime/Sto
 
 - Private by default: `profile_visibility = EVENT_PEERS`; location optional; marketing consent off.
 - **User location** is never stored or shared; discovery queries pass a transient point or a district. *(Phase 4: an exact event pin lives only in `event_private_details`; everybody else gets `events.public_point`, the pin for public locations, the centre of its ~500 m cell for hidden ones, the district centre without a pin. Search distances are measured from that public point. A venue reveals the place, so it is shown only where the address may be. Usage analytics (Phase 7, ADR-0025) are recorded only with the separate ANALYTICS consent, off by default, coded events without free text or coordinates, deleted on withdrawal. "Near me" (M5) asks for the position only when tapped, requests approximate location only (Android's precise permission is blocked, iOS defaults to reduced accuracy), rounds it to ~1 m before the one search that uses it, and keeps it in memory for that visit.)* **Event locations** may be hidden until approval. Pins for hidden-location events are snapped to a ≥ 300 m grid.
-- Minimal collection: no phone number, no DOB (only `adult_confirmed_at`), no government id, no gender (post-MVP inclusion features, if any, will be opt-in and need a purpose review).
+- Minimal collection: no phone number, no DOB (only `adult_confirmed_at`), no government id.
+- **Gender** (Phase 8 M3, founder's decision, ADR-0027) is asked in onboarding, with "rather not say" as an answer, for one purpose: offering the matching avatar set first.
+  - It is never a readable column, never shown to anyone else, and never in analytics or notifications.
+  - Only `get_my_avatar` returns it, to its owner.
+  - It is exported to its owner and purged with the account.
+- **Profile photos** (ADR-0027) live in a private bucket. Who may see one follows the profile rule (`EVERYONE`, or event peers; never a blocked person), enforced by storage policies.
+  - The app sends a 512 px JPEG re-encoded on the device: EXIF, location included, does not leave it.
+  - The bytes are deleted by the owner (replace, remove, account deletion request) or by a second-factor administrator (moderation, recorded).
 - Join requests disclose a minimal game-relevant profile to the organizer, stated at request time.
 - Participants see each other only after approval.
 - Notifications store ids, not names.
@@ -100,6 +107,10 @@ Engineering will implement the technical hooks; the following need a Turkish-law
 9. **Terms of Service**: user conduct, organizer responsibilities, **assumption-of-risk / injury disclaimers**, disclaimer that MatchUp does not guarantee venue bookings, collect payments, or verify identities/skill; handling of money exchanged offline between users.
 10. **Age policy**: 18+ self-declaration adequacy; handling minors discovered.
 11. **Data breach notification** procedure (72-hour notification to the Authority under KVKK) and incident response owner.
+13. **Gender and profile photos** (Phase 8 M3, ADR-0027):
+    - the purpose wording for asking gender and whether it needs explicit consent;
+    - images of people as personal data, their retention, and their moderation;
+    - the gap that bytes left by an interrupted upload or by a purge without the app stay in storage until a sweeper exists.
 12. **App-store disclosures** (Apple privacy nutrition labels, Google Data Safety) consistent with the above.
 
 Technical hooks already designed: versioned consents (`user_consents`), export, deletion with anonymization, retention jobs, audit logs, analytics minimization.

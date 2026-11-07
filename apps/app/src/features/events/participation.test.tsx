@@ -106,6 +106,8 @@ function event(over: Partial<EventDetails> = {}): EventDetails {
     id: EVENT,
     isOrganizer: false,
     organizerName: 'Ayşe A',
+    organizerAvatarKey: null,
+    organizerAvatarPath: null,
     inviteToken: null,
     participants: null,
     status: 'PUBLISHED',
@@ -282,8 +284,8 @@ describe('the event page for different viewers', () => {
     mockApi.fetchEvent.mockResolvedValue(
       event({
         participants: [
-          { userId: null, displayName: 'Deniz D' },
-          { userId: null, displayName: null },
+          { userId: null, displayName: 'Deniz D', avatarKey: 'f-padel', avatarPath: null },
+          { userId: null, displayName: null, avatarKey: null, avatarPath: null },
         ],
       }),
     );

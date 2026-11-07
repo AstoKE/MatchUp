@@ -166,6 +166,11 @@ Tabs/filters: Yaklaşan, Başvurularım, Düzenlediklerim, Geçmiş. Distinguish
 Emphasize pending requests and remaining capacity. Show candidate's sport-specific level, reliability indicator (when meaningful sample exists), and essential profile info. Actions: approve, reject, remove with safeguards and confirmation for destructive actions. Do not show unnecessary personal data.
 5.8 Profile and onboarding
 Use the same surfaces and restrained cards, in both themes. Showcase identity, selected sports, sport-specific skill, reliability, XP and achievements as distinct metrics. Do not conflate skill and experience. Provide profile privacy choices, 18+ gate and clear consent copy. Avoid gamification clutter.
+- **Avatars** (founder's set, 2026-11-07; ADR-0027): round, 96 pt on the profile and the avatar screen, 44–48 pt in headers, 36 pt in rosters.
+  - Each avatar shows the person's photo, else their drawing, else their initials.
+  - Inside a named control (the header link, a roster link), no initials are shown, since their letters would not be in the control's name; a person icon takes their place.
+  - The avatar screen is a three-column grid of 80 pt circles with the name below. The chosen one has a 3 pt ring in the action blue.
+  - The own set comes first; "show all avatars" opens the other set. A photo can be uploaded, changed or removed above the grid.
 5.9 Notifications / settings / empty states
 Use consistent list rows, section dividers, explicit status labels, and obvious empty state actions. Create useful empty states such as Henüz katıldığın etkinlik yok with Etkinlikleri keşfet action.
 6. Responsive web behavior
@@ -175,7 +180,7 @@ Use consistent list rows, section dividers, explicit status labels, and obvious 
 - Avoid giant full-bleed mobile heroes on desktop; constrain the court hero and text widths.
 - Support keyboard, hover, focus-visible and accessible dialogs on web.
 7. Photos, icons and content
-- The court drawings are the imagery: our own line art of each sport's playing area, drawn as SVG in the app. There are no photos in the MVP.
+- The court drawings are the imagery: our own line art of each sport's playing area, drawn as SVG in the app. The only photos are the profile photos people choose for themselves (Phase 8, ADR-0027); the 22 avatar drawings are the founder's own set.
 - If venue photos arrive later, they need their own design decision and properly licensed content.
 - Do not use screenshots or photos from the supplied GoodRec references as production assets.
 - A sport beside its name is a small dot in its court color; there are no sport glyphs. Use a coherent icon set, consistent stroke width; don't mix emoji as primary UI icons with line icons.
@@ -272,7 +277,7 @@ Participant avatars on event cards	None	List data has no participants, and guest
 Tiles and a "Bu akşam Ankara'da" list together on Discover	Tiles first, list after a choice	The founder's decision of the same day (§11, FL-2); confirm at the Discover milestone
 Six tiles and a "show all" link on a phone	All ten tiles and an "all sports" link	The link in the app selects every sport (FL-2)
 "Ankara" as a button	Plain text	The pilot has one city, and a control with one choice is a dead end (§9)
-Avatar at the top, no bell	Notification bell, no avatar	Notifications exist and need a way in; Profile is in the dock
+Avatar at the top, no bell	The avatar at the top left beside the province, and the bell	Founder's decision, 2026-11-07 (PHASE8_PLAN M3); notifications still need a way in
 Profile without level, reliability or badges	They stay	Built features, §5.8 and §11
 Dock inside the screen drawing	Also respects safe areas and text scaling	§2 rule 6 and 7
 

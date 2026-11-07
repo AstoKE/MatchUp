@@ -111,7 +111,11 @@
       "PENDING_DELETION": "Pending deletion",
       "DELETED": "Deleted"
     },
-    "back": "Back to search"
+    "back": "Back to search",
+    "photo": "Profile photo",
+    "photoNote": "Reason for removing",
+    "removePhoto": "Remove photo",
+    "photoRemoved": "Photo removed."
   },
   "flags": {
     "empty": "No flags.",
@@ -145,7 +149,8 @@
       "VENUE_ADDED": "Venue added",
       "VENUE_VERIFIED": "Venue verified",
       "VENUE_HIDDEN": "Venue hidden",
-      "VENUE_RESTORED": "Venue restored"
+      "VENUE_RESTORED": "Venue restored",
+      "AVATAR_REMOVED": "Profile photo removed"
     },
     "outcome": {
       "ACTIONED": "action taken",

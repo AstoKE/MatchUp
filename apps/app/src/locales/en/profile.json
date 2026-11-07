@@ -88,5 +88,36 @@
     "noBadges": "No badges yet. You earn them by playing.",
     "barLabel": "Progress to level {{level}}"
   },
-  "openAdmin": "Administration"
+  "openAdmin": "Administration",
+  "avatar": {
+    "title": "Choose your avatar",
+    "intro": "It shows on your profile. You can change it any time.",
+    "change": "Change avatar",
+    "choices": "Avatar choices",
+    "letters": "Initials",
+    "general": "General",
+    "setF": "girl character",
+    "setM": "boy character",
+    "labelWithSet": "{{name}}, {{set}}",
+    "showAll": "Show all avatars",
+    "showFewer": "Show fewer",
+    "uploadPhoto": "Upload a photo",
+    "replacePhoto": "Change photo",
+    "removePhoto": "Remove photo",
+    "uploading": "Uploading…",
+    "photoNote": "People who can see your profile see your photo. Location data is removed.",
+    "replacesPhoto": "If you choose an avatar and save, your photo is deleted.",
+    "saved": "Your avatar is saved.",
+    "photoSaved": "Your photo is uploaded.",
+    "photoRemoved": "Your photo is removed.",
+    "skip": "Skip for now"
+  },
+  "gender": {
+    "label": "Gender",
+    "hint": "To show avatars that suit you. Never shown to others.",
+    "FEMALE": "Woman",
+    "MALE": "Man",
+    "UNDISCLOSED": "Rather not say",
+    "required": "Choose an option."
+  }
 }

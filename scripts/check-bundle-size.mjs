@@ -62,12 +62,16 @@
 // TOTAL 918 -> 920 and INITIAL 548 -> 550 (2026-11-07, Phase 8 / M2): the wheel picker (ui/WheelPicker, the date and
 // time wheels) is used by Discover's date sheet and by the event form. A lazy chunk for Discover's sheet was tried and
 // measured: Metro moves a module shared by two lazy chunks into __common, which index.html loads, so it saved nothing.
+// TOTAL 920 -> 935 and INITIAL 550 -> 555 (2026-11-07, Phase 8 / M3): avatars and photos. The avatar screen with the photo
+// picker and the image manipulator is a lazy chunk (AvatarScreen, ~8 kB gzip; INITIAL was 563 before that split). What stays
+// in the first load is what Discover's header avatar needs: the avatar API and hooks, the drawings' asset table (the
+// pictures themselves load as images), the gender question of onboarding and their copy.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 920;
-const INITIAL_RATCHET_KB = 550;
+const TOTAL_RATCHET_KB = 935;
+const INITIAL_RATCHET_KB = 555;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';

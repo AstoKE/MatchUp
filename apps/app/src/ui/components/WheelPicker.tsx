@@ -44,6 +44,9 @@ export function WheelPicker<T extends string | number>({
   const reduced = useReducedMotion();
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
   const settle = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Only a person moves the value by scrolling. A scroll the wheel did not ask for from them (the initial position not
+  // applied yet, a layout pass, the browser restoring a position) must never change it: the wheel goes back instead.
+  const touched = useRef(false);
   const [focused, setFocused] = useState(false);
   const selected = Math.max(
     0,
@@ -74,6 +77,23 @@ export function WheelPicker<T extends string | number>({
     [],
   );
 
+  // The web: a mouse wheel, a pointer or a finger on the column counts as the person's own scroll.
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const node = (
+      scroller.current as unknown as { getScrollableNode?: () => HTMLElement | null } | null
+    )?.getScrollableNode?.();
+    if (!node) return;
+    const mark = () => {
+      touched.current = true;
+    };
+    const events = ['wheel', 'pointerdown', 'touchstart'] as const;
+    for (const name of events) node.addEventListener(name, mark, { passive: true });
+    return () => {
+      for (const name of events) node.removeEventListener(name, mark);
+    };
+  }, []);
+
   const pick = (index: number, animated = true) => {
     const clamped = Math.min(last, Math.max(0, index));
     setCentered(clamped);
@@ -84,18 +104,29 @@ export function WheelPicker<T extends string | number>({
 
   const indexAt = (y: number) => Math.min(last, Math.max(0, Math.round(y / ITEM)));
 
+  /** End of a scroll: the person's lands on a row; any other is undone. */
+  const land = (index: number) => {
+    if (touched.current) {
+      touched.current = false;
+      pick(index);
+    } else if (index !== selected) {
+      setCentered(selected);
+      scrollToIndex(selected, false);
+    }
+  };
+
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = e.nativeEvent.contentOffset.y;
     const index = indexAt(y);
-    if (index !== centered) setCentered(index);
+    if (touched.current && index !== centered) setCentered(index);
     // The web has no momentum events: settle once the wheel or the drag has stopped.
     if (Platform.OS === 'web') {
       if (settle.current) clearTimeout(settle.current);
-      settle.current = setTimeout(() => pick(index), 140);
+      settle.current = setTimeout(() => land(index), 140);
     }
   };
   const onEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) =>
-    pick(indexAt(e.nativeEvent.contentOffset.y));
+    land(indexAt(e.nativeEvent.contentOffset.y));
 
   const onAction = (e: AccessibilityActionEvent) => {
     if (e.nativeEvent.actionName === 'increment') pick(selected + 1);
@@ -175,7 +206,12 @@ export function WheelPicker<T extends string | number>({
         decelerationRate="fast"
         scrollEventThrottle={16}
         onScroll={onScroll}
+        onScrollBeginDrag={() => {
+          touched.current = true;
+        }}
         onMomentumScrollEnd={onEnd}
+        // The first position is applied once the rows have a size (an earlier scrollTo is ignored).
+        onContentSizeChange={() => scrollToIndex(selected, false)}
         // A slow drag without a fling ends without momentum.
         onScrollEndDrag={(e) => {
           const velocity = e.nativeEvent.velocity?.y ?? 0;

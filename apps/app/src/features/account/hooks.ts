@@ -20,7 +20,7 @@ function useInvalidateAccount() {
  * Re-enters the password (a fresh sign-in is what the server checks, via the token's `amr`), then
  * requests deletion. Two calls on purpose: the password never reaches our own database code.
  */
-export function useRequestDeletion() {
+export function useRequestDeletion(beforeRequest?: (userId: string) => Promise<void>) {
   const session = useSession();
   const invalidate = useInvalidateAccount();
   return useMutation({
@@ -33,6 +33,9 @@ export function useRequestDeletion() {
         password: input.password,
         captchaToken: input.captchaToken,
       });
+      // Phase 8 / M3: the profile photo's bytes go now; the purge cannot reach storage (ADR-0027). A failure here does not
+      // stop the deletion request.
+      if (beforeRequest) await beforeRequest(session.userId).catch(() => undefined);
       return requestAccountDeletion();
     },
     onSuccess: invalidate,

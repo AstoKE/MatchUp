@@ -87,6 +87,8 @@ function event(over: Partial<EventDetails> = {}): EventDetails {
     id: EVENT,
     isOrganizer: false,
     organizerName: 'Ayşe A',
+    organizerAvatarKey: null,
+    organizerAvatarPath: null,
     inviteToken: null,
     participants: null,
     status: 'PUBLISHED',

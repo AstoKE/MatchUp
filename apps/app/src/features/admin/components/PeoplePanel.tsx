@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { adminRemoveAvatarPhoto, deleteAvatarObjects, UserAvatar } from '@/features/profile';
 import { errorText } from '@/lib/error-text';
 import { Banner, Button, Skeleton, Text, TextField, useTheme, useToast } from '@/ui';
 import {
@@ -121,6 +122,12 @@ function PersonDetail({ id, onBack }: { id: string; onBack: () => void }) {
   const change = useDecision(async (input: { suspend: boolean }) =>
     input.suspend ? suspendUser(id, note) : reinstateUser(id, note),
   );
+  const [photoNote, setPhotoNote] = useState('');
+  // Phase 8 / M3: clear the reference (recorded), then delete the bytes with the administrator's own token.
+  const removePhoto = useDecision(async () => {
+    const path = await adminRemoveAvatarPhoto(id, photoNote);
+    if (path) await deleteAvatarObjects([path]);
+  });
   if (user.isError) {
     return (
       <View style={{ gap: spacing[2] }}>
@@ -146,9 +153,17 @@ function PersonDetail({ id, onBack }: { id: string; onBack: () => void }) {
     <View style={{ gap: spacing[3] }}>
       <Button variant="tertiary" label={t('admin:users.back')} onPress={onBack} />
       <Panel>
-        <Text variant="title" heading={2}>
-          {u.name ?? t('admin:reports.unknown')}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+          <UserAvatar
+            name={u.name ?? ''}
+            avatarKey={u.avatar_key ?? null}
+            avatarPath={u.avatar_path ?? null}
+            size={96}
+          />
+          <Text variant="title" heading={2} style={{ flexShrink: 1 }}>
+            {u.name ?? t('admin:reports.unknown')}
+          </Text>
+        </View>
         <Text>
           {`${t('admin:users.status')}: ${t(`admin:users.state.${u.account_status as 'ACTIVE'}`, { defaultValue: u.account_status })}`}
           {u.is_admin ? ` · ${t('admin:users.admin')}` : ''}
@@ -180,6 +195,34 @@ function PersonDetail({ id, onBack }: { id: string; onBack: () => void }) {
             disabled={note.trim().length === 0 || (!suspended && u.is_admin)}
             pending={change.isPending}
             onConfirm={() => decide(!suspended)}
+          />
+        </Panel>
+      ) : null}
+      {u.avatar_path ? (
+        <Panel>
+          <Text variant="label">{t('admin:users.photo')}</Text>
+          {removePhoto.isError ? (
+            <Banner kind="danger" message={errorText(removePhoto.error)} />
+          ) : null}
+          <TextField
+            label={t('admin:users.photoNote')}
+            value={photoNote}
+            onChangeText={(value) => setPhotoNote(value.slice(0, 1000))}
+            multiline
+          />
+          <Confirmed
+            variant="destructive"
+            label={t('admin:users.removePhoto')}
+            disabled={photoNote.trim().length === 0}
+            pending={removePhoto.isPending}
+            onConfirm={() =>
+              removePhoto.mutate(undefined, {
+                onSuccess: () => {
+                  toast.show(t('admin:users.photoRemoved'), 'success');
+                  setPhotoNote('');
+                },
+              })
+            }
           />
         </Panel>
       ) : null}

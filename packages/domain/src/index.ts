@@ -1,3 +1,4 @@
+export * from './avatar';
 export * from './auth';
 export * from './errors';
 export * from './event';

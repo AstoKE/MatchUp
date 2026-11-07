@@ -41,9 +41,13 @@ async function completeOnboarding(page: Page, displayName: string) {
     .click();
   await page.getByRole('button', { name: 'İleri' }).click();
   await page.getByLabel('Görünen ad', { exact: true }).fill(displayName);
+  await page.getByRole('radio', { name: 'Kadın', exact: true }).click();
   await page.getByRole('button', { name: 'İleri' }).click();
   await page.getByRole('checkbox', { name: 'Futbol', exact: true }).click();
   await page.getByRole('button', { name: 'Bitir' }).click();
+  // Phase 8 / M3: the avatar screen comes next, on the drawing of the first sport.
+  await expect(page.getByRole('radio', { name: 'Futbol', checked: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Devam et' }).click();
 }
 
 test.describe('registration and email verification', () => {

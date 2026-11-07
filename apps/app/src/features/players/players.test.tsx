@@ -60,6 +60,8 @@ const session: SessionState = {
 const card = (over: Partial<PlayerCard> = {}): PlayerCard => ({
   userId: THEM,
   displayName: 'Deniz Kaya',
+  avatarKey: null,
+  avatarPath: null,
   bio: 'Kaleci',
   isMe: false,
   sports: [{ sportId: FOOTBALL, level: 3.5, rating: 4.2 }],

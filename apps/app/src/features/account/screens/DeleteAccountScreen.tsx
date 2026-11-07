@@ -13,19 +13,24 @@ import { useRequestDeletion } from '../hooks';
  * Explains exactly what happens, asks for the password again (the server checks that it was entered
  * in the last 10 minutes) and starts the 30-day grace period.
  */
-export function DeleteAccountScreen() {
+/** `beforeRequest` runs after the password check, before the request: the route passes the photo's deletion. */
+export function DeleteAccountScreen({
+  beforeRequest,
+}: {
+  beforeRequest?: (userId: string) => Promise<void>;
+}) {
   return (
     <RequireOnboarded>
-      <DeleteAccount />
+      <DeleteAccount beforeRequest={beforeRequest} />
     </RequireOnboarded>
   );
 }
 
-function DeleteAccount() {
+function DeleteAccount({ beforeRequest }: { beforeRequest?: (userId: string) => Promise<void> }) {
   const { t } = useTranslation(['account', 'auth', 'common']);
   const router = useRouter();
   const { spacing } = useTheme();
-  const request = useRequestDeletion();
+  const request = useRequestDeletion(beforeRequest);
   const captcha = useCaptcha();
   const [password, setPassword] = useState('');
   const [missing, setMissing] = useState(false);
@@ -58,6 +63,7 @@ function DeleteAccount() {
       <View style={{ gap: spacing[2] }}>
         <Text>{t('account:delete.grace')}</Text>
         <Text>{t('account:delete.permanent')}</Text>
+        <Text>{t('account:delete.photo')}</Text>
         <Text tone="secondary">{t('account:delete.kept')}</Text>
       </View>
       <Banner kind="warning" message={t('account:delete.exportFirst')} />

@@ -121,6 +121,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.avatar_owner(p_name text)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "none"
+    },
+    {
       "fn": "private.award_attendance_xp(p_event uuid, p_user uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -145,12 +153,36 @@
       "guard": "none"
     },
     {
+      "fn": "private.can_delete_avatar(p_name text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
+      "fn": "private.can_read_avatar(p_name text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
       "fn": "private.can_report_user(p_uid uuid, p_target uuid)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
       "authenticated": false,
       "guard": "none"
+    },
+    {
+      "fn": "private.can_upload_avatar(p_name text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
     },
     {
       "fn": "private.clean_display_name(p_name text)",
@@ -777,6 +809,14 @@
       "guard": "private.assert_admin_aal2"
     },
     {
+      "fn": "public.admin_remove_avatar_photo(p_user_id uuid, p_note text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
       "fn": "public.admin_resolve_attendance_dispute(p_participation_id uuid, p_resolution attendance_status)",
       "definer": true,
       "search_path_empty": true,
@@ -873,6 +913,14 @@
       "guard": "none"
     },
     {
+      "fn": "public.clear_my_avatar_photo()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_active_verified_user"
+    },
+    {
       "fn": "public.complete_event(p_event_id uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -959,6 +1007,14 @@
       "anon": false,
       "authenticated": true,
       "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.get_my_avatar()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_active_verified_user"
     },
     {
       "fn": "public.get_player_card(p_user_id uuid)",
@@ -1105,6 +1161,30 @@
       "guard": "private.assert_onboarded_user"
     },
     {
+      "fn": "public.set_my_avatar(p_avatar_key text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_active_verified_user"
+    },
+    {
+      "fn": "public.set_my_avatar_photo(p_path text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.set_my_gender(p_gender profile_gender)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_active_verified_user"
+    },
+    {
       "fn": "public.set_sport_profile(p_sport_id uuid, p_level numeric, p_position_ids uuid[])",
       "definer": true,
       "search_path_empty": true,
@@ -1180,6 +1260,13 @@
   "tables": [
     {
       "table": "private.audit_logs",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "private.avatar_uploads",
       "rls": true,
       "policies": [],
       "anon": [],

@@ -26,9 +26,28 @@ jest.mock('./src/features/events/components/LazyPanels', () => ({
 jest.mock('./src/features/events/components/LazyEventsMap', () => ({
   LazyEventsMap: jest.requireActual('./src/features/events/components/EventsMap').EventsMap,
 }));
+jest.mock('./src/features/profile/components/LazyAvatarScreen', () => ({
+  LazyAvatarScreen: jest.requireActual('./src/features/profile/screens/AvatarScreen').AvatarScreen,
+}));
 jest.mock('./src/features/events/components/LazyEventStepper', () => ({
   LazyEventStepper: jest.requireActual('./src/features/events/components/EventStepper')
     .EventStepper,
+}));
+// The avatar (Phase 8 / M3) shows in the header of the main screens: without this every such test would call the real API.
+// Tests about avatars override these with jest.requireMock(...).
+jest.mock('./src/features/profile/api/avatar-api', () => ({
+  fetchMyAvatar: jest.fn(() =>
+    Promise.resolve({ displayName: null, gender: null, avatarKey: null, avatarPath: null }),
+  ),
+  setMyGender: jest.fn(() => Promise.resolve()),
+  setMyAvatar: jest.fn(() => Promise.resolve()),
+  setMyAvatarPhoto: jest.fn(() => Promise.resolve(null)),
+  clearMyAvatarPhoto: jest.fn(() => Promise.resolve()),
+  adminRemoveAvatarPhoto: jest.fn(() => Promise.resolve(null)),
+  uploadAvatarPhoto: jest.fn((userId) => Promise.resolve(`${userId}/photo.jpg`)),
+  deleteAvatarObjects: jest.fn(() => Promise.resolve()),
+  listMyAvatarObjects: jest.fn(() => Promise.resolve([])),
+  signAvatarUrl: jest.fn(() => Promise.resolve(null)),
 }));
 // The catalog kept on the device (load-catalog.ts) would carry one test's catalog into the next; component tests always
 // start without it, and load-catalog.test.ts tests the keeping itself.

@@ -7,9 +7,10 @@ import { signOut, useSession, VerifyEmailBanner } from '@/features/auth';
 import { localizedName, type Catalog } from '@/features/catalog';
 import { useMyAccount } from '@/features/onboarding';
 import { currentLocale } from '@/lib/i18n';
-import { Avatar, Button, Icon, Screen, SportDot, Text, useTheme } from '@/ui';
+import { Button, Icon, Screen, SportDot, Text, useTheme } from '@/ui';
 import type { MyProfile } from '../api/profile-api';
 import { ProgressSection } from '../components/ProgressSection';
+import { MyAvatar } from '../components/UserAvatar';
 import { WithProfile } from '../components/WithProfile';
 
 /** The signed-in user's own profile (Phase 2). Others' view of it follows the visibility setting. */
@@ -94,7 +95,7 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
     <Screen maxWidth={640}>
       <VerifyEmailBanner />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-        <Avatar name={profile.displayName} size={72} />
+        <MyAvatar size={96} />
         <View style={{ flex: 1, gap: spacing[1] }}>
           <Text variant="headline" heading={1}>
             {profile.displayName}
@@ -107,6 +108,13 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
           <Text variant="bodySm" tone="secondary">
             {location || t('profile:noLocation')}
           </Text>
+          <View style={{ alignItems: 'flex-start' }}>
+            <Button
+              variant="tertiary"
+              label={t('profile:avatar.change')}
+              onPress={() => router.push('/avatar')}
+            />
+          </View>
         </View>
       </View>
 

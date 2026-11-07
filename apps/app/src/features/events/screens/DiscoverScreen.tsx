@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useTrack } from '@/features/analytics';
 import { localizedName, useCatalog } from '@/features/catalog';
 import { NotificationBell } from '@/features/notifications';
-import { useMyProfile } from '@/features/profile';
+import { useMyProfile, HeaderAvatar } from '@/features/profile';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { mapStyleUrl } from '@/lib/map-config';
@@ -186,15 +186,19 @@ export function DiscoverScreen() {
           minHeight: TOUCH_TARGET,
         }}
       >
-        {catalog.data ? (
-          <CityPicker
-            cities={catalog.data.cities}
-            cityId={city?.id ?? null}
-            onChange={chooseCity}
-          />
-        ) : (
-          <View />
-        )}
+        {/* The own avatar opens the profile; the province sits beside it (founder's decision, 2026-11-07). */}
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], flexShrink: 1 }}
+        >
+          <HeaderAvatar />
+          {catalog.data ? (
+            <CityPicker
+              cities={catalog.data.cities}
+              cityId={city?.id ?? null}
+              onChange={chooseCity}
+            />
+          ) : null}
+        </View>
         <NotificationBell />
       </View>
       <Text

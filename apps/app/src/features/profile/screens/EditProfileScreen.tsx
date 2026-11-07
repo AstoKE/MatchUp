@@ -1,13 +1,15 @@
-import { BIO_MAX, profileEditSchema } from '@matchup/domain';
+import { BIO_MAX, profileEditSchema, type Gender } from '@matchup/domain';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LocationFields, type Catalog } from '@/features/catalog';
+import { GenderChoice } from '@/features/onboarding';
 import { errorText } from '@/lib/error-text';
 import { profileValidationMessage } from '@/lib/profile-validation';
 import { Banner, Button, Screen, Text, TextField, useToast } from '@/ui';
 import type { MyProfile } from '../api/profile-api';
 import { WithProfile } from '../components/WithProfile';
+import { useMyAvatar, useSetGender } from '../avatar-hooks';
 import { useUpdateProfile } from '../hooks';
 
 export function EditProfileScreen() {
@@ -19,6 +21,11 @@ function EditForm({ profile, catalog }: { profile: MyProfile; catalog: Catalog }
   const router = useRouter();
   const toast = useToast();
   const update = useUpdateProfile();
+  const avatar = useMyAvatar();
+  const setGender = useSetGender();
+  // Undefined until the person touches it: an older account may have none yet (ADR-0027).
+  const [gender, setGenderDraft] = useState<Gender | undefined>(undefined);
+  const currentGender = gender ?? avatar.data?.gender ?? null;
   const [name, setName] = useState(profile.displayName);
   const [bio, setBio] = useState(profile.bio ?? '');
   const [location, setLocation] = useState({
@@ -41,13 +48,18 @@ function EditForm({ profile, catalog }: { profile: MyProfile; catalog: Catalog }
     }
     setErrors({});
     setSubmitError(null);
-    update.mutate(parsed.data, {
-      onSuccess: () => {
+    update
+      .mutateAsync(parsed.data)
+      .then(() =>
+        gender !== undefined && gender !== avatar.data?.gender
+          ? setGender.mutateAsync(gender)
+          : undefined,
+      )
+      .then(() => {
         toast.show(t('profile:saved'), 'success');
         router.back();
-      },
-      onError: (error) => setSubmitError(errorText(error)),
-    });
+      })
+      .catch((error: unknown) => setSubmitError(errorText(error)));
   };
 
   const message = (key: string | undefined) => profileValidationMessage(key);
@@ -94,9 +106,10 @@ function EditForm({ profile, catalog }: { profile: MyProfile; catalog: Catalog }
         }}
         districtError={message(errors.districtId)}
       />
+      <GenderChoice value={currentGender} onChange={setGenderDraft} />
       <Button
         label={t('common:save')}
-        loading={update.isPending}
+        loading={update.isPending || setGender.isPending}
         loadingLabel={t('common:loading')}
         onPress={save}
         fullWidth

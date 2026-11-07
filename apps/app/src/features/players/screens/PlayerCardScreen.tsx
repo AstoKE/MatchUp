@@ -3,21 +3,12 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { UserAvatar } from '@/features/profile';
 import { localizedName, useCatalog } from '@/features/catalog';
 import { RequireOnboarded } from '@/features/onboarding';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
-import {
-  Avatar,
-  Banner,
-  Button,
-  EmptyState,
-  Screen,
-  ScreenHeader,
-  Text,
-  useTheme,
-  useToast,
-} from '@/ui';
+import { Banner, Button, EmptyState, Screen, ScreenHeader, Text, useTheme, useToast } from '@/ui';
 import type { PlayerCard } from '../api/players-api';
 import { ReportSheet } from '../components/ReportSheet';
 import { useBlockUser, usePlayerCard } from '../hooks';
@@ -97,7 +88,7 @@ function Card({ card, onBack }: { card: PlayerCard; onBack: () => void }) {
     <Screen maxWidth={640}>
       <ScreenHeader title={name} backLabel={t('common:back')} onBack={onBack} />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-        <Avatar name={name} />
+        <UserAvatar name={name} avatarKey={card.avatarKey} avatarPath={card.avatarPath} size={88} />
         {card.xpTotal !== null ? (
           <Text variant="titleSm">
             {t('profile:progress.level', { level: levelFromXp(card.xpTotal) })}

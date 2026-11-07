@@ -88,5 +88,36 @@
     "noBadges": "Henüz rozetin yok. Maçlara katıldıkça kazanırsın.",
     "barLabel": "Seviye {{level}} için ilerleme"
   },
-  "openAdmin": "Yönetim"
+  "openAdmin": "Yönetim",
+  "avatar": {
+    "title": "Avatarını seç",
+    "intro": "Profilinde görünür. İstediğin zaman değiştirebilirsin.",
+    "change": "Avatarı değiştir",
+    "choices": "Avatar seçenekleri",
+    "letters": "Harfler",
+    "general": "Genel",
+    "setF": "kız karakter",
+    "setM": "erkek karakter",
+    "labelWithSet": "{{name}}, {{set}}",
+    "showAll": "Tüm avatarları göster",
+    "showFewer": "Daha az göster",
+    "uploadPhoto": "Fotoğraf yükle",
+    "replacePhoto": "Fotoğrafı değiştir",
+    "removePhoto": "Fotoğrafı kaldır",
+    "uploading": "Yükleniyor…",
+    "photoNote": "Fotoğrafını profilini görebilenler görür. Konum bilgisi silinir.",
+    "replacesPhoto": "Bir avatar seçip kaydedersen fotoğrafın silinir.",
+    "saved": "Avatarın kaydedildi.",
+    "photoSaved": "Fotoğrafın yüklendi.",
+    "photoRemoved": "Fotoğrafın kaldırıldı.",
+    "skip": "Şimdilik atla"
+  },
+  "gender": {
+    "label": "Cinsiyet",
+    "hint": "Sana uygun avatarları göstermek için. Başkalarına gösterilmez.",
+    "FEMALE": "Kadın",
+    "MALE": "Erkek",
+    "UNDISCLOSED": "Belirtmek istemiyorum",
+    "required": "Bir seçenek seç."
+  }
 }

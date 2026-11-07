@@ -58,6 +58,7 @@ const mockApi = {
   fetchMyAccount: jest.fn(),
   fetchLegalVersions: jest.fn(),
   completeOnboarding: jest.fn(),
+  saveGenderAndAvatar: jest.fn(),
   acceptCurrentLegalTerms: jest.fn(),
   fetchCatalog: jest.fn(),
 };
@@ -65,6 +66,7 @@ jest.mock('./api/onboarding-api', () => ({
   fetchMyAccount: (...a: unknown[]) => mockApi.fetchMyAccount(...a),
   fetchLegalVersions: (...a: unknown[]) => mockApi.fetchLegalVersions(...a),
   completeOnboarding: (...a: unknown[]) => mockApi.completeOnboarding(...a),
+  saveGenderAndAvatar: (...a: unknown[]) => mockApi.saveGenderAndAvatar(...a),
   acceptCurrentLegalTerms: (...a: unknown[]) => mockApi.acceptCurrentLegalTerms(...a),
 }));
 jest.mock('@/features/catalog/api/catalog-api', () => ({
@@ -110,6 +112,7 @@ beforeEach(() => {
   mockApi.fetchLegalVersions.mockResolvedValue(versions);
   mockApi.fetchCatalog.mockResolvedValue(catalog);
   mockApi.completeOnboarding.mockResolvedValue(undefined);
+  mockApi.saveGenderAndAvatar.mockResolvedValue(undefined);
   mockApi.acceptCurrentLegalTerms.mockResolvedValue(undefined);
 });
 
@@ -182,9 +185,42 @@ describe('OnboardingScreen', () => {
     await check("Kullanım Koşulları'nı ve Gizlilik Bildirimi'ni okudum, kabul ediyorum.");
     await press('İleri');
     await fireEvent.changeText(await screen.findByLabelText('Görünen ad'), 'Ayşe Yılmaz');
+    await fireEvent.press(screen.getByRole('radio', { name: gender }));
     await press('İleri');
     await screen.findByText('Hangi sporları yapıyorsun?');
   }
+  let gender = 'Kadın';
+  beforeEach(() => {
+    gender = 'Kadın';
+  });
+  const avatarStep = (next: string) => ({ pathname: '/avatar', params: { first: '1', next } });
+
+  it('asks for a gender, "rather not say" included, before the sports', async () => {
+    await renderApp(<OnboardingScreen />, { session: signedIn() });
+    await screen.findByText('Başlamadan önce');
+    await check('18 yaşından büyük olduğumu onaylıyorum.');
+    await check("Kullanım Koşulları'nı ve Gizlilik Bildirimi'ni okudum, kabul ediyorum.");
+    await press('İleri');
+    await fireEvent.changeText(await screen.findByLabelText('Görünen ad'), 'Ayşe Yılmaz');
+    await press('İleri');
+    expect(await screen.findByText('Bir seçenek seç.')).toBeTruthy();
+    expect(screen.queryByText('Hangi sporları yapıyorsun?')).toBeNull();
+    expect(screen.getByRole('radio', { name: 'Belirtmek istemiyorum' })).toBeTruthy();
+    await fireEvent.press(screen.getByRole('radio', { name: 'Erkek' }));
+    expect(screen.queryByText('Bir seçenek seç.')).toBeNull();
+  });
+
+  it('"rather not say" starts with the letters', async () => {
+    gender = 'Belirtmek istemiyorum';
+    await renderApp(<OnboardingScreen />, { session: signedIn() });
+    await screen.findByText('Başlamadan önce');
+    await reachSports();
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Basketbol' }));
+    await press('Bitir');
+    await waitFor(() =>
+      expect(mockApi.saveGenderAndAvatar).toHaveBeenCalledWith('UNDISCLOSED', 'letters'),
+    );
+  });
 
   it('does not let anyone past the first step without the 18+ and terms confirmations', async () => {
     await renderApp(<OnboardingScreen />, { session: signedIn() });
@@ -263,7 +299,9 @@ describe('OnboardingScreen', () => {
       sports: [{ sportId: FOOTBALL, level: 3.5, positionIds: [KEEPER] }],
     });
     expect(sentVersions).toEqual(versions);
-    await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith('/profile'));
+    // The drawing of the first sport in the person's set, then the avatar screen, then the page that needed onboarding.
+    expect(mockApi.saveGenderAndAvatar).toHaveBeenCalledWith('FEMALE', 'f-football');
+    await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith(avatarStep('/profile')));
   });
 
   it('keeps marketing consent off unless the user turns it on', async () => {
@@ -297,7 +335,7 @@ describe('OnboardingScreen', () => {
     await reachSports();
     await fireEvent.press(screen.getByRole('checkbox', { name: 'Basketbol' }));
     await press('Bitir');
-    await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith('/'));
+    await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith(avatarStep('/')));
   });
 
   it('shows a localized server error, keeps the form, and refreshes the legal versions', async () => {
