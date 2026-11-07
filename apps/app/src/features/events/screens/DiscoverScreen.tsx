@@ -212,7 +212,12 @@ export function DiscoverScreen() {
       {ready && choice !== null ? (
         <>
           <SportStrip sports={sports} choice={choice} onChoose={choose} />
-          <DiscoverFilters filters={filters} onChange={setFilters} city={city} />
+          <DiscoverFilters
+            filters={filters}
+            onChange={setFilters}
+            city={city}
+            sport={{ sports, choice, onChoose: choose }}
+          />
           <View
             style={{
               flexDirection: 'row',

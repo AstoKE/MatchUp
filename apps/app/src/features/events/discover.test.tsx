@@ -376,6 +376,23 @@ describe('DiscoverScreen: choosing a sport', () => {
     await waitFor(() => expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA }));
   });
 
+  it('offers the same sport choice as court tiles in the filter sheet, kept out of the count', async () => {
+    mockPreference.stored = SPORT;
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    await fireEvent.press(screen.getByRole('button', { name: 'Filtreler' }));
+    // The strip and the sheet both show the choice: two tiles per sport.
+    expect(screen.getAllByRole('radio', { name: 'Futbol', checked: true })).toHaveLength(2);
+    const tennis = screen.getAllByRole('radio', { name: 'Tenis' });
+    await fireEvent.press(tennis[tennis.length - 1]!);
+    await waitFor(() =>
+      expect(lastPayload()).toEqual({ limit: 20, city_id: ANKARA, sport_ids: [TENNIS] }),
+    );
+    expect(screen.getAllByRole('radio', { name: 'Tenis', checked: true })).toHaveLength(2);
+    expect(mockPreference.store).toHaveBeenLastCalledWith(TENNIS);
+    expect(screen.getByRole('button', { name: 'Filtreler' })).toBeTruthy();
+  });
+
   it('keeps the other filters when the sport changes', async () => {
     await renderApp(<DiscoverScreen />);
     await screen.findByText('Perşembe maçı');

@@ -57,11 +57,13 @@
 // INITIAL lowered 558 -> 548 (2026-11-07, Phase 7 / M5): English is its own chunk on the web (en-resources, 12 kB gzip),
 // loaded only for English users before the first render (lib/i18n/english.web.ts); measured 547 kB. TOTAL 916 -> 917 for
 // the split's loader.
+// TOTAL 917 -> 918 (2026-11-07, Phase 7 / M7 and Phase 8 / M1): the support contact, and Discover's sport strip as
+// court tiles with a measured grid in the filter sheet. INITIAL unchanged at 548.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 917;
+const TOTAL_RATCHET_KB = 918;
 const INITIAL_RATCHET_KB = 548;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
