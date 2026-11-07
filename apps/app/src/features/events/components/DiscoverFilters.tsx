@@ -9,9 +9,15 @@ import {
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { localizedName, usePlaceSearch, type CatalogCity } from '@/features/catalog';
+import {
+  localizedName,
+  usePlaceSearch,
+  type CatalogCity,
+  type CatalogSport,
+} from '@/features/catalog';
 import { currentLocale } from '@/lib/i18n';
 import { Button, SegmentedChoice, Select, Sheet, Text, ToggleChip, useTheme } from '@/ui';
+import { SportGrid } from './DiscoverSports';
 
 function toggle<T>(list: readonly T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
@@ -25,10 +31,13 @@ export function DiscoverFilters({
   filters,
   onChange,
   city,
+  sport,
 }: {
   filters: Filters;
   onChange: (next: Filters) => void;
   city: CatalogCity | undefined;
+  /** The sport choice, shown again as court tiles at the top of the sheet; it stays out of the filter count. */
+  sport?: { sports: readonly CatalogSport[]; choice: string; onChoose: (choice: string) => void };
 }) {
   const { t } = useTranslation('events');
   const { spacing, breakpoint } = useTheme();
@@ -97,6 +106,7 @@ export function DiscoverFilters({
         }
       >
         <View style={{ gap: spacing[4] }}>
+          {sport ? <SportGrid {...sport} /> : null}
           <View style={{ gap: spacing[2] }}>
             <Text variant="label" tone="secondary">
               {t('discover.timeOfDayTitle')}
