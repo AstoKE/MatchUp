@@ -11,6 +11,7 @@ function toState(session: AuthSession | null): SessionState {
     userId: session.user.id,
     email: session.user.email ?? null,
     emailVerified: Boolean(session.user.email_confirmed_at),
+    phone: session.user.phone_confirmed_at && session.user.phone ? `+${session.user.phone}` : null,
   };
 }
 

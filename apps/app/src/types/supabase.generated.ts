@@ -1707,6 +1707,8 @@ export type Database = {
           is_admin: boolean;
           legal_consent_current: boolean;
           onboarded: boolean;
+          phone_required: boolean;
+          phone_verified: boolean;
           user_id: string;
         }[];
       };

@@ -20,6 +20,11 @@ It also names the Phase 7 milestone where it is handled.
   - Already-onboarded users are re-prompted by the re-consent gate (built: writes return `CONSENT_REQUIRED`).
   - Counsel decides whether someone who declines may keep browsing guest-readable content (current behaviour).
 - [ ] **counsel, M7:** whether the 18+ self-declaration (checkbox + server timestamp) is sufficient.
+- [ ] **counsel, Phase 8:** phone numbers (ADR-0029, SECURITY §8 item 15).
+  - The purpose wording and the Privacy Notice paragraph.
+  - Retention.
+  - The SMS provider as a processor.
+- [ ] **founder, Phase 8:** an SMS provider on hosted with confirmations on, Turkey only, and rate limits. Then switch `phone.required` on (DEPLOYMENT §14 step 8b), and check `hosted-surface.mjs` shows PASS for "a phone number needs its texted code".
 - [ ] **counsel, Phase 8:** push notifications (ADR-0028, SECURITY §8 item 14).
   - Law 6563 / İYS for "events for you" and the reminders.
   - The two consent texts.
@@ -41,7 +46,7 @@ It also names the Phase 7 milestone where it is handled.
 - [ ] **founder, M2:** leaked-password protection (HaveIBeenPwned) enabled on hosted, if the plan offers it (the advisor flags it as off).
 - [ ] **founder, M2:** email through a real SMTP provider with SPF/DKIM (the hosted default is rate limited and not for production).
 - [ ] **founder, M2:** re-run `node scripts/auth-probe.mjs` against hosted and record the numbers in AUTH_ABUSE.
-  - Known locally (ADR-0016): all three endpoints leak (sign-up 422 vs 200, sign-in timing, reset cooldown 429).
+  - Known locally (ADR-0016): sign-in timing and the reset cooldown (429) leak. The sign-up 422 is gone since phone confirmations are on too (ADR-0029, 2026-11-07); confirm on hosted.
   - We do not claim to prevent enumeration; counsel confirms the residual risk (⚖).
 - [x] **code, M2:** security review of every RPC and RLS policy, kept as a reviewed inventory that CI compares (docs/SECURITY_REVIEW.md); S7-1 fixed with its test.
 - [ ] **founder, M2:** run `scripts/security/hosted-surface.mjs` against hosted and act on any FAIL/WARN (pg_graphql; add `--signup open` once sign-up is on).
@@ -78,5 +83,5 @@ It also names the Phase 7 milestone where it is handled.
 - [ ] **code, M1:** the whole life of an event in one end-to-end flow, green in CI (F-35).
 - [x] **code, M5:** accessibility: axe on every route at two widths, a keyboard-only path (it found and fixed the cards' Enter), the manual list prepared (docs/A11Y_CHECKLIST.md).
 - [ ] **founder + code, M6:** docs/A11Y_CHECKLIST.md filled in with VoiceOver and TalkBack on devices.
-- [ ] **founder, M5:** the Turkish copy read by a native speaker from docs/COPY_REVIEW.md (926 strings; regenerate with `node scripts/i18n/export-copy.mjs`) (F-32).
+- [ ] **founder, M5:** the Turkish copy read by a native speaker from docs/COPY_REVIEW.md (950 strings; regenerate with `node scripts/i18n/export-copy.mjs`) (F-32).
 - [ ] **founder, M7:** store listings and identifiers decided. Nothing is published without the founder's go.

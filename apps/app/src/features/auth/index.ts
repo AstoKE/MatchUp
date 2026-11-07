@@ -1,4 +1,4 @@
-export { signInWithEmail, signOut } from './api/auth-api';
+export { requestPhoneCode, signInWithEmail, signOut, verifyPhoneCode } from './api/auth-api';
 export { useCaptcha } from './captcha';
 export { PasswordField } from './components/PasswordField';
 export { VerifyEmailBanner } from './components/VerifyEmailBanner';

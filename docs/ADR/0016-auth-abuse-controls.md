@@ -21,3 +21,6 @@
 **Update 2026-10-25.** The app-side CAPTCHA integration is built (web widget, native WebView via `react-native-webview`, off unless `EXPO_PUBLIC_TURNSTILE_SITE_KEY` is set) and verified on the auth lab with Cloudflare test keys; hosted configuration and a real site key remain open (AUTH_ABUSE §5).
 
 **Update 2026-11-07.** Public sign-up is opened for the pilot with CAPTCHA and the existing new-account quotas (ADR-0026). The proxy option of §2 is no longer needed; §3's prerequisites are the steps of DEPLOYMENT §14.
+
+**Update 2026-11-07 (ADR-0029).** With phone confirmations switched on as well as email confirmations, the local stack no longer answers a confirmed duplicate sign-up with `422 user_already_exists`. It answers like a new sign-up, without a session, so the sign-up signal of finding 1's table is gone locally. The sign-in timing and reset-cooldown signals are unchanged. Verify on hosted with `scripts/auth-probe.mjs` once both confirmations are on there. `auth-flow.test.ts` pins the new behaviour.
+

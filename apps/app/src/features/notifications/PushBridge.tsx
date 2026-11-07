@@ -21,7 +21,8 @@ export function PushBridge() {
 }
 
 // Screens where the question would interrupt: onboarding and the steps right after it, re-consent, deletion.
-const NOT_HERE = /^\/(onboarding|avatar|consent-update|account-deletion|delete-account)(\/|$)/;
+const NOT_HERE =
+  /^\/(onboarding|avatar|verify-phone|consent-update|account-deletion|delete-account)(\/|$)/;
 
 function NativePushBridge() {
   const session = useSession();

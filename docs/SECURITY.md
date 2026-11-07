@@ -79,7 +79,11 @@ Boundaries: **client (untrusted)** ⇄ Supabase API (PostgREST/Auth/Realtime/Sto
 
 - Private by default: `profile_visibility = EVENT_PEERS`; location optional; marketing consent off.
 - **User location** is never stored or shared; discovery queries pass a transient point or a district. *(Phase 4: an exact event pin lives only in `event_private_details`; everybody else gets `events.public_point`, the pin for public locations, the centre of its ~500 m cell for hidden ones, the district centre without a pin. Search distances are measured from that public point. A venue reveals the place, so it is shown only where the address may be. Usage analytics (Phase 7, ADR-0025) are recorded only with the separate ANALYTICS consent, off by default, coded events without free text or coordinates, deleted on withdrawal. "Near me" (M5) asks for the position only when tapped, requests approximate location only (Android's precise permission is blocked, iOS defaults to reduced accuracy), rounds it to ~1 m before the one search that uses it, and keeps it in memory for that visit.)* **Event locations** may be hidden until approval. Pins for hidden-location events are snapped to a ≥ 300 m grid.
-- Minimal collection: no phone number, no DOB (only `adult_confirmed_at`), no government id.
+- Minimal collection: no DOB (only `adult_confirmed_at`), no government id.
+- **Phone number** (Phase 8, founder's decision, ADR-0029): one Turkish mobile per account, verified by SMS code through Supabase Auth. The purpose is to stop fake and duplicate accounts.
+  - It stays in `auth.users` and is never shown to anyone. Its owner sees it masked.
+  - It is exported to its owner and deleted with the account.
+  - Enforcement is a database switch (`phone.required`), off until an SMS provider is configured.
 - **Gender** (Phase 8 M3, founder's decision, ADR-0027) is asked in onboarding, with "rather not say" as an answer, for one purpose: offering the matching avatar set first.
   - It is never a readable column, never shown to anyone else, and never in analytics or notifications.
   - Only `get_my_avatar` returns it, to its owner.
@@ -112,6 +116,11 @@ Engineering will implement the technical hooks; the following need a Turkish-law
 9. **Terms of Service**: user conduct, organizer responsibilities, **assumption-of-risk / injury disclaimers**, disclaimer that MatchUp does not guarantee venue bookings, collect payments, or verify identities/skill; handling of money exchanged offline between users.
 10. **Age policy**: 18+ self-declaration adequacy; handling minors discovered.
 11. **Data breach notification** procedure (72-hour notification to the Authority under KVKK) and incident response owner.
+15. **Phone numbers** (Phase 8, ADR-0029):
+    - the purpose wording (one account per person) and the Privacy Notice paragraph;
+    - retention;
+    - the SMS provider as a processor (and the transfer, if foreign);
+    - registering a sender name with the provider.
 14. **Push notifications** (Phase 8 M4, ADR-0028):
     - whether "events for you" and the reminders are commercial electronic messages under Law 6563 (İYS registration, wording);
     - the consent texts;

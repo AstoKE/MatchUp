@@ -87,6 +87,20 @@ export async function signOut(): Promise<void> {
   if (error) fail(error);
 }
 
+/**
+ * Phase 8 (ADR-0029): the phone as a second check on the account. `requestPhoneCode` asks Auth to text a code to the
+ * number (Auth's own phone change); `verifyPhoneCode` confirms it. The number must already be normalized (+905…).
+ */
+export async function requestPhoneCode(phone: string): Promise<void> {
+  const { error } = await supabase.auth.updateUser({ phone });
+  if (error) fail(error);
+}
+
+export async function verifyPhoneCode(phone: string, code: string): Promise<void> {
+  const { error } = await supabase.auth.verifyOtp({ phone, token: code, type: 'phone_change' });
+  if (error) fail(error);
+}
+
 export async function requestPasswordReset(input: ResetRequestInput & WithCaptcha): Promise<void> {
   const { error } = await supabase.auth.resetPasswordForEmail(input.email, {
     redirectTo: callbackUrl('/reset-password'),

@@ -11,6 +11,15 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 ## 0. As built in Phase 7
 
 - `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261114100000_phone_verification.sql` (Phase 8, ADR-0029):
+  - **Config:** `app_config` `phone.required` (off).
+  - **Functions:**
+    - `private.config_bool`;
+    - `private.phone_verified` (a confirmed `905…` number in `auth.users`);
+    - `private.assert_onboarded_user` raises `PHONE_NOT_VERIFIED` when the switch is on;
+    - `get_my_account` gains `phone_verified` and `phone_required` (recreated, additive columns);
+    - `export_my_data` includes the number.
+  - **Not ours:** the number, its uniqueness and its codes are Supabase Auth's (phone change).
 - `20261113100000_push_recommendations_reminders.sql` (Phase 8 M5, ADR-0028):
   - **Tables:** `push_outbox` kinds `RECOMMENDATION` and `REMINDER`, and `args` (catalog names and a count); `private.push_recommended` (RLS on, no grants).
   - **Functions:** `private.push_quiet` (22:00–09:00 Istanbul); `push_text(kind, locale, args)`; `push_allowed` per kind; `queue_recommendations(p_now)` (every 10 min); `queue_reminders(p_now)` (hourly).

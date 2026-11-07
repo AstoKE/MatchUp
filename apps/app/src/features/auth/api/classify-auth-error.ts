@@ -2,7 +2,14 @@ import type { AppErrorCode } from '@matchup/domain';
 
 /** Auth-specific outcomes plus the shared transport/domain codes. */
 export type AuthFailure =
-  'INVALID_CREDENTIALS' | 'EMAIL_NOT_CONFIRMED' | 'CAPTCHA_FAILED' | AppErrorCode;
+  | 'INVALID_CREDENTIALS'
+  | 'EMAIL_NOT_CONFIRMED'
+  | 'CAPTCHA_FAILED'
+  // Phase 8 phone verification (ADR-0029).
+  | 'PHONE_TAKEN'
+  | 'CODE_INVALID'
+  | 'SMS_FAILED'
+  | AppErrorCode;
 
 interface AuthErrorLike {
   code?: string | undefined;
@@ -24,6 +31,10 @@ export function classifyAuthError(error: AuthErrorLike | null | undefined): Auth
   if (code === 'email_not_confirmed') return 'EMAIL_NOT_CONFIRMED';
   // Missing, expired, reused or rejected Turnstile token (Supabase Auth CAPTCHA protection).
   if (code === 'captcha_failed') return 'CAPTCHA_FAILED';
+  // A number already on another account (Auth keeps one account per number).
+  if (code === 'phone_exists') return 'PHONE_TAKEN';
+  if (code === 'otp_expired' || code === 'otp_disabled') return 'CODE_INVALID';
+  if (code === 'sms_send_failed' || code === 'phone_provider_disabled') return 'SMS_FAILED';
   if (
     status === 429 ||
     code === 'over_request_rate_limit' ||
@@ -59,6 +70,12 @@ export function failureMessage(failure: AuthFailure): { ns: 'auth' | 'errors'; k
       return { ns: 'auth', key: 'errors.rateLimited' };
     case 'CAPTCHA_FAILED':
       return { ns: 'auth', key: 'errors.captchaFailed' };
+    case 'PHONE_TAKEN':
+      return { ns: 'auth', key: 'errors.phoneTaken' };
+    case 'CODE_INVALID':
+      return { ns: 'auth', key: 'errors.codeInvalid' };
+    case 'SMS_FAILED':
+      return { ns: 'auth', key: 'errors.smsFailed' };
     default:
       return { ns: 'errors', key: failure };
   }
