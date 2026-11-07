@@ -14,7 +14,7 @@ It also names the Phase 7 milestone where it is handled.
 - [ ] **counsel, M7:** Terms of Use and Privacy Notice reviewed and approved (`apps/app/src/locales/{tr,en}/legal.json` are drafts).
 - [ ] **counsel, M7:** data controller identity, contact, retention periods, deletion/export procedure and KVKK information duties in the Privacy Notice (SECURITY §8).
 - [ ] **counsel, M7:** the map provider named in the Privacy Notice. Proposed wording in PHASE4_REPORT §6: MapTiler receives tile requests (approximate area, IP address); "near me" reads the position once and never stores it. Also MapTiler's role and the transfer to Switzerland.
-- [ ] **counsel, M4:** whether product analytics (M4) and any processing beyond the Terms need separate explicit consent. Marketing is already a separate, optional, revocable consent.
+- [ ] **counsel, M4:** review the usage-analytics consent text (Settings, `ANALYTICS` v1; built opt-in, off by default, withdrawable with deletion, ADR-0025) and its Privacy Notice paragraph (PHASE7_PLAN M4). Marketing is already a separate, optional, revocable consent.
 - [ ] **code, M7 (after counsel):** publish the texts as a **new version**: a migration changes `legal.terms_version` / `legal.privacy_version` in `app_config` and sets `legal.draft` to `false`.
   - New users accept the new versions in onboarding (`CONSENT_VERSION_MISMATCH` otherwise).
   - Already-onboarded users are re-prompted by the re-consent gate (built: writes return `CONSENT_REQUIRED`).

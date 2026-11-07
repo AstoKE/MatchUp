@@ -45,7 +45,12 @@
     "legal": "Legal",
     "terms": "Terms of Use",
     "privacyNotice": "Privacy Notice",
-    "reliabilityHelp": "Even when off, organizers see it while weighing your request."
+    "reliabilityHelp": "Even when off, organizers see it while weighing your request.",
+    "analyticsTitle": "Usage data (optional)",
+    "analyticsConsent": "I give my explicit consent for which parts of the app I use (for example opening the map, choosing a filter, the result of \"Near me\") to be recorded linked to my account and reviewed to improve the app.",
+    "analyticsHelp": "Your location, messages and anything you write are never recorded, and the records hold nothing about other people. Consenting is not a condition for using the app. You can withdraw at any time; withdrawing deletes what was recorded until then. The records appear in your data export.",
+    "analyticsOn": "You consented to usage data.",
+    "analyticsOff": "Consent withdrawn; the records were deleted."
   },
   "validation": {
     "NAME_TOO_SHORT": "Use at least 2 characters.",

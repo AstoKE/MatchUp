@@ -28,3 +28,4 @@ Format: Context · Decision · Consequences · Status. One decision per file, im
 | [0022](0022-ios-validation-eas-build-github-test.md) | Build the iOS simulator app on EAS, test it on a GitHub macOS runner | Accepted (first stage) |
 | [0023](0023-theme-e-visual-identity.md) | Theme E: court colors, a blue action, a floating dock and new fonts (replaces `design.md` 1.0) | Accepted |
 | [0024](0024-turkey-wide-catalog-and-phase-4-providers.md) | All of Turkey in the catalog (Wikidata), MapTiler tiles, PostGIS points, venue suggestions (amends PRD §1, §4.1, §4.6; settles ADR-0011 §3) | Accepted |
+| [0025](0025-pilot-metrics-and-opt-in-analytics.md) | Pilot metrics from the service's own data; usage analytics only with explicit consent (replaces ARCHITECTURE §9's server-side event stream; settles ADR-0019 §5) | Accepted |

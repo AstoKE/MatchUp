@@ -22,7 +22,7 @@ import {
 } from '@/ui';
 import type { MyProfile } from '../api/profile-api';
 import { WithProfile } from '../components/WithProfile';
-import { useSetMarketingConsent, useUpdateSettings } from '../hooks';
+import { useSetAnalyticsConsent, useSetMarketingConsent, useUpdateSettings } from '../hooks';
 
 export function SettingsScreen() {
   return <WithProfile>{({ profile }) => <Settings profile={profile} />}</WithProfile>;
@@ -36,6 +36,7 @@ function Settings({ profile }: { profile: MyProfile }) {
   const { preference, setPreference } = useSchemePreference();
   const updateSettings = useUpdateSettings();
   const marketing = useSetMarketingConsent();
+  const analytics = useSetAnalyticsConsent();
 
   const [visibility, setVisibility] = useState<ProfileVisibility>(
     profile.settings.profileVisibility,
@@ -138,6 +139,27 @@ function Settings({ profile }: { profile: MyProfile }) {
         />
         <Text variant="caption" tone="secondary">
           {t('profile:settings.marketingHelp')}
+        </Text>
+      </Section>
+
+      <Section title={t('profile:settings.analyticsTitle')}>
+        {/* The explicit consent text is the label itself, so what is ticked is exactly what is agreed to. */}
+        <Checkbox
+          label={t('profile:settings.analyticsConsent')}
+          checked={profile.settings.analyticsConsent}
+          onChange={(granted) =>
+            analytics.mutate(granted, {
+              onSuccess: () =>
+                toast.show(
+                  t(granted ? 'profile:settings.analyticsOn' : 'profile:settings.analyticsOff'),
+                  'success',
+                ),
+              onError: (failure) => setError(errorText(failure)),
+            })
+          }
+        />
+        <Text variant="caption" tone="secondary">
+          {t('profile:settings.analyticsHelp')}
         </Text>
       </Section>
 

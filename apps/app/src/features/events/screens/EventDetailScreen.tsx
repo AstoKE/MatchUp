@@ -1,8 +1,9 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/features/auth';
+import { useTrack } from '@/features/analytics';
 import { localizedName, useCatalog, type Catalog } from '@/features/catalog';
 import { ReportSheet } from '@/features/players';
 import { errorText } from '@/lib/error-text';
@@ -41,6 +42,12 @@ export function EventDetailScreen() {
   const inviteToken = typeof params.invite === 'string' ? params.invite : null;
   const event = useEvent(id, inviteToken);
   const catalog = useCatalog();
+  const track = useTrack();
+  const loaded = Boolean(event.data);
+  // Usage analytics (consent only, ADR-0025): that a page was seen, not which.
+  useEffect(() => {
+    if (loaded) track({ name: 'event_detail_viewed' });
+  }, [loaded, track]);
 
   if (event.isPending || catalog.isPending) {
     return (

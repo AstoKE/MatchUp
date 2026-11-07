@@ -155,3 +155,29 @@ Notes on the headers:
 - The Sentry host is only needed with a DSN.
 - The MapTiler host must match the style URL.
 - Before switching the CSP on, run the production build once with the policy in **report-only** mode (`Content-Security-Policy-Report-Only`) and check the browser console on Discover, the map, the event form, sign-in with CAPTCHA and the console.
+
+## 13. Observability and recovery (Phase 7 M4)
+
+Founder actions; none of them changes code.
+
+1. **Health function and an external monitor.** Deploy the probe:
+   ```bash
+   pnpm exec supabase functions deploy health --project-ref wmgeugsqblwnhnqnczab
+   ```
+   Then point a free uptime monitor (for example UptimeRobot or Better Stack) at `https://wmgeugsqblwnhnqnczab.supabase.co/functions/v1/health`: every 5 minutes, alert by email after two failures. The probe returns only status and latency (no data) and uses the public key.
+2. **Error reporting.**
+   - Create a Sentry project (EU data region) and put its DSN in `EXPO_PUBLIC_SENTRY_DSN` for hosted builds: EAS environment variables, and the web host's build settings. The DSN is public by design.
+   - The app scrubs emails, tokens, keys, coordinates, addresses, request bodies and query strings before sending (`src/lib/observability/redact.ts`, tested).
+   - After the first real errors arrive, open a few events in Sentry and check that nothing personal got through. Record the check in LAUNCH_CHECKLIST.
+3. **Backups and a restore rehearsal.**
+   - In the dashboard, *Database → Backups*: daily backups are part of the paid plans. Point-in-time recovery is an add-on; decide whether the pilot needs it.
+   - Rehearse once before the pilot: restore the latest backup **into a new, separate project** (never over the live one), connect to it, check that `events`, `profiles` and `event_participations` have the expected counts, then delete the scratch project.
+   - Write the date and the time it took here.
+4. **Cron jobs on hosted.** In the SQL editor, `select jobname, schedule, active from cron.job;` should list:
+   - `process-deletion-queue`
+   - `complete-due-events`
+   - `auto-finalize-attendance`
+   - `close-review-windows`
+   - `attendance-reminders`
+
+   All of them should be active.

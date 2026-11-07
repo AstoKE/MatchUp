@@ -2,6 +2,7 @@ import { VENUE_KINDS, type EventDraft, type GeoPoint, type VenueKind } from '@ma
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useTrack } from '@/features/analytics';
 import { localizedName, type Catalog } from '@/features/catalog';
 import { MapCanvas, type MapMarker } from '@/features/map';
 import { errorText } from '@/lib/error-text';
@@ -79,6 +80,7 @@ export function PinField({
 }) {
   const { t } = useTranslation(['events', 'common']);
   const { spacing } = useTheme();
+  const track = useTrack();
   const [open, setOpen] = useState(false);
   const [choice, setChoice] = useState<GeoPoint | null>(null);
   if (!mapStyleUrl || !draft.districtId) return null;
@@ -99,6 +101,7 @@ export function PinField({
           onPress={() => {
             setChoice(draft.point);
             setOpen(true);
+            track({ name: 'map_opened', props: { where: 'PIN' } });
           }}
         />
         {draft.point ? (
@@ -166,6 +169,7 @@ export function SuggestVenue({
   const toast = useToast();
   const locale = currentLocale();
   const suggest = useSuggestVenue();
+  const track = useTrack();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [kind, setKind] = useState<VenueKind>('COMMERCIAL_FACILITY');
@@ -205,6 +209,7 @@ export function SuggestVenue({
         onPress={() => {
           setSportIds(draft.sportId ? [draft.sportId] : []);
           setOpen(true);
+          track({ name: 'venue_suggest_opened' });
         }}
       />
       <Sheet

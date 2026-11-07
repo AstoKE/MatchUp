@@ -37,6 +37,39 @@ export type Database = {
         };
         Relationships: [];
       };
+      analytics_events: {
+        Row: {
+          id: number;
+          name: string;
+          occurred_at: string;
+          props: NonNullable<Json>;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          id?: never;
+          name: string;
+          occurred_at?: string;
+          props?: NonNullable<Json>;
+          user_id: string;
+        };
+        Update: {
+          id?: never;
+          name?: string;
+          occurred_at?: string;
+          props?: NonNullable<Json>;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'analytics_events_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       app_config: {
         Row: {
           key: string;
@@ -1128,6 +1161,7 @@ export type Database = {
       };
       user_settings: {
         Row: {
+          analytics_consent_at: string | null;
           created_at: string;
           locale: string;
           marketing_consent_at: string | null;
@@ -1140,6 +1174,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          analytics_consent_at?: string | null;
           created_at?: string;
           locale?: string;
           marketing_consent_at?: string | null;
@@ -1151,6 +1186,7 @@ export type Database = {
           user_id: string;
         };
         Update: {
+          analytics_consent_at?: string | null;
           created_at?: string;
           locale?: string;
           marketing_consent_at?: string | null;
@@ -1463,6 +1499,7 @@ export type Database = {
         Args: { p_cursor?: Json; p_limit?: number; p_status?: string };
         Returns: Json;
       };
+      admin_pilot_metrics: { Args: { p_days?: number }; Returns: Json };
       admin_reinstate_user: { Args: { p_note: string; p_user_id: string }; Returns: undefined };
       admin_resolve_attendance_dispute: {
         Args: {
@@ -1577,6 +1614,7 @@ export type Database = {
       };
       search_events: { Args: { p_cursor?: Json; p_filters?: Json }; Returns: Json };
       search_venues: { Args: { p_filters: Json }; Returns: Json };
+      set_analytics_consent: { Args: { p_granted: boolean }; Returns: undefined };
       set_marketing_consent: { Args: { p_granted: boolean }; Returns: undefined };
       set_sport_profile: {
         Args: { p_level: number; p_position_ids: string[]; p_sport_id: string };
@@ -1584,6 +1622,7 @@ export type Database = {
       };
       submit_reviews: { Args: { p_event_id: string; p_reviews: Json }; Returns: number };
       suggest_venue: { Args: { p_input: Json }; Returns: string };
+      track_event: { Args: { p_name: string; p_props?: Json }; Returns: boolean };
       unblock_user: { Args: { p_user_id: string }; Returns: undefined };
       update_event: { Args: { p_event_id: string; p_input: Json }; Returns: undefined };
       update_my_profile: {
@@ -1606,7 +1645,7 @@ export type Database = {
       account_status: 'ACTIVE' | 'SUSPENDED' | 'PENDING_DELETION' | 'DELETED';
       attendance_status: 'NOT_CONFIRMED' | 'PRESENT' | 'ABSENT' | 'DISPUTED';
       booking_status: 'NOT_REQUIRED' | 'NOT_YET_BOOKED' | 'BOOKED_EXTERNALLY' | 'TO_BE_CONFIRMED';
-      consent_kind: 'TERMS' | 'PRIVACY_NOTICE' | 'MARKETING';
+      consent_kind: 'TERMS' | 'PRIVACY_NOTICE' | 'MARKETING' | 'ANALYTICS';
       event_cancel_reason:
         | 'WEATHER'
         | 'VENUE_UNAVAILABLE'
@@ -1736,7 +1775,7 @@ export const Constants = {
       account_status: ['ACTIVE', 'SUSPENDED', 'PENDING_DELETION', 'DELETED'],
       attendance_status: ['NOT_CONFIRMED', 'PRESENT', 'ABSENT', 'DISPUTED'],
       booking_status: ['NOT_REQUIRED', 'NOT_YET_BOOKED', 'BOOKED_EXTERNALLY', 'TO_BE_CONFIRMED'],
-      consent_kind: ['TERMS', 'PRIVACY_NOTICE', 'MARKETING'],
+      consent_kind: ['TERMS', 'PRIVACY_NOTICE', 'MARKETING', 'ANALYTICS'],
       event_cancel_reason: [
         'WEATHER',
         'VENUE_UNAVAILABLE',
