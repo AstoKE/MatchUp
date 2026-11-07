@@ -29,6 +29,8 @@ export type DatePreset = (typeof DATE_PRESETS)[number];
 
 export interface DiscoverFilters {
   datePreset: DatePreset;
+  /** One calendar day (`YYYY-MM-DD`, the city's), picked on the date wheel. It replaces the preset when set. */
+  day: string | null;
   timeOfDay: readonly TimeOfDay[];
   sportIds: readonly string[];
   districtId: string | null;
@@ -38,6 +40,7 @@ export interface DiscoverFilters {
 
 export const EMPTY_DISCOVER_FILTERS: DiscoverFilters = {
   datePreset: 'ANY',
+  day: null,
   timeOfDay: [],
   sportIds: [],
   districtId: null,
@@ -65,7 +68,7 @@ export type SearchPayload = {
 /** How many filters are switched on (the "clear filters" button shows when this is above zero). */
 export function activeFilterCount(filters: DiscoverFilters): number {
   return (
-    (filters.datePreset === 'ANY' ? 0 : 1) +
+    (filters.datePreset === 'ANY' && filters.day === null ? 0 : 1) +
     (filters.timeOfDay.length > 0 ? 1 : 0) +
     (filters.sportIds.length > 0 ? 1 : 0) +
     (filters.districtId === null ? 0 : 1) +
@@ -96,7 +99,10 @@ export function buildSearchPayload(
   if (filters.setting) payload.setting = filters.setting;
   if (filters.onlyOpen) payload.only_open = true;
 
-  if (filters.datePreset !== 'ANY') {
+  if (filters.day !== null) {
+    payload.from = zonedTimeToUtc(filters.day, '00:00', options.timeZone);
+    payload.to = zonedTimeToUtc(addDays(filters.day, 1), '00:00', options.timeZone);
+  } else if (filters.datePreset !== 'ANY') {
     const today = utcToZonedParts(options.now.toISOString(), options.timeZone).date;
     const startOf = (offset: number) =>
       zonedTimeToUtc(addDays(today, offset), '00:00', options.timeZone);

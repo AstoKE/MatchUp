@@ -18,3 +18,4 @@ export * from './Text';
 export * from './TextField';
 export * from './Toast';
 export * from './ToggleChip';
+export * from './WheelPicker';

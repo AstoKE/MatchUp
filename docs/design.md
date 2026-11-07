@@ -225,6 +225,11 @@ Decisions:
 - Discover rows keep a small "paid" label; the amount and note are on the event page.
 - Discover asks for a sport on the first visit, then keeps a sport strip above the list and one sport or all of them selected (founder's decision, 2026-11-02; USER_FLOWS FL-2). The sport left the filter chips and the filter count, and "clear filters" leaves it alone.
 - The sport strip is a line of small court tiles (about 116 px wide; it scrolls on a phone and wraps on wider screens, the chosen one ringed in the text color with a check), not chips. The Filters sheet repeats the same choice as a grid of tiles at its top. It is still outside the filter count (founder's decision, 2026-11-07; PHASE8_PLAN M1).
+- Dates and times are picked on scrolling wheels (iOS style, the same on every platform):
+  - five 44 px rows, the chosen one on a `surfaceSunken` band in bold;
+  - the rows further from it fade out.
+
+  On Discover, "Tarih seç" opens a single date wheel in a sheet (founder's decision, 2026-11-07; PHASE8_PLAN M2).
 - Term: "yedek liste" (waitlist) everywhere.
 - Badges are round icons and XP is a progress bar (founder's notes of 2026-10-31, see below), inside a calm profile section, which is how "avoid gamification clutter" is honored.
 - Auto-approve events stay. "Participation requires organizer approval" holds for all others; the green approved state appears only when the server answers APPROVED.

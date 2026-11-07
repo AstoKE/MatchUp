@@ -97,6 +97,21 @@ describe('buildSearchPayload', () => {
     });
   });
 
+  it('a picked day is exactly that local day, and outranks a preset', () => {
+    expect(payload({ day: '2026-12-31' })).toMatchObject({
+      from: '2026-12-30T21:00:00.000Z',
+      to: '2026-12-31T21:00:00.000Z',
+    });
+    expect(payload({ day: '2026-11-05', datePreset: 'TODAY' })).toMatchObject({
+      from: '2026-11-04T21:00:00.000Z',
+      to: '2026-11-05T21:00:00.000Z',
+    });
+  });
+
+  it('a picked day counts as one date filter', () => {
+    expect(activeFilterCount(filters({ day: '2026-11-05' }))).toBe(1);
+  });
+
   it('sends the indoor / outdoor choice only when it is made', () => {
     expect(payload().setting).toBeUndefined();
     expect(payload({ setting: 'OUTDOOR' })).toMatchObject({ setting: 'OUTDOOR' });

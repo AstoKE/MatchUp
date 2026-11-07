@@ -1,5 +1,5 @@
-import { formatTypedDate, utcToZonedParts, AppError, zonedTimeToUtc } from '@matchup/domain';
-import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { utcToZonedParts, AppError, zonedTimeToUtc } from '@matchup/domain';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react-native';
 import type { SessionState } from '@/features/auth';
 import { renderApp } from '@/test/render';
 import type { EventDetails } from './api/events-api';
@@ -197,7 +197,8 @@ beforeEach(() => {
   });
 });
 
-const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
+const press = (name: string | RegExp, role: 'button' | 'checkbox' = 'button') =>
+  fireEvent.press(screen.getByRole(role, { name }));
 async function choose(selectLabel: RegExp, option: string) {
   await press(selectLabel);
   await fireEvent.press(screen.getByRole('radio', { name: option }));
@@ -442,14 +443,35 @@ describe('CreateEventScreen', () => {
     expect((mockApi.createEvent.mock.calls[0]?.[0] as { publish: boolean }).publish).toBe(false);
   });
 
-  it('rejects a typed date that is not a real date', async () => {
+  it('sets the date and time with the wheels, also through screen-reader adjustments', async () => {
     await renderApp(<CreateEventScreen />, { session: signedIn });
     await screen.findByText('Ne oynanacak?');
     await choose(/^Spor:/, 'Futbol');
     await press('İleri');
-    await fireEvent.changeText(await screen.findByLabelText('Tarih (GG.AA.YYYY)'), '31.02.2027');
-    await press('İleri');
-    expect(await screen.findByText('Geçerli bir tarih gir (GG.AA.YYYY).')).toBeTruthy();
+    const date = await screen.findByRole('adjustable', { name: 'Tarih' });
+    const hour = screen.getByRole('adjustable', { name: 'Saat' });
+    // The new event starts tomorrow at 19:00.
+    expect(date).toHaveAccessibilityValue({ text: 'Yarın' });
+    expect(hour).toHaveAccessibilityValue({ text: '19' });
+    const adjust = (wheel: typeof date, actionName: 'increment' | 'decrement') =>
+      fireEvent(wheel, 'accessibilityAction', { nativeEvent: { actionName } });
+    await adjust(date, 'decrement');
+    expect(screen.getByRole('adjustable', { name: 'Tarih' })).toHaveAccessibilityValue({
+      text: 'Bugün',
+    });
+    expect(screen.getByRole('checkbox', { name: 'Bugün', checked: true })).toBeTruthy();
+    await adjust(hour, 'increment');
+    await fireEvent.press(
+      within(screen.getByRole('adjustable', { name: 'Dakika' })).getByText('45', {
+        includeHiddenElements: true,
+      }),
+    );
+    expect(screen.getByRole('adjustable', { name: 'Saat' })).toHaveAccessibilityValue({
+      text: '20',
+    });
+    expect(screen.getByRole('adjustable', { name: 'Dakika' })).toHaveAccessibilityValue({
+      text: '45',
+    });
   });
 
   it('reviews what was entered, says who approves, and jumps back to a section', async () => {
@@ -478,16 +500,29 @@ describe('CreateEventScreen', () => {
     await screen.findByText('Ne oynanacak?');
     await choose(/^Spor:/, 'Futbol');
     await press('İleri');
-    // Half an hour ahead: fine for a draft, too soon to publish.
+    // Half an hour ahead (on the wheel's 5-minute grid): fine for a draft, too soon to publish.
+    const step = 5 * 60_000;
     const soon = utcToZonedParts(
-      new Date(Date.now() + 30 * 60_000).toISOString(),
+      new Date(Math.ceil((Date.now() + 30 * 60_000) / step) * step).toISOString(),
       'Europe/Istanbul',
     );
-    await fireEvent.changeText(
-      await screen.findByLabelText('Tarih (GG.AA.YYYY)'),
-      formatTypedDate(soon.date),
+    const today = utcToZonedParts(new Date().toISOString(), 'Europe/Istanbul').date;
+    await screen.findByRole('adjustable', { name: 'Tarih' });
+    await press(soon.date === today ? 'Bugün' : 'Yarın', 'checkbox');
+    const [hour, minute] = soon.time.split(':') as [string, string];
+    await fireEvent.press(
+      within(screen.getByRole('adjustable', { name: 'Saat' })).getByText(hour, {
+        includeHiddenElements: true,
+      }),
     );
-    await fireEvent.changeText(screen.getByLabelText('Başlangıç saati (SS:DD)'), soon.time);
+    await fireEvent.press(
+      within(screen.getByRole('adjustable', { name: 'Dakika' })).getByText(minute, {
+        includeHiddenElements: true,
+      }),
+    );
+    expect(screen.getByRole('adjustable', { name: 'Saat' })).toHaveAccessibilityValue({
+      text: hour,
+    });
     await press('İleri');
     await choose(/^İlçe:/, 'Çankaya');
     await fireEvent.changeText(screen.getByLabelText('Yer'), 'ODTÜ Halı Saha 2');
@@ -495,7 +530,7 @@ describe('CreateEventScreen', () => {
     await fireEvent.changeText(screen.getByLabelText('Başlık'), 'Perşembe maçı');
     await press('İleri');
     await press('Yayınla');
-    expect(await screen.findByLabelText('Tarih (GG.AA.YYYY)')).toBeTruthy();
+    expect(await screen.findByRole('adjustable', { name: 'Tarih' })).toBeTruthy();
     expect(screen.getByText('Devam etmek için işaretli alanları düzelt.')).toBeTruthy();
     expect(mockApi.createEvent).not.toHaveBeenCalled();
   });

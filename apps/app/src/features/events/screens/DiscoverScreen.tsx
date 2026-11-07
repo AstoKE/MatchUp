@@ -61,7 +61,7 @@ export function DiscoverScreen() {
   const setFilters = (next: Filters | ((current: Filters) => Filters)) =>
     setFiltersState((current) => {
       const value = typeof next === 'function' ? next(current) : next;
-      if (value.datePreset !== current.datePreset)
+      if (value.datePreset !== current.datePreset || value.day !== current.day)
         track({ name: 'filter_applied', props: { kind: 'DATE' } });
       if (value.timeOfDay !== current.timeOfDay)
         track({ name: 'filter_applied', props: { kind: 'TIME' } });

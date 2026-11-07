@@ -1,6 +1,6 @@
 # Phase 8 plan: discovery and engagement
 
-Status 2026-11-07: planned; M1 built (in review).
+Status 2026-11-07: M1 merged (#84); M2 built (in review).
 
 The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROADMAP "Later" (push, P-01) forward. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
@@ -52,6 +52,17 @@ The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROA
   - components: keyboard and screen-reader adjustments;
   - E2E: creating an event with the wheels;
   - axe.
+- **Status 2026-11-07: built.**
+  - `ui/WheelPicker`:
+    - snaps on native with `snapToInterval` and settles after the wheel or a drag on the web;
+    - a tap on a row picks it;
+    - one `adjustable` control with increment and decrement, keyboard arrows, Page Up/Down and Home/End;
+    - `aria-value*` set explicitly (the first E2E run showed React Native Web does not map `accessibilityValue`);
+    - reduced motion stops the animated scroll.
+  - `DateWheel` covers 365 days in the form and 90 on Discover, labelled Bugün, Yarın, then "12 Kas Per". `TimeWheel` has hours and 5-minute steps; an odd minute of an existing event stays on the wheel.
+  - Discover's filter gained `day`. A picked day replaces the day chips and counts as one date filter. No RPC change: `search_events` already takes `from`/`to`.
+  - **Tests:** domain (picked day, day boundaries), components (screen-reader steps, taps, both ends), and `e2e/wheels.spec.ts` (mouse wheel, keyboard, click, axe, and a whole form whose review shows 20:30).
+  - **Not verified:** native momentum and snapping on a real iPhone or Android device.
 
 ### M3: avatars and profile photos
 

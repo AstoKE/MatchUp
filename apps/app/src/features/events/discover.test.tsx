@@ -1,4 +1,4 @@
-import { AppError } from '@matchup/domain';
+import { AppError, utcToZonedParts, zonedTimeToUtc } from '@matchup/domain';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { SessionState } from '@/features/auth';
 import { renderApp } from '@/test/render';
@@ -200,6 +200,40 @@ describe('DiscoverScreen', () => {
       pathname: '/e/[id]',
       params: { id: '00000000-0000-4000-8000-0000000000e1' },
     });
+  });
+
+  it('searches one picked day from the date wheel, which replaces the day chips', async () => {
+    await renderApp(<DiscoverScreen />);
+    await screen.findByText('Perşembe maçı');
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Bugün' }));
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Tarih seç' }));
+    const wheel = await screen.findByRole('adjustable', { name: 'Tarih' });
+    expect(wheel).toHaveAccessibilityValue({ text: 'Bugün' });
+    // Two days ahead with the screen reader's swipe up.
+    const up = () =>
+      fireEvent(screen.getByRole('adjustable', { name: 'Tarih' }), 'accessibilityAction', {
+        nativeEvent: { actionName: 'increment' },
+      });
+    await up();
+    await up();
+    await fireEvent.press(screen.getByRole('button', { name: 'Bu günü göster' }));
+    const today = utcToZonedParts(new Date().toISOString(), 'Europe/Istanbul').date;
+    const [y, m, d] = today.split('-').map(Number) as [number, number, number];
+    const picked = new Date(Date.UTC(y, m - 1, d + 2)).toISOString().slice(0, 10);
+    const next = new Date(Date.UTC(y, m - 1, d + 3)).toISOString().slice(0, 10);
+    await waitFor(() =>
+      expect(lastPayload()).toMatchObject({
+        from: zonedTimeToUtc(picked, '00:00', 'Europe/Istanbul'),
+        to: zonedTimeToUtc(next, '00:00', 'Europe/Istanbul'),
+      }),
+    );
+    expect(screen.getByRole('checkbox', { name: 'Bugün', checked: false })).toBeTruthy();
+    expect(screen.getByRole('checkbox', { name: /^Tarih: /, checked: true })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Filtreler (1)' })).toBeTruthy();
+
+    // A day chip replaces the picked day again.
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Yarın' }));
+    expect(await screen.findByRole('checkbox', { name: 'Tarih seç', checked: false })).toBeTruthy();
   });
 
   it('sends the chosen filters to the server', async () => {
