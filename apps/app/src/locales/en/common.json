@@ -1,6 +1,12 @@
 {
   "loading": "Loading…",
   "retry": "Try again",
+  "support": {
+    "title": "Support",
+    "body": "If you have a problem, a question or an objection, email us.",
+    "pending": "Our support address will be here very soon.",
+    "emailHint": "Opens your email app"
+  },
   "cancel": "Cancel",
   "close": "Close",
   "save": "Save",

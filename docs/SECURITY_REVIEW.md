@@ -45,14 +45,14 @@ node scripts/security/hosted-surface.mjs --url https://wmgeugsqblwnhnqnczab.supa
 ```
 
 It uses only the public key and writes nothing. It checks:
-- sign-up disabled and email confirmation on;
+- sign-up in the expected state (disabled by default; with `--signup open`, enabled **and** CAPTCHA enforced, ADR-0026) and email confirmation on;
 - no extra sign-in providers;
 - the functions a guest can call are exactly the reviewed four;
 - whether GraphQL is exposed;
 - that a guest reads nothing from six private tables;
 - that the health endpoint answers without data.
 
-Every line should be PASS or INFO; send any FAIL or WARN back. On the local stack, "public sign-up disabled" fails on purpose (local sign-up is on).
+Every line should be PASS or INFO; send any FAIL or WARN back. On the local stack, "public sign-up disabled" fails on purpose (local sign-up is on), and with `--signup open` "CAPTCHA enforced" fails on purpose (local CAPTCHA is off). The CAPTCHA check sends one password-reset request for `surface-check@example.invalid`, which a CAPTCHA-protected project refuses before doing anything; no mail can be delivered to that reserved domain.
 
 ## 4. Phase 4–6 surfaces, reviewed
 

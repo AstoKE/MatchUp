@@ -133,7 +133,7 @@ Founder actions; none of them can be checked from the repository. After each, `n
 
 **Supabase dashboard (project `wmgeugsqblwnhnqnczab`):**
 1. *Authentication → Sign In / Providers → Email:* "Confirm email" on, "Secure email change" on. Minimum password length 10 is already set. Turn on "Prevent use of leaked passwords" if the plan offers it (the advisor flags it as off).
-2. *Authentication → Sign In / Providers:* public sign-up stays **off** until the pilot account decision (PHASE7_PLAN). Every other provider stays off; anonymous sign-ins off.
+2. *Authentication → Sign In / Providers:* public sign-up stays **off** until every step of §14 is done (ADR-0026). Every other provider stays off; anonymous sign-ins off.
 3. *Authentication → Rate Limits:* review the numbers for email sending, token refresh, verifications, and sign-ups and sign-ins per IP. The defaults are reasonable for a pilot. With the built-in SMTP, email sending is limited to a few per hour, which a pilot outgrows at once: see 4.
 4. *Authentication → SMTP Settings:* a real provider (for example Resend, Postmark or Brevo) on a domain you control, with SPF and DKIM records at the DNS host. The sender is a no-reply address on that domain.
 5. *Authentication → URL Configuration:* Site URL = the production web origin. Redirect URLs = only that origin's `/auth/callback` and the app's deep-link scheme. No wildcards, no localhost.
@@ -181,3 +181,41 @@ Founder actions; none of them changes code.
    - `attendance-reminders`
 
    All of them should be active.
+
+## 14. Opening public sign-up (Phase 7 M7, ADR-0026)
+
+Founder actions, **in this order**. Each step depends on the one before it. Do not switch sign-up on until steps 1–8 are done.
+
+1. **SMTP** (§12 step 4).
+   - Send a password reset to your own address and check that it arrives, is not in spam, and that SPF and DKIM pass.
+   - Without real SMTP, confirmation emails stop after a few an hour, and new people cannot finish signing up.
+2. **Rate limits** (§12 step 3).
+   - Write the numbers you set into AUTH_ABUSE §5.
+3. **Leaked-password protection** (§12 step 1), if the plan offers it.
+4. **Redirect URLs** (§12 step 5).
+   - Only the production web origin's `/auth/callback` and the app's scheme. The confirmation link in the email must open the real site.
+5. **CAPTCHA, both halves in one sitting.** A mismatch blocks every sign-in:
+   - In Cloudflare, *Turnstile*: add a widget for the production hostname, *Managed* mode. Keep the site key and the secret.
+   - In Supabase, *Authentication → Attack Protection*: enable CAPTCHA, provider Turnstile, paste the **secret**.
+   - Set `EXPO_PUBLIC_TURNSTILE_SITE_KEY` to the **site key** in the EAS environment `production` and on the web host. Rebuild and redeploy the web.
+   - Check that you can still sign in on the deployed web.
+6. **Support address.**
+   - Set `contact.supportEmail` in `packages/config/src/brand.ts`. This is a code change; ask Claude for a PR.
+   - Production builds refuse to start without it.
+   - Make sure someone reads that inbox (OPERATIONS §1).
+7. **Administrator ready** (§11).
+   - At least one administrator with TOTP can open `/admin`.
+   - The health monitor, error reporting and backups of §13 are in place.
+8. **Accept the legal risk.**
+   - The Terms and Privacy Notice are drafts (`legal.draft = true`). ADR-0026 records that the founder accepts this.
+   - Counsel's review and the new-version migration follow later (LAUNCH_CHECKLIST §1).
+9. **Switch sign-up on:** *Authentication → Sign In / Providers → Allow new users to sign up*. Keep "Confirm email" on.
+10. **Check from the outside:**
+    ```bash
+    node scripts/security/hosted-surface.mjs --url https://wmgeugsqblwnhnqnczab.supabase.co --anon-key <publishable key> --signup open
+    ```
+    - It must show `PASS public sign-up enabled` and `PASS CAPTCHA enforced`.
+    - Then re-run `node scripts/auth-probe.mjs` against hosted (ADR-0016 §4) and record the numbers in AUTH_ABUSE.
+11. **Sign up once yourself** on the deployed web with a fresh address, from confirmation through onboarding. Then delete that account in the app.
+
+**To close sign-up again:** turn off "Allow new users to sign up". Existing accounts keep working. Then run `hosted-surface.mjs` without `--signup`.
