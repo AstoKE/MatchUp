@@ -9,6 +9,7 @@ import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
 import { env } from '@/lib/env';
 import { log } from '@/lib/observability';
+import { runBeforeSignOut } from '@/lib/before-sign-out';
 import { supabase } from '@/lib/supabase/client';
 import { AuthFlowError, classifyAuthError, isAlreadyRegistered } from './classify-auth-error';
 
@@ -81,6 +82,7 @@ export async function signInWithEmail(input: SignInInput & WithCaptcha): Promise
 
 /** Signs out THIS device (local scope); other sessions stay valid. */
 export async function signOut(): Promise<void> {
+  await runBeforeSignOut();
   const { error } = await supabase.auth.signOut({ scope: 'local' });
   if (error) fail(error);
 }

@@ -66,12 +66,15 @@
 // picker and the image manipulator is a lazy chunk (AvatarScreen, ~8 kB gzip; INITIAL was 563 before that split). What stays
 // in the first load is what Discover's header avatar needs: the avatar API and hooks, the drawings' asset table (the
 // pictures themselves load as images), the gender question of onboarding and their copy.
+// TOTAL 935 -> 937 and INITIAL 555 -> 557 (2026-11-07, Phase 8 / M4): push. expo-notifications is native only (the web uses
+// push-device.web.ts, checked: not in any chunk); what grows is the root PushBridge (it renders nothing on the web), the
+// Settings section that points to the phone app, the push API and hooks, and their Turkish copy.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 935;
-const INITIAL_RATCHET_KB = 555;
+const TOTAL_RATCHET_KB = 937;
+const INITIAL_RATCHET_KB = 557;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';

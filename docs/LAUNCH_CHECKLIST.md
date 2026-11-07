@@ -20,6 +20,11 @@ It also names the Phase 7 milestone where it is handled.
   - Already-onboarded users are re-prompted by the re-consent gate (built: writes return `CONSENT_REQUIRED`).
   - Counsel decides whether someone who declines may keep browsing guest-readable content (current behaviour).
 - [ ] **counsel, M7:** whether the 18+ self-declaration (checkbox + server timestamp) is sufficient.
+- [ ] **counsel, Phase 8:** push notifications (ADR-0028, SECURITY §8 item 14).
+  - Law 6563 / İYS for "events for you" and the reminders.
+  - The two consent texts.
+  - Expo, Apple and Google as processors, and the transfer.
+- [ ] **founder, Phase 8:** push credentials: an APNs key in EAS (`eas credentials`, or let the build create it), and for Android an FCM V1 service-account key uploaded to EAS. Then "Test bildirimi gönder" on a real phone (DEPLOYMENT §15).
 - [ ] **counsel, Phase 8:** gender and profile photos (ADR-0027, SECURITY §8 item 13).
   - The purpose wording for the gender question, and its Privacy Notice paragraph.
   - Photos of people, their retention and their moderation.
@@ -73,5 +78,5 @@ It also names the Phase 7 milestone where it is handled.
 - [ ] **code, M1:** the whole life of an event in one end-to-end flow, green in CI (F-35).
 - [x] **code, M5:** accessibility: axe on every route at two widths, a keyboard-only path (it found and fixed the cards' Enter), the manual list prepared (docs/A11Y_CHECKLIST.md).
 - [ ] **founder + code, M6:** docs/A11Y_CHECKLIST.md filled in with VoiceOver and TalkBack on devices.
-- [ ] **founder, M5:** the Turkish copy read by a native speaker from docs/COPY_REVIEW.md (912 strings; regenerate with `node scripts/i18n/export-copy.mjs`) (F-32).
+- [ ] **founder, M5:** the Turkish copy read by a native speaker from docs/COPY_REVIEW.md (926 strings; regenerate with `node scripts/i18n/export-copy.mjs`) (F-32).
 - [ ] **founder, M7:** store listings and identifiers decided. Nothing is published without the founder's go.

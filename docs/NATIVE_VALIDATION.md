@@ -164,6 +164,15 @@ What to check by hand on the iPhone:
 
 The native upload sends the file as a form part (`features/profile/api/avatar-api.ts`). The web sends raw bytes, and only the web path is verified (E2E `avatars.spec.ts`).
 
+## Phase 8 / M4 push: not run (2026-11-07)
+
+`expo-notifications` is a native module, so a new build is needed. Push cannot arrive in a simulator. On the founder's iPhone (DEPLOYMENT §15):
+- after onboarding, the popup asks once with both kinds off;
+- turning one on shows the iOS permission prompt;
+- Settings › Bildirimler › "Test bildirimi gönder" brings a notification within a minute, in the app's language;
+- tapping a notification about an event opens it;
+- signing out and sending a test from another account to the same phone delivers nothing.
+
 ## Next
 
 0. **Phase 4 / M5 added native code** (`@maplibre/maplibre-react-native`, `expo-location`): the Android development build (Linux container, ADR-0015) and the iOS simulator build (EAS, ADR-0022) must be rebuilt before the next device run, with `EXPO_PUBLIC_MAP_STYLE_URL` set. To check on the emulator: Discover → Harita shows tiles and markers; the event form's pin picker takes a tap; "Yakınımdakiler" asks for approximate location once and sorts by distance (emulator location set to Ankara).

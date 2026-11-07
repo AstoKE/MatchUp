@@ -12,6 +12,7 @@ import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { SessionProvider } from '@/features/auth';
+import { PushBridge } from '@/features/notifications';
 import { env } from '@/lib/env';
 import { currentLocale, initI18n, prepareLanguage } from '@/lib/i18n';
 import { configureLogger, initObservability, reportError } from '@/lib/observability';
@@ -47,6 +48,7 @@ function Shell() {
     <>
       <SkipLink />
       <Stack screenOptions={{ headerShown: false }} />
+      <PushBridge />
       <ThemedStatusBar />
     </>
   );

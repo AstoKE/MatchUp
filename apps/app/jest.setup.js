@@ -33,6 +33,19 @@ jest.mock('./src/features/events/components/LazyEventStepper', () => ({
   LazyEventStepper: jest.requireActual('./src/features/events/components/EventStepper')
     .EventStepper,
 }));
+// Push (Phase 8 / M4): no native module in tests; permission undetermined, no token, nothing tapped.
+jest.mock('expo-notifications', () => ({
+  setNotificationHandler: jest.fn(),
+  setNotificationChannelAsync: jest.fn(() => Promise.resolve()),
+  AndroidImportance: { DEFAULT: 3 },
+  getPermissionsAsync: jest.fn(() =>
+    Promise.resolve({ status: 'undetermined', canAskAgain: true }),
+  ),
+  requestPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'denied', canAskAgain: false })),
+  getExpoPushTokenAsync: jest.fn(() => Promise.reject(new Error('no token in tests'))),
+  getLastNotificationResponseAsync: jest.fn(() => Promise.resolve(null)),
+  addNotificationResponseReceivedListener: jest.fn(() => ({ remove: jest.fn() })),
+}));
 // The avatar (Phase 8 / M3) shows in the header of the main screens: without this every such test would call the real API.
 // Tests about avatars override these with jest.requireMock(...).
 jest.mock('./src/features/profile/api/avatar-api', () => ({

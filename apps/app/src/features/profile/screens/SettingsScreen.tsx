@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AccountSection } from '@/features/account';
+import { PushSettingsSection } from '@/features/notifications';
 import { BlockedList } from '@/features/players';
 import { LanguagePicker, SupportContact } from '@/features/settings';
 import { errorText } from '@/lib/error-text';
@@ -29,7 +30,7 @@ export function SettingsScreen() {
 }
 
 function Settings({ profile }: { profile: MyProfile }) {
-  const { t } = useTranslation(['players', 'profile', 'common', 'auth']);
+  const { t } = useTranslation(['players', 'profile', 'common', 'auth', 'notifications']);
   const router = useRouter();
   const toast = useToast();
   const { spacing } = useTheme();
@@ -161,6 +162,10 @@ function Settings({ profile }: { profile: MyProfile }) {
         <Text variant="caption" tone="secondary">
           {t('profile:settings.analyticsHelp')}
         </Text>
+      </Section>
+
+      <Section title={t('notifications:push.settingsTitle')}>
+        <PushSettingsSection />
       </Section>
 
       <Section title={t('profile:settings.legal')}>

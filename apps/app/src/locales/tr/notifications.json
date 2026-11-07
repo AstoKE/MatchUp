@@ -27,5 +27,21 @@
     "ATTENDANCE_REMINDER": "{{event}} bitti. Yoklamayı işaretle ve kesinleştir; yapmazsan sistem yarın kendiliğinden kesinleştirir."
   },
   "unknown": "Yeni bir bildirimin var.",
-  "emptyAction": "Etkinlikleri keşfet"
+  "emptyAction": "Etkinlikleri keşfet",
+  "push": {
+    "promptTitle": "Bildirimler",
+    "promptBody": "İstersen sana uygun yeni etkinlikleri ve zaman zaman bir hatırlatma gönderebiliriz. İkisi de kapalı; açmak istediğini seç.",
+    "recommendations": "Sana uygun etkinlikler: sporlarına ve şehrine göre yeni maçlar (günde en fazla 1)",
+    "reminders": "Hatırlatmalar: bir süre girmediğinde şehrindeki etkinlikler (haftada en fazla 1)",
+    "changeLater": "Bunu istediğin zaman Ayarlar › Bildirimler'den değiştirebilirsin.",
+    "notNow": "Şimdi değil",
+    "saved": "Bildirim tercihlerin kaydedildi.",
+    "blocked": "Telefonun bu uygulamanın bildirimlerine izin vermiyor. Telefonun ayarlarından açabilirsin.",
+    "help": "Bildirimlerde adın, konumun ya da mesaj içeriği yer almaz; dokununca ilgili etkinlik açılır.",
+    "test": "Test bildirimi gönder",
+    "testSent": "Test bildirimi gönderildi; bir dakika içinde gelir.",
+    "noDevice": "Bu telefon henüz kayıtlı değil: önce bildirimlere izin ver.",
+    "webOnlyNote": "Bildirimler telefondaki uygulamada çalışır; tercihlerini oradan açabilirsin.",
+    "settingsTitle": "Bildirimler"
+  }
 }
