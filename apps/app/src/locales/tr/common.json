@@ -1,6 +1,12 @@
 {
   "loading": "Yükleniyor…",
   "retry": "Tekrar dene",
+  "support": {
+    "title": "Destek",
+    "body": "Bir sorun, soru ya da itirazın varsa bize e-postayla yaz.",
+    "pending": "Destek adresimiz çok yakında burada olacak.",
+    "emailHint": "E-posta uygulamanı açar"
+  },
   "cancel": "Vazgeç",
   "close": "Kapat",
   "save": "Kaydet",

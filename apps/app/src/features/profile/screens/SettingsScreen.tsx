@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AccountSection } from '@/features/account';
 import { BlockedList } from '@/features/players';
-import { LanguagePicker } from '@/features/settings';
+import { LanguagePicker, SupportContact } from '@/features/settings';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import {
@@ -176,6 +176,10 @@ function Settings({ profile }: { profile: MyProfile }) {
             onPress={() => router.push('/legal/privacy')}
           />
         </View>
+      </Section>
+
+      <Section title={t('common:support.title')}>
+        <SupportContact />
       </Section>
 
       <Section title={t('players:blocked.title')}>

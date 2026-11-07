@@ -1,6 +1,6 @@
 # Phase 7 plan: hardening and the Turkey pilot
 
-Status 2026-11-07: **M1–M4 merged (#77–#80), M5 built** (in review). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
+Status 2026-11-07: **M1–M5 merged (#77–#81), M6 in review (#82), M7 built** (in review; the go/no-go list is in [PHASE7_REPORT](PHASE7_REPORT.md)). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
 
 **Why.** Phases 2–6 and 4 built the product and tested it locally and on the web. A pilot puts it in front of strangers across the country: the remaining risks are operational (who answers reports, backups, email, abuse), unverified platforms (native Phase 4–6, iOS, release builds) and scale (indexes and budgets beyond 5000 events).
 
@@ -145,7 +145,7 @@ Not there:
 
 ### M7: pilot readiness and the release candidate
 
-- **Accounts while public sign-up is disabled (decision needed, below).**
+- **Accounts: open sign-up with CAPTCHA and the new-account limits** (decided 2026-11-07, ADR-0026). The ordered steps are in DEPLOYMENT §14, and the surface check has `--signup open`.
 - **Support:**
   - a contact address reachable from the app and from the suspended-account page;
   - who answers reports and how fast (SECURITY says 24 h);
@@ -154,16 +154,28 @@ Not there:
 - **Store listings and identifiers** when the founder decides them (ADR-0010). Nothing is published without the founder's go.
 - **`docs/PHASE7_REPORT.md`** and the go/no-go list.
 
+**Status 2026-11-07: built.**
+- ADR-0026 records open sign-up behind CAPTCHA and the existing new-account quotas, with the founder's acceptance of the draft legal texts.
+- DEPLOYMENT §14 has the ordered steps. `hosted-surface.mjs --signup open` fails unless sign-up is on **and** a request without a CAPTCHA token is refused. Both modes were dry-run on the local stack, where CAPTCHA is off, so the FAIL there is the expected result. The PASS path needs a CAPTCHA-protected project and is unverified.
+- `SupportContact` (Settings › Destek, and the suspended page) shows `brand.contact.supportEmail` as a mail link, or a placeholder while it is empty. `app.config.ts` refuses a production build without it. Component tests cover both states.
+- `docs/OPERATIONS.md` is the runbook. `docs/PHASE7_REPORT.md` holds the go/no-go list.
+- **Not done:**
+  - the legal texts as a new version (waits for counsel);
+  - store listings and identifiers (founder);
+  - every hosted step (founder).
+
 ## Decisions taken
 
 | Question | Decision |
 |---|---|
 | Pilot area | All of Turkey (2026-11-07) |
 | Plan review | No separate docs PR: this plan ships with M1 (2026-11-07) |
+| How pilot users get accounts | (c) open sign-up with CAPTCHA and the existing new-account quotas; the founder accepts the draft legal texts as a risk; counsel deferred (2026-11-07, ADR-0026) |
+| Support address | A placeholder until the founder sets `brand.contact.supportEmail`; production builds refuse to start without it (2026-11-07) |
 
 ## Decisions needed, and when
 
-- **Before M7: how pilot users get accounts.** Public sign-up is disabled on hosted (ADR-0016) and the Auth API cannot be fenced by a proxy. The options:
+- ~~**Before M7: how pilot users get accounts.**~~ Decided, see above. For the record: public sign-up was disabled on hosted (ADR-0016) and the Auth API cannot be fenced by a proxy. The options:
   - (a) invitations sent from the dashboard or an admin RPC (`inviteUserByEmail`), so only invited emails can join;
   - (b) a sign-up allow-list checked by an Auth hook (invite codes);
   - (c) open sign-up with CAPTCHA and the new-account limits.

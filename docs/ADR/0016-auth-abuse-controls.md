@@ -19,3 +19,5 @@
 **Consequences.** + The risk is measured, bounded and written down instead of assumed. + No new moving part. − CAPTCHA integration (web widget, native WebView) is still to build and adds friction. − Timing and reset-oracle signals remain for anyone willing to pay for solves. − Hosted behaviour is unverified.
 
 **Update 2026-10-25.** The app-side CAPTCHA integration is built (web widget, native WebView via `react-native-webview`, off unless `EXPO_PUBLIC_TURNSTILE_SITE_KEY` is set) and verified on the auth lab with Cloudflare test keys; hosted configuration and a real site key remain open (AUTH_ABUSE §5).
+
+**Update 2026-11-07.** Public sign-up is opened for the pilot with CAPTCHA and the existing new-account quotas (ADR-0026). The proxy option of §2 is no longer needed; §3's prerequisites are the steps of DEPLOYMENT §14.

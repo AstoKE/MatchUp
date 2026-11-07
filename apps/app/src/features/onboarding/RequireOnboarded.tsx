@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { RequireAuth, signOut } from '@/features/auth';
+import { SupportContact } from '@/features/settings';
 import { errorText } from '@/lib/error-text';
 import { EmptyState, Screen, useTheme } from '@/ui';
 import { useMyAccount } from './hooks';
@@ -76,6 +77,7 @@ function SuspendedPage() {
         actionLabel={t('suspended.signOut')}
         onAction={() => void signOut().then(() => router.replace('/'))}
       />
+      <SupportContact align="center" />
     </Screen>
   );
 }

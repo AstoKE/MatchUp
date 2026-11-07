@@ -1,6 +1,6 @@
 # Pilot launch checklist
 
-Status 2026-11-07, rewritten for the **Turkey-wide pilot** ([PHASE7_PLAN](PHASE7_PLAN.md)). Hosted Supabase (Paris, ADR-0018) holds every migration up to Phase 4 and no real users. Public sign-up must stay **disabled** on any hosted project (`[auth] enable_signup = false`) until every item below is checked. This is not legal advice; items marked ⚖ need a qualified lawyer.
+Status 2026-11-07, rewritten for the **Turkey-wide pilot** ([PHASE7_PLAN](PHASE7_PLAN.md)). Hosted Supabase (Paris, ADR-0018) holds every migration up to Phase 4 and no real users. Public sign-up opens with CAPTCHA and the new-account limits (ADR-0026, 2026-11-07), but only after the steps of DEPLOYMENT §14. Until then it stays **disabled** on hosted. The founder accepts that the legal texts are still drafts when sign-up opens; the ⚖ items stay open and are not waived. This is not legal advice; items marked ⚖ need a qualified lawyer.
 
 Each open item names its **owner**:
 - **code** is done in the repository, with tests;
@@ -23,12 +23,8 @@ It also names the Phase 7 milestone where it is handled.
 
 ## 2. Accounts, abuse and enumeration
 
-- [ ] **founder, M7: how pilot users get accounts** while public sign-up is disabled (PHASE7_PLAN, decision needed):
-  - (a) invitations;
-  - (b) invite codes checked by an Auth hook;
-  - (c) open sign-up with CAPTCHA.
-
-  An Edge proxy is **not** recommended (ADR-0016).
+- [x] **founder, M7: how pilot users get accounts.** Decided 2026-11-07: (c) open sign-up with CAPTCHA and the existing new-account quotas (ADR-0026). The draft-legal-text risk is accepted by the founder.
+- [ ] **founder, M7:** open sign-up following DEPLOYMENT §14 in order, then `hosted-surface.mjs --signup open` shows PASS for sign-up and CAPTCHA.
 - [ ] **founder + code, M2:** CAPTCHA on sign-up, sign-in and password reset (Turnstile).
   - **App side built and unit-tested** (`EXPO_PUBLIC_TURNSTILE_SITE_KEY`, web widget and native WebView, AUTH_ABUSE §5).
   - Open: the Turnstile account and site key with the production hostname; the secret in hosted Auth; the site key in the production build (enable both together: a mismatch blocks every sign-in); the native widget on a device; counsel on Turnstile as a processor (⚖).
@@ -39,13 +35,16 @@ It also names the Phase 7 milestone where it is handled.
   - Known locally (ADR-0016): all three endpoints leak (sign-up 422 vs 200, sign-in timing, reset cooldown 429).
   - We do not claim to prevent enumeration; counsel confirms the residual risk (⚖).
 - [x] **code, M2:** security review of every RPC and RLS policy, kept as a reviewed inventory that CI compares (docs/SECURITY_REVIEW.md); S7-1 fixed with its test.
-- [ ] **founder, M2:** run `scripts/security/hosted-surface.mjs` against hosted and act on any FAIL/WARN (pg_graphql, sign-up).
+- [ ] **founder, M2:** run `scripts/security/hosted-surface.mjs` against hosted and act on any FAIL/WARN (pg_graphql; add `--signup open` once sign-up is on).
 - [ ] **founder, when hosting the web:** the response headers of DEPLOYMENT §12 (CSP report-only first).
 
 ## 3. Operations
 
-- [ ] **founder, M7:** who answers reports and how fast (SECURITY says 24 h). The admin runbook (`docs/OPERATIONS.md`, code, M7) covers reports, suspensions, the venue queue, disputes, deletion requests and incidents.
-- [ ] **founder + code, M7:** a support contact reachable from the app and from the suspended-account page (it says "bize ulaş" and names no address yet).
+- [ ] **founder, M7:** who answers reports and how fast. The runbook proposes: reports within 24 h, disputes within 48 h, support email within 2 working days, one founder as operator (OPERATIONS §7). Confirm, or name a second administrator.
+- [x] **code, M7:** the admin runbook `docs/OPERATIONS.md`: reports, suspensions and appeals, flags, venues, deletion and KVKK requests, spam waves, outages, breaches.
+- [ ] **founder + code, M7:** a support contact reachable from the app and from the suspended-account page.
+  - **Built:** Settings › Destek and the suspended page show `brand.contact.supportEmail` as a mail link, or a placeholder while it is empty. A production build refuses to start without it.
+  - **Open (founder):** the address itself, and someone reading that inbox.
 - [ ] **founder, M2:** the first administrator and TOTP on hosted (DEPLOYMENT §11).
 - [ ] **founder + code, M2:** a profanity list for display names, if wanted.
 - [ ] **counsel, M7:** retention of reports and moderation notes (⚖).
@@ -70,5 +69,5 @@ It also names the Phase 7 milestone where it is handled.
 - [ ] **code, M1:** the whole life of an event in one end-to-end flow, green in CI (F-35).
 - [x] **code, M5:** accessibility: axe on every route at two widths, a keyboard-only path (it found and fixed the cards' Enter), the manual list prepared (docs/A11Y_CHECKLIST.md).
 - [ ] **founder + code, M6:** docs/A11Y_CHECKLIST.md filled in with VoiceOver and TalkBack on devices.
-- [ ] **founder, M5:** the Turkish copy read by a native speaker from docs/COPY_REVIEW.md (868 strings; regenerate with `node scripts/i18n/export-copy.mjs`) (F-32).
+- [ ] **founder, M5:** the Turkish copy read by a native speaker from docs/COPY_REVIEW.md (872 strings; regenerate with `node scripts/i18n/export-copy.mjs`) (F-32).
 - [ ] **founder, M7:** store listings and identifiers decided. Nothing is published without the founder's go.

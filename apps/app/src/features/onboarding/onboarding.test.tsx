@@ -151,6 +151,8 @@ describe('RequireOnboarded', () => {
     await renderApp(gated(), { session: signedIn() });
     expect(await screen.findByText('Hesabın askıya alındı')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Çıkış yap' })).toBeTruthy();
+    // Until the founder sets the support address, the page says one is coming (SupportContact.test covers the address).
+    expect(screen.getByText('Destek adresimiz çok yakında burada olacak.')).toBeTruthy();
     expect(screen.queryByText('gizli içerik')).toBeNull();
   });
 

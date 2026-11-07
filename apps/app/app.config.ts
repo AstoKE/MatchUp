@@ -5,7 +5,7 @@ import { parseEnv } from './src/lib/env.schema.ts';
 // Fail the build/start early (expo start, export, prebuild all evaluate this file) when the public
 // configuration is missing or unsafe. Skipped only for explicit tooling runs.
 if (process.env.SKIP_ENV_VALIDATION !== '1') {
-  parseEnv({
+  const env = parseEnv({
     EXPO_PUBLIC_APP_ENV: process.env.EXPO_PUBLIC_APP_ENV,
     EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL,
     EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
@@ -13,6 +13,12 @@ if (process.env.SKIP_ENV_VALIDATION !== '1') {
     EXPO_PUBLIC_SENTRY_DSN: process.env.EXPO_PUBLIC_SENTRY_DSN,
     EXPO_PUBLIC_TURNSTILE_SITE_KEY: process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY,
   });
+  // Real users must be able to reach a person, also from the suspended-account page (LAUNCH_CHECKLIST §3).
+  if (env.EXPO_PUBLIC_APP_ENV === 'production' && !brand.contact.supportEmail) {
+    throw new Error(
+      'brand.contact.supportEmail (packages/config) must be set for a production build.',
+    );
+  }
 }
 
 export default ({ config }: ConfigContext): ExpoConfig => ({

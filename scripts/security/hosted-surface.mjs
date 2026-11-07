@@ -2,7 +2,11 @@
 // Phase 7 / M2 (docs/SECURITY_REVIEW.md). Read-only: it signs nobody up and writes nothing. Run by the founder against
 // hosted (Claude does not read hosted); the local stack works too, for a dry run.
 //
-//   node scripts/security/hosted-surface.mjs --url https://<ref>.supabase.co --anon-key <publishable key>
+//   node scripts/security/hosted-surface.mjs --url https://<ref>.supabase.co --anon-key <publishable key> [--signup open]
+//
+// --signup says which state public sign-up should be in: `closed` (the default) or `open` (ADR-0026, only after the
+// steps of DEPLOYMENT §14). With `open`, CAPTCHA must be enforced: one password-reset request without a token is sent
+// for a reserved address (example.invalid, so no mail goes out) and must be refused for the missing CAPTCHA.
 //
 // Exit code 1 when a check fails; warnings do not fail.
 const args = Object.fromEntries(
@@ -13,9 +17,10 @@ const args = Object.fromEntries(
 );
 const url = args.url?.replace(/\/$/, '');
 const key = args['anon-key'];
-if (!url || !key) {
+const signup = args.signup ?? 'closed';
+if (!url || !key || !['closed', 'open'].includes(signup)) {
   console.error(
-    'usage: node scripts/security/hosted-surface.mjs --url <project url> --anon-key <publishable key>',
+    'usage: node scripts/security/hosted-surface.mjs --url <project url> --anon-key <publishable key> [--signup closed|open]',
   );
   process.exit(2);
 }
@@ -44,14 +49,15 @@ async function get(path, init = {}) {
   return { status: response.status, body };
 }
 
-// 1. Auth: public sign-up off, no auto-confirm, no unexpected providers.
+// 1. Auth: public sign-up in the expected state, no auto-confirm, no unexpected providers.
 {
   const { status, body } = await get('/auth/v1/settings');
   if (status !== 200 || !body) report('FAIL', 'auth settings', `HTTP ${status}`);
   else {
+    const open = body.disable_signup === false;
     report(
-      body.disable_signup ? 'PASS' : 'FAIL',
-      'public sign-up disabled',
+      open === (signup === 'open') ? 'PASS' : 'FAIL',
+      `public sign-up ${signup === 'open' ? 'enabled' : 'disabled'}`,
       `disable_signup=${body.disable_signup}`,
     );
     report(
@@ -73,6 +79,22 @@ async function get(path, init = {}) {
       `phone=${Boolean(body.external?.phone)}`,
     );
   }
+}
+
+// 1b. Open sign-up only with CAPTCHA (ADR-0026). GoTrue checks the token before anything else, so a reset request
+// without one is refused with captcha_failed and nothing is sent.
+if (signup === 'open') {
+  const { status, body } = await get('/auth/v1/recover', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'surface-check@example.invalid' }),
+  });
+  const refused = status === 400 && /captcha/i.test(`${body?.error_code ?? ''} ${body?.msg ?? ''}`);
+  report(
+    refused ? 'PASS' : 'FAIL',
+    'CAPTCHA enforced',
+    `HTTP ${status} ${body?.error_code ?? ''}`.trim(),
+  );
 }
 
 // 2. What PostgREST's OpenAPI root shows a guest: tables it may read and functions it may call.
