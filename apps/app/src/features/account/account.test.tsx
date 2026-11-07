@@ -142,6 +142,26 @@ describe('DeleteAccountScreen', () => {
     );
   });
 
+  it('deletes the profile photo after the password check and before the request, and goes on if that fails', async () => {
+    mockApi.signInWithEmail.mockResolvedValue(undefined);
+    mockApi.requestAccountDeletion.mockResolvedValue('2026-11-24T10:00:00.000Z');
+    const beforeRequest = jest.fn(() => Promise.reject(new Error('storage down')));
+    await renderApp(<DeleteAccountScreen beforeRequest={beforeRequest} />, { session: signedIn });
+    expect(await screen.findByText(/Profil fotoğrafın varsa/)).toBeTruthy();
+    await fireEvent.changeText(screen.getByLabelText('Şifren'), 'correct horse');
+    await press(CONFIRM);
+    await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith('/account-deletion'));
+    expect(beforeRequest).toHaveBeenCalledWith(
+      signedIn.status === 'authenticated' ? signedIn.userId : '',
+    );
+    expect(mockApi.signInWithEmail.mock.invocationCallOrder[0]).toBeLessThan(
+      beforeRequest.mock.invocationCallOrder[0]!,
+    );
+    expect(beforeRequest.mock.invocationCallOrder[0]).toBeLessThan(
+      mockApi.requestAccountDeletion.mock.invocationCallOrder[0]!,
+    );
+  });
+
   it('stops at a wrong password with the generic credentials message', async () => {
     mockApi.signInWithEmail.mockRejectedValue(new AuthFlowError('INVALID_CREDENTIALS'));
     await renderApp(<DeleteAccountScreen />, { session: signedIn });

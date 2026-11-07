@@ -41,7 +41,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     package: brand.identifiers.appId,
     // Approximate location only: the precise permission is never requested.
-    blockedPermissions: ['android.permission.ACCESS_FINE_LOCATION'],
+    blockedPermissions: [
+      'android.permission.ACCESS_FINE_LOCATION',
+      // The photo picker needs neither (ADR-0027).
+      'android.permission.CAMERA',
+      'android.permission.RECORD_AUDIO',
+    ],
     adaptiveIcon: {
       backgroundColor: '#F2F5F1',
       foregroundImage: './assets/android-icon-foreground.png',
@@ -71,6 +76,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         isIosBackgroundLocationEnabled: false,
         isAndroidBackgroundLocationEnabled: false,
         isAndroidForegroundServiceEnabled: false,
+      },
+    ],
+    // Phase 8 / M3: a profile photo from the library only. No camera, no microphone (privacy by default, ADR-0027).
+    [
+      'expo-image-picker',
+      {
+        photosPermission:
+          'Profil fotoğrafı seçmek için, yalnızca sen istediğinde kullanılır. / Used only when you ask, to pick a profile photo.',
+        cameraPermission: false,
+        microphonePermission: false,
       },
     ],
   ],

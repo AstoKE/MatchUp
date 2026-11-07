@@ -39,6 +39,8 @@ const privateRow = z.object({
 const participantRow = z.object({
   user_id: z.optional(z.uuid()),
   display_name: z.nullable(z.string()),
+  avatar_key: z.optional(z.nullable(z.string())),
+  avatar_path: z.optional(z.nullable(z.string())),
 });
 
 const eventRow = z.object({
@@ -76,6 +78,9 @@ const eventRow = z.object({
   // What `get_event` adds for this viewer; the server decides every one of them.
   is_organizer: z.boolean(),
   organizer_name: z.nullable(z.string()),
+  // Phase 8 / M3 (optional: an older server does not send them).
+  organizer_avatar_key: z.optional(z.nullable(z.string())),
+  organizer_avatar_path: z.optional(z.nullable(z.string())),
   invite_token: z.nullable(z.string()),
   private: z.nullable(privateRow),
   participants_visible: z.boolean(),
@@ -89,6 +94,8 @@ export interface EventDetails {
   /** Decided by the server for this viewer; the organizer's user id is never sent. */
   isOrganizer: boolean;
   organizerName: string | null;
+  organizerAvatarKey: string | null;
+  organizerAvatarPath: string | null;
   status: z.infer<typeof eventRow>['status'];
   title: string;
   description: string | null;
@@ -134,7 +141,14 @@ export interface EventDetails {
     point?: GeoPoint | null;
   } | null;
   /** Approved players (display names), for the organizer and approved players; null when not visible. */
-  participants: { userId: string | null; displayName: string | null }[] | null;
+  participants:
+    | {
+        userId: string | null;
+        displayName: string | null;
+        avatarKey: string | null;
+        avatarPath: string | null;
+      }[]
+    | null;
 }
 
 /**
@@ -158,6 +172,8 @@ export async function fetchEvent(
     id: row.id,
     isOrganizer: row.is_organizer,
     organizerName: row.organizer_name,
+    organizerAvatarKey: row.organizer_avatar_key ?? null,
+    organizerAvatarPath: row.organizer_avatar_path ?? null,
     status: row.status,
     title: row.title,
     description: row.description,
@@ -201,6 +217,8 @@ export async function fetchEvent(
       ? (row.participants ?? []).map((p) => ({
           userId: p.user_id ?? null,
           displayName: p.display_name,
+          avatarKey: p.avatar_key ?? null,
+          avatarPath: p.avatar_path ?? null,
         }))
       : null,
   };

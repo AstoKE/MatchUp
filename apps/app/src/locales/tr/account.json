@@ -17,7 +17,8 @@
     "exportFirst": "Silmeden önce verilerini indirmek isteyebilirsin: Ayarlar › Hesap › Verilerimi indir.",
     "password": "Şifren",
     "passwordHint": "Güvenliğin için şifreni yeniden girmen gerekiyor.",
-    "confirm": "Hesabımı silmeyi talep et"
+    "confirm": "Hesabımı silmeyi talep et",
+    "photo": "Profil fotoğrafın varsa, talebinle birlikte hemen silinir; talebi iptal etsen de geri gelmez."
   },
   "pending": {
     "title": "Hesabın silinecek",

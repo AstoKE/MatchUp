@@ -93,6 +93,9 @@ test.describe('onboarding gate', () => {
     await page.getByLabel('Görünen ad', { exact: true }).fill('Al');
     await expect(page.getByText('En az 2 karakter kullan.')).toHaveCount(0); // message goes away while fixing
     await next(page).click();
+    await expect(page.getByText('Bir seçenek seç.')).toBeVisible(); // gender, "rather not say" included
+    await page.getByRole('radio', { name: 'Erkek', exact: true }).click();
+    await next(page).click();
     await page.getByRole('button', { name: 'Bitir' }).click(); // no sport
     await expect(page.getByText('En az bir spor seç.')).toBeVisible();
 
@@ -106,7 +109,10 @@ test.describe('onboarding gate', () => {
     await expect(page.getByRole('checkbox', { name: 'Forvet', exact: true })).toBeDisabled();
 
     await page.getByRole('button', { name: 'Bitir' }).click();
-    await expect(page).toHaveURL(/localhost:4173\/$/); // returnTo was the home page
+    // The avatar screen first (the boy set, on football), skippable; then the home page, the returnTo.
+    await expect(page.getByRole('radio', { name: 'Futbol', checked: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Şimdilik atla' }).click();
+    await expect(page).toHaveURL(/localhost:4173\/$/);
     await page.getByRole('tab', { name: 'Profil' }).click();
     await expect(page.getByText('Futbol · Seviye 3.5')).toBeVisible();
     await expect(page.getByText('Kaleci, Defans, Orta saha')).toBeVisible();
@@ -228,13 +234,20 @@ test.describe('accessibility of onboarding, legal and profile screens (axe, WCAG
     await expectNoBlocking(page);
 
     await page.getByLabel('Görünen ad', { exact: true }).fill('Axe Test');
+    await page.getByRole('radio', { name: 'Belirtmek istemiyorum', exact: true }).click();
     await next(page).click();
     await page.getByRole('checkbox', { name: 'Futbol', exact: true }).click();
     await expect(page.getByText('Seviye 3')).toBeVisible();
     await expectNoBlocking(page);
+
+    // The avatar screen that follows: every drawing at once for "rather not say", the letters chosen.
+    await page.getByRole('button', { name: 'Bitir' }).click();
+    await expect(page.getByRole('radio', { name: 'Harfler', checked: true })).toBeVisible();
+    await page.getByRole('radio', { name: 'Tenis, kız karakter' }).click();
+    await expectNoBlocking(page);
   });
 
-  for (const path of ['/profile', '/edit-profile', '/edit-sports', '/settings']) {
+  for (const path of ['/profile', '/edit-profile', '/edit-sports', '/settings', '/avatar']) {
     test(`no serious or critical violations on ${path} (onboarded user)`, async ({ page }) => {
       const s = requireStack();
       const email = uniqueEmail('axe-profile');

@@ -157,6 +157,9 @@ const userRow = z.object({
   id: z.uuid(),
   name: z.nullable(z.string()),
   bio: z.nullable(z.string()),
+  // Phase 8 / M3 (optional: an older server does not send them).
+  avatar_key: z.optional(z.nullable(z.string())),
+  avatar_path: z.optional(z.nullable(z.string())),
   account_status: z.string(),
   created_at: z.string(),
   is_admin: z.boolean(),

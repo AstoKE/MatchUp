@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { VerifyEmailBanner } from '@/features/auth';
 import { useCatalog } from '@/features/catalog';
 import { NotificationBell } from '@/features/notifications';
+import { HeaderAvatar } from '@/features/profile';
 import { RequireOnboarded } from '@/features/onboarding';
 import { errorText } from '@/lib/error-text';
 import { i18n } from '@/lib/i18n';
@@ -109,9 +110,14 @@ function MyEventsContent() {
           gap: spacing[3],
         }}
       >
-        <Text variant="headline" heading={1}>
-          {t('nav:myEvents')}
-        </Text>
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], flexShrink: 1 }}
+        >
+          <HeaderAvatar />
+          <Text variant="headline" heading={1}>
+            {t('nav:myEvents')}
+          </Text>
+        </View>
         <NotificationBell />
       </View>
       <SegmentedChoice

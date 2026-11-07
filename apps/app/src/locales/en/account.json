@@ -17,7 +17,8 @@
     "exportFirst": "You may want to download your data before deleting: Settings › Account › Download my data.",
     "password": "Your password",
     "passwordHint": "For your security, please enter your password again.",
-    "confirm": "Request account deletion"
+    "confirm": "Request account deletion",
+    "photo": "If you have a profile photo, it is deleted right away with your request, and does not come back if you cancel."
   },
   "pending": {
     "title": "Your account will be deleted",

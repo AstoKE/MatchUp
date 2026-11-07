@@ -30,3 +30,4 @@ Format: Context · Decision · Consequences · Status. One decision per file, im
 | [0024](0024-turkey-wide-catalog-and-phase-4-providers.md) | All of Turkey in the catalog (Wikidata), MapTiler tiles, PostGIS points, venue suggestions (amends PRD §1, §4.1, §4.6; settles ADR-0011 §3) | Accepted |
 | [0025](0025-pilot-metrics-and-opt-in-analytics.md) | Pilot metrics from the service's own data; usage analytics only with explicit consent (replaces ARCHITECTURE §9's server-side event stream; settles ADR-0019 §5) | Accepted |
 | [0026](0026-open-sign-up-for-the-pilot.md) | Open public sign-up for the pilot behind CAPTCHA and new-account limits; draft legal texts accepted as a founder risk (amends ADR-0016 §2–3) | Accepted |
+| [0027](0027-avatars-gender-and-profile-photos.md) | Drawn avatars by gender and first sport, a private gender, profile photos in a private bucket with the profile's visibility rule | Accepted |

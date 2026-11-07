@@ -623,6 +623,7 @@ export type Database = {
         Row: {
           account_status: Database['public']['Enums']['account_status'];
           adult_confirmed_at: string | null;
+          avatar_key: string | null;
           avatar_path: string | null;
           bio: string | null;
           city_id: string | null;
@@ -630,6 +631,7 @@ export type Database = {
           deletion_requested_at: string | null;
           display_name: string | null;
           district_id: string | null;
+          gender: Database['public']['Enums']['profile_gender'] | null;
           id: string;
           onboarded_at: string | null;
           updated_at: string;
@@ -638,6 +640,7 @@ export type Database = {
         Insert: {
           account_status?: Database['public']['Enums']['account_status'];
           adult_confirmed_at?: string | null;
+          avatar_key?: string | null;
           avatar_path?: string | null;
           bio?: string | null;
           city_id?: string | null;
@@ -645,6 +648,7 @@ export type Database = {
           deletion_requested_at?: string | null;
           display_name?: string | null;
           district_id?: string | null;
+          gender?: Database['public']['Enums']['profile_gender'] | null;
           id: string;
           onboarded_at?: string | null;
           updated_at?: string;
@@ -652,6 +656,7 @@ export type Database = {
         Update: {
           account_status?: Database['public']['Enums']['account_status'];
           adult_confirmed_at?: string | null;
+          avatar_key?: string | null;
           avatar_path?: string | null;
           bio?: string | null;
           city_id?: string | null;
@@ -659,6 +664,7 @@ export type Database = {
           deletion_requested_at?: string | null;
           display_name?: string | null;
           district_id?: string | null;
+          gender?: Database['public']['Enums']['profile_gender'] | null;
           id?: string;
           onboarded_at?: string | null;
           updated_at?: string;
@@ -1501,6 +1507,7 @@ export type Database = {
       };
       admin_pilot_metrics: { Args: { p_days?: number }; Returns: Json };
       admin_reinstate_user: { Args: { p_note: string; p_user_id: string }; Returns: undefined };
+      admin_remove_avatar_photo: { Args: { p_note: string; p_user_id: string }; Returns: string };
       admin_resolve_attendance_dispute: {
         Args: {
           p_participation_id: string;
@@ -1528,6 +1535,7 @@ export type Database = {
       };
       cancel_participation: { Args: { p_event_id: string }; Returns: undefined };
       catalog_places: { Args: Record<PropertyKey, never>; Returns: Json };
+      clear_my_avatar_photo: { Args: Record<PropertyKey, never>; Returns: undefined };
       complete_event: { Args: { p_event_id: string }; Returns: undefined };
       complete_onboarding: {
         Args: {
@@ -1569,6 +1577,7 @@ export type Database = {
           user_id: string;
         }[];
       };
+      get_my_avatar: { Args: Record<PropertyKey, never>; Returns: Json };
       get_player_card: { Args: { p_user_id: string }; Returns: Json };
       list_event_requests: { Args: { p_event_id: string }; Returns: Json };
       list_my_blocks: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -1616,6 +1625,12 @@ export type Database = {
       search_venues: { Args: { p_filters: Json }; Returns: Json };
       set_analytics_consent: { Args: { p_granted: boolean }; Returns: undefined };
       set_marketing_consent: { Args: { p_granted: boolean }; Returns: undefined };
+      set_my_avatar: { Args: { p_avatar_key: string }; Returns: undefined };
+      set_my_avatar_photo: { Args: { p_path: string }; Returns: string };
+      set_my_gender: {
+        Args: { p_gender: Database['public']['Enums']['profile_gender'] };
+        Returns: undefined;
+      };
       set_sport_profile: {
         Args: { p_level: number; p_position_ids: string[]; p_sport_id: string };
         Returns: undefined;
@@ -1660,6 +1675,7 @@ export type Database = {
       location_visibility: 'PUBLIC' | 'APPROVED_ONLY';
       participation_status:
         'REQUESTED' | 'APPROVED' | 'REJECTED' | 'WAITLISTED' | 'CANCELED' | 'REMOVED';
+      profile_gender: 'FEMALE' | 'MALE' | 'UNDISCLOSED';
       profile_visibility: 'EVERYONE' | 'EVENT_PEERS';
     };
     CompositeTypes: {
@@ -1797,6 +1813,7 @@ export const Constants = {
         'CANCELED',
         'REMOVED',
       ],
+      profile_gender: ['FEMALE', 'MALE', 'UNDISCLOSED'],
       profile_visibility: ['EVERYONE', 'EVENT_PEERS'],
     },
   },

@@ -1,4 +1,4 @@
-import { mapRpcError, type OnboardingInput } from '@matchup/domain';
+import { mapRpcError, type AvatarKey, type Gender, type OnboardingInput } from '@matchup/domain';
 import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 import { nullableArg } from '@/lib/supabase/rpc-args';
@@ -92,6 +92,17 @@ export async function completeOnboarding(
     })),
   });
   if (error) throw mapRpcError(error);
+}
+
+/**
+ * Right after onboarding (Phase 8 / M3): the private gender and the drawing it gives. complete_onboarding keeps its
+ * signature for installed apps, so this is a second call; if it fails, the person keeps the initials and can choose later.
+ */
+export async function saveGenderAndAvatar(gender: Gender, avatarKey: AvatarKey): Promise<void> {
+  const gendered = await supabase.rpc('set_my_gender', { p_gender: gender });
+  if (gendered.error) throw mapRpcError(gendered.error);
+  const drawn = await supabase.rpc('set_my_avatar', { p_avatar_key: avatarKey });
+  if (drawn.error) throw mapRpcError(drawn.error);
 }
 
 /** Re-consent for already-onboarded users; the versions must be the ones the user was shown. */

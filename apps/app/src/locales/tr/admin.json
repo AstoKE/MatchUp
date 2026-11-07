@@ -111,7 +111,11 @@
       "PENDING_DELETION": "Silinme bekliyor",
       "DELETED": "Silindi"
     },
-    "back": "Aramaya dön"
+    "back": "Aramaya dön",
+    "photo": "Profil fotoğrafı",
+    "photoNote": "Kaldırma nedeni",
+    "removePhoto": "Fotoğrafı kaldır",
+    "photoRemoved": "Fotoğraf kaldırıldı."
   },
   "flags": {
     "empty": "İşaret yok.",
@@ -145,7 +149,8 @@
       "VENUE_ADDED": "Mekân eklendi",
       "VENUE_VERIFIED": "Mekân doğrulandı",
       "VENUE_HIDDEN": "Mekân gizlendi",
-      "VENUE_RESTORED": "Mekân geri getirildi"
+      "VENUE_RESTORED": "Mekân geri getirildi",
+      "AVATAR_REMOVED": "Profil fotoğrafı kaldırıldı"
     },
     "outcome": {
       "ACTIONED": "işlem yapıldı",

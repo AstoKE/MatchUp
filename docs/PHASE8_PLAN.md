@@ -1,6 +1,6 @@
 # Phase 8 plan: discovery and engagement
 
-Status 2026-11-07: M1 merged (#84); M2 built (in review).
+Status 2026-11-07: M1 and M2 merged (#84, #85); M3 built (in review).
 
 The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROADMAP "Later" (push, P-01) forward. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
@@ -11,7 +11,11 @@ The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROA
 | Sport choice on Discover | Court tiles instead of chips: a horizontally scrolling strip above the list, and the same tiles as a grid in the Filters sheet. Tapping one shows that sport's events |
 | Date and time pickers | Our own scrolling wheel (iOS style), the same on iOS, Android and the web, for the event form and Discover. No new dependency |
 | Automatic avatar | A character or icon drawing chosen by the person's first sport. The founder designs the drawings in another session and hands them over before the avatar PR |
-| Own photo | The person may replace the automatic avatar with a photo |
+| Own photo | The person may replace the automatic avatar with a photo; built in the same PR as the drawings |
+| Avatar set | The founder's 22 drawings (a general one and ten sports, for women and for men), 2026-11-07 |
+| Gender | Asked while filling in the profile: woman / man / rather not say. Private, never shown to others. "Rather not say" starts with the letters and sees every drawing |
+| Switching | The own set first, "show all avatars" for the other one |
+| Where the avatar shows | At the top left of the main screens, left of the province; it opens the profile |
 | Push notifications | Two separate consents, both **off** by default: "events for you" and "reminders". A new account is asked once in a popup, and can turn either on right there |
 
 ## Milestones
@@ -82,7 +86,34 @@ The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROA
   - pgTAP: bucket policies, a stranger and a blocked person refused;
   - integration: upload and remove; purge and export;
   - components and E2E on the web (file input).
-- **Blocked on:** the founder's drawings. The photo part can be built first.
+- **Status 2026-11-07: built** (ADR-0027).
+  - **Database:** migration `20261111100000_avatars.sql`:
+    - the private `gender`, `avatar_key` and the `avatars` bucket;
+    - storage policies with the player-card rule; a daily cap on photo changes;
+    - administrator removal, recorded;
+    - the avatar added to the player card, the event page (organizer and roster) and the console.
+  - **App:**
+    - onboarding asks for gender, saves the automatic drawing, then opens the avatar screen (skippable);
+    - the avatar screen offers the drawings, the letters and an own photo;
+    - the header avatar sits on Discover and My Events;
+    - Edit profile changes the gender;
+    - the deletion request deletes the photo first.
+  - **Design changes from this plan:**
+    - one photo path per change (`<user>/<uuid>.jpg`) instead of a fixed name, so a replace never overwrites;
+    - no new report target: a photo is reported as the person (the "inappropriate content" reason), and the console removes it;
+    - signed URLs come from the Storage API under the policy, not from an RPC;
+    - the purge cannot delete bytes, so the app deletes them at the deletion request.
+  - **Found and fixed by the tests:**
+    - initials inside a named link failed axe 2.5.3, so the header and roster show a person icon there;
+    - the onboarding redirect could open the avatar screen before the gender was saved;
+    - the M2 date wheel, on the web, could take a scroll it did not ask for and move an edited event to today. It now changes value only on the person's own scroll.
+  - **Tests:**
+    - pgTAP 29 (26);
+    - integration `avatars.test.ts` (13, against the real Storage API, with a mutation check on the block rule);
+    - components (avatar screen, edit profile, onboarding, deletion);
+    - E2E `avatars.spec.ts`: a 900 × 600 photo with GPS EXIF comes back 512 × 512 with no EXIF.
+  - **Bundle:** the avatar screen is a lazy chunk. INITIAL 550 → 555, TOTAL 920 → 935, with the reason recorded.
+  - **Not verified:** the picker, crop and upload on an iPhone or an Android device (a new development build is needed).
 
 ### M4: push foundation
 

@@ -98,7 +98,8 @@ select is(public.get_event(pg_temp.ev('pub')) ->> 'title', 'S11 Açık maç', 'a
 select is((select array_agg(k order by k) from jsonb_object_keys(public.get_event(pg_temp.ev('pub'))) k),
   array['approved_count', 'auto_approve', 'booking_status', 'cancel_message', 'cancel_reason', 'capacity', 'city_id',
         'cost_amount_minor', 'cost_note', 'description', 'district_id', 'duration_minutes', 'ends_at', 'equipment_note',
-        'id', 'invite_token', 'is_organizer', 'location_visibility', 'my_status', 'organizer_name', 'organizer_plays',
+        'id', 'invite_token', 'is_organizer', 'location_visibility', 'my_status', 'organizer_avatar_key',
+        'organizer_avatar_path', 'organizer_name', 'organizer_plays',
         'participants', 'participants_visible', 'private', 'public_location_label', 'public_point', 'public_point_precision',
         'setting', 'skill_max', 'skill_min', 'sport_format_id', 'sport_id', 'starts_at', 'status', 'title', 'venue',
         'visibility', 'waitlist_enabled'],
@@ -149,8 +150,8 @@ select is((select array_agg(p ->> 'display_name') from jsonb_array_elements(publ
   array['Onaylı O'], 'the roster lists approved players only (not the pending one, not the organizer)');
 select is((public.get_event(pg_temp.ev('pub')) ->> 'participants_visible')::boolean, true, '... and says so');
 select is((select array_agg(k order by k) from (select distinct jsonb_object_keys(p) k
-    from jsonb_array_elements(public.get_event(pg_temp.ev('pub')) -> 'participants') p) s), array['display_name', 'user_id'],
-  'a roster entry holds a display name and the id that opens a card, nothing else');
+    from jsonb_array_elements(public.get_event(pg_temp.ev('pub')) -> 'participants') p) s), array['avatar_key', 'avatar_path', 'display_name', 'user_id'],
+  'a roster entry holds a display name, the avatar (Phase 8 / M3) and the id that opens a card, nothing else');
 select is(public.get_event(pg_temp.ev('canc')) ->> 'status', 'CANCELED', 'a participant still sees a canceled event they were in');
 select is(public.get_event(pg_temp.ev('draft')), null::jsonb, 'but not a draft');
 

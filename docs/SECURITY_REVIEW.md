@@ -26,6 +26,8 @@ Status 2026-11-07. Scope: the database API (every function, table, policy and gr
 | S7-6 | `update_my_profile` has no rate limit: a person can rename themselves often. Names are cleaned (no links, phones, addresses) and reports name the person, not the label. | Low | Accepted; revisit if reports show abuse |
 | S7-7 | `private` schema has `USAGE` for the API roles (RLS policies call `private.is_*`). Nothing in it is executable by guests or readable by either role (tests). | Info | Accepted, guarded by the inventory |
 | S7-8 | PostgREST's OpenAPI root lists the tables a guest may read and the four guest functions. | Info | Accepted (Supabase default; nothing private is listed) |
+| S8-1 | Phase 8 M3 (ADR-0027) added the first storage bucket and its policies, and six functions (inventory diff in that PR). Reviewed: guests can call none; the owner-run policy helpers check `auth.uid()`; photo reads follow the player-card rule and only the current photo; gender has no column grant. All of this is proven against the real Storage API in `avatars.test.ts`, with a mutation check. | Info | Reviewed 2026-11-07 |
+| S8-2 | Photo bytes cannot be deleted from SQL. Leftovers from an interrupted upload, or from a purge when the app did not delete first, stay in storage, unreadable through the API, until a sweeper with a service credential exists. | Low | Accepted for the pilot; counsel (SECURITY §8 item 13) |
 
 No finding allowed reading or changing another person's data, bypassing a quota, or escalating to admin.
 

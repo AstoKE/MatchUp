@@ -2,6 +2,7 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { UserAvatar } from '@/features/profile';
 import { useSession } from '@/features/auth';
 import { useTrack } from '@/features/analytics';
 import { localizedName, useCatalog, type Catalog } from '@/features/catalog';
@@ -9,7 +10,6 @@ import { ReportSheet } from '@/features/players';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import {
-  Avatar,
   Banner,
   Button,
   CourtDrawing,
@@ -346,7 +346,12 @@ function Detail({
 
       {event.organizerName ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-          <Avatar name={event.organizerName} size={44} />
+          <UserAvatar
+            name={event.organizerName}
+            avatarKey={event.organizerAvatarKey}
+            avatarPath={event.organizerAvatarPath}
+            size={44}
+          />
           <View style={{ flexShrink: 1 }}>
             <Text variant="titleSm">{event.organizerName}</Text>
             <Text variant="caption" tone="secondary">
@@ -374,13 +379,34 @@ function Detail({
                         accessibilityLabel={t('events:requests.openCard', {
                           name: p.displayName ?? t('events:requests.unnamed'),
                         })}
-                        style={{ minHeight: TOUCH_TARGET, justifyContent: 'center' }}
+                        style={{
+                          minHeight: TOUCH_TARGET,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: spacing[3],
+                        }}
                       >
+                        {/* Inside a named link: no initials, whose letters would not be in its name (WCAG 2.5.3). */}
+                        <UserAvatar
+                          name={p.displayName ?? ''}
+                          avatarKey={p.avatarKey}
+                          avatarPath={p.avatarPath}
+                          size={36}
+                          fallback="icon"
+                        />
                         <Text tone="link">{p.displayName ?? t('events:requests.unnamed')}</Text>
                       </Pressable>
                     </Link>
                   ) : (
-                    <Text>{p.displayName ?? t('events:requests.unnamed')}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+                      <UserAvatar
+                        name={p.displayName ?? ''}
+                        avatarKey={p.avatarKey}
+                        avatarPath={p.avatarPath}
+                        size={36}
+                      />
+                      <Text>{p.displayName ?? t('events:requests.unnamed')}</Text>
+                    </View>
                   )}
                 </View>
               ))}

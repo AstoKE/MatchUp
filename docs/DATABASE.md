@@ -11,6 +11,11 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 ## 0. As built in Phase 7
 
 - `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261111100000_avatars.sql` (Phase 8 M3, ADR-0027):
+  - **Columns and tables:** `profile_gender` enum and `profiles.gender` (private: no column grant); `profiles.avatar_key` (checked against the 22 drawings and `letters`, readable like the display name); private bucket `avatars` (1 MB, `image/jpeg`); `private.avatar_uploads` (RLS on, no grants) and `quota.max_avatar_photos_per_day` (10).
+  - **Policies:** on `storage.objects`, `avatars_insert`, `avatars_select` and `avatars_delete`, through `private.avatar_owner`, `can_upload_avatar`, `can_read_avatar` (the `get_player_card` rule, only the current photo for others) and `can_delete_avatar` (owner or second-factor admin). There is no update policy.
+  - **RPCs:** `get_my_avatar`, `set_my_gender`, `set_my_avatar`, `set_my_avatar_photo` (returns the replaced path), `clear_my_avatar_photo`, `admin_remove_avatar_photo` (aal2, recorded as `AVATAR_REMOVED`).
+  - **Redefined additively:** `get_player_card`, `get_event` (organizer and roster avatars; the photo path only for signed-in people), `admin_get_user`, `export_my_data` (gender, key) and `purge_account` (clears them).
 - `20261110100000_analytics_consent_kind.sql`, `20261110110000_pilot_metrics_and_analytics.sql` (M4, ADR-0025): `consent_kind` value `ANALYTICS`; `user_settings.analytics_consent_at`; `analytics_events` (RLS on, no API grants); `set_analytics_consent`, `track_event` (allow-list, coded properties, consent checked, 300/h), `admin_pilot_metrics` (aal2, totals only); export and purge extended.
 
 ## 0a. As built in Phase 4 (catalog of Turkey, points, venues)
