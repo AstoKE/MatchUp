@@ -16,12 +16,15 @@ export function CourtTile({
   onPress,
   selected,
   compact = false,
+  all = false,
 }: {
   slug: string | undefined;
   label: string;
   onPress: () => void;
   selected?: boolean;
   compact?: boolean;
+  /** "All sports": a few courts side by side instead of one drawing. */
+  all?: boolean;
 }) {
   const { breakpoint, colors, radius, spacing } = useTheme();
   const [focused, setFocused] = useState(false);
@@ -37,7 +40,8 @@ export function CourtTile({
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={({ pressed }) => ({
-        minHeight: TOUCH_TARGET * 2,
+        // A compact tile is as tall as its content (it is far above the 44 pt minimum); the large one keeps its presence.
+        minHeight: compact ? TOUCH_TARGET : TOUCH_TARGET * 2,
         borderRadius: radius.tile,
         backgroundColor: court?.court ?? colors.surfaceSunken,
         // The chosen tile is ringed in the text color; the others keep the same size with a clear ring.
@@ -56,28 +60,75 @@ export function CourtTile({
     >
       <View
         style={{
-          height: compact ? 44 : breakpoint === 'expanded' ? 104 : 64,
+          height: compact ? 40 : breakpoint === 'expanded' ? 104 : 64,
           padding: spacing[1],
           paddingBottom: 0,
         }}
       >
-        <CourtDrawing slug={slug} color={on} />
+        {all ? <CourtMosaic /> : <CourtDrawing slug={slug} color={on} />}
       </View>
-      <View
+      <Text
+        variant="label"
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: spacing[1],
+          color: on,
+          fontSize: compact ? 13 : 16,
           paddingHorizontal: compact ? spacing[2] : spacing[3],
+          paddingTop: compact ? spacing[1] : 0,
           paddingBottom: spacing[2],
         }}
       >
-        {selected ? <Icon name="check" color={on} size={16} /> : null}
-        <Text variant="label" style={{ color: on, fontSize: compact ? 14 : 16, flexShrink: 1 }}>
-          {label}
-        </Text>
-      </View>
+        {label}
+      </Text>
+      {selected ? (
+        // In the corner, so the check never pushes the name onto a second line.
+        <View
+          style={{
+            position: 'absolute',
+            top: spacing[1],
+            right: spacing[1],
+            width: 20,
+            height: 20,
+            borderRadius: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: colors.textPrimary,
+          }}
+        >
+          <Icon name="check" color={colors.bgApp} size={14} />
+        </View>
+      ) : null}
     </Pressable>
+  );
+}
+
+const MOSAIC = ['football', 'basketball', 'volleyball', 'tennis'] as const;
+
+/** Four courts' colors side by side: every sport at once. */
+function CourtMosaic() {
+  const { spacing } = useTheme();
+  return (
+    <View
+      style={{
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        // Lined up with the name, clear of the corner check.
+        paddingLeft: spacing[1],
+        gap: spacing[1],
+      }}
+    >
+      {MOSAIC.map((slug) => (
+        <View
+          key={slug}
+          style={{
+            width: 12,
+            height: 24,
+            borderRadius: 4,
+            backgroundColor: sportColors[slug]?.court,
+          }}
+        />
+      ))}
+    </View>
   );
 }
 

@@ -78,6 +78,7 @@ export function SportStrip({
       <CourtTile
         compact
         slug={option.slug}
+        all={option.id === ALL_SPORTS}
         label={option.label}
         selected={option.id === choice}
         onPress={() => onChoose(option.id)}
@@ -103,6 +104,7 @@ export function SportStrip({
               key={option.id}
               compact
               slug={option.slug}
+              all={option.id === ALL_SPORTS}
               label={option.label}
               selected={option.id === choice}
               onPress={() => onChoose(option.id)}
@@ -167,6 +169,7 @@ export function SportGrid({
               key={option.id}
               compact
               slug={option.slug}
+              all={option.id === ALL_SPORTS}
               label={option.label}
               selected={option.id === choice}
               onPress={() => onChoose(option.id)}

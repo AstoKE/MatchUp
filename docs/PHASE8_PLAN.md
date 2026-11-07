@@ -33,7 +33,11 @@ The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROA
   - On a phone the strip is one scrolling line of 116 px tiles.
   - On wider screens, and in the sheet, the tiles sit in a measured grid of equal columns (at least 100 px each). All eleven fit one row on a desktop, and a short last row does not stretch.
   - The first E2E run caught that a hidden-scrollbar line cannot be scrolled with a mouse, so wide screens do not scroll.
-  - Checked on screenshots at 390 px and 1280 px.
+  - The founder's review found the "All sports" tile broken at medium widths. Its name wrapped next to the check and stretched its whole row, and the 88 px minimum left empty space under every name. Fixed:
+    - the check sits in a corner badge;
+    - a compact tile is as tall as its content;
+    - "All sports" shows four court colors instead of an empty frame.
+  - Checked on screenshots at 390, 640, 760, 1024 and 1280 px, and in the sheet.
 
 ### M2: wheel date and time pickers
 
