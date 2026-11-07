@@ -132,6 +132,25 @@ What to check on the phone, and write down (pass, fail, or not tried): sign-in s
 
 Not covered even then: other iPhones and iOS versions, push notifications (not built), release (store) builds.
 
+## Phase 4–7 on devices (2026-11-07)
+
+**iOS, by hand on a real iPhone (founder):**
+- Build: the `device` profile on EAS, with the hosted backend and the map style URL in the `preview` environment.
+- Checked: Discover with the province picker, the map and "near me", the pin picker and "suggest a venue", the event page with the venue and booking label, Settings with the usage-data consent, the language switch.
+- Result: no problems reported.
+- This is a manual check. No automated iOS flow ran, and VoiceOver was not covered (docs/A11Y_CHECKLIST.md is still open).
+
+**Android: not run.**
+- The new development build needs the native map and location modules. Building it in the Linux container (`scripts/android/build-apk.sh`) on the 15 GB development laptop, next to the local Supabase stack, a web dev server and a browser, caused a system-wide out-of-memory freeze (kernel log 13:40, Chrome killed, hard reset).
+- The founder decided not to run Android builds or the emulator on this machine.
+- Maestro flows `23-province-and-map`, `24-near-me` and `25-report-event`, and their section in `scripts/android/native-validation.mjs` (N23–N25 with a database check of the report), are **written but have never run**. Expect to adjust selectors on the first run.
+
+**Proposed path for Android, not started:**
+- Build the APK on EAS (in the cloud, like iOS).
+- Run it on an emulator in a GitHub Actions Linux runner with KVM, with the local Supabase stack in Docker on that runner (unlike the macOS runner, Linux runners have Docker).
+- Run the existing suite plus N23–N25.
+- Also: a pass on the founder's own Android phone with the `device`-style build.
+
 ## Next
 
 0. **Phase 4 / M5 added native code** (`@maplibre/maplibre-react-native`, `expo-location`): the Android development build (Linux container, ADR-0015) and the iOS simulator build (EAS, ADR-0022) must be rebuilt before the next device run, with `EXPO_PUBLIC_MAP_STYLE_URL` set. To check on the emulator: Discover → Harita shows tiles and markers; the event form's pin picker takes a tap; "Yakınımdakiler" asks for approximate location once and sorts by distance (emulator location set to Ankara).

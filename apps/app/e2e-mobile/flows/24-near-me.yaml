@@ -1,0 +1,24 @@
+appId: com.example.matchup.dev
+# 24 Near me on the device (Phase 4) — requires -e TITLE; the runner sets the emulator's position next to the event's
+# pin first. The OS asks for location once (approximate only: the precise permission is blocked in the manifest), the
+# list is then sorted by distance with the distance on the card.
+---
+- launchApp
+- assertVisible: ${TITLE}
+- tapOn: 'Near me'
+- runFlow:
+    when:
+      visible: '.*While using the app.*'
+    commands:
+      - tapOn: '.*While using the app.*'
+- runFlow:
+    when:
+      visible: '.*Only this time.*'
+    commands:
+      - tapOn: '.*Only this time.*'
+- extendedWaitUntil:
+    visible: '.*nearest first'
+    timeout: 20000
+- assertVisible: '.*${TITLE}.* m.*|.*${TITLE}.*km.*'
+- takeScreenshot: 24-near-me
+- tapOn: 'Near me'

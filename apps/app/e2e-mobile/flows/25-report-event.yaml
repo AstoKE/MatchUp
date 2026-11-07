@@ -1,0 +1,16 @@
+appId: com.example.matchup.dev
+# 25 Report an event on the device (Phase 6) — requires -e TITLE. The report sheet opens from the event page, takes a
+# reason and answers with a thank-you; the runner then checks the report row in the database.
+---
+- launchApp
+- tapOn: ${TITLE}
+- scrollUntilVisible:
+    element: 'Report this event'
+    direction: DOWN
+- tapOn: 'Report this event'
+- assertVisible: 'Why are you reporting?'
+- tapOn: 'Fake event'
+- takeScreenshot: 25-report-sheet
+- tapOn: 'Send report'
+- assertVisible: 'Your report was received. Thank you.'
+- takeScreenshot: 25-report-sent
