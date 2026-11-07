@@ -115,7 +115,8 @@ Engineering will implement the technical hooks; the following need a Turkish-law
 14. **Push notifications** (Phase 8 M4, ADR-0028):
     - whether "events for you" and the reminders are commercial electronic messages under Law 6563 (İYS registration, wording);
     - the consent texts;
-    - Expo (and Apple and Google behind it) as processors, and the transfer abroad.
+    - Expo (and Apple and Google behind it) as processors, and the transfer abroad;
+    - whether matching people to events (by sport, province and self-assessed level) is profiling that needs more disclosure.
 13. **Gender and profile photos** (Phase 8 M3, ADR-0027):
     - the purpose wording for asking gender and whether it needs explicit consent;
     - images of people as personal data, their retention, and their moderation;

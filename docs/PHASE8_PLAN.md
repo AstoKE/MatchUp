@@ -1,6 +1,6 @@
 # Phase 8 plan: discovery and engagement
 
-Status 2026-11-07: M1–M3 merged (#84–#86); M4 built (in review).
+Status 2026-11-07: M1–M4 merged (#84–#87); M5 built (in review).
 
 The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROADMAP "Later" (push, P-01) forward. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
@@ -17,6 +17,7 @@ The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROA
 | Switching | The own set first, "show all avatars" for the other one |
 | Where the avatar shows | At the top left of the main screens, left of the province; it opens the profile |
 | Push notifications | Two separate consents, both **off** by default: "events for you" and "reminders". A new account is asked once in a popup, and can turn either on right there |
+| Reminder cap | At most **2 a week** (founder, 2026-11-07; the plan said 1), at least 48 hours apart |
 
 ## Milestones
 
@@ -158,11 +159,33 @@ The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROA
 - **Events for you:**
   - a new published event matches when its sport is in the person's sport profiles, its district or city matches the profile's city, and its skill range covers the person's level (when the event has one);
   - **caps:** at most 1 a day per person; quiet hours 22:00–09:00 Europe/Istanbul; never for events the person organizes, has joined, or whose organizer they blocked or are blocked by.
-- **Reminders:** at most 1 a week, only after 7 days without opening the app, and only if there are upcoming events in the person's city. The text is neutral and comes from i18n in the person's locale.
+- **Reminders:** at most 2 a week (founder, 2026-11-07), only after 7 days without opening the app, and only if there are upcoming events in the person's city. The text is neutral and comes from i18n in the person's locale.
 - **Data model:** the outbox from M4 and a per-user send log for the caps; `app_config` knobs for the caps.
 - **Tests:**
   - integration: matching, caps, quiet hours, blocks, consent withdrawn mid-queue;
   - a load check on fan-out for a busy city.
+- **Status 2026-11-07: built** (migration `20261113100000`, ADR-0028).
+  - **Events for you:** every 10 minutes. A published public event with room is eligible if it was published in the last 36 hours and starts 2 hours or later from now.
+    - It goes to people who play its sport, live in its province, and fit its level range.
+    - Never the organizer, a participant or a blocked pair; never the same event twice (`private.push_recommended`).
+    - One a day (Istanbul day), and the soonest fitting event wins.
+    - The text names the sport and the district.
+  - **Reminders:** every hour. The person's phones have not opened the app for 7 days (the token refresh on start is the signal), and the province has upcoming games.
+    - At most 2 in 7 days, at least 48 hours apart.
+    - The text names the province and a count.
+  - **Quiet hours** 22:00–09:00 Istanbul for both. Every limit is an `app_config` row.
+  - **Design changes from this plan:**
+    - the province is the match, not the district (a district is too small for a pilot);
+    - the inactivity signal is the device's last start, since the app has no other "last opened";
+    - the text arguments are catalog names stored with the message (`push_outbox.args`).
+  - **Fan-out, measured** on the local stack in a rolled-back transaction (5,000 people with both consents, 50 new events in one province):
+    - recommendations took 4.7 s at first. Checking each person once, then searching each person's soonest fitting event with `LATERAL … LIMIT 1`, brought it to **1.2 s**, most of it writing 5,000 messages;
+    - reminders take 0.3 s;
+    - the sender took 100 rows a minute, so a morning's 5,000 would have taken 50 minutes. It now takes 1,000 a run (10 requests of 100), so they leave in about 5 minutes.
+  - **Tests:**
+    - integration `push-producers.test.ts` (6): matching, exclusions, the daily limit, no repeat, quiet hours, the reminder limits, withdrawal. Three mutation checks: block, participation, quiet hours;
+    - pgTAP 30 (20).
+  - **Not verified:** delivery on a phone (as in M4).
 
 ## Order and why
 

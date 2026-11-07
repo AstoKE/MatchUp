@@ -31,7 +31,11 @@ The app already has in-app notifications. It had no push, no device registry and
 5. **Payloads** carry a fixed title and body in the person's language (`private.push_text`), and at most a kind and an event id. Never a name, free text or coordinates. A tap opens the event, and its details load in the app under the usual rules.
 6. **The web has no push** in the MVP. `push-device.web.ts` is a stub, Settings points to the phone app, and `expo-notifications` is not in the web bundle.
 7. **A test message** (`send_test_push`, 3 a day) lets a person, and the founder on a real phone, check delivery without any consent, because it is asked for.
-8. **M5 adds the producers**: matching events and reminders, with their caps and quiet hours. M4 sends only the test.
+8. **The producers (M5, built):**
+   - "events for you": a new public game in the person's sport, province and level range, at most 1 a day;
+   - reminders: after 7 days away, when the province has games, at most **2 a week** (founder, 2026-11-07), 48 hours apart;
+   - nothing between 22:00 and 09:00 Istanbul;
+   - details in PHASE8_PLAN M5.
 
 ## Consequences
 

@@ -585,8 +585,32 @@
       "guard": "none"
     },
     {
-      "fn": "private.push_text(p_kind text, p_locale text)",
+      "fn": "private.push_quiet(p_now timestamp with time zone)",
       "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.push_text(p_kind text, p_locale text, p_args jsonb)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.queue_recommendations(p_now timestamp with time zone)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.queue_reminders(p_now timestamp with time zone)",
+      "definer": true,
       "search_path_empty": true,
       "anon": false,
       "authenticated": false,
@@ -1362,6 +1386,13 @@
     },
     {
       "table": "private.closed_review_windows",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "private.push_recommended",
       "rls": true,
       "policies": [],
       "anon": [],
