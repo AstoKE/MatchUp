@@ -177,6 +177,9 @@ test.describe('discovering events (Phase 3 / M3)', () => {
     await page.getByRole('button', { name: 'Futbol', exact: true }).click();
     await expect(card).toBeVisible();
     await expect(card).toContainText('Çankaya · ODTÜ Halı Saha 2');
+    // The card is a row: the time tile beside the text, not above it (a style lost inside <Link asChild> once
+    // stacked them; Phase 7 M5).
+    await expect(card).toHaveCSS('flex-direction', 'row');
     await expect(card).toContainText('11 yer kaldı');
     await expectNoBlocking(page);
 

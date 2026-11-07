@@ -37,6 +37,7 @@ export function EventListRow({
   const { t } = useTranslation('events');
   const { breakpoint, colors, radius, spacing } = useTheme();
   const [focused, setFocused] = useState(false);
+  const [pressed, setPressed] = useState(false);
   const locale = currentLocale();
   // Read the clock once per row (render must stay pure); the server decides what is still joinable.
   const [shownAt] = useState(Date.now);
@@ -88,7 +89,11 @@ export function EventListRow({
         accessibilityRole="link"
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        style={({ pressed }) => ({
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
+        // A plain style object: <Link asChild> passes its child's style through, but a style function is dropped on
+        // the web, which flattened the card (the time tile alone on a line).
+        style={{
           minHeight: TOUCH_TARGET,
           flexDirection: 'row',
           gap: spacing[3],
@@ -105,7 +110,7 @@ export function EventListRow({
                 outlineStyle: 'solid' as const,
               }
             : null),
-        })}
+        }}
       >
         <TimeTile
           slug={sport?.slug}

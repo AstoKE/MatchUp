@@ -217,7 +217,8 @@ export function DiscoverScreen() {
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
-              alignItems: 'center',
+              // Bottom-aligned: the view switch carries its label above its buttons, the near-me chip does not.
+              alignItems: 'flex-end',
               gap: spacing[2],
             }}
           >
