@@ -27,6 +27,7 @@ import {
   useToast,
   darkColors,
   lightColors,
+  WheelPicker,
 } from '.';
 
 const metrics = {
@@ -360,5 +361,35 @@ describe('ThemeProvider', () => {
     const spy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     expect(() => render(<ThemeProbe />)).rejects.toThrow(/ThemeProvider/);
     spy.mockRestore();
+  });
+});
+
+describe('WheelPicker', () => {
+  const options = ['00', '05', '10', '15'].map((v) => ({ value: v, label: v }));
+
+  it('is one adjustable control that reads the chosen option, and a tap on an option picks it', async () => {
+    const onChange = jest.fn();
+    await renderThemed(
+      <WheelPicker label="Dakika" options={options} value="05" onChange={onChange} />,
+    );
+    const wheel = screen.getByRole('adjustable', { name: 'Dakika' });
+    expect(wheel).toHaveAccessibilityValue({ text: '05', min: 0, max: 3, now: 1 });
+    await fireEvent.press(screen.getByText('15', { includeHiddenElements: true }));
+    expect(onChange).toHaveBeenLastCalledWith('15');
+  });
+
+  it('steps with the screen reader and stops at both ends', async () => {
+    const onChange = jest.fn();
+    await renderThemed(
+      <WheelPicker label="Dakika" options={options} value="00" onChange={onChange} />,
+    );
+    const act_ = (actionName: string) =>
+      fireEvent(screen.getByRole('adjustable', { name: 'Dakika' }), 'accessibilityAction', {
+        nativeEvent: { actionName },
+      });
+    await act_('decrement');
+    expect(onChange).not.toHaveBeenCalled();
+    await act_('increment');
+    expect(onChange).toHaveBeenLastCalledWith('05');
   });
 });

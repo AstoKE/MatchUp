@@ -3,6 +3,7 @@ import {
   DATE_PRESETS,
   EMPTY_DISCOVER_FILTERS,
   TIME_OF_DAY_PARTS,
+  utcToZonedParts,
   type DiscoverFilters as Filters,
   type TimeOfDay,
 } from '@matchup/domain';
@@ -18,6 +19,10 @@ import {
 import { currentLocale } from '@/lib/i18n';
 import { Button, SegmentedChoice, Select, Sheet, Text, ToggleChip, useTheme } from '@/ui';
 import { SportGrid } from './DiscoverSports';
+import { DateWheel } from './WhenWheels';
+
+/** How far ahead the date wheel of Discover goes. */
+const DISCOVER_DAYS_AHEAD = 90;
 
 function toggle<T>(list: readonly T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
@@ -47,6 +52,17 @@ export function DiscoverFilters({
   const search = usePlaceSearch();
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch });
   const count = activeFilterCount(filters);
+  const timeZone = city?.timeZone ?? 'Europe/Istanbul';
+  const today = utcToZonedParts(new Date().toISOString(), timeZone).date;
+  const [dayOpen, setDayOpen] = useState(false);
+  const [draftDay, setDraftDay] = useState(today);
+  const dayFormat = new Intl.DateTimeFormat(locale, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'UTC',
+  });
+  const dayLabel = (iso: string) => dayFormat.format(new Date(`${iso}T12:00:00Z`));
   const chips = (
     <>
       <Button
@@ -60,10 +76,28 @@ export function DiscoverFilters({
         <ToggleChip
           key={value}
           label={t(`discover.date.${value}`)}
-          selected={filters.datePreset === value}
-          onPress={() => set({ datePreset: filters.datePreset === value ? 'ANY' : value })}
+          selected={filters.day === null && filters.datePreset === value}
+          onPress={() =>
+            set({
+              day: null,
+              datePreset: filters.day === null && filters.datePreset === value ? 'ANY' : value,
+            })
+          }
         />
       ))}
+      {/* Selected like the other day chips once a day is picked; it always opens the wheel. */}
+      <ToggleChip
+        label={
+          filters.day === null
+            ? t('discover.date.pick')
+            : t('discover.date.picked', { day: dayLabel(filters.day) })
+        }
+        selected={filters.day !== null}
+        onPress={() => {
+          setDraftDay(filters.day ?? today);
+          setDayOpen(true);
+        }}
+      />
       <ToggleChip
         label={t('discover.onlyOpen')}
         selected={filters.onlyOpen}
@@ -146,6 +180,44 @@ export function DiscoverFilters({
               onChange={(districtId) => set({ districtId })}
             />
           ) : null}
+        </View>
+      </Sheet>
+
+      <Sheet
+        visible={dayOpen}
+        title={t('discover.date.pickTitle')}
+        onClose={() => setDayOpen(false)}
+        closeLabel={t('discover.filtersClose')}
+        footer={
+          <View style={{ gap: spacing[2] }}>
+            <Button
+              label={t('discover.date.apply')}
+              fullWidth
+              onPress={() => {
+                set({ day: draftDay, datePreset: 'ANY' });
+                setDayOpen(false);
+              }}
+            />
+            {filters.day !== null ? (
+              <Button
+                variant="tertiary"
+                label={t('discover.date.anyDay')}
+                onPress={() => {
+                  set({ day: null });
+                  setDayOpen(false);
+                }}
+              />
+            ) : null}
+          </View>
+        }
+      >
+        <View style={{ width: '100%', maxWidth: 360, alignSelf: 'center' }}>
+          <DateWheel
+            from={today}
+            days={DISCOVER_DAYS_AHEAD}
+            value={draftDay}
+            onChange={setDraftDay}
+          />
         </View>
       </Sheet>
     </View>

@@ -59,12 +59,15 @@
 // the split's loader.
 // TOTAL 917 -> 918 (2026-11-07, Phase 7 / M7 and Phase 8 / M1): the support contact, and Discover's sport strip as
 // court tiles with a measured grid in the filter sheet. INITIAL unchanged at 548.
+// TOTAL 918 -> 920 and INITIAL 548 -> 550 (2026-11-07, Phase 8 / M2): the wheel picker (ui/WheelPicker, the date and
+// time wheels) is used by Discover's date sheet and by the event form. A lazy chunk for Discover's sheet was tried and
+// measured: Metro moves a module shared by two lazy chunks into __common, which index.html loads, so it saved nothing.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 918;
-const INITIAL_RATCHET_KB = 548;
+const TOTAL_RATCHET_KB = 920;
+const INITIAL_RATCHET_KB = 550;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';

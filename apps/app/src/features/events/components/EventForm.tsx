@@ -1,14 +1,12 @@
 import {
   BOOKING_STATUSES,
+  EVENT_MAX_DAYS_AHEAD,
   formatTypedDate,
-  parseTypedDate,
-  parseTypedTime,
   SKILL_LEVELS,
   utcToZonedParts,
   type EventDraft,
   type EventDraftErrors,
 } from '@matchup/domain';
-import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, usePlaceSearch, type Catalog } from '@/features/catalog';
@@ -26,6 +24,7 @@ import {
 import { eventValidationMessage } from '../format';
 import { useVenues } from '../hooks';
 import { PinField, SuggestVenue } from './PlaceOnMap';
+import { addDays, DateWheel, TimeWheel } from './WhenWheels';
 
 export const EVENT_FORM_STEPS = 5;
 
@@ -119,11 +118,6 @@ function WhatStep({ catalog, draft, onChange, errors, locked }: EventFormProps) 
   );
 }
 
-function addDays(isoDate: string, days: number): string {
-  const [y, m, d] = isoDate.split('-').map(Number) as [number, number, number];
-  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
-}
-
 function WhenStep({ catalog, draft, onChange, errors, locked, now }: EventFormProps) {
   const { t } = useTranslation('events');
   const { spacing } = useTheme();
@@ -131,8 +125,6 @@ function WhenStep({ catalog, draft, onChange, errors, locked, now }: EventFormPr
   const city = catalog.cities.find((c) => c.id === draft.cityId);
   const timeZone = city?.timeZone ?? 'Europe/Istanbul';
   const today = utcToZonedParts(now.toISOString(), timeZone).date;
-  const [dateText, setDateText] = useState(formatTypedDate(draft.date));
-  const [timeText, setTimeText] = useState(draft.time);
   const weekday = new Intl.DateTimeFormat(locale, {
     weekday: 'short',
     day: 'numeric',
@@ -145,10 +137,9 @@ function WhenStep({ catalog, draft, onChange, errors, locked, now }: EventFormPr
   const min = format?.minParticipants ?? 2;
   const max = format?.maxParticipants ?? 500;
 
-  const pickDate = (iso: string) => {
-    setDateText(formatTypedDate(iso));
-    onChange({ date: iso });
-  };
+  const pickDate = (iso: string) => onChange({ date: iso });
+  const dateError = eventValidationMessage(errors.date);
+  const timeError = eventValidationMessage(errors.time);
 
   return (
     <View style={{ gap: spacing[4] }}>
@@ -171,28 +162,32 @@ function WhenStep({ catalog, draft, onChange, errors, locked, now }: EventFormPr
           />
         ))}
       </View>
-      <TextField
-        label={t('fields.date')}
-        value={dateText}
-        onChangeText={(text) => {
-          setDateText(text);
-          onChange({ date: parseTypedDate(text) ?? text });
-        }}
-        error={eventValidationMessage(errors.date)}
-        inputMode="numeric"
-        maxLength={10}
-      />
-      <TextField
-        label={t('fields.time')}
-        value={timeText}
-        onChangeText={(text) => {
-          setTimeText(text);
-          onChange({ time: parseTypedTime(text) ?? text });
-        }}
-        error={eventValidationMessage(errors.time)}
-        inputMode="numeric"
-        maxLength={5}
-      />
+      <View style={{ gap: spacing[2] }}>
+        <Text variant="label" tone="secondary">
+          {t('fields.when')}
+        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+          <View style={{ flex: 1, maxWidth: 240 }}>
+            <DateWheel
+              from={today}
+              days={EVENT_MAX_DAYS_AHEAD}
+              value={draft.date}
+              onChange={pickDate}
+            />
+          </View>
+          <TimeWheel value={draft.time} onChange={(time) => onChange({ time })} />
+        </View>
+        {dateError ? (
+          <Text tone="danger" accessibilityLiveRegion="polite" role="alert">
+            {dateError}
+          </Text>
+        ) : null}
+        {timeError ? (
+          <Text tone="danger" accessibilityLiveRegion="polite" role="alert">
+            {timeError}
+          </Text>
+        ) : null}
+      </View>
       <Select
         label={t('fields.duration')}
         placeholder={t('fields.duration')}
