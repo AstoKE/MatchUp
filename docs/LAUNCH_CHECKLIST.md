@@ -69,5 +69,5 @@ It also names the Phase 7 milestone where it is handled.
 - [ ] **code, M1:** the whole life of an event in one end-to-end flow, green in CI (F-35).
 - [x] **code, M5:** accessibility: axe on every route at two widths, a keyboard-only path (it found and fixed the cards' Enter), the manual list prepared (docs/A11Y_CHECKLIST.md).
 - [ ] **founder + code, M6:** docs/A11Y_CHECKLIST.md filled in with VoiceOver and TalkBack on devices.
-- [ ] **founder, M5:** the Turkish copy read by a native speaker from docs/COPY_REVIEW.md (872 strings; regenerate with `node scripts/i18n/export-copy.mjs`) (F-32).
+- [ ] **founder, M5:** the Turkish copy read by a native speaker from docs/COPY_REVIEW.md (879 strings; regenerate with `node scripts/i18n/export-copy.mjs`) (F-32).
 - [ ] **founder, M7:** store listings and identifiers decided. Nothing is published without the founder's go.
