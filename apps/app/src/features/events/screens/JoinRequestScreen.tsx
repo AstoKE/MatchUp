@@ -124,7 +124,6 @@ function Form({
   onSending: (sending: boolean) => void;
 }) {
   const { t } = useTranslation(['events', 'common']);
-  const { spacing } = useTheme();
   const router = useRouter();
   const locale = currentLocale();
   const join = useRequestJoin();

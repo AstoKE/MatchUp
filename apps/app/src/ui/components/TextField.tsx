@@ -8,7 +8,7 @@ import {
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
-import { MAX_FONT_SCALE, TOUCH_TARGET } from '../tokens';
+import { MAX_FONT_SCALE } from '../tokens';
 import { useTheme } from '../theme';
 import { Text } from './Text';
 

@@ -44,10 +44,10 @@ jest.mock('expo-router', () => {
   const { Text } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     useRouter: () => mockRouter,
+    Link: jest.requireActual<typeof import('@/test/link-mock')>('@/test/link-mock').LinkMock,
     useLocalSearchParams: () => ({ id: '00000000-0000-4000-8000-0000000000bb' }),
     usePathname: () => '/u/x',
     Redirect: ({ href }: { href: string }) => <Text testID="redirect">{String(href)}</Text>,
-    Link: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   };
 });
 

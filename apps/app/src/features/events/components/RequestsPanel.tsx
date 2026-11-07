@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -151,7 +151,6 @@ function RequestRow({
 }) {
   const { t } = useTranslation(['events', 'common']);
   const { colors, radius, spacing } = useTheme();
-  const router = useRouter();
   const name = request.displayName ?? t('events:requests.unnamed');
   const locale = currentLocale();
   const decimal = new Intl.NumberFormat(locale, {
@@ -171,16 +170,17 @@ function RequestRow({
       }}
     >
       {request.userId ? (
-        <Pressable
-          accessibilityRole="link"
-          accessibilityLabel={t('events:requests.openCard', { name })}
-          onPress={() => router.push({ pathname: '/u/[id]', params: { id: request.userId ?? '' } })}
-          style={{ minHeight: TOUCH_TARGET, justifyContent: 'center', alignSelf: 'flex-start' }}
-        >
-          <Text variant="titleSm" tone="link">
-            {name}
-          </Text>
-        </Pressable>
+        <Link href={{ pathname: '/u/[id]', params: { id: request.userId } }} asChild>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel={t('events:requests.openCard', { name })}
+            style={{ minHeight: TOUCH_TARGET, justifyContent: 'center', alignSelf: 'flex-start' }}
+          >
+            <Text variant="titleSm" tone="link">
+              {name}
+            </Text>
+          </Pressable>
+        </Link>
       ) : (
         <Text variant="titleSm">{name}</Text>
       )}

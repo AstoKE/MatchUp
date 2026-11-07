@@ -32,6 +32,7 @@ jest.mock('expo-router', () => {
   const { Text } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     useRouter: () => mockRouter,
+    Link: jest.requireActual<typeof import('@/test/link-mock')>('@/test/link-mock').LinkMock,
     usePathname: () => '/notifications',
     Redirect: ({ href }: { href: unknown }) => (
       <Text testID="redirect">{JSON.stringify(href)}</Text>

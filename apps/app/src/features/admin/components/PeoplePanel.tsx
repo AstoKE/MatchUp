@@ -99,7 +99,11 @@ function ReviewList({ userId, as }: { userId: string; as: 'reviewer' | 'reviewee
             disabled={note.trim().length === 0}
             pending={change.isPending}
             onConfirm={() =>
-              change.mutate({ review }, { onSuccess: () => toast.show(t('users.done'), 'success') })
+              // The list reloads after the change: a per-call onSuccess could be skipped (see VenuesPanel).
+              change
+                .mutateAsync({ review })
+                .then(() => toast.show(t('users.done'), 'success'))
+                .catch(() => undefined)
             }
           />
         </View>

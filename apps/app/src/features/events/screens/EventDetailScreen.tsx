@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -368,18 +368,17 @@ function Detail({
               {event.participants.map((p, index) => (
                 <View key={p.userId ?? index} role="listitem">
                   {p.userId ? (
-                    <Pressable
-                      accessibilityRole="link"
-                      accessibilityLabel={t('events:requests.openCard', {
-                        name: p.displayName ?? t('events:requests.unnamed'),
-                      })}
-                      onPress={() =>
-                        router.push({ pathname: '/u/[id]', params: { id: p.userId ?? '' } })
-                      }
-                      style={{ minHeight: TOUCH_TARGET, justifyContent: 'center' }}
-                    >
-                      <Text tone="link">{p.displayName ?? t('events:requests.unnamed')}</Text>
-                    </Pressable>
+                    <Link href={{ pathname: '/u/[id]', params: { id: p.userId } }} asChild>
+                      <Pressable
+                        accessibilityRole="link"
+                        accessibilityLabel={t('events:requests.openCard', {
+                          name: p.displayName ?? t('events:requests.unnamed'),
+                        })}
+                        style={{ minHeight: TOUCH_TARGET, justifyContent: 'center' }}
+                      >
+                        <Text tone="link">{p.displayName ?? t('events:requests.unnamed')}</Text>
+                      </Pressable>
+                    </Link>
                   ) : (
                     <Text>{p.displayName ?? t('events:requests.unnamed')}</Text>
                   )}

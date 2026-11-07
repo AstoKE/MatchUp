@@ -4,7 +4,10 @@ import { act, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime, formatMoneyMinor, i18n, initI18n, toLocaleLower, toLocaleUpper } from '.';
-import { resources } from './resources';
+import { enResources } from './en-resources';
+import { resources as trOnly } from './resources';
+
+const resources = { tr: trOnly.tr, en: enResources };
 
 type Json = { [key: string]: string | Json };
 
@@ -35,6 +38,20 @@ describe('translation resources', () => {
       expect(placeholders(en[key] ?? '')).toEqual(placeholders(text));
     }
   });
+
+  it.each(namespaces)(
+    'namespace "%s": every plural has both forms, and counts are interpolated',
+    (ns) => {
+      // i18next picks _one/_other by the count in both languages; a lone form shows a raw key for the other count.
+      const tr = flatten(resources.tr[ns] as Json);
+      for (const key of Object.keys(tr)) {
+        const base = key.replace(/_(one|other)$/, '');
+        if (base === key) continue;
+        expect(tr).toHaveProperty([`${base}_one`]);
+        expect(tr).toHaveProperty([`${base}_other`]);
+      }
+    },
+  );
 
   it('no resource hard-codes the product name (ADR-0010)', () => {
     const all = JSON.stringify(resources);

@@ -1,14 +1,3 @@
-import enAccount from '@/locales/en/account.json';
-import enAuth from '@/locales/en/auth.json';
-import enCommon from '@/locales/en/common.json';
-import enErrors from '@/locales/en/errors.json';
-import enEvents from '@/locales/en/events.json';
-import enLegal from '@/locales/en/legal.json';
-import enNav from '@/locales/en/nav.json';
-import enNotifications from '@/locales/en/notifications.json';
-import enOnboarding from '@/locales/en/onboarding.json';
-import enPlayers from '@/locales/en/players.json';
-import enProfile from '@/locales/en/profile.json';
 import trAccount from '@/locales/tr/account.json';
 import trAuth from '@/locales/tr/auth.json';
 import trCommon from '@/locales/tr/common.json';
@@ -21,6 +10,10 @@ import trOnboarding from '@/locales/tr/onboarding.json';
 import trPlayers from '@/locales/tr/players.json';
 import trProfile from '@/locales/tr/profile.json';
 
+/**
+ * Turkish, the default and fallback language, is in the first load. English is loaded on demand on the web
+ * (english.web.ts) and bundled on phones (english.ts): see PERFORMANCE §4 item 5.
+ */
 export const resources = {
   tr: {
     common: trCommon,
@@ -34,19 +27,6 @@ export const resources = {
     account: trAccount,
     events: trEvents,
     notifications: trNotifications,
-  },
-  en: {
-    common: enCommon,
-    nav: enNav,
-    auth: enAuth,
-    errors: enErrors,
-    players: enPlayers,
-    profile: enProfile,
-    onboarding: enOnboarding,
-    legal: enLegal,
-    account: enAccount,
-    events: enEvents,
-    notifications: enNotifications,
   },
 } as const;
 

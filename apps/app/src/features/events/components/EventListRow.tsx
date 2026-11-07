@@ -1,5 +1,5 @@
 import { formatDistance } from '@matchup/domain';
-import { useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +36,6 @@ export function EventListRow({
 }) {
   const { t } = useTranslation('events');
   const { breakpoint, colors, radius, spacing } = useTheme();
-  const router = useRouter();
   const [focused, setFocused] = useState(false);
   const locale = currentLocale();
   // Read the clock once per row (render must stay pure); the server decides what is still joinable.
@@ -82,76 +81,79 @@ export function EventListRow({
       : `${place} · ${formatDistance(event.distanceM, locale)}`;
 
   return (
-    <Pressable
-      accessibilityRole="link"
-      onPress={() => router.push({ pathname: '/e/[id]', params: { id: event.id } })}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-      style={({ pressed }) => ({
-        minHeight: TOUCH_TARGET,
-        flexDirection: 'row',
-        gap: spacing[3],
-        padding: spacing[3],
-        borderRadius: radius.lg,
-        borderWidth: 1,
-        borderColor: colors.borderSubtle,
-        backgroundColor: pressed ? colors.surfaceOverlay : colors.surfaceRaised,
-        ...(focused
-          ? {
-              outlineColor: colors.focusRing,
-              outlineWidth: 2,
-              outlineOffset: 2,
-              outlineStyle: 'solid' as const,
-            }
-          : null),
-      })}
-    >
-      <TimeTile
-        slug={sport?.slug}
-        time={formatEventTime(event.startsAt, timeZone, locale)}
-        size={breakpoint === 'expanded' ? 80 : 64}
-      />
-      <View style={{ flex: 1, gap: 2 }}>
-        <Text variant="caption" tone="secondary">
-          {[
-            sport && localizedName(sport.names, locale),
-            format && localizedName(format.names, locale),
-            event.setting && t(`setting.${event.setting}`),
-          ]
-            .filter(Boolean)
-            .join(' · ')}
-        </Text>
-        <Text variant="titleSm" heading={showDate ? 2 : 3}>
-          {event.title}
-        </Text>
-        {showDate ? (
-          <Text variant="bodySm">{formatEventStart(event.startsAt, timeZone, locale)}</Text>
-        ) : null}
-        <Text variant="caption" tone="secondary">
-          {where}
-        </Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            gap: spacing[2],
-            marginTop: spacing[1],
-          }}
-        >
-          {allBadges.map((badge) =>
-            badge.chip ? (
-              <StatusChip key={badge.label} kind={badge.chip} label={badge.label} />
-            ) : badge.tone === 'neutral' ? (
-              <Text key={badge.label} variant="micro">
-                {badge.label}
-              </Text>
-            ) : (
-              <Pill key={badge.label} label={badge.label} tone={badge.tone} />
-            ),
-          )}
+    // A real link (an <a href> on the web): Enter opens it like a click, as WCAG 2.1.1 asks; a Pressable with
+    // role="link" alone reacted to the mouse only (found by e2e/keyboard.spec.ts).
+    <Link href={{ pathname: '/e/[id]', params: { id: event.id } }} asChild>
+      <Pressable
+        accessibilityRole="link"
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        style={({ pressed }) => ({
+          minHeight: TOUCH_TARGET,
+          flexDirection: 'row',
+          gap: spacing[3],
+          padding: spacing[3],
+          borderRadius: radius.lg,
+          borderWidth: 1,
+          borderColor: colors.borderSubtle,
+          backgroundColor: pressed ? colors.surfaceOverlay : colors.surfaceRaised,
+          ...(focused
+            ? {
+                outlineColor: colors.focusRing,
+                outlineWidth: 2,
+                outlineOffset: 2,
+                outlineStyle: 'solid' as const,
+              }
+            : null),
+        })}
+      >
+        <TimeTile
+          slug={sport?.slug}
+          time={formatEventTime(event.startsAt, timeZone, locale)}
+          size={breakpoint === 'expanded' ? 80 : 64}
+        />
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text variant="caption" tone="secondary">
+            {[
+              sport && localizedName(sport.names, locale),
+              format && localizedName(format.names, locale),
+              event.setting && t(`setting.${event.setting}`),
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+          </Text>
+          <Text variant="titleSm" heading={showDate ? 2 : 3}>
+            {event.title}
+          </Text>
+          {showDate ? (
+            <Text variant="bodySm">{formatEventStart(event.startsAt, timeZone, locale)}</Text>
+          ) : null}
+          <Text variant="caption" tone="secondary">
+            {where}
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: spacing[2],
+              marginTop: spacing[1],
+            }}
+          >
+            {allBadges.map((badge) =>
+              badge.chip ? (
+                <StatusChip key={badge.label} kind={badge.chip} label={badge.label} />
+              ) : badge.tone === 'neutral' ? (
+                <Text key={badge.label} variant="micro">
+                  {badge.label}
+                </Text>
+              ) : (
+                <Pill key={badge.label} label={badge.label} tone={badge.tone} />
+              ),
+            )}
+          </View>
         </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </Link>
   );
 }
