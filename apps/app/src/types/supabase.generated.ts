@@ -773,6 +773,7 @@ export type Database = {
       };
       push_outbox: {
         Row: {
+          args: NonNullable<Json>;
           created_at: string;
           dispatched_at: string | null;
           event_id: string | null;
@@ -782,6 +783,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          args?: NonNullable<Json>;
           created_at?: string;
           dispatched_at?: string | null;
           event_id?: string | null;
@@ -790,6 +792,7 @@ export type Database = {
           user_id: string;
         };
         Update: {
+          args?: NonNullable<Json>;
           created_at?: string;
           dispatched_at?: string | null;
           event_id?: string | null;

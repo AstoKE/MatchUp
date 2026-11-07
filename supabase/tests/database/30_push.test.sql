@@ -1,6 +1,6 @@
 -- Phase 8 / M4: the push foundation (ADR-0028). The sender itself is exercised in db-tests/push.test.ts.
 begin;
-select plan(14);
+select plan(20);
 
 select has_table('public', 'push_devices', 'devices table');
 select has_table('public', 'push_outbox', 'outbox table');
@@ -28,9 +28,21 @@ select ok(not has_function_privilege('authenticated', 'private.push_dispatch()',
       and not has_function_privilege('authenticated', 'private.push_collect()', 'execute'),
   'nobody but the scheduler runs the sender');
 select results_eq($$ select jobname::text from cron.job where jobname like 'push-%' order by jobname $$,
-  $$ values ('push-collect'), ('push-dispatch'), ('push-prune') $$, 'the sender runs on schedule');
-select is(private.push_text('TEST', 'en') ->> 'title', 'Notifications are on', 'English text for English speakers');
-select is(private.push_text('TEST', 'tr') ->> 'title', 'Bildirimler açık', 'Turkish otherwise');
+  $$ values ('push-collect'), ('push-dispatch'), ('push-prune'), ('push-recommendations'), ('push-reminders') $$,
+  'the sender and the producers run on schedule');
+select is(private.push_text('TEST', 'en', '{}') ->> 'title', 'Notifications are on', 'English text for English speakers');
+select is(private.push_text('TEST', 'tr', '{}') ->> 'title', 'Bildirimler açık', 'Turkish otherwise');
+
+-- Phase 8 / M5
+select is(private.push_text('REMINDER', 'tr', '{"city": {"tr": "Ankara", "en": "Ankara"}, "count": 3}') ->> 'body',
+  'Ankara: yaklaşan 3 etkinlik seni bekliyor.', 'a reminder names the province and a count');
+select is(private.push_text('REMINDER', 'en', '{"city": {"tr": "Ankara", "en": "Ankara"}, "count": 1}') ->> 'body',
+  'Ankara: 1 upcoming event is waiting.', 'singular in English');
+select ok(private.push_quiet('2026-11-10 20:30:00+00'::timestamptz), '23:30 in Istanbul is quiet');
+select ok(not private.push_quiet('2026-11-10 09:00:00+00'::timestamptz), '12:00 in Istanbul is not');
+select ok(not has_table_privilege('authenticated', 'private.push_recommended', 'select'), 'what was recommended is private');
+select throws_ok($$ insert into public.push_outbox (user_id, kind) values (gen_random_uuid(), 'SPAM') $$, '23514', null,
+  'only known kinds are queued');
 
 select * from finish();
 rollback;

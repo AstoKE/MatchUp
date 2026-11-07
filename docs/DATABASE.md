@@ -11,6 +11,11 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 ## 0. As built in Phase 7
 
 - `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261113100000_push_recommendations_reminders.sql` (Phase 8 M5, ADR-0028):
+  - **Tables:** `push_outbox` kinds `RECOMMENDATION` and `REMINDER`, and `args` (catalog names and a count); `private.push_recommended` (RLS on, no grants).
+  - **Functions:** `private.push_quiet` (22:00–09:00 Istanbul); `push_text(kind, locale, args)`; `push_allowed` per kind; `queue_recommendations(p_now)` (every 10 min); `queue_reminders(p_now)` (hourly).
+  - **Config:** `push.recommendations_per_day` (1), `push.reminders_per_week` (2), `push.reminder_gap_hours` (48), `push.reminder_inactive_days` (7), and the quiet hours.
+  - **Changed:** the sender takes 1,000 rows a run; the purge also forgets recommendations.
 - `20261112100000_push_consent_kinds.sql`, `20261112110000_push_foundation.sql` (Phase 8 M4, ADR-0028):
   - **Consents:** consent kinds `PUSH_RECOMMENDATIONS` and `PUSH_REMINDERS`; `user_settings.push_recommendations_at`, `push_reminders_at` and `push_prompted_at`.
   - **Tables:** `pg_net`; `push_devices` (unique Expo token, at most 10 per person), `push_outbox` and `push_deliveries`. RLS is on and there are no API grants.
