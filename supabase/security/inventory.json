@@ -265,6 +265,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.export_push_data(p_uid uuid)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.finalize_event_row(p_event uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -513,6 +521,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.prune_push()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.public_point_of(r private.event_input)",
       "definer": false,
       "search_path_empty": true,
@@ -539,6 +555,38 @@
     {
       "fn": "private.purge_event_data(p_uid uuid)",
       "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.push_allowed(p_uid uuid, p_kind text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.push_collect()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.push_dispatch()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.push_text(p_kind text, p_locale text)",
+      "definer": false,
       "search_path_empty": true,
       "anon": false,
       "authenticated": false,
@@ -602,6 +650,14 @@
     },
     {
       "fn": "private.send_attendance_reminders(p_at timestamp with time zone)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.set_push_consent(p_uid uuid, p_kind consent_kind, p_granted boolean)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
@@ -1073,6 +1129,14 @@
       "guard": "private.assert_onboarded_user"
     },
     {
+      "fn": "public.register_push_device(p_token text, p_platform text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
       "fn": "public.reject_participation(p_participation_id uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -1145,6 +1209,14 @@
       "guard": "none"
     },
     {
+      "fn": "public.send_test_push()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
       "fn": "public.set_analytics_consent(p_granted boolean)",
       "definer": true,
       "search_path_empty": true,
@@ -1185,6 +1257,14 @@
       "guard": "private.assert_active_verified_user"
     },
     {
+      "fn": "public.set_push_consents(p_recommendations boolean, p_reminders boolean)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
       "fn": "public.set_sport_profile(p_sport_id uuid, p_level numeric, p_position_ids uuid[])",
       "definer": true,
       "search_path_empty": true,
@@ -1223,6 +1303,14 @@
       "anon": false,
       "authenticated": true,
       "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.unregister_push_device(p_token text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_active_verified_user"
     },
     {
       "fn": "public.update_event(p_event_id uuid, p_input jsonb)",
@@ -1429,6 +1517,27 @@
         "profiles_select_own r authenticated",
         "profiles_select_public r authenticated"
       ],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.push_deliveries",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.push_devices",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.push_outbox",
+      "rls": true,
+      "policies": [],
       "anon": [],
       "authenticated": []
     },

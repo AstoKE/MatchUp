@@ -686,6 +686,127 @@ export type Database = {
           },
         ];
       };
+      push_deliveries: {
+        Row: {
+          created_at: string;
+          device_id: number | null;
+          error: string | null;
+          id: number;
+          outbox_id: number;
+          position: number;
+          request_id: number;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          device_id?: number | null;
+          error?: string | null;
+          id?: never;
+          outbox_id: number;
+          position: number;
+          request_id: number;
+          status?: string;
+        };
+        Update: {
+          created_at?: string;
+          device_id?: number | null;
+          error?: string | null;
+          id?: never;
+          outbox_id?: number;
+          position?: number;
+          request_id?: number;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'push_deliveries_device_id_fkey';
+            columns: ['device_id'];
+            isOneToOne: false;
+            referencedRelation: 'push_devices';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'push_deliveries_outbox_id_fkey';
+            columns: ['outbox_id'];
+            isOneToOne: false;
+            referencedRelation: 'push_outbox';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      push_devices: {
+        Row: {
+          created_at: string;
+          id: number;
+          last_seen_at: string;
+          platform: string;
+          token: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: never;
+          last_seen_at?: string;
+          platform: string;
+          token: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: never;
+          last_seen_at?: string;
+          platform?: string;
+          token?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'push_devices_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      push_outbox: {
+        Row: {
+          created_at: string;
+          dispatched_at: string | null;
+          event_id: string | null;
+          id: number;
+          kind: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          dispatched_at?: string | null;
+          event_id?: string | null;
+          id?: never;
+          kind: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          dispatched_at?: string | null;
+          event_id?: string | null;
+          id?: never;
+          kind?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'push_outbox_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       reliability_events: {
         Row: {
           created_at: string;
@@ -1172,6 +1293,9 @@ export type Database = {
           locale: string;
           marketing_consent_at: string | null;
           profile_visibility: Database['public']['Enums']['profile_visibility'];
+          push_prompted_at: string | null;
+          push_recommendations_at: string | null;
+          push_reminders_at: string | null;
           show_badges: boolean;
           show_reliability: boolean;
           theme: string;
@@ -1185,6 +1309,9 @@ export type Database = {
           locale?: string;
           marketing_consent_at?: string | null;
           profile_visibility?: Database['public']['Enums']['profile_visibility'];
+          push_prompted_at?: string | null;
+          push_recommendations_at?: string | null;
+          push_reminders_at?: string | null;
           show_badges?: boolean;
           show_reliability?: boolean;
           theme?: string;
@@ -1197,6 +1324,9 @@ export type Database = {
           locale?: string;
           marketing_consent_at?: string | null;
           profile_visibility?: Database['public']['Enums']['profile_visibility'];
+          push_prompted_at?: string | null;
+          push_recommendations_at?: string | null;
+          push_reminders_at?: string | null;
           show_badges?: boolean;
           show_reliability?: boolean;
           theme?: string;
@@ -1594,6 +1724,7 @@ export type Database = {
       };
       mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number };
       publish_event: { Args: { p_event_id: string }; Returns: undefined };
+      register_push_device: { Args: { p_platform: string; p_token: string }; Returns: undefined };
       reject_participation: { Args: { p_participation_id: string }; Returns: undefined };
       remove_participant: {
         Args: { p_participation_id: string; p_reason?: string };
@@ -1623,12 +1754,17 @@ export type Database = {
       };
       search_events: { Args: { p_cursor?: Json; p_filters?: Json }; Returns: Json };
       search_venues: { Args: { p_filters: Json }; Returns: Json };
+      send_test_push: { Args: Record<PropertyKey, never>; Returns: boolean };
       set_analytics_consent: { Args: { p_granted: boolean }; Returns: undefined };
       set_marketing_consent: { Args: { p_granted: boolean }; Returns: undefined };
       set_my_avatar: { Args: { p_avatar_key: string }; Returns: undefined };
       set_my_avatar_photo: { Args: { p_path: string }; Returns: string };
       set_my_gender: {
         Args: { p_gender: Database['public']['Enums']['profile_gender'] };
+        Returns: undefined;
+      };
+      set_push_consents: {
+        Args: { p_recommendations: boolean; p_reminders: boolean };
         Returns: undefined;
       };
       set_sport_profile: {
@@ -1639,6 +1775,7 @@ export type Database = {
       suggest_venue: { Args: { p_input: Json }; Returns: string };
       track_event: { Args: { p_name: string; p_props?: Json }; Returns: boolean };
       unblock_user: { Args: { p_user_id: string }; Returns: undefined };
+      unregister_push_device: { Args: { p_token: string }; Returns: undefined };
       update_event: { Args: { p_event_id: string; p_input: Json }; Returns: undefined };
       update_my_profile: {
         Args: { p_bio: string; p_city_id: string; p_display_name: string; p_district_id: string };
@@ -1660,7 +1797,13 @@ export type Database = {
       account_status: 'ACTIVE' | 'SUSPENDED' | 'PENDING_DELETION' | 'DELETED';
       attendance_status: 'NOT_CONFIRMED' | 'PRESENT' | 'ABSENT' | 'DISPUTED';
       booking_status: 'NOT_REQUIRED' | 'NOT_YET_BOOKED' | 'BOOKED_EXTERNALLY' | 'TO_BE_CONFIRMED';
-      consent_kind: 'TERMS' | 'PRIVACY_NOTICE' | 'MARKETING' | 'ANALYTICS';
+      consent_kind:
+        | 'TERMS'
+        | 'PRIVACY_NOTICE'
+        | 'MARKETING'
+        | 'ANALYTICS'
+        | 'PUSH_RECOMMENDATIONS'
+        | 'PUSH_REMINDERS';
       event_cancel_reason:
         | 'WEATHER'
         | 'VENUE_UNAVAILABLE'
@@ -1791,7 +1934,14 @@ export const Constants = {
       account_status: ['ACTIVE', 'SUSPENDED', 'PENDING_DELETION', 'DELETED'],
       attendance_status: ['NOT_CONFIRMED', 'PRESENT', 'ABSENT', 'DISPUTED'],
       booking_status: ['NOT_REQUIRED', 'NOT_YET_BOOKED', 'BOOKED_EXTERNALLY', 'TO_BE_CONFIRMED'],
-      consent_kind: ['TERMS', 'PRIVACY_NOTICE', 'MARKETING', 'ANALYTICS'],
+      consent_kind: [
+        'TERMS',
+        'PRIVACY_NOTICE',
+        'MARKETING',
+        'ANALYTICS',
+        'PUSH_RECOMMENDATIONS',
+        'PUSH_REMINDERS',
+      ],
       event_cancel_reason: [
         'WEATHER',
         'VENUE_UNAVAILABLE',

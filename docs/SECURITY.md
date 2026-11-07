@@ -90,6 +90,11 @@ Boundaries: **client (untrusted)** ⇄ Supabase API (PostgREST/Auth/Realtime/Sto
 - Join requests disclose a minimal game-relevant profile to the organizer, stated at request time.
 - Participants see each other only after approval.
 - Notifications store ids, not names.
+- **Push** (Phase 8 M4, ADR-0028) has two consents, both off by default and asked once. The OS permission is requested only when a kind is switched on.
+  - Payloads hold a fixed localized text and at most an event id.
+  - The device token is unregistered before sign-out, so a shared phone never shows the previous person's notifications.
+  - Consent and account state are checked when sending.
+  - There is no push on the web.
 - Export and deletion are first-class (§8).
 
 ## 8. KVKK (Turkey) and data lifecycle — items requiring legal review before public launch
@@ -107,6 +112,10 @@ Engineering will implement the technical hooks; the following need a Turkish-law
 9. **Terms of Service**: user conduct, organizer responsibilities, **assumption-of-risk / injury disclaimers**, disclaimer that MatchUp does not guarantee venue bookings, collect payments, or verify identities/skill; handling of money exchanged offline between users.
 10. **Age policy**: 18+ self-declaration adequacy; handling minors discovered.
 11. **Data breach notification** procedure (72-hour notification to the Authority under KVKK) and incident response owner.
+14. **Push notifications** (Phase 8 M4, ADR-0028):
+    - whether "events for you" and the reminders are commercial electronic messages under Law 6563 (İYS registration, wording);
+    - the consent texts;
+    - Expo (and Apple and Google behind it) as processors, and the transfer abroad.
 13. **Gender and profile photos** (Phase 8 M3, ADR-0027):
     - the purpose wording for asking gender and whether it needs explicit consent;
     - images of people as personal data, their retention, and their moderation;

@@ -1,6 +1,6 @@
 # Phase 8 plan: discovery and engagement
 
-Status 2026-11-07: M1 and M2 merged (#84, #85); M3 built (in review).
+Status 2026-11-07: M1–M3 merged (#84–#86); M4 built (in review).
 
 The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROADMAP "Later" (push, P-01) forward. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
@@ -131,6 +131,27 @@ The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROA
   - iOS needs an APNs key in EAS and a physical iPhone.
 
   The server side is tested locally against a fake Expo endpoint.
+
+- **Status 2026-11-07: built** (ADR-0028).
+  - **Database:**
+    - migrations `20261112100000` (consent kinds) and `20261112110000`;
+    - devices, the outbox and deliveries;
+    - the sender in SQL with pg_cron and pg_net, checked at sending time;
+    - the test message.
+  - **App:**
+    - `expo-notifications`, native only (`push-device.web.ts` is a stub);
+    - `PushBridge` at the root: the one-time popup, refreshing the token, unregistering before sign-out (`lib/before-sign-out.ts`), opening the tapped event;
+    - Settings › Bildirimler with both kinds and "Test bildirimi gönder".
+  - **Design changes from this plan:**
+    - one RPC for both choices (`set_push_consents`) instead of one per kind;
+    - receipts are not read in the pilot; the tickets are;
+    - the local and CI stacks switch the sender off in a dev seed.
+  - **Tests:**
+    - pgTAP 30 (14), and 06 extended;
+    - integration `push.test.ts` (9): what is queued is checked inside a rolled-back transaction, and Expo's answers are inserted as pg_net stores them. A mutation check covers the active-account rule;
+    - components `push.test.tsx` (11);
+    - E2E `push.spec.ts`: the web never asks.
+  - **Not verified:** delivery on a real phone. The founder builds iOS; Android is not run here.
 
 ### M5: events for you, and reminders
 

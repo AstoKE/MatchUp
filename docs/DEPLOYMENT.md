@@ -219,3 +219,25 @@ Founder actions, **in this order**. Each step depends on the one before it. Do n
 11. **Sign up once yourself** on the deployed web with a fresh address, from confirmation through onboarding. Then delete that account in the app.
 
 **To close sign-up again:** turn off "Allow new users to sign up". Existing accounts keep working. Then run `hosted-surface.mjs` without `--signup`.
+
+## 15. Push notifications (Phase 8 M4, ADR-0028)
+
+Founder actions. The database side ships with the migrations: the sender runs every minute and is on by default on hosted (`push.enabled`).
+
+1. **iOS (APNs).**
+   - The first EAS build after `expo-notifications` was added asks to set up push. Let EAS create the APNs key, or run `eas credentials` → iOS → Push Notifications.
+   - Nothing goes into the repository.
+2. **Android (FCM).**
+   - Create a Firebase project and add an Android app with the package name.
+   - Make a service-account key for FCM V1 and upload it with `eas credentials` → Android → FCM V1. The app does not ship `google-services.json` in the pilot; add it when the Android build is made.
+3. **Check on a real phone:**
+   - install the new build and sign in;
+   - answer the popup with one kind on, and allow notifications;
+   - Settings › Bildirimler › **Test bildirimi gönder**. A notification arrives within a minute.
+4. **If nothing arrives:**
+   - In the SQL editor: `select status, error from public.push_deliveries order by id desc limit 5;`
+   - `DeviceNotRegistered` means a stale token (the app registers again on the next start).
+   - `InvalidCredentials` means the APNs or FCM key in EAS is wrong.
+   - `NO_RESPONSE` means pg_net could not reach Expo.
+5. **To stop all push at once:** `update public.app_config set value = 'false'::jsonb where key = 'push.enabled';`
+

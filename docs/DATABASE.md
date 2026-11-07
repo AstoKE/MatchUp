@@ -11,6 +11,21 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 ## 0. As built in Phase 7
 
 - `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261112100000_push_consent_kinds.sql`, `20261112110000_push_foundation.sql` (Phase 8 M4, ADR-0028):
+  - **Consents:** consent kinds `PUSH_RECOMMENDATIONS` and `PUSH_REMINDERS`; `user_settings.push_recommendations_at`, `push_reminders_at` and `push_prompted_at`.
+  - **Tables:** `pg_net`; `push_devices` (unique Expo token, at most 10 per person), `push_outbox` and `push_deliveries`. RLS is on and there are no API grants.
+  - **RPCs:**
+    - `register_push_device` (a token moves to the caller) and `unregister_push_device` (own only);
+    - `set_push_consents` (both kinds, records the prompt);
+    - `send_test_push` (3 a day).
+  - **Sender:**
+    - `private.push_text`, `push_allowed` (an active account; consent per kind);
+    - `push_dispatch` (up to 100 rows a run, requests of at most 100 messages);
+    - `push_collect` (tickets in order; `DeviceNotRegistered` deletes the token);
+    - `prune_push` (30 days);
+    - cron jobs `push-dispatch` and `push-collect` every minute, `push-prune` daily.
+  - **Config:** `push.enabled` (the local and CI dev seed turns it off), `push.endpoint`, and quotas.
+  - **Export and purge** are extended.
 - `20261111100000_avatars.sql` (Phase 8 M3, ADR-0027):
   - **Columns and tables:** `profile_gender` enum and `profiles.gender` (private: no column grant); `profiles.avatar_key` (checked against the 22 drawings and `letters`, readable like the display name); private bucket `avatars` (1 MB, `image/jpeg`); `private.avatar_uploads` (RLS on, no grants) and `quota.max_avatar_photos_per_day` (10).
   - **Policies:** on `storage.objects`, `avatars_insert`, `avatars_select` and `avatars_delete`, through `private.avatar_owner`, `can_upload_avatar`, `can_read_avatar` (the `get_player_card` rule, only the current photo for others) and `can_delete_avatar` (owner or second-factor admin). There is no update policy.

@@ -78,6 +78,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         isAndroidForegroundServiceEnabled: false,
       },
     ],
+    // Phase 8 / M4: push notifications (ADR-0028). iOS needs an APNs key in EAS credentials, Android an FCM key.
+    'expo-notifications',
     // Phase 8 / M3: a profile photo from the library only. No camera, no microphone (privacy by default, ADR-0027).
     [
       'expo-image-picker',
