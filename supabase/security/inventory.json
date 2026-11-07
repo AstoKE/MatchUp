@@ -33,6 +33,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.analytics_props_ok(p_name text, p jsonb)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.apply_attendance_outcome(p_participation uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -194,6 +202,14 @@
     },
     {
       "fn": "private.events_before_write()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.export_analytics_data(p_uid uuid)",
       "definer": false,
       "search_path_empty": true,
       "anon": false,
@@ -745,6 +761,14 @@
       "guard": "private.assert_admin_aal2"
     },
     {
+      "fn": "public.admin_pilot_metrics(p_days integer)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
       "fn": "public.admin_reinstate_user(p_user_id uuid, p_note text)",
       "definer": true,
       "search_path_empty": true,
@@ -1065,6 +1089,14 @@
       "guard": "none"
     },
     {
+      "fn": "public.set_analytics_consent(p_granted boolean)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
       "fn": "public.set_marketing_consent(p_granted boolean)",
       "definer": true,
       "search_path_empty": true,
@@ -1090,6 +1122,14 @@
     },
     {
       "fn": "public.suggest_venue(p_input jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.track_event(p_name text, p_props jsonb)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
@@ -1169,6 +1209,13 @@
       "authenticated": [
         "SELECT"
       ]
+    },
+    {
+      "table": "public.analytics_events",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
     },
     {
       "table": "public.app_config",

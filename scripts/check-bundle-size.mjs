@@ -49,12 +49,17 @@
 // INITIAL raised 555 -> 556 for M5, with the reason: "near me" and the list/map switch sit on Discover (+2.9 kB), and the
 // event page's request, attendance and review panels moved out of the first load to pay for them (-2.3 kB). Measured
 // 555.26 kB on main before, 555.6 kB after.
+// TOTAL 913 -> 916 and INITIAL 556 -> 558 (2026-11-07, Phase 7 / M4): the explicit usage-data consent text in two
+// languages sits in the profile translations, which every first load carries (all namespaces are bundled up front), plus
+// the small usage hooks on Discover and the event page; the console's pilot section is in the lazy admin chunk (+2 kB).
+// Splitting more screens into lazy chunks has stopped paying (~1 kB of loader per split). The structural fix is loading
+// translations per language on demand (PERFORMANCE §4 item 5), scheduled in Phase 7 / M5.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 913;
-const INITIAL_RATCHET_KB = 556;
+const TOTAL_RATCHET_KB = 916;
+const INITIAL_RATCHET_KB = 558;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';

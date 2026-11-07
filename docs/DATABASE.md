@@ -8,6 +8,11 @@ Related: [ARCHITECTURE](ARCHITECTURE.md) · [SECURITY](SECURITY.md) · [RATING_S
 
 Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `profiles`, `user_settings`, `user_consents`, `platform_admins`, `app_config`; enums `account_status`, `profile_visibility`, `consent_kind`; `private.set_updated_at`, `private.is_admin`, `private.assert_active_verified_user`, `private.handle_new_user` (trigger on `auth.users`); RPC `public.get_my_account`. Default privileges are revoked so every grant is explicit; **no table has any write grant or policy for API roles**; the only guest-readable object is `app_config`. Not yet created: sport/geo/event/progression/safety tables, PostGIS, `user_sport_profiles`/positions, rate-limit and analytics tables (Phases 2–7). The profile row has no FK to `auth.users` (ADR-0003). pgTAP tests assert all of the above (`supabase/tests/database`).
 
+## 0. As built in Phase 7
+
+- `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261110100000_analytics_consent_kind.sql`, `20261110110000_pilot_metrics_and_analytics.sql` (M4, ADR-0025): `consent_kind` value `ANALYTICS`; `user_settings.analytics_consent_at`; `analytics_events` (RLS on, no API grants); `set_analytics_consent`, `track_event` (allow-list, coded properties, consent checked, 300/h), `admin_pilot_metrics` (aal2, totals only); export and purge extended.
+
 ## 0a. As built in Phase 4 (catalog of Turkey, points, venues)
 
 - `20261107100000_points_and_venues.sql` (M3–M4): `pg_trgm`; `private.fold_tr`, `snap_point` (centre of a 0.0045° × 0.006° cell), `parse_point`, `point_in_district` (75 km from the district seat), `point_json`; `event_private_details.exact_point` and `venue_id`; `events.public_point` and `public_point_precision`; `venues`, `venue_sports` (RLS on, no grants to API roles); `search_venues` (anon), `suggest_venue`, `admin_add_venue`, `admin_set_venue_status`, `admin_list_venues`; `report` and `admin_get_report` accept `VENUE`; `moderation_actions`/`audit_logs` gain `VENUE_ADDED/VERIFIED/HIDDEN/RESTORED`; quotas `quota.max_venue_suggestions_per_day` (5) and `quota.new_account_max_venue_suggestions_per_day` (1). `create_event`, `update_event`, `get_event`, `search_events`, `export_my_data`, `purge_account` redefined additively (docs/PHASE4_PLAN.md M3, M4).

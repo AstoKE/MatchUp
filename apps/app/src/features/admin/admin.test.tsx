@@ -27,6 +27,7 @@ const mockApi = {
   setVenueStatus: jest.fn(),
   addVenue: jest.fn(),
   fetchCatalog: jest.fn(),
+  fetchPilotMetrics: jest.fn(),
 };
 jest.mock('./api/admin-api', () => ({
   fetchAdminSecurity: (...a: unknown[]) => mockApi.fetchAdminSecurity(...a),
@@ -43,6 +44,7 @@ jest.mock('./api/admin-api', () => ({
   fetchVenues: (...a: unknown[]) => mockApi.fetchVenues(...a),
   setVenueStatus: (...a: unknown[]) => mockApi.setVenueStatus(...a),
   addVenue: (...a: unknown[]) => mockApi.addVenue(...a),
+  fetchPilotMetrics: (...a: unknown[]) => mockApi.fetchPilotMetrics(...a),
 }));
 jest.mock('@/features/catalog/api/catalog-api', () => ({
   fetchCatalog: (...a: unknown[]) => mockApi.fetchCatalog(...a),
@@ -385,6 +387,32 @@ describe('venues', () => {
     expect(mockApi.setVenueStatus.mock.invocationCallOrder[0]).toBeLessThan(
       mockApi.resolveReport.mock.invocationCallOrder[0]!,
     );
+  });
+});
+
+describe('the pilot dashboard', () => {
+  it('shows totals, rates, provinces and consented usage, and changes the period', async () => {
+    mockApi.fetchPilotMetrics.mockResolvedValue({
+      days: 30,
+      players: { onboarded: 120, new: 40, organized: 12, joined: 55, analytics_consent: 9 },
+      events: { published: 30, upcoming: 18, canceled: 2, completed: 10, fill_rate: 0.825 },
+      participation: { requests: 140, approved: 100, no_show_rate: null },
+      provinces: [
+        { city_id: '00000000-0000-4000-8000-0000000000a1', name: 'Ankara', upcoming: 11 },
+      ],
+      provinces_active: 4,
+      usage: { map_opened: 21 },
+      daily: [],
+    });
+    await renderApp(<AdminGate />, { session });
+    await fireEvent.press(await screen.findByRole('radio', { name: 'Pilot' }));
+    expect(await screen.findByText('Yaklaşan etkinliği olan il: 4')).toBeTruthy();
+    expect(screen.getByText('%82,5')).toBeTruthy();
+    expect(screen.getByText('Harita açıldı')).toBeTruthy();
+    expect(screen.getByText('Kullanım (rıza veren 9 kişi)')).toBeTruthy();
+    expect(mockApi.fetchPilotMetrics).toHaveBeenCalledWith(30);
+    await fireEvent.press(screen.getByRole('radio', { name: '7 gün' }));
+    await waitFor(() => expect(mockApi.fetchPilotMetrics).toHaveBeenCalledWith(7));
   });
 });
 

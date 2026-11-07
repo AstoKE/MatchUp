@@ -328,3 +328,34 @@ export const addVenue = (v: NewVenue) =>
     },
     (data) => z.uuid().parse(data),
   );
+
+// ---- pilot metrics (Phase 7 / M4) ------------------------------------------------------------------------------------
+const count = z.number();
+const rate = z.nullable(z.number());
+const pilotMetrics = z.object({
+  days: z.number(),
+  players: z.object({
+    onboarded: count,
+    new: count,
+    organized: count,
+    joined: count,
+    analytics_consent: count,
+  }),
+  events: z.object({
+    published: count,
+    upcoming: count,
+    canceled: count,
+    completed: count,
+    fill_rate: rate,
+  }),
+  participation: z.object({ requests: count, approved: count, no_show_rate: rate }),
+  provinces: z.array(z.object({ city_id: z.uuid(), name: z.string(), upcoming: count })),
+  provinces_active: count,
+  usage: z.record(z.string(), count),
+  daily: z.array(
+    z.object({ day: z.string(), new_players: count, published: count, requests: count }),
+  ),
+});
+export type PilotMetrics = z.infer<typeof pilotMetrics>;
+export const fetchPilotMetrics = (days: number) =>
+  call('admin_pilot_metrics', { p_days: days }, (data) => pilotMetrics.parse(data));

@@ -20,6 +20,8 @@ export interface MySettings {
   showReliability: boolean;
   showBadges: boolean;
   marketingConsent: boolean;
+  /** Usage analytics (Phase 7 / M4): off unless the person turns it on. */
+  analyticsConsent: boolean;
 }
 
 export interface MyProfile {
@@ -45,6 +47,7 @@ const settingsRow = z.object({
   show_reliability: z.boolean(),
   show_badges: z.boolean(),
   marketing_consent_at: z.nullable(z.string()),
+  analytics_consent_at: z.nullable(z.string()),
 });
 const sportRow = z.object({ sport_id: z.uuid(), self_assessed_level: z.number() });
 const positionRow = z.object({ sport_id: z.uuid(), position_id: z.uuid() });
@@ -60,7 +63,7 @@ export async function fetchMyProfile(userId: string): Promise<MyProfile> {
     supabase
       .from('user_settings')
       .select(
-        'locale, theme, profile_visibility, show_reliability, show_badges, marketing_consent_at',
+        'locale, theme, profile_visibility, show_reliability, show_badges, marketing_consent_at, analytics_consent_at',
       )
       .eq('user_id', userId)
       .single(),
@@ -91,6 +94,7 @@ export async function fetchMyProfile(userId: string): Promise<MyProfile> {
       showReliability: s.show_reliability,
       showBadges: s.show_badges,
       marketingConsent: s.marketing_consent_at !== null,
+      analyticsConsent: s.analytics_consent_at !== null,
     },
     sports: z
       .array(sportRow)
@@ -121,7 +125,7 @@ export async function updateMyProfile(input: ProfileEditInput): Promise<void> {
   if (error) throw mapRpcError(error);
 }
 
-export type SettingsUpdate = Omit<MySettings, 'marketingConsent'>;
+export type SettingsUpdate = Omit<MySettings, 'marketingConsent' | 'analyticsConsent'>;
 
 export async function updateMySettings(settings: SettingsUpdate): Promise<void> {
   const { error } = await supabase.rpc('update_my_settings', {
@@ -136,6 +140,12 @@ export async function updateMySettings(settings: SettingsUpdate): Promise<void> 
 
 export async function setMarketingConsent(granted: boolean): Promise<void> {
   const { error } = await supabase.rpc('set_marketing_consent', { p_granted: granted });
+  if (error) throw mapRpcError(error);
+}
+
+/** The explicit, separate consent to usage analytics; withdrawing it also deletes what was recorded (server side). */
+export async function setAnalyticsConsent(granted: boolean): Promise<void> {
+  const { error } = await supabase.rpc('set_analytics_consent', { p_granted: granted });
   if (error) throw mapRpcError(error);
 }
 

@@ -12,6 +12,7 @@ import {
   searchUsers,
   verifyTotp,
   fetchVenues,
+  fetchPilotMetrics,
   type ReportCursor,
   type VenueCursor,
   type VenueStatus,
@@ -85,3 +86,6 @@ export const useAdminVenues = (status: VenueStatus) =>
     initialPageParam: null as VenueCursor | null,
     getNextPageParam: (last) => last.next_cursor,
   });
+
+export const usePilotMetrics = (days: number) =>
+  useQuery({ queryKey: ['admin', 'pilot', days], queryFn: () => fetchPilotMetrics(days) });

@@ -45,7 +45,12 @@
     "legal": "Hukuki metinler",
     "terms": "Kullanım Koşulları",
     "privacyNotice": "Gizlilik Bildirimi",
-    "reliabilityHelp": "Kapatsan da organizatörler, isteğini değerlendirirken puanını görür."
+    "reliabilityHelp": "Kapatsan da organizatörler, isteğini değerlendirirken puanını görür.",
+    "analyticsTitle": "Kullanım verisi (isteğe bağlı)",
+    "analyticsConsent": "Uygulamanın hangi bölümlerini kullandığımın (örneğin haritayı açtığımın, bir filtre seçtiğimin, \"Yakınımdakiler\"in sonucunun) hesabımla ilişkilendirilerek kaydedilmesine ve uygulamayı geliştirmek için incelenmesine açık rıza veriyorum.",
+    "analyticsHelp": "Konumun, mesajların ve yazdığın hiçbir metin kaydedilmez; kayıtlar başka kişilerle ilgili bilgi içermez. Rıza vermek uygulamayı kullanmanın şartı değildir. İstediğin zaman geri alabilirsin; geri aldığında o güne kadar kaydedilenler silinir. Kayıtların veri dışa aktarımında görünür.",
+    "analyticsOn": "Kullanım verisi için rıza verdin.",
+    "analyticsOff": "Rızan geri alındı; kaydedilenler silindi."
   },
   "validation": {
     "NAME_TOO_SHORT": "En az 2 karakter kullan.",

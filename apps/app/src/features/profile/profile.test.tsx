@@ -58,6 +58,7 @@ const baseProfile = {
     showReliability: true,
     showBadges: true,
     marketingConsent: false,
+    analyticsConsent: false,
   },
   sports: [{ sportId: FOOTBALL, level: 3.5, positionIds: [KEEPER] }],
 };
@@ -76,6 +77,7 @@ const mockApi = {
   updateMyProfile: jest.fn(),
   updateMySettings: jest.fn(),
   setMarketingConsent: jest.fn(),
+  setAnalyticsConsent: jest.fn(),
   replaceSportProfiles: jest.fn(),
   fetchCatalog: jest.fn(),
 };
@@ -84,6 +86,7 @@ jest.mock('./api/profile-api', () => ({
   updateMyProfile: (...a: unknown[]) => mockApi.updateMyProfile(...a),
   updateMySettings: (...a: unknown[]) => mockApi.updateMySettings(...a),
   setMarketingConsent: (...a: unknown[]) => mockApi.setMarketingConsent(...a),
+  setAnalyticsConsent: (...a: unknown[]) => mockApi.setAnalyticsConsent(...a),
   replaceSportProfiles: (...a: unknown[]) => mockApi.replaceSportProfiles(...a),
 }));
 jest.mock('@/features/catalog/api/catalog-api', () => ({
@@ -118,6 +121,7 @@ beforeEach(() => {
     mockApi.updateMyProfile,
     mockApi.updateMySettings,
     mockApi.setMarketingConsent,
+    mockApi.setAnalyticsConsent,
     mockApi.replaceSportProfiles,
   ]) {
     fn.mockResolvedValue(undefined);
@@ -294,6 +298,38 @@ describe('SettingsScreen', () => {
     await waitFor(() => expect(mockApi.setMarketingConsent).toHaveBeenCalledTimes(1));
     expect(firstArg(mockApi.setMarketingConsent)).toBe(true);
     expect(mockApi.updateMySettings).not.toHaveBeenCalled();
+  });
+
+  it('asks for usage-data consent with its full text, off by default, and can take it back', async () => {
+    await renderApp(<SettingsScreen />, { session });
+    const box = await screen.findByRole('checkbox', {
+      name: /hesabımla ilişkilendirilerek kaydedilmesine/,
+    });
+    expect(box).not.toBeChecked();
+    expect(screen.getByText(/geri aldığında o güne kadar kaydedilenler silinir/)).toBeTruthy();
+    await fireEvent.press(box);
+    await waitFor(() =>
+      expect(mockApi.setAnalyticsConsent).toHaveBeenCalledWith(true, expect.anything()),
+    );
+    expect(await screen.findByText('Kullanım verisi için rıza verdin.')).toBeTruthy();
+    expect(mockApi.setMarketingConsent).not.toHaveBeenCalled();
+  });
+
+  it('withdraws usage-data consent from the same place', async () => {
+    mockApi.fetchMyProfile.mockResolvedValue({
+      ...baseProfile,
+      settings: { ...baseProfile.settings, analyticsConsent: true },
+    });
+    await renderApp(<SettingsScreen />, { session });
+    const box = await screen.findByRole('checkbox', {
+      name: /hesabımla ilişkilendirilerek kaydedilmesine/,
+    });
+    expect(box).toBeChecked();
+    await fireEvent.press(box);
+    await waitFor(() =>
+      expect(mockApi.setAnalyticsConsent).toHaveBeenCalledWith(false, expect.anything()),
+    );
+    expect(await screen.findByText('Rızan geri alındı; kaydedilenler silindi.')).toBeTruthy();
   });
 
   it('shows a server error instead of pretending the save worked', async () => {

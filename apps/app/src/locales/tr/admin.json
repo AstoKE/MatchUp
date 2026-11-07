@@ -8,7 +8,8 @@
     "disputes": "İtirazlar",
     "users": "Kişiler",
     "audit": "Kayıt",
-    "venues": "Mekânlar"
+    "venues": "Mekânlar",
+    "pilot": "Pilot"
   },
   "mfa": {
     "enrollTitle": "İkinci doğrulamayı kur",
@@ -192,5 +193,40 @@
     "missing": "Ad, il, ilçe, koordinat ve en az bir spor gerekli.",
     "city": "İl",
     "district": "İlçe"
+  },
+  "pilot": {
+    "range": "Dönem",
+    "days_one": "{{count}} gün",
+    "days_other": "{{count}} gün",
+    "loadFailed": "Pilot verileri yüklenemedi",
+    "none": "—",
+    "players": "Oyuncular",
+    "onboarded": "Kayıtlı ve aktif",
+    "newPlayers": "Bu dönemde katılan",
+    "organized": "Etkinlik düzenleyen",
+    "joined": "Katılım isteği gönderen",
+    "events": "Etkinlikler",
+    "published": "Yayınlanan",
+    "upcoming": "Şu an yaklaşan",
+    "completed": "Tamamlanan",
+    "canceled": "İptal edilen",
+    "fillRate": "Ortalama doluluk (tamamlananlar)",
+    "requests": "Katılım isteği",
+    "approved": "Onaylanan",
+    "noShow": "Gelmeme oranı (yoklaması kesinleşenler)",
+    "provinces_one": "Yaklaşan etkinliği olan il: {{count}}",
+    "provinces_other": "Yaklaşan etkinliği olan il: {{count}}",
+    "noProvinces": "Yaklaşan etkinlik yok.",
+    "usage_one": "Kullanım (rıza veren {{count}} kişi)",
+    "usage_other": "Kullanım (rıza veren {{count}} kişi)",
+    "noUsage": "Bu dönemde kayıt yok.",
+    "event": {
+      "discover_viewed": "Keşfet açıldı",
+      "filter_applied": "Filtre kullanıldı",
+      "event_detail_viewed": "Etkinlik sayfası açıldı",
+      "map_opened": "Harita açıldı",
+      "near_me_used": "Yakınımdakiler kullanıldı",
+      "venue_suggest_opened": "Mekân önerme açıldı"
+    }
   }
 }

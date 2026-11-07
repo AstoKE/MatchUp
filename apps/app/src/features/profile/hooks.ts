@@ -3,6 +3,7 @@ import { useSession } from '@/features/auth';
 import {
   fetchMyProfile,
   replaceSportProfiles,
+  setAnalyticsConsent,
   setMarketingConsent,
   updateMyProfile,
   updateMySettings,
@@ -47,4 +48,5 @@ function useProfileMutation<TInput>(mutationFn: (input: TInput) => Promise<void>
 export const useUpdateProfile = () => useProfileMutation(updateMyProfile);
 export const useUpdateSettings = () => useProfileMutation(updateMySettings);
 export const useSetMarketingConsent = () => useProfileMutation(setMarketingConsent);
+export const useSetAnalyticsConsent = () => useProfileMutation(setAnalyticsConsent);
 export const useReplaceSports = () => useProfileMutation(replaceSportProfiles);

@@ -1,6 +1,6 @@
 # Phase 7 plan: hardening and the Turkey pilot
 
-Status 2026-11-07: **M1 (#77) and M2 (#78) merged, M3 built** (in review). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
+Status 2026-11-07: **M1–M3 merged (#77–#79), M4 built** (in review). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
 
 **Why.** Phases 2–6 and 4 built the product and tested it locally and on the web. A pilot puts it in front of strangers across the country: the remaining risks are operational (who answers reports, backups, email, abuse), unverified platforms (native Phase 4–6, iOS, release builds) and scale (indexes and budgets beyond 5000 events).
 
@@ -83,6 +83,18 @@ Not there:
 
 ### M4: observability and analytics
 
+**Status 2026-11-07: built** (ADR-0025).
+- **Pilot metrics:** `admin_pilot_metrics(days)` computes players, events, requests, fill rate, no-show rate, active provinces and usage counts from the service's own data, for admins at aal2. It contains no individual. It is shown in the console's **Pilot** section with a 7/30/90-day choice.
+- **Usage analytics:** opt-in with an explicit consent text in Settings (`ANALYTICS`, `v1`, off by default). `track_event` checks the allow-list and coded properties, records nothing without consent, and has a limit of 300 an hour. Withdrawing the consent deletes the records. Export and purge cover them.
+- **Instrumented:** Discover viewed, filter kinds, the map opened, near-me result, event page viewed, venue suggestion opened.
+- **Tests:** pgTAP `28_analytics` (31; four mutations caught), components, admin console.
+- **Founder steps:** Sentry DSN, the health function and monitor, backups and a restore rehearsal (DEPLOYMENT §13).
+- **Changed from the plan:** no server-side event stream inside the RPCs. The pilot questions are answered from the operational data instead (less personal data, nothing to consent to).
+
+**Privacy Notice paragraph proposed for counsel (draft, not legal advice):**
+
+> **Kullanım verisi (isteğe bağlı).** Ayarlar'da ayrıca açık rıza verirsen, uygulamanın hangi bölümlerini kullandığın (örneğin haritayı açman, bir filtre seçmen, "Yakınımdakiler"in sonucu) hesabınla ilişkilendirilerek kaydedilir ve uygulamayı geliştirmek için incelenir. Konumun, mesajların ve yazdığın metinler kaydedilmez; kayıtlar başka kişilerle ilgili bilgi içermez. Rıza vermek hizmetin şartı değildir; varsayılan olarak kapalıdır. Rızanı istediğin zaman geri alabilirsin; geri aldığında o güne kadarki kayıtlar silinir. Kayıtlar veri dışa aktarımında yer alır ve hesabın silindiğinde silinir. Pilotun genel durumunu (kayıt sayısı, doluluk, gelmeme oranı gibi) hizmetin zaten işlediği verilerden, kişileri göstermeyen toplamlar olarak hesaplarız.
+
 - **`analytics_events`** (ADR-0019 §5):
   - Server-side events written inside the RPC transactions (non-spoofable): created, published, requested, approved, rejected, canceled, completed, attendance finalized, review submitted.
   - A client `track_event` RPC with an allow-list, a rate limit and no PII (screen views, filters, map opened, near me used).
@@ -98,6 +110,8 @@ Not there:
 - **Backups:** point-in-time recovery decision and **a restore rehearsal** (founder, steps given).
 
 ### M5: accessibility and language
+
+- **Translations loaded per language on demand** (PERFORMANCE §4 item 5): the first load carries every namespace in both languages today; M4 had to raise INITIAL to 558 kB for the consent text. Target: back under 556 kB.
 
 - axe on every route at phone and desktop width (today: the main flows only).
 - Keyboard-only pass on the web.

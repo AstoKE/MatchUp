@@ -8,7 +8,8 @@
     "disputes": "Disputes",
     "users": "People",
     "audit": "Record",
-    "venues": "Venues"
+    "venues": "Venues",
+    "pilot": "Pilot"
   },
   "mfa": {
     "enrollTitle": "Set up the second step",
@@ -192,5 +193,40 @@
     "missing": "Name, province, district, coordinates and at least one sport are needed.",
     "city": "Province",
     "district": "District"
+  },
+  "pilot": {
+    "range": "Period",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "loadFailed": "Pilot data could not be loaded",
+    "none": "—",
+    "players": "Players",
+    "onboarded": "Registered and active",
+    "newPlayers": "Joined in this period",
+    "organized": "Organized an event",
+    "joined": "Asked to join",
+    "events": "Events",
+    "published": "Published",
+    "upcoming": "Upcoming now",
+    "completed": "Completed",
+    "canceled": "Canceled",
+    "fillRate": "Average fill (completed)",
+    "requests": "Join requests",
+    "approved": "Approved",
+    "noShow": "No-show rate (finalized attendance)",
+    "provinces_one": "Provinces with upcoming events: {{count}}",
+    "provinces_other": "Provinces with upcoming events: {{count}}",
+    "noProvinces": "No upcoming events.",
+    "usage_one": "Usage ({{count}} person consented)",
+    "usage_other": "Usage ({{count}} people consented)",
+    "noUsage": "Nothing recorded in this period.",
+    "event": {
+      "discover_viewed": "Discover opened",
+      "filter_applied": "Filter used",
+      "event_detail_viewed": "Event page opened",
+      "map_opened": "Map opened",
+      "near_me_used": "Near me used",
+      "venue_suggest_opened": "Venue suggestion opened"
+    }
   }
 }

@@ -8,9 +8,10 @@ import {
   type GeoPoint,
 } from '@matchup/domain';
 import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useTrack } from '@/features/analytics';
 import { localizedName, useCatalog } from '@/features/catalog';
 import { NotificationBell } from '@/features/notifications';
 import { useMyProfile } from '@/features/profile';
@@ -54,8 +55,30 @@ export function DiscoverScreen() {
   const catalog = useCatalog();
   const profile = useMyProfile();
   const toast = useToast();
-  const [filters, setFilters] = useState<Filters>(EMPTY_DISCOVER_FILTERS);
-  const [view, setView] = useState<'list' | 'map'>('list');
+  const track = useTrack();
+  const [filters, setFiltersState] = useState<Filters>(EMPTY_DISCOVER_FILTERS);
+  // Usage analytics (consent only, ADR-0025): which kind of filter changed, never its value.
+  const setFilters = (next: Filters | ((current: Filters) => Filters)) =>
+    setFiltersState((current) => {
+      const value = typeof next === 'function' ? next(current) : next;
+      if (value.datePreset !== current.datePreset)
+        track({ name: 'filter_applied', props: { kind: 'DATE' } });
+      if (value.timeOfDay !== current.timeOfDay)
+        track({ name: 'filter_applied', props: { kind: 'TIME' } });
+      if (value.setting !== current.setting)
+        track({ name: 'filter_applied', props: { kind: 'SETTING' } });
+      if (value.districtId !== current.districtId && value.districtId !== null)
+        track({ name: 'filter_applied', props: { kind: 'DISTRICT' } });
+      if (value.onlyOpen !== current.onlyOpen)
+        track({ name: 'filter_applied', props: { kind: 'OPEN' } });
+      return value;
+    });
+  const [view, setViewState] = useState<'list' | 'map'>('list');
+  const setView = (next: 'list' | 'map') => {
+    setViewState(next);
+    track({ name: 'discover_viewed', props: { view: next === 'map' ? 'MAP' : 'LIST' } });
+    if (next === 'map') track({ name: 'map_opened', props: { where: 'DISCOVER' } });
+  };
   // The device's position for "near me": kept in memory for this visit only.
   const [near, setNear] = useState<GeoPoint | null>(null);
   const [locating, setLocating] = useState(false);
@@ -67,6 +90,7 @@ export function DiscoverScreen() {
     setLocating(true);
     const result = await locateMe();
     setLocating(false);
+    track({ name: 'near_me_used', props: { result: 'point' in result ? 'OK' : result.error } });
     if ('point' in result) setNear(result.point);
     else toast.show(t(`events:discover.near.${result.error}`), 'danger');
   };
@@ -82,6 +106,8 @@ export function DiscoverScreen() {
     };
   }, []);
   const choose = (next: string) => {
+    if (stored !== undefined && stored !== null)
+      track({ name: 'filter_applied', props: { kind: 'SPORT' } });
     setStored(next);
     void storeDiscoverSport(next);
   };
@@ -100,6 +126,14 @@ export function DiscoverScreen() {
     stored !== undefined &&
     catalog.data !== undefined &&
     (!profile.isPending || profile.fetchStatus === 'idle');
+  // One "Discover viewed" per visit, once the list can show.
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (ready && !viewedRef.current) {
+      viewedRef.current = true;
+      track({ name: 'discover_viewed', props: { view: 'LIST' } });
+    }
+  }, [ready, track]);
   // Read the clock once per visit (render must stay pure); "today" is resolved server-side bounds only.
   const [openedAt] = useState(Date.now);
   // A pick made here wins over the profile for the rest of the visit; it is remembered for the next one.
@@ -109,6 +143,7 @@ export function DiscoverScreen() {
     (catalog.data ? startingCityId(catalog.data, profile.data?.cityId, readStoredCity()) : null);
   const city = catalog.data?.cities.find((c) => c.id === cityId);
   const chooseCity = (next: string) => {
+    track({ name: 'filter_applied', props: { kind: 'CITY' } });
     setPickedCityId(next);
     storeCity(next);
     // A district of the previous province means nothing in the new one.
