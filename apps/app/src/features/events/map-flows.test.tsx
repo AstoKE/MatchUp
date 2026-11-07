@@ -141,6 +141,7 @@ jest.mock('@/features/map', () => {
 const mockRouter = { replace: jest.fn(), push: jest.fn(), back: jest.fn(), canGoBack: () => false };
 jest.mock('expo-router', () => ({
   useRouter: () => mockRouter,
+  Link: jest.requireActual<typeof import('@/test/link-mock')>('@/test/link-mock').LinkMock,
   useLocalSearchParams: () => ({}),
   usePathname: () => '/',
 }));

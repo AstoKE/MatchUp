@@ -70,6 +70,7 @@ let mockInvite: string | undefined;
 const mockRouter = { replace: jest.fn(), push: jest.fn(), back: jest.fn(), canGoBack: jest.fn() };
 jest.mock('expo-router', () => ({
   useRouter: () => mockRouter,
+  Link: jest.requireActual<typeof import('@/test/link-mock')>('@/test/link-mock').LinkMock,
   useLocalSearchParams: () => ({ id: '00000000-0000-4000-8000-0000000000e1', invite: mockInvite }),
   usePathname: () => '/e/00000000-0000-4000-8000-0000000000e1/join',
 }));

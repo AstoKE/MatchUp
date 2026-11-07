@@ -110,7 +110,12 @@ function VenueRow({ venue }: { venue: AdminVenue }) {
     .map((id) => catalog.data?.sports.find((s) => s.id === id))
     .flatMap((s) => (s ? [localizedName(s.names, locale)] : []));
   const run = (action: 'VERIFY' | 'HIDE' | 'RESTORE') =>
-    decide.mutate(action, { onSuccess: () => toast.show(t('admin:venues.done'), 'success') });
+    // mutateAsync, not mutate(…, { onSuccess }): the decision reloads the list and this row leaves it, and React Query
+    // skips a per-call callback once its component is gone, which lost the confirmation (found by e2e/admin.spec.ts).
+    decide
+      .mutateAsync(action)
+      .then(() => toast.show(t('admin:venues.done'), 'success'))
+      .catch(() => undefined); // shown by the banner while the row is still there
   return (
     <Panel>
       <Text variant="label">

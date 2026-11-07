@@ -68,6 +68,7 @@ It also names the Phase 7 milestone where it is handled.
 - [x] Account deletion and data export in the app (ADR-0017: 30-day grace, password re-entry, daily purge, JSON export; event, review, report, block and venue data included).
   - Still open: retention of consent evidence and whether suspended accounts may self-delete (counsel ⚖); storage cleanup when avatars arrive; `pg_cron` and the purge job verified on hosted (founder, M4); the native share sheet on a device (M6).
 - [ ] **code, M1:** the whole life of an event in one end-to-end flow, green in CI (F-35).
-- [ ] **code, M5:** accessibility: axe on every route at two widths; a keyboard pass; a manual VoiceOver/TalkBack checklist filled in on devices (M6).
-- [ ] **founder, M5:** the Turkish copy read by a native speaker from the exported list (F-32).
+- [x] **code, M5:** accessibility: axe on every route at two widths, a keyboard-only path (it found and fixed the cards' Enter), the manual list prepared (docs/A11Y_CHECKLIST.md).
+- [ ] **founder + code, M6:** docs/A11Y_CHECKLIST.md filled in with VoiceOver and TalkBack on devices.
+- [ ] **founder, M5:** the Turkish copy read by a native speaker from docs/COPY_REVIEW.md (868 strings; regenerate with `node scripts/i18n/export-copy.mjs`) (F-32).
 - [ ] **founder, M7:** store listings and identifiers decided. Nothing is published without the founder's go.

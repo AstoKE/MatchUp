@@ -1,5 +1,8 @@
 import { navItems, reservedNavItems } from './config';
-import { resources } from '@/lib/i18n/resources';
+import { enResources } from '@/lib/i18n/en-resources';
+import { resources as trOnly } from '@/lib/i18n/resources';
+
+const resources = { tr: trOnly.tr, en: enResources };
 
 describe('navigation config (D-02)', () => {
   it('ships exactly the four MVP destinations, Create being emphasized', () => {

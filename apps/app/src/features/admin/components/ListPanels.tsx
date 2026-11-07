@@ -91,10 +91,11 @@ export function DisputesPanel() {
                 label={t(present ? 'admin:disputes.present' : 'admin:disputes.absent')}
                 pending={decide.isPending}
                 onConfirm={() =>
-                  decide.mutate(
-                    { id: d.participation_id, present },
-                    { onSuccess: () => toast.show(t('admin:disputes.done'), 'success') },
-                  )
+                  // The resolved dispute leaves the list: a per-call onSuccess would be skipped (see VenuesPanel).
+                  decide
+                    .mutateAsync({ id: d.participation_id, present })
+                    .then(() => toast.show(t('admin:disputes.done'), 'success'))
+                    .catch(() => undefined)
                 }
               />
             ))}

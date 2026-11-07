@@ -1,6 +1,6 @@
 # Phase 7 plan: hardening and the Turkey pilot
 
-Status 2026-11-07: **M1–M3 merged (#77–#79), M4 built** (in review). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
+Status 2026-11-07: **M1–M4 merged (#77–#80), M5 built** (in review). Scope: ROADMAP F-31 (client analytics, dashboards), F-32 (Turkish review), F-33 (accessibility), F-34 (hardening), F-35 (lifecycle E2E), and the open items of [LAUNCH_CHECKLIST](LAUNCH_CHECKLIST.md). Exit: a **pilot release candidate for all of Turkey** (founder's decision of 2026-11-07, amending ROADMAP §1 and ADR-0024's "can still start in Ankara"). No new product features: what is built is made safe, fast, observable and provable.
 
 **Why.** Phases 2–6 and 4 built the product and tested it locally and on the web. A pilot puts it in front of strangers across the country: the remaining risks are operational (who answers reports, backups, email, abuse), unverified platforms (native Phase 4–6, iOS, release builds) and scale (indexes and budgets beyond 5000 events).
 
@@ -110,6 +110,17 @@ Not there:
 - **Backups:** point-in-time recovery decision and **a restore rehearsal** (founder, steps given).
 
 ### M5: accessibility and language
+
+**Status 2026-11-07: built.**
+- **Translations per language:** on the web, English is its own 12 kB chunk loaded before the first render only for English users. INITIAL went from 558 to **547 kB** (ratchet 548). Phones keep both languages in the bundle.
+- **axe on every route:** at phone and desktop widths (`e2e/a11y-routes.spec.ts`, 6 tests covering guest, organizer, player, onboarding and re-consent). No serious or critical findings.
+- **Keyboard-only path:** sign-in, Discover, event page, join request (`e2e/keyboard.spec.ts`). **It found a real WCAG 2.1.1 failure:** event cards and the player names in rosters were Pressables with `role="link"`, which React Native Web activates on click only. Enter did nothing. They are now expo-router `Link`s (an `<a href>` on the web).
+- **Language checks:**
+  - a script test forbids `toUpperCase()`/`toLowerCase()` without a locale in app and domain code (three machine-only exceptions, each with its reason);
+  - every plural has both forms;
+  - `docs/COPY_REVIEW.md` lists all 868 strings, Turkish next to English, for a native speaker (`node scripts/i18n/export-copy.mjs`).
+- **Also fixed:** in the console, the confirmation after verifying a venue, resolving a dispute or hiding a review was sometimes lost. The row leaves the list on reload, and React Query skips a per-call `onSuccess` once its component is gone; `mutateAsync` is used instead. This was found by a failing `admin.spec` run, and the spec then passed three times in a row.
+- **Manual list:** `docs/A11Y_CHECKLIST.md` (screen readers, text size, motion, dark mode, targets), to be filled in on devices in M6.
 
 - **Translations loaded per language on demand** (PERFORMANCE §4 item 5): the first load carries every namespace in both languages today; M4 had to raise INITIAL to 558 kB for the consent text. Target: back under 556 kB.
 

@@ -54,12 +54,15 @@
 // the small usage hooks on Discover and the event page; the console's pilot section is in the lazy admin chunk (+2 kB).
 // Splitting more screens into lazy chunks has stopped paying (~1 kB of loader per split). The structural fix is loading
 // translations per language on demand (PERFORMANCE §4 item 5), scheduled in Phase 7 / M5.
+// INITIAL lowered 558 -> 548 (2026-11-07, Phase 7 / M5): English is its own chunk on the web (en-resources, 12 kB gzip),
+// loaded only for English users before the first render (lib/i18n/english.web.ts); measured 547 kB. TOTAL 916 -> 917 for
+// the split's loader.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 916;
-const INITIAL_RATCHET_KB = 558;
+const TOTAL_RATCHET_KB = 917;
+const INITIAL_RATCHET_KB = 548;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';
