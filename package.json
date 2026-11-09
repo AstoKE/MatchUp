@@ -41,7 +41,7 @@
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
     "source-map-explorer": "^2.5.3",
-    "supabase": "^2.122.0",
+    "supabase": "^3.0.0",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.0"
   }
