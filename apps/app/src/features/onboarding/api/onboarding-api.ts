@@ -12,6 +12,9 @@ const accountRow = z.object({
   onboarded: z.boolean(),
   legal_consent_current: z.boolean(),
   deletion_due_at: z.nullable(z.string()),
+  // Phase 8 (ADR-0029); optional: an older server does not send them.
+  phone_verified: z.optional(z.boolean()),
+  phone_required: z.optional(z.boolean()),
 });
 
 export interface MyAccount {
@@ -26,6 +29,10 @@ export interface MyAccount {
   legalConsentCurrent: boolean;
   /** ISO time the account will be purged while a deletion request is pending; otherwise null. */
   deletionDueAt: string | null;
+  /** A confirmed Turkish mobile number is on the account (ADR-0029). */
+  phoneVerified: boolean;
+  /** The server requires one for writes (`phone.required`); the app's gate follows it. */
+  phoneRequired: boolean;
 }
 
 /** Server-authoritative account state (the client never decides who is onboarded). */
@@ -42,6 +49,8 @@ export async function fetchMyAccount(): Promise<MyAccount> {
     onboarded: row.onboarded,
     legalConsentCurrent: row.legal_consent_current,
     deletionDueAt: row.deletion_due_at,
+    phoneVerified: row.phone_verified ?? false,
+    phoneRequired: row.phone_required ?? false,
   };
 }
 

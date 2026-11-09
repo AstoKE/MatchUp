@@ -209,6 +209,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.config_bool(p_key text, p_default boolean)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "none"
+    },
+    {
       "fn": "private.config_int(p_key text, p_default integer)",
       "definer": true,
       "search_path_empty": true,
@@ -486,6 +494,14 @@
       "search_path_empty": true,
       "anon": false,
       "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.phone_verified(p_uid uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
       "guard": "none"
     },
     {

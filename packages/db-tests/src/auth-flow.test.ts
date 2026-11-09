@@ -97,6 +97,8 @@ describe('registration with email verification (PKCE, real Auth + Mailpit)', () 
         onboarded: false,
         legal_consent_current: false,
         deletion_due_at: null,
+        phone_verified: false,
+        phone_required: false,
       },
     ]);
 
@@ -154,16 +156,17 @@ describe('server-side password policy', () => {
 });
 
 describe('account enumeration resistance', () => {
-  it('RESIDUAL RISK (pinned): the Auth API distinguishes a CONFIRMED duplicate sign-up', async () => {
-    // GoTrue answers 422 user_already_exists for confirmed addresses. We cannot change that here;
-    // the client treats it like success (unit-tested) and production relies on rate limits + CAPTCHA.
-    // This test pins the behavior so an upstream change (good or bad) is noticed. See SECURITY.md §5.
+  it('a CONFIRMED duplicate sign-up now looks like a normal one (pinned)', async () => {
+    // Until 2026-11-07 GoTrue answered 422 user_already_exists here (ADR-0016's sign-up signal). Since phone
+    // confirmations are on as well (ADR-0029, the only Auth setting changed), it answers like a new sign-up, without a
+    // session. Pinned so an upstream or configuration change (good or bad) is noticed; hosted must run with both
+    // confirmations on (hosted-surface.mjs checks). The client still treats user_already_exists as success.
     const existing = await createUser();
     const dup = await anonClient().auth.signUp({
       email: existing.email,
       password: STRONG_PASSWORD,
     });
-    expect(dup.error?.code).toBe('user_already_exists');
+    expect(dup.error).toBeNull();
     expect(dup.data.session).toBeNull();
   });
 

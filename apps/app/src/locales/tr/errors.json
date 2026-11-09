@@ -25,5 +25,6 @@
   "NETWORK": "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.",
   "TIMEOUT": "İşlem zaman aşımına uğradı. Lütfen tekrar dene.",
   "UNKNOWN": "Bir şeyler ters gitti. Lütfen tekrar dene.",
-  "MFA_REQUIRED": "Bu işlem için ikinci doğrulaman gerekiyor."
+  "MFA_REQUIRED": "Bu işlem için ikinci doğrulaman gerekiyor.",
+  "PHONE_NOT_VERIFIED": "Devam etmek için telefonunu doğrula."
 }

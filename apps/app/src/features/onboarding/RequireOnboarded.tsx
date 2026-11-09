@@ -60,6 +60,10 @@ function OnboardedGate({ children }: { children: ReactNode }) {
   if (!account.data.onboarded) {
     return <Redirect href={{ pathname: '/onboarding', params: { returnTo: pathname } }} />;
   }
+  // Phase 8 (ADR-0029): when the server requires a verified phone, it comes before anything else is done.
+  if (account.data.phoneRequired && !account.data.phoneVerified) {
+    return <Redirect href={{ pathname: '/verify-phone', params: { returnTo: pathname } }} />;
+  }
   if (!account.data.legalConsentCurrent) {
     return <Redirect href={{ pathname: '/consent-update', params: { returnTo: pathname } }} />;
   }

@@ -29,6 +29,10 @@ jest.mock('./src/features/events/components/LazyEventsMap', () => ({
 jest.mock('./src/features/profile/components/LazyAvatarScreen', () => ({
   LazyAvatarScreen: jest.requireActual('./src/features/profile/screens/AvatarScreen').AvatarScreen,
 }));
+jest.mock('./src/features/onboarding/LazyVerifyPhoneScreen', () => ({
+  LazyVerifyPhoneScreen: jest.requireActual('./src/features/onboarding/screens/VerifyPhoneScreen')
+    .VerifyPhoneScreen,
+}));
 jest.mock('./src/features/events/components/LazyEventStepper', () => ({
   LazyEventStepper: jest.requireActual('./src/features/events/components/EventStepper')
     .EventStepper,

@@ -1,9 +1,10 @@
-import type { ProfileVisibility, ThemePreference } from '@matchup/domain';
+import { maskTurkishMobile, type ProfileVisibility, type ThemePreference } from '@matchup/domain';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AccountSection } from '@/features/account';
+import { useSession } from '@/features/auth';
 import { PushSettingsSection } from '@/features/notifications';
 import { BlockedList } from '@/features/players';
 import { LanguagePicker, SupportContact } from '@/features/settings';
@@ -164,6 +165,10 @@ function Settings({ profile }: { profile: MyProfile }) {
         </Text>
       </Section>
 
+      <Section title={t('auth:phone.settingsTitle')}>
+        <PhoneRow />
+      </Section>
+
       <Section title={t('notifications:push.settingsTitle')}>
         <PushSettingsSection />
       </Section>
@@ -193,6 +198,31 @@ function Settings({ profile }: { profile: MyProfile }) {
 
       <AccountSection />
     </Screen>
+  );
+}
+
+/** Phase 8 (ADR-0029): the confirmed number, masked, and the way to verify or change it. */
+function PhoneRow() {
+  const { t } = useTranslation('auth');
+  const { spacing } = useTheme();
+  const router = useRouter();
+  const session = useSession();
+  const phone = session.status === 'authenticated' ? (session.phone ?? null) : null;
+  return (
+    <View style={{ gap: spacing[2], alignItems: 'flex-start' }}>
+      <Text tone={phone ? 'primary' : 'secondary'}>
+        {phone
+          ? t('phone.settingsVerified', { number: maskTurkishMobile(phone) })
+          : t('phone.settingsMissing')}
+      </Text>
+      <Button
+        variant="secondary"
+        label={phone ? t('phone.settingsChange') : t('phone.settingsVerify')}
+        onPress={() =>
+          router.push({ pathname: '/verify-phone', params: { returnTo: '/settings' } })
+        }
+      />
+    </View>
   );
 }
 

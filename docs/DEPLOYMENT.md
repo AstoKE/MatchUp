@@ -209,6 +209,17 @@ Founder actions, **in this order**. Each step depends on the one before it. Do n
 8. **Accept the legal risk.**
    - The Terms and Privacy Notice are drafts (`legal.draft = true`). ADR-0026 records that the founder accepts this.
    - Counsel's review and the new-version migration follow later (LAUNCH_CHECKLIST §1).
+8b. **Phone verification (ADR-0029)**, before sign-up:
+    - **Provider.** In *Authentication → Sign In / Providers → Phone*, configure an SMS provider:
+      - Twilio, MessageBird or Vonage;
+      - or a Turkish provider through *Auth Hooks → Send SMS* (ask Claude for the small Edge Function).
+    - **Confirmations.** Keep **"Enable phone confirmations" ON**. Off, numbers are marked confirmed without a code.
+    - **Phone sign-in.** If the dashboard lets phone sign-up and sign-in be turned off separately, keep them off: the phone is a check on the account, not a way in.
+    - **Countries.** In the provider, allow **Turkey only** (Twilio: *Messaging → Settings → Geo permissions*). This is the defence against SMS pumping.
+    - **Sender name.** Register one with the provider if you want texts to come from a name.
+    - **Rate limits.** In *Authentication → Rate Limits*, set the SMS limit per hour.
+    - **Test on yourself:** Settings › Telefon › *Telefonu doğrula*. The code arrives and the number shows as verified.
+    - **Switch the requirement on:** `update public.app_config set value = 'true'::jsonb where key = 'phone.required';`. Everyone, existing accounts included, verifies at their next visit. To switch off, set it back to `'false'`.
 9. **Switch sign-up on:** *Authentication → Sign In / Providers → Allow new users to sign up*. Keep "Confirm email" on.
 10. **Check from the outside:**
     ```bash

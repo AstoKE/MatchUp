@@ -1,6 +1,6 @@
 # Phase 8 plan: discovery and engagement
 
-Status 2026-11-07: M1–M4 merged (#84–#87); M5 built (in review).
+Status 2026-11-07: M1–M5 merged (#84–#87, #93); M6 phone verification built (in review).
 
 The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROADMAP "Later" (push, P-01) forward. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
@@ -186,6 +186,29 @@ The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROA
     - integration `push-producers.test.ts` (6): matching, exclusions, the daily limit, no repeat, quiet hours, the reminder limits, withdrawal. Three mutation checks: block, participation, quiet hours;
     - pgTAP 30 (20).
   - **Not verified:** delivery on a phone (as in M4).
+
+### M6: phone verification (added by the founder, 2026-11-07)
+
+- **Decisions:**
+  - the purpose is to stop fake and duplicate accounts, so each number is on one account only;
+  - Turkish mobiles only;
+  - existing accounts verify at their next visit;
+  - the SMS provider is not chosen yet.
+- **Status 2026-11-07: built** (ADR-0029).
+  - **Mechanism:** Supabase Auth's phone change (a texted code, `verifyOtp`).
+  - **Database:** migration `20261114100000`. The `phone.required` switch (off) gates every write behind the onboarded-user guard. `get_my_account` reports both flags.
+  - **App:**
+    - `/verify-phone`, reached from the gate or from Settings › Telefon, which shows the masked number;
+    - a 60-second resend wait;
+    - plain messages for a taken number, a wrong code or a failed send.
+  - **Found while building:** with phone confirmations off, Auth marks any number confirmed without a code. The local config now runs them on, as hosted must, and the surface check fails if they are off.
+  - **Tests:**
+    - domain (normalizing and masking);
+    - pgTAP 31 (11: the switch, a foreign or unconfirmed number, browsing still open);
+    - integration `phone.test.ts` (3: right and wrong code against real Auth, one number per account, foreign numbers ignored);
+    - components (6: the gate, the screen);
+    - E2E `phone.spec.ts` (Settings → texted code → verified; axe).
+  - **Not verified:** a real SMS (no provider yet).
 
 ## Order and why
 

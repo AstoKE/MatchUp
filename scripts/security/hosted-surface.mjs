@@ -73,6 +73,14 @@ async function get(path, init = {}) {
       'no providers besides email',
       external.join(', ') || 'none',
     );
+    // Phase 8 (ADR-0029): with phone confirmations off, Auth marks any new number confirmed without texting a code, and
+    // the one-account-per-number check means nothing.
+    report(
+      body.phone_autoconfirm ? 'FAIL' : 'PASS',
+      'a phone number needs its texted code',
+      `phone_autoconfirm=${Boolean(body.phone_autoconfirm)}`,
+    );
+    // Configuring an SMS provider can switch on phone sign-in (an SMS code instead of the password): see DEPLOYMENT §14.
     report(
       body.external?.phone ? 'WARN' : 'PASS',
       'phone sign-in off',

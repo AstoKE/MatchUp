@@ -69,12 +69,15 @@
 // TOTAL 935 -> 937 and INITIAL 555 -> 557 (2026-11-07, Phase 8 / M4): push. expo-notifications is native only (the web uses
 // push-device.web.ts, checked: not in any chunk); what grows is the root PushBridge (it renders nothing on the web), the
 // Settings section that points to the phone app, the push API and hooks, and their Turkish copy.
+// TOTAL 937 -> 940 and INITIAL 557 -> 558 (2026-11-07, Phase 8 phone verification, ADR-0029): the phone screen is a lazy
+// chunk (INITIAL was 559 before that split); the first load keeps the gate's check, the Settings row, the number helpers
+// and the Turkish copy.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 937;
-const INITIAL_RATCHET_KB = 557;
+const TOTAL_RATCHET_KB = 940;
+const INITIAL_RATCHET_KB = 558;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';

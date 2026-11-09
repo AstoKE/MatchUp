@@ -55,3 +55,5 @@ Before public registration (also in `LAUNCH_CHECKLIST.md`):
 ## 6. Not tested
 
 Hosted-project behaviour (limits, CAPTCHA with a real widget and real solver cost), timing over a real network with jitter (local numbers are an upper bound on separability; a 40 ms gap is large but real-world detectability needs a measurement), per-account lockout (Supabase has none beyond IP limits), and abuse through OAuth/magic-link flows (not enabled).
+
+**2026-11-07 (ADR-0029).** With phone confirmations on as well, the local stack answers a confirmed duplicate sign-up like a new one: no `422`, no session. The sign-up row above no longer holds locally; the other two signals do. Re-measure on hosted once both confirmations are on there.
