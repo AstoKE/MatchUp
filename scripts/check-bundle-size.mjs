@@ -72,12 +72,15 @@
 // TOTAL 937 -> 940 and INITIAL 557 -> 558 (2026-11-07, Phase 8 phone verification, ADR-0029): the phone screen is a lazy
 // chunk (INITIAL was 559 before that split); the first load keeps the gate's check, the Settings row, the number helpers
 // and the Turkish copy.
+// TOTAL 940 -> 941 and INITIAL 558 -> 559 (2026-11-09, minor/patch dependency updates): @tanstack/query-core and the
+// Supabase client grew a little (measured with source maps against main). i18next 26.7 / react-i18next 17.1.13 would have
+// added 1.9 kB more for features the app does not use, so they stay at 26.5 / 17.1.8.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 940;
-const INITIAL_RATCHET_KB = 558;
+const TOTAL_RATCHET_KB = 941;
+const INITIAL_RATCHET_KB = 559;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';

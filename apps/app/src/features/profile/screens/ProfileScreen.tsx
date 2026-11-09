@@ -82,7 +82,14 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
   const { spacing, colors, radius } = useTheme();
   const locale = currentLocale();
   // After signing out, land on the guest home page rather than a sign-in prompt.
-  const logout = useMutation({ mutationFn: signOut, onSuccess: () => router.replace('/') });
+  // The navigation follows the promise, not the mutation's onSuccess: signing out re-renders this protected screen into
+  // a redirect at once, and a callback of an unmounted screen may not run (seen 2026-11-09 with newer supabase-js).
+  const logout = useMutation({ mutationFn: signOut });
+  const signOutHome = () =>
+    void logout
+      .mutateAsync()
+      .then(() => router.replace('/'))
+      .catch(() => undefined);
 
   const city = catalog.cities.find((c) => c.id === profile.cityId);
   const district = city?.districts.find((d) => d.id === profile.districtId);
@@ -205,11 +212,7 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
             onPress={() => router.push('/admin' as Href)}
           />
         ) : null}
-        <AccountRow
-          label={t('auth:signOut')}
-          disabled={logout.isPending}
-          onPress={() => logout.mutate()}
-        />
+        <AccountRow label={t('auth:signOut')} disabled={logout.isPending} onPress={signOutHome} />
       </View>
     </Screen>
   );
