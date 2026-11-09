@@ -5,11 +5,26 @@ updates:
     # Monthly and grouped: every Dependabot PR costs a full CI run (docs/GITHUB_SETUP.md §5b).
     schedule: { interval: monthly }
     open-pull-requests-limit: 3
+    # Groups take minor and patch updates only: a major version comes as its own PR, to be tested on its own
+    # (2026-11-09: TypeScript 7, ESLint 10 and others arrived in one group of 17).
     groups:
-      expo-sdk: { patterns: ['expo*', 'react-native*', '@expo/*', 'react', 'react-dom'] }
+      expo-sdk:
+        patterns: ['expo*', 'react-native*', '@expo/*', 'react', 'react-dom']
+        update-types: [minor, patch]
       everything-else:
         patterns: ['*']
         exclude-patterns: ['expo*', 'react-native*', '@expo/*', 'react', 'react-dom']
+        update-types: [minor, patch]
+    ignore:
+      # The types follow the Node version in .nvmrc (24), not the newest Node.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # Expo SDK pins these; `npx expo install` moves them with the SDK, never Dependabot alone.
+      - dependency-name: 'react'
+      - dependency-name: 'react-dom'
+      - dependency-name: 'react-native'
+      - dependency-name: 'react-native-svg'
+      - dependency-name: '@sentry/react-native'
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: monthly }

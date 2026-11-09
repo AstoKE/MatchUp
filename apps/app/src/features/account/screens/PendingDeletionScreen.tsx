@@ -27,7 +27,14 @@ function PendingDeletion() {
   const { colors, spacing } = useTheme();
   const account = useMyAccount();
   const cancel = useCancelDeletion();
-  const logout = useMutation({ mutationFn: signOut, onSuccess: () => router.replace('/') });
+  // The navigation follows the promise, not the mutation's onSuccess: signing out re-renders this protected screen into
+  // a redirect at once, and a callback of an unmounted screen may not run (seen 2026-11-09 with newer supabase-js).
+  const logout = useMutation({ mutationFn: signOut });
+  const signOutHome = () =>
+    void logout
+      .mutateAsync()
+      .then(() => router.replace('/'))
+      .catch(() => undefined);
   const [error, setError] = useState<string | null>(null);
 
   if (account.isPending) {
@@ -85,7 +92,7 @@ function PendingDeletion() {
           label={t('auth:signOut')}
           loading={logout.isPending}
           loadingLabel={t('common:loading')}
-          onPress={() => logout.mutate()}
+          onPress={signOutHome}
           fullWidth
         />
       </View>

@@ -67,6 +67,7 @@ Decision (founder, 2026-11-09): stay on the free plan without paying for extra m
 **The rule then:** a PR is merged when **`pnpm ci:local` passes on its last commit** and its report is posted on the PR (`pnpm ci:local --comment <PR>`), instead of the four GitHub checks. Once the quota is back, GitHub's checks are the rule again.
 
 What `scripts/ci/local-ci.mjs` does, and why it is not the same as running the gates in the working copy:
+- `--ref <branch|commit>` checks another branch **without switching the checkout of the working copy**. Claude uses it, because the working copy is shared with the founder's terminal: on 2026-11-09 a branch switched under it let a migration reach hosted before its merge.
 - `gh` must be on `PATH` and signed in for `--comment`.
 - It checks out the **committed HEAD** into a temporary git worktree and installs with `--frozen-lockfile`. A file that was never committed fails there, as in CI. Uncommitted changes are not part of the run.
 - It runs the **quality job** step by step, the same commands as `ci.yml`:

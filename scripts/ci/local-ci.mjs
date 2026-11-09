@@ -4,6 +4,7 @@
 //   pnpm ci:local                 # the committed HEAD
 //   pnpm ci:local --comment 94    # ... and post the report on PR #94
 //   pnpm ci:local --skip-native   # without the Hermes compile (slow; CI keeps it)
+//   pnpm ci:local --ref feat/x     # another branch or commit, without touching the working copy's checkout
 //
 // Why not just the gates in the working copy: CI starts from a clean checkout and an empty database. So does this.
 // - The committed HEAD is checked out into a temporary git worktree: a file that was never committed fails here too.
@@ -19,16 +20,27 @@ import { join, resolve } from 'node:path';
 const args = process.argv.slice(2);
 const commentOn = args.includes('--comment') ? args[args.indexOf('--comment') + 1] : null;
 const skipNative = args.includes('--skip-native');
-if (commentOn !== null && !/^\d+$/.test(commentOn ?? '')) {
-  console.error('usage: pnpm ci:local [--comment <PR number>] [--skip-native]');
+// Checking another ref this way never switches the branch of the working copy someone else may be using
+// (2026-11-09: a branch switched under the founder's terminal let a migration reach hosted before its merge).
+const ref = args.includes('--ref') ? args[args.indexOf('--ref') + 1] : 'HEAD';
+if ((commentOn !== null && !/^\d+$/.test(commentOn ?? '')) || !ref || ref.startsWith('--')) {
+  console.error(
+    'usage: pnpm ci:local [--ref <branch|commit>] [--comment <PR number>] [--skip-native]',
+  );
   process.exit(2);
 }
 
 const repo = resolve(new URL('../..', import.meta.url).pathname);
 const git = (...a) => spawnSync('git', a, { cwd: repo, encoding: 'utf8' }).stdout.trim();
-const sha = git('rev-parse', 'HEAD');
-const branch = git('rev-parse', '--abbrev-ref', 'HEAD');
-if (git('status', '--porcelain')) {
+// The main repository: the one that holds the history, also when this script runs from a worktree.
+const historyRoot = resolve(repo, git('rev-parse', '--git-common-dir'), '..');
+const sha = git('rev-parse', '--verify', `${ref}^{commit}`);
+if (!sha) {
+  console.error(`unknown ref: ${ref}`);
+  process.exit(2);
+}
+const branch = ref === 'HEAD' ? git('rev-parse', '--abbrev-ref', 'HEAD') : ref;
+if (ref === 'HEAD' && git('status', '--porcelain')) {
   console.warn(
     'note: uncommitted changes are NOT part of this run (only the committed HEAD is checked).',
   );
@@ -114,7 +126,7 @@ const steps = [
       '--user',
       `${process.getuid()}:${process.getgid()}`,
       '-v',
-      `${repo}:/repo:ro`,
+      `${historyRoot}:/repo:ro`,
       '-w',
       '/repo',
       '-e',
