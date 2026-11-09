@@ -2,10 +2,16 @@ version: 2
 updates:
   - package-ecosystem: npm
     directory: /
-    schedule: { interval: weekly }
-    open-pull-requests-limit: 5
+    # Monthly and grouped: every Dependabot PR costs a full CI run (docs/GITHUB_SETUP.md §5b).
+    schedule: { interval: monthly }
+    open-pull-requests-limit: 3
     groups:
       expo-sdk: { patterns: ['expo*', 'react-native*', '@expo/*', 'react', 'react-dom'] }
+      everything-else:
+        patterns: ['*']
+        exclude-patterns: ['expo*', 'react-native*', '@expo/*', 'react', 'react-dom']
   - package-ecosystem: github-actions
     directory: /
-    schedule: { interval: weekly }
+    schedule: { interval: monthly }
+    groups:
+      actions: { patterns: ['*'] }
