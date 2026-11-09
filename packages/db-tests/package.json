@@ -10,13 +10,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.118.0",
+    "@supabase/supabase-js": "^2.119.0",
     "pg": "^8.23.1"
   },
   "devDependencies": {
     "@matchup/domain": "workspace:*",
-    "@types/node": "^24.0.0",
+    "@types/node": "^26.6.6",
     "@types/pg": "^8.15.0",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   }
 }
