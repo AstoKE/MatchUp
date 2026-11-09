@@ -85,11 +85,12 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
   // The navigation follows the promise, not the mutation's onSuccess: signing out re-renders this protected screen into
   // a redirect at once, and a callback of an unmounted screen may not run (seen 2026-11-09 with newer supabase-js).
   const logout = useMutation({ mutationFn: signOut });
-  const signOutHome = () =>
-    void logout
-      .mutateAsync()
-      .then(() => router.replace('/'))
-      .catch(() => undefined);
+  // Home first, then sign out: while this screen is in view, the session turning guest would send its guard to
+  // sign-in (the SIGNED_OUT event and the promise race since supabase-js 2.119). Home is open to guests.
+  const signOutHome = () => {
+    router.replace('/');
+    void logout.mutateAsync().catch(() => undefined);
+  };
 
   const city = catalog.cities.find((c) => c.id === profile.cityId);
   const district = city?.districts.find((d) => d.id === profile.districtId);

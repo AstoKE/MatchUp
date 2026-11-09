@@ -8,12 +8,14 @@ import { sanitizeCallbackNext, sanitizeReturnTo } from './returnTo';
 import { SessionContext, type SessionState } from './session';
 
 const mockRedirect = jest.fn();
+let mockFocused = true;
 jest.mock('expo-router', () => ({
   Redirect: (props: unknown) => {
     mockRedirect(props);
     return null;
   },
   usePathname: () => '/my-events',
+  useIsFocused: () => mockFocused,
 }));
 
 const metrics = {
@@ -36,7 +38,10 @@ async function renderGuarded(session: SessionState) {
   );
 }
 
-beforeEach(() => mockRedirect.mockClear());
+beforeEach(() => {
+  mockRedirect.mockClear();
+  mockFocused = true;
+});
 
 describe('RequireAuth (UX guard; the database enforces the real rules)', () => {
   it('sends guests to sign-in and remembers where they were', async () => {
@@ -45,6 +50,13 @@ describe('RequireAuth (UX guard; the database enforces the real rules)', () => {
     expect(mockRedirect).toHaveBeenCalledWith({
       href: { pathname: '/sign-in', params: { returnTo: '/my-events' } },
     });
+  });
+
+  it('does not pull the person away from a screen kept out of sight (a background tab)', async () => {
+    mockFocused = false;
+    await renderGuarded({ status: 'guest' });
+    expect(mockRedirect).not.toHaveBeenCalled();
+    expect(screen.queryByText('gizli içerik')).toBeNull();
   });
 
   it('shows a loading indicator (and does not redirect) while the session loads', async () => {
