@@ -2,6 +2,8 @@
 
 Status: Phase 0 · Source of scope: [PRD](PRD.md) · Priorities: **P0** launch-blocking · **P1** launch-critical, may slip one iteration · **P2** first post-MVP · **P3** later · Complexity: S (≤ 2 d) · M (≤ 1 wk) · L (1–2 wk) · XL (> 2 wk) for a solo developer working with Claude Code (rough, for ordering not scheduling).
 
+> **2026-11-09: the founder's next features are recorded** in §3.3: pricing, organizations (teams) with a creation request and requirements, businesses requesting a listing, and admins adding businesses. They are future work, not a phase.
+>
 > **Status 2026-11-07: Phase 4 is built and on hosted** ([PHASE4_REPORT](PHASE4_REPORT.md)); its native run is pending. **Phase 7 has started** ([PHASE7_PLAN](PHASE7_PLAN.md)): hardening and a pilot for all of Turkey.
 >
 > **Status 2026-11-05: Phase 6 is merged; Phase 4 is next**, widened to all of Turkey ([PHASE4_PLAN](PHASE4_PLAN.md), ADR-0024), then Phase 7.
@@ -85,17 +87,29 @@ Dependencies refer to feature IDs. "AC" = acceptance criteria (abbreviated; expa
 | P-01 | Push notifications (Expo push + device tokens + preferences) | P2 (first) | Needs Apple/Google credentials; addresses R-8 |
 | P-02 | QR / geo check-in for attendance | P2 | Strengthens trust root (R-5) |
 | P-03 | Event chat / participant messaging | P2 | Moderation load; replaces WhatsApp links |
-| P-04 | Teams, friends, invitations (Community tab) | P2 | New tables per DATABASE §4 |
+| P-04 | Teams, friends, invitations (Community tab) | P2 | New tables per DATABASE §4. Teams as organizations: see §3.3, P-16 |
 | P-05 | Recurring events | P2 | `event_series` |
 | P-06 | Recommendations ("players like you", events) | P3 | needs data volume |
-| P-07 | Organizations, partner verification, partner events | P3 | enables `event_type = PARTNER` |
-| P-08 | Venue operator tools, availability, booking requests | P3 | |
-| P-09 | Payments (provider abstraction, refunds, payouts) | P3 | regulatory review |
+| P-07 | Organizations, partner verification, partner events | P3 | enables `event_type = PARTNER`; detailed in §3.3 (P-16, P-17) |
+| P-08 | Venue operator tools, availability, booking requests | P3 | needs business accounts first: §3.3 (P-18, P-19) |
+| P-09 | Payments (provider abstraction, refunds, payouts) | P3 | regulatory review; what is paid: §3.3 (P-15) |
 | P-10 | Sponsored placements (labelled) | P3 | |
 | P-11 | Tournaments | P3 | |
 | P-12 | Enforced per-position slots | P3 | |
 | P-13 | Additional cities | P2 | data seeding + moderation capacity |
 | P-14 | Avatars: own photo or a sport-themed design (founder's idea, 2026-11-01) | P2 | The default is the initials shown today. In-house designs per sport are the low-risk part, with no moderation or legal load. A photo is user content: it needs upload rules, moderation and reporting (F-27, F-28), counsel on KVKK, and must be in export and deletion (ADR-0017). `profiles.avatar_path` already exists and is handled by export and purge; verify before building. |
+
+### 3.3 Next features from the founder (recorded 2026-11-09)
+
+Recorded as future work only: nothing here is approved for a phase, and none of it is built. Each item needs its own plan (objective, data model, security impact, tests) and, where marked, an ADR before work starts. The **Decide** items are open questions for the founder, not decisions. Until a phase includes them, the MVP rule stands: no commercial features (payments, ads, bookings).
+
+| ID | Feature | Pri | Depends on | What it means |
+|---|---|---|---|---|
+| P-15 | Pricing | P3 | P-09, P-16, P-18 | What is free and what is paid, and for whom. **Decide:** <br>- who pays: players, organizations, businesses, or several of them; <br>- the model: subscription, per event, or commission. <br>The recommended starting point keeps playing free for players. <br>**Constraints before any price:** <br>- Apple and Google require in-app purchase for digital goods used in the app (B2B services may differ; check the store rules); <br>- Turkish distance-selling and consumer law; <br>- e-invoice/e-archive; <br>- a payment provider (P-09); <br>- counsel. **ADR required.** |
+| P-16 | Organizations (teams, clubs) | P2 | phone verification (ADR-0029), F-28 | A lasting group with a name, a page, members and roles: owner, admin, member. Events can be created *as* the organization. Merges P-04's persistent teams with P-07's organizations, so there is one concept, not two. <br>**Data:** <br>- `organizations`; <br>- `organization_members`, following the `platform_admins` pattern (DATABASE §4 future entities); <br>- a later migration lets `event_type = PARTNER`, or an `organization_id` on events, carry the link. <br>**Must hold:** <br>- authority comes from membership rows, never from the client; <br>- leaving and deleting work, and both appear in export and deletion (ADR-0017); <br>- organizations can be reported and hidden (F-27, F-28). <br>**ADR required.** |
+| P-17 | Organization creation request and requirements | P2 | P-16 | Organizations are not created on the spot. A person sends a request (name, sports, city, short description, acceptance of organization terms); an admin approves or rejects it with a reason in the admin console, and the action is audit-logged. <br>**Requirements (proposal, decide):** <br>- a verified phone; <br>- an account at least N days old; <br>- at least N completed events as organizer; <br>- reliability above a threshold; <br>- no active suspension or open serious report; <br>- a limit of organizations per person. <br>Checked in Postgres when the request is made, and again at approval. <br>**Decide:** the numbers, and whether verified (commercial) organizations are a separate, stricter tier (PRD §2, "Verified Commercial Organizer"). |
+| P-18 | Business listing request (a business adds or claims its venue) | P2 | F-21 (built), F-28 | A request point, in the app and on the web, where a business asks to be listed: it adds a new facility or claims an existing venue. <br>**Fields:** business name, contact person, phone and email, the venue(s), and proof of authority (**decide** which: tax number, signboard photo, document, phone call). <br>An admin reviews, approves or rejects. On approval the business account becomes the **Venue Operator** of those venues (PRD §2). <br>**Different from what exists:** players' community suggestions (`USER_SUBMITTED`, shown as unverified) stay as they are. <br>**Must hold:** <br>- operator rights come only from an approved membership row; <br>- an operator can edit their venue's details but never its verification; <br>- the request form is rate-limited and protected against spam (ADR-0026 pattern); <br>- business contact data is minimal and in the privacy notice (KVKK). <br>**ADR required.** |
+| P-19 | Admins add businesses | P2 | P-18 | Admins can already add venues (`ADMIN_CURATED`, Phase 4) and verify or hide them. **New:** an admin creates a business record directly, links its venues, and can assign an operator account later (invite by email; the person accepts). Every step is audit-logged and needs admin MFA, as all admin actions do (S-14). |
 
 ## 4. Ten highest-risk decisions and risks
 
