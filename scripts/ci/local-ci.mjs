@@ -93,9 +93,16 @@ const steps = [
     'expo doctor',
     'npx',
     ['--yes', 'expo-doctor@latest'],
-    { cwd: 'apps/app', env: placeholders },
+    // It fetches package metadata from the internet: a failed fetch failed it once (2026-11-09), then it passed twice.
+    { cwd: 'apps/app', env: placeholders, retries: 1 },
   ],
-  ['quality', 'dependency audit (high+)', 'pnpm', ['audit', '--audit-level', 'high', '--prod']],
+  [
+    'quality',
+    'dependency audit (high+)',
+    'pnpm',
+    ['audit', '--audit-level', 'high', '--prod'],
+    { retries: 1 },
+  ],
   // The history lives in the main repository (a worktree's .git is only a pointer), and --all scans every ref.
   [
     'secret scan',
@@ -156,17 +163,28 @@ for (const [job, name, cmd, cmdArgs, opts = {}] of steps) {
   );
   const started = Date.now();
   process.stdout.write(`[${job}] ${name} ... `);
-  const run = spawnSync(cmd, cmdArgs, {
-    cwd: opts.cwd === repo ? repo : join(tree, opts.cwd ?? ''),
-    env: { ...baseEnv, ...(opts.env ?? {}) },
-    encoding: 'utf8',
-    maxBuffer: 256 * 1024 * 1024,
-  });
-  writeFileSync(log, `${run.stdout ?? ''}\n${run.stderr ?? ''}`);
+  // Only the steps that depend on the internet get a second try; the report says when one was needed.
+  let run;
+  let attempts = 0;
+  let output = '';
+  do {
+    attempts += 1;
+    run = spawnSync(cmd, cmdArgs, {
+      cwd: opts.cwd === repo ? repo : join(tree, opts.cwd ?? ''),
+      env: { ...baseEnv, ...(opts.env ?? {}) },
+      encoding: 'utf8',
+      maxBuffer: 256 * 1024 * 1024,
+    });
+    output += `--- attempt ${attempts} ---\n${run.stdout ?? ''}\n${run.stderr ?? ''}${run.error ? `\n${run.error.message}` : ''}\n`;
+  } while (run.status !== 0 && attempts <= (opts.retries ?? 0));
+  writeFileSync(log, output);
   const ok = run.status === 0;
   const seconds = Math.round((Date.now() - started) / 1000);
-  console.log(`${ok ? 'ok' : `FAILED (exit ${run.status ?? run.signal})`} ${seconds}s`);
-  results.push({ job, name, ok, seconds, log });
+  const note = attempts > 1 ? ` (attempt ${attempts})` : '';
+  console.log(
+    `${ok ? 'ok' : `FAILED (exit ${run.status ?? run.signal ?? run.error?.message})`}${note} ${seconds}s`,
+  );
+  results.push({ job, name, ok, seconds, log, note });
   if (!ok) failed = true;
 }
 
@@ -180,7 +198,9 @@ const lines = [
   '',
   '| Job | Step | Result | Time |',
   '|---|---|---|---|',
-  ...results.map((r) => `| ${r.job} | ${r.name} | ${r.ok ? '✅' : '❌'} | ${r.seconds}s |`),
+  ...results.map(
+    (r) => `| ${r.job} | ${r.name} | ${r.ok ? '✅' : '❌'}${r.note} | ${r.seconds}s |`,
+  ),
   '',
   `Jobs: ${jobs.map((j) => `${j} ${results.filter((r) => r.job === j).every((r) => r.ok) ? '✅' : '❌'}`).join(' · ')}${skipNative ? ' · native compile skipped' : ''}`,
 ];
@@ -197,7 +217,7 @@ if (commentOn) {
   console.log(
     posted.status === 0
       ? `Posted on PR #${commentOn}.`
-      : `Could not post on PR #${commentOn}: ${posted.stderr}`,
+      : `Could not post on PR #${commentOn} (is gh on PATH and signed in?): ${posted.error?.message ?? posted.stderr}`,
   );
 }
 process.exit(failed ? 1 : 0);

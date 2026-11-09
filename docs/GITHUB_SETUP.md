@@ -67,6 +67,7 @@ Decision (founder, 2026-11-09): stay on the free plan without paying for extra m
 **The rule then:** a PR is merged when **`pnpm ci:local` passes on its last commit** and its report is posted on the PR (`pnpm ci:local --comment <PR>`), instead of the four GitHub checks. Once the quota is back, GitHub's checks are the rule again.
 
 What `scripts/ci/local-ci.mjs` does, and why it is not the same as running the gates in the working copy:
+- `gh` must be on `PATH` and signed in for `--comment`.
 - It checks out the **committed HEAD** into a temporary git worktree and installs with `--frozen-lockfile`. A file that was never committed fails there, as in CI. Uncommitted changes are not part of the run.
 - It runs the **quality job** step by step, the same commands as `ci.yml`:
   - typecheck, lint, format, brand, script tests, unit and component tests;
@@ -76,7 +77,8 @@ What `scripts/ci/local-ci.mjs` does, and why it is not the same as running the g
 - It runs the **secret scan** with the same gitleaks version, as a container, over the full history.
 - The **database** job stops the local stack **without a backup** and starts it empty, so every migration and seed runs as in CI. Then it runs pgTAP, integration, and the type-drift check. Local development data is lost; hosted is never touched.
 - It runs **E2E** with a local env written inside the worktree only.
-- Steps run one at a time (this laptop's memory), so the whole run takes about 20 minutes.
+- The two steps that fetch from the internet (expo-doctor, audit) get one more try if they fail, and the report marks it. expo-doctor once failed on a metadata fetch and then passed twice.
+- Steps run one at a time (this laptop's memory), so the whole run takes about 10 minutes.
 - The exit code is 0 only if every step exited 0. Logs and the report are kept in a temp folder, whose path is printed.
 
 What it cannot replace: a second machine. A result that depends on this laptop (an installed tool, a cache) would not show. The pinned versions (`.nvmrc`, `packageManager`, gitleaks) keep that small.
