@@ -60,6 +60,31 @@ CI needs **no secrets** today: it uses placeholder public values and a local Sup
 
 First runs on GitHub (2026-10-24, Phase 1 history): `quality`, `database` and `e2e-web` **passed** on `ubuntu-latest`. `secret-scan` failed without finding anything: `gitleaks/gitleaks-action@v2` scans `<first pushed commit>^..HEAD`, and the first push contained the root commit, which has no parent ("no leaks found in partial scan", then exit 1). Fix: the job now downloads a pinned gitleaks release, verifies its SHA-256 and scans the full history itself. Dependabot's npm job also reports failure: it cannot move Expo-pinned packages (`react`, `react-native-gesture-handler`, …), which is expected; those are upgraded with `npx expo install --fix` during an SDK upgrade, not by Dependabot.
 
+## 5b. Local CI, while GitHub Actions minutes are exhausted
+
+Decision (founder, 2026-11-09): stay on the free plan without paying for extra minutes. The free plan includes about 2,000 Linux minutes a month; November's were used up on 2026-11-08, and the quota resets on the 1st. While the quota is used up, Actions does not start the jobs at all ("recent account payments have failed or your spending limit needs to be increased"), and nothing is charged.
+
+**The rule then:** a PR is merged when **`pnpm ci:local` passes on its last commit** and its report is posted on the PR (`pnpm ci:local --comment <PR>`), instead of the four GitHub checks. Once the quota is back, GitHub's checks are the rule again.
+
+What `scripts/ci/local-ci.mjs` does, and why it is not the same as running the gates in the working copy:
+- It checks out the **committed HEAD** into a temporary git worktree and installs with `--frozen-lockfile`. A file that was never committed fails there, as in CI. Uncommitted changes are not part of the run.
+- It runs the **quality job** step by step, the same commands as `ci.yml`:
+  - typecheck, lint, format, brand, script tests, unit and component tests;
+  - web export, bundle secrets and size;
+  - the native compile (`--skip-native` leaves it out);
+  - expo-doctor, audit.
+- It runs the **secret scan** with the same gitleaks version, as a container, over the full history.
+- The **database** job stops the local stack **without a backup** and starts it empty, so every migration and seed runs as in CI. Then it runs pgTAP, integration, and the type-drift check. Local development data is lost; hosted is never touched.
+- It runs **E2E** with a local env written inside the worktree only.
+- Steps run one at a time (this laptop's memory), so the whole run takes about 20 minutes.
+- The exit code is 0 only if every step exited 0. Logs and the report are kept in a temp folder, whose path is printed.
+
+What it cannot replace: a second machine. A result that depends on this laptop (an installed tool, a cache) would not show. The pinned versions (`.nvmrc`, `packageManager`, gitleaks) keep that small.
+
+To use fewer minutes once they are back:
+- Dependabot opens its PRs monthly and grouped (`.github/dependabot.yml`);
+- `ci.yml` already cancels a run when the same branch is pushed again.
+
 ## 6. Android CI
 
 Native builds are **not** in CI yet (Gradle + emulator on hosted runners is slow and flaky without KVM acceleration; GitHub's Linux runners do support KVM). Plan: a separate, manually triggered workflow that builds the debug APK and runs the Maestro suite on an `ubuntu-latest` emulator, added once the local suite is stable (see ANDROID_SETUP.md §8).

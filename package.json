@@ -15,6 +15,7 @@
     "format:check": "prettier --check .",
     "check:brand": "node scripts/check-brand-literals.mjs",
     "test": "pnpm -r --filter=!@matchup/db-tests test",
+    "ci:local": "node scripts/ci/local-ci.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:brand && pnpm test:scripts && pnpm test",
     "prepare": "husky",
     "db:start": "supabase start -x studio,imgproxy,logflare,vector,supavisor",
