@@ -1,6 +1,6 @@
 # Phase 8 plan: discovery and engagement
 
-Status 2026-11-07: M1–M5 merged (#84–#87, #93); M6 phone verification built (in review).
+Status 2026-11-10: M1–M6 merged (#84–#87, #93, #94). The founder checked the iOS device build (`289e88a6`, commit `81fb345`) by hand on a real iPhone: no problems except the follow-ups recorded in ROADMAP §3.4. That is a manual check, not an automated run; a real SMS is still unverified (provider on hold).
 
 The founder asked for these on 2026-11-07, after Phase 7. They move parts of ROADMAP "Later" (push, P-01) forward. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
