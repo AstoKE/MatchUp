@@ -67,17 +67,27 @@ export async function pushBlockedByOs(): Promise<boolean> {
   return status === 'denied' && !canAskAgain;
 }
 
-/** Calls back with the event id of a tapped notification (also the one that opened the app). Returns an unsubscribe. */
-export function onPushOpened(open: (eventId: string | null) => void): () => void {
-  const eventIdOf = (response: Notifications.NotificationResponse) => {
-    const id = response.notification.request.content.data?.event_id;
-    return typeof id === 'string' ? id : null;
+export interface OpenedPush {
+  eventId: string | null;
+  kind: string | null;
+}
+
+/** Calls back with what a tapped notification is about (also the one that opened the app). Returns an unsubscribe. */
+export function onPushOpened(open: (push: OpenedPush) => void): () => void {
+  const read = (response: Notifications.NotificationResponse): OpenedPush => {
+    const data = response.notification.request.content.data;
+    const id = data?.event_id;
+    const kind = data?.kind;
+    return {
+      eventId: typeof id === 'string' ? id : null,
+      kind: typeof kind === 'string' ? kind : null,
+    };
   };
   void Notifications.getLastNotificationResponseAsync().then((last) => {
-    if (last) open(eventIdOf(last));
+    if (last) open(read(last));
   });
   const subscription = Notifications.addNotificationResponseReceivedListener((response) =>
-    open(eventIdOf(response)),
+    open(read(response)),
   );
   return () => subscription.remove();
 }

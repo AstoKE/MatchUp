@@ -2,10 +2,17 @@ import { mapRpcError } from '@matchup/domain';
 import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 
-/** Phase 8 / M4 (ADR-0028): the two push consents, the "asked once" mark, devices and the test message. */
-export interface PushSettings {
+/**
+ * Phase 8 / M4 (ADR-0028): the two push consents, "my events" (P-20: requests and approvals, a preference that starts on),
+ * the "asked once" mark, devices and the test message.
+ */
+export interface PushChoice {
   recommendations: boolean;
   reminders: boolean;
+  activity: boolean;
+}
+
+export interface PushSettings extends PushChoice {
   /** The popup has been answered (either way); it is never shown again for this account. */
   prompted: boolean;
 }
@@ -14,12 +21,13 @@ const settingsRow = z.object({
   push_recommendations_at: z.nullable(z.string()),
   push_reminders_at: z.nullable(z.string()),
   push_prompted_at: z.nullable(z.string()),
+  push_activity: z.boolean(),
 });
 
 export async function fetchPushSettings(userId: string): Promise<PushSettings> {
   const { data, error } = await supabase
     .from('user_settings')
-    .select('push_recommendations_at, push_reminders_at, push_prompted_at')
+    .select('push_recommendations_at, push_reminders_at, push_prompted_at, push_activity')
     .eq('user_id', userId)
     .single();
   if (error) throw mapRpcError(error);
@@ -27,17 +35,16 @@ export async function fetchPushSettings(userId: string): Promise<PushSettings> {
   return {
     recommendations: row.push_recommendations_at !== null,
     reminders: row.push_reminders_at !== null,
+    activity: row.push_activity,
     prompted: row.push_prompted_at !== null,
   };
 }
 
-export async function setPushConsents(choice: {
-  recommendations: boolean;
-  reminders: boolean;
-}): Promise<void> {
-  const { error } = await supabase.rpc('set_push_consents', {
+export async function setPushPreferences(choice: PushChoice): Promise<void> {
+  const { error } = await supabase.rpc('set_push_preferences', {
     p_recommendations: choice.recommendations,
     p_reminders: choice.reminders,
+    p_activity: choice.activity,
   });
   if (error) throw mapRpcError(error);
 }

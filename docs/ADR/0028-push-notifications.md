@@ -37,6 +37,15 @@ The app already has in-app notifications. It had no push, no device registry and
    - nothing between 22:00 and 09:00 Istanbul;
    - details in PHASE8_PLAN M5.
 
+9. **Addendum 2026-11-11, "my events" (ROADMAP P-20, founder 2026-11-10/11):**
+   - a new join request that needs a decision is pushed to the organizer, an approval to the player; tapping opens the management screen or the event;
+   - its own switch, `user_settings.push_activity`, **on by default**: these messages are about the person's own events, not promotion, so it is a preference rather than a recorded consent under 6563 (counsel to confirm; legal review is deferred);
+   - existing accounts that answered the popup with nothing on start with it off; the popup now shows it ticked, and "not now" turns everything off;
+   - nothing reaches a phone without OS permission, because the app registers a token only then;
+   - quiet hours delay these messages to 09:00 instead of dropping them, and the sender drops any whose request was decided or whose event started in the meantime;
+   - at most one message per person, kind and event while one waits or within 30 minutes;
+   - queued by a trigger on the existing in-app notifications, so every path is covered; a failure to queue never fails the request or approval.
+
 ## Consequences
 
 **Positive**

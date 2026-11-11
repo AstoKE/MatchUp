@@ -10,6 +10,6 @@ export const requestPushToken = (): Promise<DeviceToken | null> => Promise.resol
 export const currentPushToken = (): Promise<DeviceToken | null> => Promise.resolve(null);
 export const pushBlockedByOs = (): Promise<boolean> => Promise.resolve(false);
 export const onPushOpened =
-  (_open: (eventId: string | null) => void): (() => void) =>
+  (_open: (push: { eventId: string | null; kind: string | null }) => void): (() => void) =>
   () =>
     undefined;

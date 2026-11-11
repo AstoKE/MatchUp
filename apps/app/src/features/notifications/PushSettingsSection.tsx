@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { errorText } from '@/lib/error-text';
 import { Banner, Button, Checkbox, Skeleton, Text, useTheme, useToast } from '@/ui';
 import { pushBlockedByOs, pushSupported } from './push-device';
-import { usePushSettings, useSavePushChoice, useSendTestPush } from './push-hooks';
+import type { PushChoice } from './api/push-api';
+import { anyPush, usePushSettings, useSavePushChoice, useSendTestPush } from './push-hooks';
 
-/** Settings › Notifications: the two kinds (each saved at once), a test message, and a note when the phone refuses. */
+/** Settings › Notifications: the three kinds (each saved at once), a test message, and a note when the phone refuses. */
 export function PushSettingsSection() {
   const { t } = useTranslation(['notifications', 'common']);
   const { spacing } = useTheme();
@@ -34,7 +35,7 @@ export function PushSettingsSection() {
   if (!settings.data) return <Skeleton height={120} radiusKey="md" />;
   const value = settings.data;
 
-  const change = (choice: { recommendations: boolean; reminders: boolean }) => {
+  const change = (choice: PushChoice) => {
     setError(null);
     save
       .mutateAsync(choice)
@@ -47,18 +48,23 @@ export function PushSettingsSection() {
   return (
     <View style={{ gap: spacing[3] }}>
       {error ? <Banner kind="danger" message={error} /> : null}
-      {blocked && (value.recommendations || value.reminders) ? (
+      {blocked && anyPush(value) ? (
         <Banner kind="warning" message={t('notifications:push.blocked')} />
       ) : null}
       <Checkbox
+        label={t('notifications:push.activity')}
+        checked={value.activity}
+        onChange={(activity) => change({ ...choiceOf(value), activity })}
+      />
+      <Checkbox
         label={t('notifications:push.recommendations')}
         checked={value.recommendations}
-        onChange={(recommendations) => change({ recommendations, reminders: value.reminders })}
+        onChange={(recommendations) => change({ ...choiceOf(value), recommendations })}
       />
       <Checkbox
         label={t('notifications:push.reminders')}
         checked={value.reminders}
-        onChange={(reminders) => change({ recommendations: value.recommendations, reminders })}
+        onChange={(reminders) => change({ ...choiceOf(value), reminders })}
       />
       <Text variant="caption" tone="secondary">
         {t('notifications:push.help')}
@@ -86,3 +92,9 @@ export function PushSettingsSection() {
     </View>
   );
 }
+
+const choiceOf = (value: PushChoice): PushChoice => ({
+  recommendations: value.recommendations,
+  reminders: value.reminders,
+  activity: value.activity,
+});

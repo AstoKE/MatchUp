@@ -30,7 +30,8 @@
   "emptyAction": "Discover events",
   "push": {
     "promptTitle": "Notifications",
-    "promptBody": "If you like, we can send you new events that suit you and an occasional reminder. Both are off; choose what you want.",
+    "promptBody": "If you like, we can tell you about your own events, send new events that suit you and an occasional reminder. Choose what you want.",
+    "activity": "My events: join requests for your events and approval of your requests",
     "recommendations": "Events for you: new games for your sports and province (at most 1 a day)",
     "reminders": "Reminders: events in your province when you have not been around for a while (at most 2 a week)",
     "changeLater": "You can change this any time in Settings › Notifications.",
