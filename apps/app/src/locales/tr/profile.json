@@ -135,5 +135,38 @@
     "bodyHint": "En az {{min}}, en fazla {{max}} karakter. Adres, telefon gibi kişisel bilgi yazma.",
     "send": "Gönder",
     "sent": "Mesajın bize ulaştı. Teşekkürler!"
+  },
+  "organizations": {
+    "title": "Organizasyonlarım",
+    "intro": "Ekibin ya da kulübün için bir organizasyon kurabilirsin. İstekleri bir yönetici inceleyip onaylar.",
+    "empty": "Henüz bir organizasyonun ya da isteğin yok.",
+    "loadFailed": "Organizasyonlar yüklenemedi",
+    "create": "Organizasyon kur",
+    "limit": "En fazla {{count}} organizasyon kurabilirsin; bekleyen istekler de sayılır.",
+    "status": {
+      "PENDING": "Onay bekliyor",
+      "ACTIVE": "Aktif",
+      "REJECTED": "Onaylanmadı"
+    },
+    "role": {
+      "OWNER": "Sahibi",
+      "ADMIN": "Yönetici",
+      "MEMBER": "Üye"
+    },
+    "pendingHint": "Bir yönetici isteğini inceleyecek; karar verilince sana bildirim gelir.",
+    "rejected": "Onaylanmama sebebi: {{reason}}",
+    "cancel": "İsteği geri çek",
+    "cancelYes": "Evet, geri çek",
+    "keep": "Vazgeç",
+    "requestTitle": "Organizasyon kur",
+    "requestIntro": "Organizasyonun adı ve açıklaması onaylandıktan sonra herkese görünür. Bağlantı, e-posta ya da telefon numarası yazma.",
+    "name": "Adı",
+    "nameHint": "2–40 karakter, örneğin \"Çankaya Kartalları\".",
+    "description": "Açıklama (isteğe bağlı)",
+    "descriptionHint": "En fazla {{max}} karakter: ne oynadığınız, ne zaman buluştuğunuz.",
+    "city": "İl",
+    "sports": "Sporlar (en fazla {{max}})",
+    "send": "İsteği gönder",
+    "sent": "İsteğin gönderildi. Karar verilince haber vereceğiz."
   }
 }

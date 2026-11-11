@@ -11,6 +11,11 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 ## 0. As built in Phase 7
 
 - `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261118100000_organizations.sql` (Phase 9 M1, ADR-0030):
+  - **Tables:** `organizations` (name 2–40 with the display-name filter, description ≤ 500 without links or numbers, province, 1–5 sports, status `PENDING`/`ACTIVE`/`REJECTED`/`DISSOLVED`, who decided, the reason of a rejection) and `organization_members` (role `OWNER`/`ADMIN`/`MEMBER`, one owner). RLS on, no API grants.
+  - **RPCs:** `request_organization` (at most `quota.max_owned_organizations` = 2 owned, waiting ones included), `cancel_organization_request`, `list_my_organizations`; `admin_list_organization_requests`, `admin_decide_organization` (second factor; a reason is required to reject; audited as `ORGANIZATION_APPROVED`/`ORGANIZATION_REJECTED` without text).
+  - **Notifications:** `ORGANIZATION_APPROVED`, `ORGANIZATION_REJECTED` to the requester.
+  - **Export and purge:** `private.export_organization_data` joins `export_my_data`. The purge deletes waiting requests and memberships; an active organization passes to its longest-standing administrator, or is dissolved without one; rejected ones stay as records.
 - `20261117100000_feedback.sql` (ROADMAP P-22):
   - **Table:** `feedback` (kind, body 10–2000, optional screen name, status `NEW`/`SEEN`/`DONE`, who handled it). RLS on, no API grants.
   - **RPCs:** `submit_feedback`; `admin_list_feedback`, `admin_set_feedback_status` (audit action `FEEDBACK_UPDATED`).
@@ -432,6 +437,8 @@ Every `admin_*` function starts with `private.assert_admin_aal2()`: signed in, v
 | `block_user(id)`, `unblock_user(id)`, `list_my_blocks()` | 6 — **built (M1)** | self | mutual and silent: neither side finds, joins or reviews the other; open requests between them are rejected without a notification; someone already approved stays approved |
 | `get_player_card(user_id)` | 6 — **built (M3)** | self | `NOT_FOUND` unless the profile is public or the viewer has met the person, and always when blocked either way; honors `show_reliability` and `show_badges` |
 | `report(target_type, target_id, reason, details, invite_token)` | 6 — **built (M2)** | self | `USER` and `EVENT` only; only what the reporter could see, otherwise `NOT_FOUND`; 20 a day (`RATE_LIMITED`); repeating an open report returns the first |
+| `request_organization(name, description, city_id, sport_ids)`, `cancel_organization_request(id)`, `list_my_organizations()` | 9 — **built (M1)** | self (onboarded) | at most 2 owned, waiting ones included; ADR-0030 |
+| `admin_list_organization_requests(status)`, `admin_decide_organization(id, approve, reason)` | 9 — **built (M1)** | admin with `aal2` | oldest waiting first, with the requester's account age, completed events as organizer and open reports; a rejection needs a reason the requester reads |
 | `submit_feedback(kind, body, context)` | P-22 — **built** | self (onboarded) | `REQUEST`/`SUGGESTION`/`COMPLAINT`, 10–2000 characters, `context` a screen name; 5 a day (`quota.max_feedback_per_day`); nobody reads `feedback` through the API |
 | `admin_list_feedback(status)`, `admin_set_feedback_status(id, status)` | P-22 — **built** | admin with `aal2` | default list = not done, newest first, at most 100; a status change is audited (`FEEDBACK_UPDATED`, no text) |
 | `admin_*` (queue, action, resolve dispute, verify venue, suspend) | 6 | admin | audited |

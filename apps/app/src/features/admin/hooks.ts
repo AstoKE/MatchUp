@@ -15,6 +15,8 @@ import {
   fetchPilotMetrics,
   fetchFeedback,
   type FeedbackStatus,
+  fetchOrganizationRequests,
+  type OrganizationRequestStatus,
   type ReportCursor,
   type VenueCursor,
   type VenueStatus,
@@ -94,3 +96,9 @@ export const usePilotMetrics = (days: number) =>
 
 export const useFeedback = (status: FeedbackStatus | null) =>
   useQuery({ queryKey: ['admin', 'feedback', status], queryFn: () => fetchFeedback(status) });
+
+export const useOrganizationRequests = (status: OrganizationRequestStatus) =>
+  useQuery({
+    queryKey: ['admin', 'organizations', status],
+    queryFn: () => fetchOrganizationRequests(status),
+  });

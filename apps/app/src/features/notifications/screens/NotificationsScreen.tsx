@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { RequireOnboarded } from '@/features/onboarding';
@@ -98,9 +98,12 @@ function lookOf(type: AppNotification['type']): {
   icon: IconName;
   color: 'success' | 'danger' | 'textSecondary';
 } {
-  if (type === 'REQUEST_APPROVED') return { icon: 'check', color: 'success' };
+  if (type === 'REQUEST_APPROVED' || type === 'ORGANIZATION_APPROVED') {
+    return { icon: 'check', color: 'success' };
+  }
   if (
     type === 'REQUEST_REJECTED' ||
+    type === 'ORGANIZATION_REJECTED' ||
     type === 'PARTICIPANT_REMOVED' ||
     type === 'EVENT_CANCELED' ||
     type === 'EVENT_CANCELED_BY_ADMIN'
@@ -124,14 +127,18 @@ function Row({ notification, onOpen }: { notification: AppNotification; onOpen: 
     minute: '2-digit',
   }).format(new Date(notification.createdAt));
   const eventId = notification.eventId;
+  // An organization decision opens the person's organizations, where the reason of a rejection is shown.
+  const organization =
+    notification.type === 'ORGANIZATION_APPROVED' || notification.type === 'ORGANIZATION_REJECTED';
   const look = lookOf(notification.type);
   return (
     <Pressable
-      accessibilityRole={eventId ? 'link' : 'text'}
-      disabled={!eventId}
+      accessibilityRole={eventId || organization ? 'link' : 'text'}
+      disabled={!eventId && !organization}
       onPress={() => {
         if (!notification.read) onOpen();
         if (eventId) router.push({ pathname: '/e/[id]', params: { id: eventId } });
+        else if (organization) router.push('/organizations' as Href);
       }}
       style={{
         minHeight: TOUCH_TARGET,

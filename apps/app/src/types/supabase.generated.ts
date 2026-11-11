@@ -641,6 +641,108 @@ export type Database = {
           },
         ];
       };
+      organization_members: {
+        Row: {
+          created_at: string;
+          organization_id: string;
+          role: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          organization_id: string;
+          role: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          organization_id?: string;
+          role?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'organization_members_organization_id_fkey';
+            columns: ['organization_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'organization_members_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      organizations: {
+        Row: {
+          city_id: string;
+          created_at: string;
+          created_by: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          description: string | null;
+          id: string;
+          name: string;
+          reject_reason: string | null;
+          sport_ids: string[];
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          city_id: string;
+          created_at?: string;
+          created_by: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          description?: string | null;
+          id?: string;
+          name: string;
+          reject_reason?: string | null;
+          sport_ids: string[];
+          status?: string;
+        };
+        Update: {
+          city_id?: string;
+          created_at?: string;
+          created_by?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          description?: string | null;
+          id?: string;
+          name?: string;
+          reject_reason?: string | null;
+          sport_ids?: string[];
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'organizations_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'cities';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'organizations_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'organizations_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       platform_admins: {
         Row: {
           granted_at: string;
@@ -1681,6 +1783,10 @@ export type Database = {
       };
       admin_add_venue: { Args: { p_input: Json; p_source_ref?: string }; Returns: string };
       admin_cancel_event: { Args: { p_event_id: string; p_note: string }; Returns: undefined };
+      admin_decide_organization: {
+        Args: { p_approve: boolean; p_id: string; p_reason?: string };
+        Returns: undefined;
+      };
       admin_get_report: { Args: { p_report_id: string }; Returns: Json };
       admin_get_user: { Args: { p_user_id: string }; Returns: Json };
       admin_hide_review: { Args: { p_note: string; p_review_id: string }; Returns: undefined };
@@ -1688,6 +1794,7 @@ export type Database = {
       admin_list_disputes: { Args: Record<PropertyKey, never>; Returns: Json };
       admin_list_feedback: { Args: { p_status?: string }; Returns: Json };
       admin_list_flags: { Args: Record<PropertyKey, never>; Returns: Json };
+      admin_list_organization_requests: { Args: { p_status?: string }; Returns: Json };
       admin_list_reports: {
         Args: { p_cursor?: Json; p_limit?: number; p_status?: string };
         Returns: Json;
@@ -1726,6 +1833,7 @@ export type Database = {
         Args: { p_event_id: string; p_message?: string; p_reason: string };
         Returns: undefined;
       };
+      cancel_organization_request: { Args: { p_id: string }; Returns: undefined };
       cancel_participation: { Args: { p_event_id: string }; Returns: undefined };
       catalog_places: { Args: Record<PropertyKey, never>; Returns: Json };
       clear_my_avatar_photo: { Args: Record<PropertyKey, never>; Returns: undefined };
@@ -1780,6 +1888,7 @@ export type Database = {
         Args: { p_bucket: string; p_cursor?: Json; p_limit?: number };
         Returns: Json;
       };
+      list_my_organizations: { Args: Record<PropertyKey, never>; Returns: Json };
       mark_attendance: {
         Args: {
           p_participation_id: string;
@@ -1815,6 +1924,10 @@ export type Database = {
           p_message?: string;
           p_position_id?: string;
         };
+        Returns: string;
+      };
+      request_organization: {
+        Args: { p_city_id: string; p_description: string; p_name: string; p_sport_ids: string[] };
         Returns: string;
       };
       search_events: { Args: { p_cursor?: Json; p_filters?: Json }; Returns: Json };

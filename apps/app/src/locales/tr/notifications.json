@@ -24,7 +24,9 @@
     "REPORT_OUTCOME": "Bildirimini inceledik. Teşekkürler.",
     "ACCOUNT_REINSTATED": "Hesabın yeniden açıldı.",
     "EVENT_CANCELED_BY_ADMIN": "{{event}} bir yönetici tarafından iptal edildi.",
-    "ATTENDANCE_REMINDER": "{{event}} bitti. Yoklamayı işaretle ve kesinleştir; yapmazsan sistem yarın kendiliğinden kesinleştirir."
+    "ATTENDANCE_REMINDER": "{{event}} bitti. Yoklamayı işaretle ve kesinleştir; yapmazsan sistem yarın kendiliğinden kesinleştirir.",
+    "ORGANIZATION_APPROVED": "Organizasyon isteğin onaylandı.",
+    "ORGANIZATION_REJECTED": "Organizasyon isteğin onaylanmadı. Sebebini Organizasyonlarım'da görebilirsin."
   },
   "unknown": "Yeni bir bildirimin var.",
   "emptyAction": "Etkinlikleri keşfet",

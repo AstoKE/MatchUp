@@ -36,9 +36,12 @@ export function CityPicker({
     <>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={t('events:discover.cityButton', {
-          city: current ? localizedName(current.names, locale) : '',
-        })}
+        // With nothing chosen yet (a form), the name says what to do instead of "İl: . Değiştir".
+        accessibilityLabel={
+          current
+            ? t('events:discover.cityButton', { city: localizedName(current.names, locale) })
+            : t('events:discover.cityPick')
+        }
         aria-expanded={open}
         onPress={() => setOpen(true)}
         style={{

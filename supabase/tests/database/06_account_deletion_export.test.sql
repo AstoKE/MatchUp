@@ -109,7 +109,9 @@ select is(
   -- analytics_events (Phase 7): exported; deleted on purge and when the analytics consent is withdrawn.
   -- push_devices, push_outbox (Phase 8): exported; deleted on purge (deliveries cascade with the outbox).
   -- feedback (P-22): exported; deleted on purge (free text), and its handler forgotten.
-  array['analytics_events', 'event_participations', 'events', 'feedback', 'notifications', 'platform_admins', 'push_devices', 'push_outbox', 'reliability_events', 'reports', 'skill_reviews',
+  -- organizations, organization_members (Phase 9): exported; memberships deleted on purge, pending requests deleted, an
+  -- organization without another administrator dissolved, the deciding administrator forgotten.
+  array['analytics_events', 'event_participations', 'events', 'feedback', 'notifications', 'organization_members', 'organizations', 'platform_admins', 'push_devices', 'push_outbox', 'reliability_events', 'reports', 'skill_reviews',
         'user_achievements', 'user_blocks', 'user_consents', 'user_progress', 'user_settings', 'user_sport_positions', 'user_sport_profiles',
         'user_sport_ratings', 'venues', 'xp_transactions'],
   'per-user tables are exactly the ones export_my_data and purge_account handle'
