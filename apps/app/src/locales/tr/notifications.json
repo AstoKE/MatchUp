@@ -30,7 +30,8 @@
   "emptyAction": "Etkinlikleri keşfet",
   "push": {
     "promptTitle": "Bildirimler",
-    "promptBody": "İstersen sana uygun yeni etkinlikleri ve zaman zaman bir hatırlatma gönderebiliriz. İkisi de kapalı; açmak istediğini seç.",
+    "promptBody": "İstersen etkinliklerinle ilgili gelişmeleri, sana uygun yeni etkinlikleri ve zaman zaman bir hatırlatma gönderebiliriz. Açmak istediklerini seç.",
+    "activity": "Etkinliklerim: etkinliğine gelen katılım istekleri ve isteğinin onaylanması",
     "recommendations": "Sana uygun etkinlikler: sporlarına ve şehrine göre yeni maçlar (günde en fazla 1)",
     "reminders": "Hatırlatmalar: bir süre girmediğinde şehrindeki etkinlikler (haftada en fazla 2)",
     "changeLater": "Bunu istediğin zaman Ayarlar › Bildirimler'den değiştirebilirsin.",

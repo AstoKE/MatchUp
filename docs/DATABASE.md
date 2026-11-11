@@ -20,6 +20,12 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
     - `get_my_account` gains `phone_verified` and `phone_required` (recreated, additive columns);
     - `export_my_data` includes the number.
   - **Not ours:** the number, its uniqueness and its codes are Supabase Auth's (phone change).
+- `20261116100000_activity_push.sql` (ROADMAP P-20, ADR-0028 addendum):
+  - **Settings:** `user_settings.push_activity` ("my events", default true; existing accounts that answered the popup with nothing on start with it off). A preference, not a recorded consent.
+  - **Tables:** `push_outbox` kinds `JOIN_REQUEST` and `REQUEST_APPROVED`, and `send_after` (held through the quiet hours).
+  - **Trigger:** `notifications_activity_push` after insert on `notifications` (`JOIN_REQUESTED` with status `REQUESTED`, `REQUEST_APPROVED`) queues the push through `private.queue_activity_push`: switch on, a registered phone, and no message for the same person, kind and event waiting or sent in the last `push.activity_window_minutes` (30). It never fails the request or approval.
+  - **Functions:** `private.push_quiet_until`; `private.push_relevant` (at send time: the event has not started, a request is still open, the player is still approved); `push_text` and `push_allowed` with the two kinds; `push_dispatch` honours `send_after` and relevance.
+  - **RPC:** `set_push_preferences(recommendations, reminders, activity)`. `set_push_consents` stays for installed apps and leaves the switch as it is.
 - `20261113100000_push_recommendations_reminders.sql` (Phase 8 M5, ADR-0028):
   - **Tables:** `push_outbox` kinds `RECOMMENDATION` and `REMINDER`, and `args` (catalog names and a count); `private.push_recommended` (RLS on, no grants).
   - **Functions:** `private.push_quiet` (22:00–09:00 Istanbul); `push_text(kind, locale, args)`; `push_allowed` per kind; `queue_recommendations(p_now)` (every 10 min); `queue_reminders(p_now)` (hourly).

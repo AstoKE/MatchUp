@@ -4,10 +4,15 @@ import {
   fetchPushSettings,
   registerPushDevice,
   sendTestPush,
-  setPushConsents,
+  setPushPreferences,
   unregisterPushDevice,
+  type PushChoice,
 } from './api/push-api';
 import { currentPushToken, requestPushToken } from './push-device';
+
+/** Whether any kind is on: then this device should be registered. */
+export const anyPush = (choice: PushChoice) =>
+  choice.recommendations || choice.reminders || choice.activity;
 
 const pushKey = (userId: string | null) => ['push-settings', userId] as const;
 
@@ -27,18 +32,15 @@ export interface SavedPushChoice {
 }
 
 /**
- * Saves both choices. Turning one on asks the OS for permission (only then) and registers this device; turning both off
- * unregisters it. The consents are saved either way: the person's choice is theirs, even if the phone says no for now.
+ * Saves all three choices. Turning one on asks the OS for permission (only then) and registers this device; turning all
+ * off unregisters it. The consents are saved either way: the person's choice is theirs, even if the phone says no for now.
  */
 export function useSavePushChoice() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (choice: {
-      recommendations: boolean;
-      reminders: boolean;
-    }): Promise<SavedPushChoice> => {
+    mutationFn: async (choice: PushChoice): Promise<SavedPushChoice> => {
       let deviceReady = true;
-      if (choice.recommendations || choice.reminders) {
+      if (anyPush(choice)) {
         const device = await requestPushToken();
         if (device) await registerPushDevice(device.token, device.platform);
         else deviceReady = false;
@@ -46,7 +48,7 @@ export function useSavePushChoice() {
         const device = await currentPushToken();
         if (device) await unregisterPushDevice(device.token).catch(() => undefined);
       }
-      await setPushConsents(choice);
+      await setPushPreferences(choice);
       return { deviceReady };
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['push-settings'] }),

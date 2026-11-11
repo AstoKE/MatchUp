@@ -9,16 +9,20 @@ import { errorText } from '@/lib/error-text';
 import { Banner, Button, Checkbox, Sheet, Text, useTheme, useToast } from '@/ui';
 import { registerPushDevice, unregisterPushDevice } from './api/push-api';
 import { currentPushToken, onPushOpened, pushSupported } from './push-device';
-import { usePushSettings, useSavePushChoice } from './push-hooks';
+import type { PushChoice } from './api/push-api';
+import { anyPush, usePushSettings, useSavePushChoice } from './push-hooks';
 
 /**
  * Mounted once at the root (Phase 8 / M4, ADR-0028): asks a person once about push notifications, keeps this device's
- * token registered while a kind is on, unregisters it at sign-out, and opens the event a tapped notification is about.
+ * token registered while a kind is on, unregisters it at sign-out, and opens the event a tapped notification is about
+ * (for a new request, its management screen, where the organizer decides).
  * Nothing on the web.
  */
 export function PushBridge() {
   return pushSupported ? <NativePushBridge /> : null;
 }
+
+const NOTHING: PushChoice = { recommendations: false, reminders: false, activity: false };
 
 // Screens where the question would interrupt: onboarding and the steps right after it, re-consent, deletion.
 const NOT_HERE =
@@ -32,7 +36,7 @@ function NativePushBridge() {
   const settings = usePushSettings();
   const [answered, setAnswered] = useState(false);
   const userId = session.status === 'authenticated' ? session.userId : null;
-  const wanted = settings.data ? settings.data.recommendations || settings.data.reminders : false;
+  const wanted = settings.data ? anyPush(settings.data) : false;
 
   useEffect(
     () =>
@@ -53,8 +57,12 @@ function NativePushBridge() {
 
   useEffect(
     () =>
-      onPushOpened((eventId) => {
-        if (eventId) router.push({ pathname: '/e/[id]', params: { id: eventId } });
+      onPushOpened(({ eventId, kind }) => {
+        if (!eventId) return;
+        router.push({
+          pathname: kind === 'JOIN_REQUEST' ? '/e/[id]/manage' : '/e/[id]',
+          params: { id: eventId },
+        });
       }),
     [router],
   );
@@ -69,7 +77,10 @@ function NativePushBridge() {
   return ask ? <PushPrompt onDone={() => setAnswered(true)} /> : null;
 }
 
-/** The one-time question: both kinds off, the person turns on what they want, right here. */
+/**
+ * The one-time question: the two promotional kinds off, "my events" on (it is about the person's own events; P-20), and
+ * the person changes what they want, right here. "Not now" turns everything off.
+ */
 export function PushPrompt({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation(['notifications', 'common']);
   const { spacing } = useTheme();
@@ -77,14 +88,15 @@ export function PushPrompt({ onDone }: { onDone: () => void }) {
   const save = useSavePushChoice();
   const [recommendations, setRecommendations] = useState(false);
   const [reminders, setReminders] = useState(false);
+  const [activity, setActivity] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const answer = (choice: { recommendations: boolean; reminders: boolean }) => {
+  const answer = (choice: PushChoice) => {
     setError(null);
     save
       .mutateAsync(choice)
       .then(({ deviceReady }) => {
-        if (choice.recommendations || choice.reminders) {
+        if (anyPush(choice)) {
           toast.show(
             deviceReady ? t('notifications:push.saved') : t('notifications:push.blocked'),
             deviceReady ? 'success' : 'info',
@@ -99,7 +111,7 @@ export function PushPrompt({ onDone }: { onDone: () => void }) {
     <Sheet
       visible
       title={t('notifications:push.promptTitle')}
-      onClose={() => answer({ recommendations: false, reminders: false })}
+      onClose={() => answer(NOTHING)}
       closeLabel={t('notifications:push.notNow')}
       footer={
         <View style={{ gap: spacing[2] }}>
@@ -107,13 +119,13 @@ export function PushPrompt({ onDone }: { onDone: () => void }) {
             label={t('common:save')}
             fullWidth
             loading={save.isPending}
-            onPress={() => answer({ recommendations, reminders })}
+            onPress={() => answer({ recommendations, reminders, activity })}
           />
           <Button
             variant="tertiary"
             label={t('notifications:push.notNow')}
             disabled={save.isPending}
-            onPress={() => answer({ recommendations: false, reminders: false })}
+            onPress={() => answer(NOTHING)}
           />
         </View>
       }
@@ -121,6 +133,11 @@ export function PushPrompt({ onDone }: { onDone: () => void }) {
       <View style={{ gap: spacing[3] }}>
         <Text tone="secondary">{t('notifications:push.promptBody')}</Text>
         {error ? <Banner kind="danger" message={error} /> : null}
+        <Checkbox
+          label={t('notifications:push.activity')}
+          checked={activity}
+          onChange={setActivity}
+        />
         <Checkbox
           label={t('notifications:push.recommendations')}
           checked={recommendations}

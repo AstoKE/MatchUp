@@ -779,6 +779,7 @@ export type Database = {
           event_id: string | null;
           id: number;
           kind: string;
+          send_after: string | null;
           user_id: string;
         };
         ComputedFields: never;
@@ -789,6 +790,7 @@ export type Database = {
           event_id?: string | null;
           id?: never;
           kind: string;
+          send_after?: string | null;
           user_id: string;
         };
         Update: {
@@ -798,6 +800,7 @@ export type Database = {
           event_id?: string | null;
           id?: never;
           kind?: string;
+          send_after?: string | null;
           user_id?: string;
         };
         Relationships: [
@@ -1296,6 +1299,7 @@ export type Database = {
           locale: string;
           marketing_consent_at: string | null;
           profile_visibility: Database['public']['Enums']['profile_visibility'];
+          push_activity: boolean;
           push_prompted_at: string | null;
           push_recommendations_at: string | null;
           push_reminders_at: string | null;
@@ -1312,6 +1316,7 @@ export type Database = {
           locale?: string;
           marketing_consent_at?: string | null;
           profile_visibility?: Database['public']['Enums']['profile_visibility'];
+          push_activity?: boolean;
           push_prompted_at?: string | null;
           push_recommendations_at?: string | null;
           push_reminders_at?: string | null;
@@ -1327,6 +1332,7 @@ export type Database = {
           locale?: string;
           marketing_consent_at?: string | null;
           profile_visibility?: Database['public']['Enums']['profile_visibility'];
+          push_activity?: boolean;
           push_prompted_at?: string | null;
           push_recommendations_at?: string | null;
           push_reminders_at?: string | null;
@@ -1770,6 +1776,10 @@ export type Database = {
       };
       set_push_consents: {
         Args: { p_recommendations: boolean; p_reminders: boolean };
+        Returns: undefined;
+      };
+      set_push_preferences: {
+        Args: { p_activity: boolean; p_recommendations: boolean; p_reminders: boolean };
         Returns: undefined;
       };
       set_sport_profile: {

@@ -609,8 +609,32 @@
       "guard": "none"
     },
     {
+      "fn": "private.push_quiet_until(p_now timestamp with time zone)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.push_relevant(p_kind text, p_uid uuid, p_event uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.push_text(p_kind text, p_locale text, p_args jsonb)",
       "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.queue_activity_push()",
+      "definer": true,
       "search_path_empty": true,
       "anon": false,
       "authenticated": false,
@@ -1298,6 +1322,14 @@
     },
     {
       "fn": "public.set_push_consents(p_recommendations boolean, p_reminders boolean)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.set_push_preferences(p_recommendations boolean, p_reminders boolean, p_activity boolean)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,

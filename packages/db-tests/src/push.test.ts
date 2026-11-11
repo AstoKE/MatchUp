@@ -103,6 +103,30 @@ describe('consents', () => {
     );
     expect(rows).toEqual([{ kind: 'PUSH_RECOMMENDATIONS', revoked: true }]);
   });
+
+  it('"my events" starts on, is saved with the other two, and is no recorded consent (P-20)', async () => {
+    const a = await onboardedUser(c, 'Sevgi');
+    const activity = async () =>
+      (
+        await db().query<{ on: boolean }>(
+          `select push_activity as on from public.user_settings where user_id = $1`,
+          [a.user.id],
+        )
+      ).rows[0]?.on;
+    expect(await activity()).toBe(true);
+    const off = { p_recommendations: true, p_reminders: false, p_activity: false };
+    expect((await rpc('set_push_preferences', off, a.token)).status).toBe(204);
+    expect(await activity()).toBe(false);
+    const { rows } = await db().query<{ kind: string }>(
+      `select kind::text from public.user_consents where user_id = $1 and kind::text like 'PUSH_%'`,
+      [a.user.id],
+    );
+    expect(rows).toEqual([{ kind: 'PUSH_RECOMMENDATIONS' }]);
+    // Installed apps still send two choices: "my events" stays as it is.
+    await rpc('set_push_consents', { p_recommendations: false, p_reminders: false }, a.token);
+    expect(await activity()).toBe(false);
+    expect([401, 403]).toContain((await rpc('set_push_preferences', off)).status);
+  });
 });
 
 describe('the test message', () => {
