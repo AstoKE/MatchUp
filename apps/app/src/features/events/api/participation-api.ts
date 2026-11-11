@@ -84,6 +84,9 @@ const requestRow = z.object({
   user_id: z.optional(z.uuid()),
   status: z.enum(['REQUESTED', 'WAITLISTED', 'APPROVED']),
   display_name: z.nullable(z.string()),
+  // Optional: sent from migration 20261115100000 on (ROADMAP P-21).
+  avatar_key: z.optional(z.nullable(z.string())),
+  avatar_path: z.optional(z.nullable(z.string())),
   level: z.nullable(z.number()),
   message: z.nullable(z.string()),
   position_id: z.nullable(z.uuid()),
@@ -100,6 +103,8 @@ export interface EventRequest {
   userId: string | null;
   status: 'REQUESTED' | 'WAITLISTED' | 'APPROVED';
   displayName: string | null;
+  avatarKey: string | null;
+  avatarPath: string | null;
   /** Self-assessed level for the event's sport, when the player gave one. */
   level: number | null;
   message: string | null;
@@ -121,6 +126,8 @@ export async function fetchEventRequests(eventId: string): Promise<EventRequest[
     userId: row.user_id ?? null,
     status: row.status,
     displayName: row.display_name,
+    avatarKey: row.avatar_key ?? null,
+    avatarPath: row.avatar_path ?? null,
     level: row.level,
     message: row.message,
     requestedAt: row.requested_at,

@@ -147,6 +147,8 @@ const request = (over: Partial<EventRequest> = {}): EventRequest => ({
   userId: null,
   status: 'REQUESTED',
   displayName: 'Deniz D',
+  avatarKey: null,
+  avatarPath: null,
   level: 3.5,
   message: 'Orta saha oynarım',
   requestedAt: '2026-11-01T10:00:00Z',
@@ -401,6 +403,18 @@ describe("the organizer's queue", () => {
     expect(screen.getByText('1')).toBeTruthy();
     expect(screen.getByText('Kalan yer')).toBeTruthy();
     expect(screen.getByText('3')).toBeTruthy();
+  });
+
+  it('shows each player with their avatar: the drawing when chosen, the initials otherwise (P-21)', async () => {
+    mockApi.fetchEventRequests.mockResolvedValue([
+      request({ avatarKey: 'f-padel' }),
+      request({ id: '00000000-0000-4000-8000-000000000c02', displayName: 'Ece Er' }),
+    ]);
+    await renderApp(<EventManageScreen />, { session: organizer });
+    await screen.findByText('Deniz D');
+    expect(screen.getByText('EE', { includeHiddenElements: true })).toBeTruthy();
+    // A drawing replaces the initials.
+    expect(screen.queryByText('DD', { includeHiddenElements: true })).toBeNull();
   });
 
   it('shows rating and reliability when they exist, and "new player" when they do not', async () => {
