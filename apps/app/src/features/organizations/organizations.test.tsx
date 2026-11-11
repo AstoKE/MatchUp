@@ -1,6 +1,8 @@
 import { AppError } from '@matchup/domain';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { SessionState } from '@/features/auth';
+import enOrganizations from '@/locales/en/organizations.json';
+import trOrganizations from '@/locales/tr/organizations.json';
 import { renderApp } from '@/test/render';
 import type { Organization } from './api/organizations-api';
 import { MyOrganizationsScreen } from './screens/MyOrganizationsScreen';
@@ -154,5 +156,17 @@ describe('the request form', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'İsteği gönder' }));
     expect(await screen.findByRole('alert')).toBeTruthy();
     expect(mockRouter.replace).not.toHaveBeenCalled();
+  });
+});
+
+describe('the organization copy', () => {
+  it('has the same keys in Turkish and English', () => {
+    const keys = (o: object, prefix = ''): string[] =>
+      Object.entries(o).flatMap(([k, v]) =>
+        typeof v === 'object' && v !== null
+          ? keys(v as object, `${prefix}${k}.`)
+          : [`${prefix}${k}`],
+      );
+    expect(keys(enOrganizations).sort()).toEqual(keys(trOrganizations).sort());
   });
 });

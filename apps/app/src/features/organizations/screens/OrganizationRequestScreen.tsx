@@ -24,6 +24,7 @@ import {
   ORGANIZATION_NAME_MAX,
   ORGANIZATION_SPORTS_MAX,
 } from '../api/organizations-api';
+import { ensureOrganizationsCopy } from '../copy';
 import { useRequestOrganization } from '../hooks';
 
 /**
@@ -31,7 +32,8 @@ import { useRequestOrganization } from '../hooks';
  * the person is told when it is decided. The server checks the same rules again.
  */
 export function OrganizationRequestScreen() {
-  const { t } = useTranslation(['profile', 'common']);
+  ensureOrganizationsCopy();
+  const { t } = useTranslation(['organizations', 'common']);
   const router = useRouter();
   const toast = useToast();
   const { spacing } = useTheme();
@@ -48,7 +50,7 @@ export function OrganizationRequestScreen() {
 
   const header = (
     <ScreenHeader
-      title={t('profile:organizations.requestTitle')}
+      title={t('organizations:requestTitle')}
       backLabel={t('common:back')}
       onBack={back}
     />
@@ -95,7 +97,7 @@ export function OrganizationRequestScreen() {
         sportIds,
       })
       .then(() => {
-        toast.show(t('profile:organizations.sent'), 'success');
+        toast.show(t('organizations:sent'), 'success');
         router.replace('/organizations' as Href);
       })
       .catch((failure: unknown) => setError(errorText(failure)));
@@ -104,31 +106,29 @@ export function OrganizationRequestScreen() {
   return (
     <Screen maxWidth={560}>
       {header}
-      <Text tone="secondary">{t('profile:organizations.requestIntro')}</Text>
+      <Text tone="secondary">{t('organizations:requestIntro')}</Text>
       {error ? <Banner kind="danger" message={error} /> : null}
       <TextField
-        label={t('profile:organizations.name')}
-        hint={t('profile:organizations.nameHint')}
+        label={t('organizations:name')}
+        hint={t('organizations:nameHint')}
         value={name}
         onChangeText={setName}
         maxLength={ORGANIZATION_NAME_MAX}
       />
       <TextField
-        label={t('profile:organizations.description')}
-        hint={t('profile:organizations.descriptionHint', { max: ORGANIZATION_DESCRIPTION_MAX })}
+        label={t('organizations:description')}
+        hint={t('organizations:descriptionHint', { max: ORGANIZATION_DESCRIPTION_MAX })}
         value={description}
         onChangeText={setDescription}
         maxLength={ORGANIZATION_DESCRIPTION_MAX}
         multiline
       />
       <View style={{ gap: spacing[2] }}>
-        <Text variant="label">{t('profile:organizations.city')}</Text>
+        <Text variant="label">{t('organizations:city')}</Text>
         <CityPicker cities={catalog.data.cities} cityId={cityId} onChange={setCityId} />
       </View>
       <View style={{ gap: spacing[2] }}>
-        <Text variant="label">
-          {t('profile:organizations.sports', { max: ORGANIZATION_SPORTS_MAX })}
-        </Text>
+        <Text variant="label">{t('organizations:sports', { max: ORGANIZATION_SPORTS_MAX })}</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
           {catalog.data.sports.map((sport) => (
             <ToggleChip
@@ -142,7 +142,7 @@ export function OrganizationRequestScreen() {
         </View>
       </View>
       <Button
-        label={t('profile:organizations.send')}
+        label={t('organizations:send')}
         disabled={!ready}
         loading={send.isPending}
         loadingLabel={t('common:loading')}

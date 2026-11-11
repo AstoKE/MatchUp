@@ -3,12 +3,10 @@ import { Screen, Skeleton } from '@/ui';
 
 // Few visits need them (PERFORMANCE): the organization screens load when they open.
 const MyOrganizationsScreen = lazy(() =>
-  import('./screens/MyOrganizationsScreen').then((m) => ({ default: m.MyOrganizationsScreen })),
+  import('./screens').then((m) => ({ default: m.MyOrganizationsScreen })),
 );
 const OrganizationRequestScreen = lazy(() =>
-  import('./screens/OrganizationRequestScreen').then((m) => ({
-    default: m.OrganizationRequestScreen,
-  })),
+  import('./screens').then((m) => ({ default: m.OrganizationRequestScreen })),
 );
 
 function Loading({ children }: { children: ReactNode }) {

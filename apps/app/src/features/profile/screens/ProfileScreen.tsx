@@ -203,7 +203,7 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
           onPress={() => router.push('/edit-sports')}
         />
         <AccountRow
-          label={t('profile:organizations.title')}
+          label={t('profile:organizationsTitle')}
           onPress={() => router.push('/organizations' as Href)}
         />
         <AccountRow
