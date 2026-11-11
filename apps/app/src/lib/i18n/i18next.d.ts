@@ -10,6 +10,7 @@ declare module 'i18next' {
     resources: (typeof resources)['tr'] & {
       admin: typeof import('@/locales/tr/admin.json');
       organizations: typeof import('@/locales/tr/organizations.json');
+      organizationInvite: typeof import('@/locales/tr/organization-invite.json');
     };
   }
 }

@@ -1,0 +1,12 @@
+{
+  "open": "Organizasyona davet et",
+  "title": "{{name}} kişisini davet et",
+  "send": "Davet et ({{organization}})",
+  "state": {
+    "ACTIVE": "Üye",
+    "INVITED": "Davet edildi",
+    "REQUESTED": "Katılmak istiyor"
+  },
+  "sent": "{{name}} davet edildi.",
+  "joined": "{{name}} artık üye: zaten katılmak istiyordu."
+}

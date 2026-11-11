@@ -66,4 +66,37 @@ describe('organization requests', () => {
     expect(review.status).toBe(400);
     expect(codeOf(review.body)).toBe('NOT_ALLOWED');
   });
+
+  it('membership through the API: invite, accept, the member list, leave (M2)', async () => {
+    const owner = await onboardedUser(c, 'Kurucu C');
+    const guest = await onboardedUser(c, 'Kurucu D');
+    const made = await ask(owner.token, 'Üyelik Kulübü');
+    await db().query(
+      `update public.organizations set status = 'ACTIVE', decided_at = now() where id = $1`,
+      [made.body],
+    );
+    const invited = await rpc(
+      'invite_to_organization',
+      { p_org: made.body, p_user: guest.user.id },
+      owner.token,
+    );
+    expect(invited.body).toBe('INVITED');
+    const before = await rpc('get_organization', { p_id: made.body }, guest.token);
+    expect((before.body as { membership: string; members: unknown }).membership).toBe('INVITED');
+    expect((before.body as { members: unknown }).members).toBeNull();
+    expect(
+      (
+        await rpc(
+          'respond_to_organization_invite',
+          { p_org: made.body, p_accept: true },
+          guest.token,
+        )
+      ).status,
+    ).toBe(204);
+    const after = await rpc('get_organization', { p_id: made.body }, guest.token);
+    expect((after.body as { members: unknown[] }).members).toHaveLength(2);
+    expect((await rpc('leave_organization', { p_org: made.body }, guest.token)).status).toBe(204);
+    const owners = await rpc('leave_organization', { p_org: made.body }, owner.token);
+    expect(codeOf(owners.body)).toBe('NOT_ALLOWED');
+  });
 });

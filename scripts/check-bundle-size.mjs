@@ -83,12 +83,15 @@
 // their own copy (features/organizations/copy.ts, like the console's): two separate lazy imports had pushed the shared
 // code and the Turkish copy into __common (+1.3 kB of first load). Plus the console's organizations section (AdminGate
 // 16.4 -> 17.7 kB, admins only). INITIAL unchanged by it (560 kB, __common +0.3 kB for the routes).
+// TOTAL 949 -> 955 and INITIAL 560 -> 561 (2026-11-11, Phase 9 / M2): the organization page joins the lazy organization
+// chunk (+3.1 kB), the player card's invitation is its own lazy chunk with its own copy (1.3 kB). The first load grows
+// 666 bytes (573,534 -> 574,200): three notification texts and their routing, the page's route and the lazy wrappers.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 949;
-const INITIAL_RATCHET_KB = 560;
+const TOTAL_RATCHET_KB = 955;
+const INITIAL_RATCHET_KB = 561;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';

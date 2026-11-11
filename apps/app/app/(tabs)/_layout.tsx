@@ -65,6 +65,7 @@ export default function TabsLayout() {
             'e/[id]/manage',
             'e/[id]/requested',
             'u/[id]',
+            'o/[id]',
             'notifications',
           ] as const
         ).map((name) => (

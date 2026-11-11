@@ -27,6 +27,7 @@ const mockRouter = { replace: jest.fn(), push: jest.fn(), back: jest.fn(), canGo
 jest.mock('expo-router', () => ({
   useRouter: () => mockRouter,
   usePathname: () => '/organizations',
+  Link: jest.requireActual<typeof import('@/test/link-mock')>('@/test/link-mock').LinkMock,
 }));
 
 const ANKARA = '00000000-0000-4000-8000-0000000000a1';
@@ -70,6 +71,7 @@ const organization = (over: Partial<Organization> = {}): Organization => ({
   rejectReason: null,
   createdAt: '2026-11-11T10:00:00Z',
   memberCount: 1,
+  membership: 'ACTIVE',
   ...over,
 });
 

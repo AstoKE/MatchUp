@@ -98,7 +98,11 @@ function lookOf(type: AppNotification['type']): {
   icon: IconName;
   color: 'success' | 'danger' | 'textSecondary';
 } {
-  if (type === 'REQUEST_APPROVED' || type === 'ORGANIZATION_APPROVED') {
+  if (
+    type === 'REQUEST_APPROVED' ||
+    type === 'ORGANIZATION_APPROVED' ||
+    type === 'ORGANIZATION_MEMBER_APPROVED'
+  ) {
     return { icon: 'check', color: 'success' };
   }
   if (
@@ -127,9 +131,12 @@ function Row({ notification, onOpen }: { notification: AppNotification; onOpen: 
     minute: '2-digit',
   }).format(new Date(notification.createdAt));
   const eventId = notification.eventId;
-  // An organization decision opens the person's organizations, where the reason of a rejection is shown.
-  const organization =
-    notification.type === 'ORGANIZATION_APPROVED' || notification.type === 'ORGANIZATION_REJECTED';
+  // A rejected request opens the person's organizations (where the reason is); the others open the organization.
+  const organization = notification.type?.startsWith('ORGANIZATION_') ?? false;
+  const organizationPage =
+    organization && notification.type !== 'ORGANIZATION_REJECTED' && notification.organizationId
+      ? notification.organizationId
+      : null;
   const look = lookOf(notification.type);
   return (
     <Pressable
@@ -138,6 +145,8 @@ function Row({ notification, onOpen }: { notification: AppNotification; onOpen: 
       onPress={() => {
         if (!notification.read) onOpen();
         if (eventId) router.push({ pathname: '/e/[id]', params: { id: eventId } });
+        else if (organizationPage)
+          router.push({ pathname: '/o/[id]', params: { id: organizationPage } } as Href);
         else if (organization) router.push('/organizations' as Href);
       }}
       style={{

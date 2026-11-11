@@ -1,0 +1,12 @@
+{
+  "open": "Invite to an organization",
+  "title": "Invite {{name}}",
+  "send": "Invite ({{organization}})",
+  "state": {
+    "ACTIVE": "Member",
+    "INVITED": "Invited",
+    "REQUESTED": "Wants to join"
+  },
+  "sent": "{{name}} was invited.",
+  "joined": "{{name}} is now a member: they had asked to join."
+}

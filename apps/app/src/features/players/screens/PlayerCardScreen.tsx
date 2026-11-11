@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { UserAvatar } from '@/features/profile';
 import { localizedName, useCatalog } from '@/features/catalog';
 import { RequireOnboarded } from '@/features/onboarding';
+import { InviteToOrganization } from '@/features/organizations';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { Banner, Button, EmptyState, Screen, ScreenHeader, Text, useTheme, useToast } from '@/ui';
@@ -152,6 +153,7 @@ function Card({ card, onBack }: { card: PlayerCard; onBack: () => void }) {
 
       {card.isMe ? null : (
         <View style={{ gap: spacing[2] }}>
+          <InviteToOrganization userId={card.userId} name={name} />
           <Button
             variant="secondary"
             label={t('players:report.open')}
