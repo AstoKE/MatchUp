@@ -1,3 +1,4 @@
+export { CityPicker } from './components/CityPicker';
 export { CancelEventScreen } from './screens/CancelEventScreen';
 export { CreateEventScreen } from './screens/CreateEventScreen';
 export { DiscoverScreen } from './screens/DiscoverScreen';

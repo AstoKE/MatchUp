@@ -24,7 +24,9 @@
     "REPORT_OUTCOME": "We looked at your report. Thank you.",
     "ACCOUNT_REINSTATED": "Your account is open again.",
     "EVENT_CANCELED_BY_ADMIN": "{{event}} was canceled by a moderator.",
-    "ATTENDANCE_REMINDER": "{{event}} has ended. Mark attendance and finalize it; if you do not, the system finalizes it for you soon."
+    "ATTENDANCE_REMINDER": "{{event}} has ended. Mark attendance and finalize it; if you do not, the system finalizes it for you soon.",
+    "ORGANIZATION_APPROVED": "Your organization request was approved.",
+    "ORGANIZATION_REJECTED": "Your organization request was not approved. You can see why in My organizations."
   },
   "unknown": "You have a new notification.",
   "emptyAction": "Discover events",

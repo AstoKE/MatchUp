@@ -9,6 +9,7 @@
     "users": "Kişiler",
     "audit": "Kayıt",
     "venues": "Mekânlar",
+    "organizations": "Organizasyonlar",
     "feedback": "Geri bildirim",
     "pilot": "Pilot"
   },
@@ -254,5 +255,22 @@
     "markSeen": "Görüldü",
     "markDone": "Tamamlandı",
     "reopen": "Yeniden aç"
+  },
+  "organizations": {
+    "filter": "Durum",
+    "status": {
+      "PENDING": "Bekleyen",
+      "ACTIVE": "Onaylanan",
+      "REJECTED": "Reddedilen"
+    },
+    "empty": "Burada istek yok.",
+    "requester": "İsteyen: {{since}} tarihinden beri üye · organizatör olarak {{events}} tamamlanmış etkinlik · {{reports}} açık bildirim",
+    "reason": "Red sebebi: {{reason}}",
+    "reasonLabel": "Red sebebi",
+    "reasonHint": "Reddetmek için gerekli; isteyen kişi bunu okur. Onaylarken boş bırak.",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "approved": "Organizasyon onaylandı.",
+    "rejected": "İstek reddedildi."
   }
 }

@@ -1,0 +1,33 @@
+{
+  "title": "My organizations",
+  "intro": "You can set up an organization for your team or club. An administrator reviews and approves requests.",
+  "empty": "You have no organizations or requests yet.",
+  "loadFailed": "Organizations could not be loaded",
+  "create": "Set up an organization",
+  "limit": "You can set up at most {{count}} organizations; waiting requests count too.",
+  "status": {
+    "PENDING": "Waiting for approval",
+    "ACTIVE": "Active",
+    "REJECTED": "Not approved"
+  },
+  "role": {
+    "OWNER": "Owner",
+    "ADMIN": "Administrator",
+    "MEMBER": "Member"
+  },
+  "pendingHint": "An administrator will review your request; you will be notified of the decision.",
+  "rejected": "Reason: {{reason}}",
+  "cancel": "Withdraw the request",
+  "cancelYes": "Yes, withdraw",
+  "keep": "Keep it",
+  "requestTitle": "Set up an organization",
+  "requestIntro": "The name and description are visible to everyone once approved. Do not include links, e-mail addresses or phone numbers.",
+  "name": "Name",
+  "nameHint": "2–40 characters, for example \"Çankaya Eagles\".",
+  "description": "Description (optional)",
+  "descriptionHint": "At most {{max}} characters: what you play and when you meet.",
+  "city": "Province",
+  "sports": "Sports (at most {{max}})",
+  "send": "Send the request",
+  "sent": "Your request was sent. We will let you know the decision."
+}

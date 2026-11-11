@@ -389,3 +389,41 @@ export async function setFeedbackStatus(id: string, status: FeedbackStatus): Pro
   const { error } = await supabase.rpc('admin_set_feedback_status', { p_id: id, p_status: status });
   if (error) throw mapRpcError(error);
 }
+
+// ---- organization requests (Phase 9, ADR-0030) -------------------------------------------------------------------------
+export type OrganizationRequestStatus = 'PENDING' | 'ACTIVE' | 'REJECTED';
+const organizationRequestRow = z.array(
+  z.object({
+    id: z.uuid(),
+    name: z.string(),
+    description: z.nullable(z.string()),
+    city_id: z.uuid(),
+    sport_ids: z.array(z.uuid()),
+    status: z.enum(['PENDING', 'ACTIVE', 'REJECTED']),
+    reject_reason: z.nullable(z.string()),
+    created_at: z.string(),
+    decided_at: z.nullable(z.string()),
+    requester_id: z.uuid(),
+    requester_name: z.nullable(z.string()),
+    requester_since: z.string(),
+    requester_events_organized: z.number(),
+    requester_open_reports: z.number(),
+  }),
+);
+export type OrganizationRequest = z.infer<typeof organizationRequestRow>[number];
+export const fetchOrganizationRequests = (status: OrganizationRequestStatus) =>
+  call('admin_list_organization_requests', { p_status: status }, (data) =>
+    organizationRequestRow.parse(data),
+  );
+export async function decideOrganization(
+  id: string,
+  approve: boolean,
+  reason: string | null,
+): Promise<void> {
+  const { error } = await supabase.rpc('admin_decide_organization', {
+    p_id: id,
+    p_approve: approve,
+    ...(reason ? { p_reason: reason } : {}),
+  });
+  if (error) throw mapRpcError(error);
+}

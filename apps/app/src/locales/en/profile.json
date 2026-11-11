@@ -135,5 +135,6 @@
     "bodyHint": "At least {{min}} and at most {{max}} characters. Do not include personal details such as an address or phone number.",
     "send": "Send",
     "sent": "Your message reached us. Thank you!"
-  }
+  },
+  "organizationsTitle": "My organizations"
 }

@@ -9,6 +9,7 @@
     "users": "People",
     "audit": "Record",
     "venues": "Venues",
+    "organizations": "Organizations",
     "feedback": "Feedback",
     "pilot": "Pilot"
   },
@@ -254,5 +255,22 @@
     "markSeen": "Mark seen",
     "markDone": "Mark done",
     "reopen": "Reopen"
+  },
+  "organizations": {
+    "filter": "Status",
+    "status": {
+      "PENDING": "Waiting",
+      "ACTIVE": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "empty": "No requests here.",
+    "requester": "Requester: member since {{since}} · {{events}} completed events as organizer · {{reports}} open reports",
+    "reason": "Reason: {{reason}}",
+    "reasonLabel": "Reason for rejecting",
+    "reasonHint": "Required to reject; the requester reads it. Leave empty to approve.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approved": "Organization approved.",
+    "rejected": "Request rejected."
   }
 }

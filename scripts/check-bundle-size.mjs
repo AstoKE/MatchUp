@@ -77,12 +77,18 @@
 // added 1.9 kB more for features the app does not use, so they stay at 26.5 / 17.1.8.
 // TOTAL 941 -> 943 (2026-11-11, ROADMAP P-22): the feedback form behind Settings › Destek (the sheet, its call and copy in
 // both languages) and the console's feedback section (AdminGate, lazy, admins only). INITIAL did not move (559 kB).
+// INITIAL 559 -> 560 (2026-11-11): main after merging P-20 and P-22 together measured 560 kB (each was within 559 alone):
+// the "my events" switch and the feedback row both sit in Settings, which is in the first load.
+// TOTAL 943 -> 949 (2026-11-11, Phase 9 / M1, ADR-0030): organizations. The two screens are ONE lazy chunk (4.4 kB) with
+// their own copy (features/organizations/copy.ts, like the console's): two separate lazy imports had pushed the shared
+// code and the Turkish copy into __common (+1.3 kB of first load). Plus the console's organizations section (AdminGate
+// 16.4 -> 17.7 kB, admins only). INITIAL unchanged by it (560 kB, __common +0.3 kB for the routes).
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 943;
-const INITIAL_RATCHET_KB = 559;
+const TOTAL_RATCHET_KB = 949;
+const INITIAL_RATCHET_KB = 560;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';

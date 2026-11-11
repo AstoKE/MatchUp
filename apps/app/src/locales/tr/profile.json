@@ -135,5 +135,6 @@
     "bodyHint": "En az {{min}}, en fazla {{max}} karakter. Adres, telefon gibi kişisel bilgi yazma.",
     "send": "Gönder",
     "sent": "Mesajın bize ulaştı. Teşekkürler!"
-  }
+  },
+  "organizationsTitle": "Organizasyonlarım"
 }
