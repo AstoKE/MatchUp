@@ -2,6 +2,7 @@ import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { UserAvatar } from '@/features/profile';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
 import { Banner, Button, EmptyState, Skeleton, Text, TOUCH_TARGET, useTheme } from '@/ui';
@@ -174,15 +175,37 @@ function RequestRow({
           <Pressable
             accessibilityRole="link"
             accessibilityLabel={t('events:requests.openCard', { name })}
-            style={{ minHeight: TOUCH_TARGET, justifyContent: 'center', alignSelf: 'flex-start' }}
+            style={{
+              minHeight: TOUCH_TARGET,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing[3],
+              alignSelf: 'flex-start',
+            }}
           >
+            {/* Inside a named link: no initials, whose letters would not be in its name (WCAG 2.5.3). */}
+            <UserAvatar
+              name={request.displayName ?? ''}
+              avatarKey={request.avatarKey}
+              avatarPath={request.avatarPath}
+              size={40}
+              fallback="icon"
+            />
             <Text variant="titleSm" tone="link">
               {name}
             </Text>
           </Pressable>
         </Link>
       ) : (
-        <Text variant="titleSm">{name}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+          <UserAvatar
+            name={request.displayName ?? ''}
+            avatarKey={request.avatarKey}
+            avatarPath={request.avatarPath}
+            size={40}
+          />
+          <Text variant="titleSm">{name}</Text>
+        </View>
       )}
       <Text variant="caption" tone="secondary">
         {[
