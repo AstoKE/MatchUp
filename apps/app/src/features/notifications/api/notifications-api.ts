@@ -19,6 +19,9 @@ const NOTIFICATION_TYPES = [
   'ATTENDANCE_REMINDER',
   'ORGANIZATION_APPROVED',
   'ORGANIZATION_REJECTED',
+  'ORGANIZATION_INVITED',
+  'ORGANIZATION_JOIN_REQUESTED',
+  'ORGANIZATION_MEMBER_APPROVED',
 ] as const;
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 
@@ -36,6 +39,8 @@ export interface AppNotification {
   /** Null for a type this app version does not know yet (shown generically, never dropped). */
   type: NotificationType | null;
   eventId: string | null;
+  /** For the organization notifications (Phase 9). */
+  organizationId: string | null;
   createdAt: string;
   read: boolean;
   /** The event's title, when the viewer may still see the event. */
@@ -71,6 +76,8 @@ export async function fetchNotifications(): Promise<AppNotification[]> {
       id: r.id,
       type: isType(r.type) ? r.type : null,
       eventId,
+      organizationId:
+        typeof r.payload.organization_id === 'string' ? r.payload.organization_id : null,
       createdAt: r.created_at,
       read: r.read_at !== null,
       eventTitle: eventId ? (titles.get(eventId) ?? null) : null,

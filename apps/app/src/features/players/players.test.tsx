@@ -21,6 +21,8 @@ const mockApi = {
   fetchCatalog: jest.fn(),
   fetchMyAccount: jest.fn(),
 };
+// The invitation is tested with the organizations (organization-page.test.tsx); here it stays out of the way.
+jest.mock('@/features/organizations', () => ({ InviteToOrganization: () => null }));
 jest.mock('./api/players-api', () => ({
   REPORT_REASONS: ['SPAM', 'HARASSMENT', 'UNSAFE', 'FAKE_EVENT', 'INAPPROPRIATE', 'OTHER'],
   fetchPlayerCard: (...a: unknown[]) => mockApi.fetchPlayerCard(...a),

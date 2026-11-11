@@ -644,24 +644,37 @@ export type Database = {
       organization_members: {
         Row: {
           created_at: string;
+          invited_by: string | null;
           organization_id: string;
           role: string;
+          status: string;
           user_id: string;
         };
         ComputedFields: never;
         Insert: {
           created_at?: string;
+          invited_by?: string | null;
           organization_id: string;
           role: string;
+          status?: string;
           user_id: string;
         };
         Update: {
           created_at?: string;
+          invited_by?: string | null;
           organization_id?: string;
           role?: string;
+          status?: string;
           user_id?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'organization_members_invited_by_fkey';
+            columns: ['invited_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'organization_members_organization_id_fkey';
             columns: ['organization_id'];
@@ -1855,6 +1868,10 @@ export type Database = {
         Args: { p_client_request_id: string; p_input: Json; p_publish?: boolean };
         Returns: string;
       };
+      decide_organization_request: {
+        Args: { p_accept: boolean; p_org: string; p_user: string };
+        Returns: undefined;
+      };
       delete_draft: { Args: { p_event_id: string }; Returns: undefined };
       dispute_attendance: {
         Args: { p_participation_id: string; p_reason: string };
@@ -1881,7 +1898,10 @@ export type Database = {
         }[];
       };
       get_my_avatar: { Args: Record<PropertyKey, never>; Returns: Json };
+      get_organization: { Args: { p_id: string }; Returns: Json };
       get_player_card: { Args: { p_user_id: string }; Returns: Json };
+      invite_to_organization: { Args: { p_org: string; p_user: string }; Returns: string };
+      leave_organization: { Args: { p_org: string }; Returns: undefined };
       list_event_requests: { Args: { p_event_id: string }; Returns: Json };
       list_my_blocks: { Args: Record<PropertyKey, never>; Returns: Json };
       list_my_events: {
@@ -1889,6 +1909,7 @@ export type Database = {
         Returns: Json;
       };
       list_my_organizations: { Args: Record<PropertyKey, never>; Returns: Json };
+      list_organizations_to_invite: { Args: { p_user: string }; Returns: Json };
       mark_attendance: {
         Args: {
           p_participation_id: string;
@@ -1900,6 +1921,7 @@ export type Database = {
       publish_event: { Args: { p_event_id: string }; Returns: undefined };
       register_push_device: { Args: { p_platform: string; p_token: string }; Returns: undefined };
       reject_participation: { Args: { p_participation_id: string }; Returns: undefined };
+      remove_organization_member: { Args: { p_org: string; p_user: string }; Returns: undefined };
       remove_participant: {
         Args: { p_participation_id: string; p_reason?: string };
         Returns: undefined;
@@ -1930,6 +1952,11 @@ export type Database = {
         Args: { p_city_id: string; p_description: string; p_name: string; p_sport_ids: string[] };
         Returns: string;
       };
+      request_to_join_organization: { Args: { p_org: string }; Returns: string };
+      respond_to_organization_invite: {
+        Args: { p_accept: boolean; p_org: string };
+        Returns: undefined;
+      };
       search_events: { Args: { p_cursor?: Json; p_filters?: Json }; Returns: Json };
       search_venues: { Args: { p_filters: Json }; Returns: Json };
       send_test_push: { Args: Record<PropertyKey, never>; Returns: boolean };
@@ -1939,6 +1966,10 @@ export type Database = {
       set_my_avatar_photo: { Args: { p_path: string }; Returns: string };
       set_my_gender: {
         Args: { p_gender: Database['public']['Enums']['profile_gender'] };
+        Returns: undefined;
+      };
+      set_organization_role: {
+        Args: { p_org: string; p_role: string; p_user: string };
         Returns: undefined;
       };
       set_push_consents: {
@@ -1960,6 +1991,10 @@ export type Database = {
       submit_reviews: { Args: { p_event_id: string; p_reviews: Json }; Returns: number };
       suggest_venue: { Args: { p_input: Json }; Returns: string };
       track_event: { Args: { p_name: string; p_props?: Json }; Returns: boolean };
+      transfer_organization_ownership: {
+        Args: { p_org: string; p_user: string };
+        Returns: undefined;
+      };
       unblock_user: { Args: { p_user_id: string }; Returns: undefined };
       unregister_push_device: { Args: { p_token: string }; Returns: undefined };
       update_event: { Args: { p_event_id: string; p_input: Json }; Returns: undefined };

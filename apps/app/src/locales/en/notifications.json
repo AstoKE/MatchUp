@@ -26,7 +26,10 @@
     "EVENT_CANCELED_BY_ADMIN": "{{event}} was canceled by a moderator.",
     "ATTENDANCE_REMINDER": "{{event}} has ended. Mark attendance and finalize it; if you do not, the system finalizes it for you soon.",
     "ORGANIZATION_APPROVED": "Your organization request was approved.",
-    "ORGANIZATION_REJECTED": "Your organization request was not approved. You can see why in My organizations."
+    "ORGANIZATION_REJECTED": "Your organization request was not approved. You can see why in My organizations.",
+    "ORGANIZATION_INVITED": "You were invited to an organization.",
+    "ORGANIZATION_JOIN_REQUESTED": "Someone wants to join your organization.",
+    "ORGANIZATION_MEMBER_APPROVED": "You became a member of an organization."
   },
   "unknown": "You have a new notification.",
   "emptyAction": "Discover events",

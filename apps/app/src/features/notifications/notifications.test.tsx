@@ -53,6 +53,7 @@ const note = (over: Partial<AppNotification> = {}): AppNotification => ({
   eventId: EVENT,
   createdAt: '2026-11-01T10:00:00Z',
   read: false,
+  organizationId: null,
   eventTitle: 'Perşembe maçı',
   ...over,
 });

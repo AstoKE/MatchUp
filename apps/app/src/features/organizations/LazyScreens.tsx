@@ -5,6 +5,9 @@ import { Screen, Skeleton } from '@/ui';
 const MyOrganizationsScreen = lazy(() =>
   import('./screens').then((m) => ({ default: m.MyOrganizationsScreen })),
 );
+const OrganizationScreen = lazy(() =>
+  import('./screens').then((m) => ({ default: m.OrganizationScreen })),
+);
 const OrganizationRequestScreen = lazy(() =>
   import('./screens').then((m) => ({ default: m.OrganizationRequestScreen })),
 );
@@ -35,6 +38,14 @@ export function LazyOrganizationRequestScreen() {
   return (
     <Loading>
       <OrganizationRequestScreen />
+    </Loading>
+  );
+}
+
+export function LazyOrganizationScreen() {
+  return (
+    <Loading>
+      <OrganizationScreen />
     </Loading>
   );
 }

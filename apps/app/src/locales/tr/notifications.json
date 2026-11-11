@@ -26,7 +26,10 @@
     "EVENT_CANCELED_BY_ADMIN": "{{event}} bir yönetici tarafından iptal edildi.",
     "ATTENDANCE_REMINDER": "{{event}} bitti. Yoklamayı işaretle ve kesinleştir; yapmazsan sistem yarın kendiliğinden kesinleştirir.",
     "ORGANIZATION_APPROVED": "Organizasyon isteğin onaylandı.",
-    "ORGANIZATION_REJECTED": "Organizasyon isteğin onaylanmadı. Sebebini Organizasyonlarım'da görebilirsin."
+    "ORGANIZATION_REJECTED": "Organizasyon isteğin onaylanmadı. Sebebini Organizasyonlarım'da görebilirsin.",
+    "ORGANIZATION_INVITED": "Bir organizasyona davet edildin.",
+    "ORGANIZATION_JOIN_REQUESTED": "Organizasyonuna katılmak isteyen var.",
+    "ORGANIZATION_MEMBER_APPROVED": "Bir organizasyona üye oldun."
   },
   "unknown": "Yeni bir bildirimin var.",
   "emptyAction": "Etkinlikleri keşfet",

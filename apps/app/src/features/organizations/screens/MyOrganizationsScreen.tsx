@@ -1,11 +1,21 @@
-import { useRouter, type Href } from 'expo-router';
+import { Link, useRouter, type Href } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, useCatalog } from '@/features/catalog';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
-import { Banner, Button, EmptyState, Screen, ScreenHeader, Skeleton, Text, useTheme } from '@/ui';
+import {
+  Banner,
+  Button,
+  EmptyState,
+  Screen,
+  ScreenHeader,
+  Skeleton,
+  Text,
+  TOUCH_TARGET,
+  useTheme,
+} from '@/ui';
 import { ownedCount, type Organization } from '../api/organizations-api';
 import { ensureOrganizationsCopy } from '../copy';
 import { useCancelOrganizationRequest, useMyOrganizations } from '../hooks';
@@ -105,11 +115,30 @@ function OrganizationRow({ organization }: { organization: Organization }) {
         backgroundColor: colors.surfaceRaised,
       }}
     >
-      <Text variant="titleSm">{organization.name}</Text>
+      {organization.status === 'ACTIVE' ? (
+        <Link href={{ pathname: '/o/[id]', params: { id: organization.id } } as Href} asChild>
+          <Pressable
+            accessibilityRole="link"
+            style={{ minHeight: TOUCH_TARGET, justifyContent: 'center', alignSelf: 'flex-start' }}
+          >
+            <Text variant="titleSm" tone="link">
+              {organization.name}
+            </Text>
+          </Pressable>
+        </Link>
+      ) : (
+        <Text variant="titleSm">{organization.name}</Text>
+      )}
       <Text variant="caption" tone="secondary">
         {[
-          t(`organizations:status.${organization.status}`),
-          t(`organizations:role.${organization.role}`),
+          organization.membership === 'INVITED'
+            ? t('organizations:page.statusInvited')
+            : organization.membership === 'REQUESTED'
+              ? t('organizations:page.statusRequested')
+              : t(`organizations:status.${organization.status}`),
+          organization.membership === 'ACTIVE'
+            ? t(`organizations:role.${organization.role}`)
+            : null,
           city ? localizedName(city.names, locale) : null,
           sports.join(', ') || null,
         ]

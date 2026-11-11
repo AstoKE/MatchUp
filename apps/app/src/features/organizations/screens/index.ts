@@ -2,3 +2,4 @@
 // of the first load. Two separate lazy imports would move the shared code into __common, which every page loads.
 export { MyOrganizationsScreen } from './MyOrganizationsScreen';
 export { OrganizationRequestScreen } from './OrganizationRequestScreen';
+export { OrganizationScreen } from './OrganizationScreen';
