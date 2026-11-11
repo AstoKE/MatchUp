@@ -104,7 +104,7 @@ const steps = [
     'quality',
     'expo doctor',
     'npx',
-    ['--yes', 'expo-doctor@latest'],
+    ['--yes', 'expo-doctor@1.21.6'], // pinned with ci.yml: 1.21.7 cannot start (missing @expo/env)
     // It fetches package metadata from the internet: a failed fetch failed it once (2026-11-09), then it passed twice.
     { cwd: 'apps/app', env: placeholders, retries: 1 },
   ],
