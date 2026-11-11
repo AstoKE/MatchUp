@@ -89,6 +89,9 @@ Android setup, the container build and the Windows-specific pitfalls are in docs
 
 ## 6. Troubleshooting
 
+- **Expo patch releases held back (`apps/app/package.json` → `expo.install.exclude`, 2026-11-11).** Expo published patch releases of 11 SDK 58 packages (expo 58.0.24, expo-router 58.0.31 and others). With them, the web app rendered screen content more than once and 7 event E2E tests failed (strict-mode duplicates), while `main` passed the same tests on the same stack. The packages stay at their tested versions and are listed in `expo.install.exclude`, so expo-doctor accepts them. To take them: remove the list, `npx expo install --fix`, run the full E2E, and check a device build; then lift the hold in a PR of its own.
+
+
 | Symptom | Cause / fix |
 |---|---|
 | `failed to connect to the docker API` | Docker Desktop is not running — start it, wait for the engine |
