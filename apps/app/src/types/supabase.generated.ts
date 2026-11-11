@@ -513,6 +513,58 @@ export type Database = {
           },
         ];
       };
+      feedback: {
+        Row: {
+          body: string;
+          context: string | null;
+          created_at: string;
+          handled_at: string | null;
+          handled_by: string | null;
+          id: string;
+          kind: string;
+          status: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          body: string;
+          context?: string | null;
+          created_at?: string;
+          handled_at?: string | null;
+          handled_by?: string | null;
+          id?: string;
+          kind: string;
+          status?: string;
+          user_id: string;
+        };
+        Update: {
+          body?: string;
+          context?: string | null;
+          created_at?: string;
+          handled_at?: string | null;
+          handled_by?: string | null;
+          id?: string;
+          kind?: string;
+          status?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'feedback_handled_by_fkey';
+            columns: ['handled_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'feedback_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       moderation_actions: {
         Row: {
           action: string;
@@ -1634,6 +1686,7 @@ export type Database = {
       admin_hide_review: { Args: { p_note: string; p_review_id: string }; Returns: undefined };
       admin_list_actions: { Args: { p_cursor?: Json; p_limit?: number }; Returns: Json };
       admin_list_disputes: { Args: Record<PropertyKey, never>; Returns: Json };
+      admin_list_feedback: { Args: { p_status?: string }; Returns: Json };
       admin_list_flags: { Args: Record<PropertyKey, never>; Returns: Json };
       admin_list_reports: {
         Args: { p_cursor?: Json; p_limit?: number; p_status?: string };
@@ -1660,6 +1713,7 @@ export type Database = {
       };
       admin_restore_review: { Args: { p_note: string; p_review_id: string }; Returns: undefined };
       admin_search_users: { Args: { p_query: string }; Returns: Json };
+      admin_set_feedback_status: { Args: { p_id: string; p_status: string }; Returns: undefined };
       admin_set_venue_status: {
         Args: { p_action: string; p_note?: string; p_venue_id: string };
         Returns: boolean;
@@ -1785,6 +1839,10 @@ export type Database = {
       set_sport_profile: {
         Args: { p_level: number; p_position_ids: string[]; p_sport_id: string };
         Returns: undefined;
+      };
+      submit_feedback: {
+        Args: { p_body: string; p_context?: string; p_kind: string };
+        Returns: string;
       };
       submit_reviews: { Args: { p_event_id: string; p_reviews: Json }; Returns: number };
       suggest_venue: { Args: { p_input: Json }; Returns: string };

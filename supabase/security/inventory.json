@@ -265,6 +265,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.export_feedback_data(p_uid uuid)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.export_place_data(p_uid uuid)",
       "definer": false,
       "search_path_empty": true,
@@ -881,6 +889,14 @@
       "guard": "private.assert_admin_aal2"
     },
     {
+      "fn": "public.admin_list_feedback(p_status text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
       "fn": "public.admin_list_flags()",
       "definer": true,
       "search_path_empty": true,
@@ -962,6 +978,14 @@
     },
     {
       "fn": "public.admin_search_users(p_query text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_set_feedback_status(p_id uuid, p_status text)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
@@ -1345,6 +1369,14 @@
       "guard": "private.assert_onboarded_user"
     },
     {
+      "fn": "public.submit_feedback(p_kind text, p_body text, p_context text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
       "fn": "public.submit_reviews(p_event_id uuid, p_reviews jsonb)",
       "definer": true,
       "search_path_empty": true,
@@ -1557,6 +1589,13 @@
       "authenticated": [
         "SELECT"
       ]
+    },
+    {
+      "table": "public.feedback",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
     },
     {
       "table": "public.moderation_actions",

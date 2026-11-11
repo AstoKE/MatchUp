@@ -9,6 +9,7 @@
     "users": "People",
     "audit": "Record",
     "venues": "Venues",
+    "feedback": "Feedback",
     "pilot": "Pilot"
   },
   "mfa": {
@@ -233,5 +234,25 @@
       "near_me_used": "Near me used",
       "venue_suggest_opened": "Venue suggestion opened"
     }
+  },
+  "feedback": {
+    "filter": "Status",
+    "open": "Open",
+    "done": "Done",
+    "empty": "No messages here.",
+    "kind": {
+      "REQUEST": "Request",
+      "SUGGESTION": "Suggestion",
+      "COMPLAINT": "Complaint"
+    },
+    "status": {
+      "NEW": "New",
+      "SEEN": "Seen",
+      "DONE": "Done"
+    },
+    "context": "Sent from: {{screen}}",
+    "markSeen": "Mark seen",
+    "markDone": "Mark done",
+    "reopen": "Reopen"
   }
 }

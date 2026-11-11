@@ -3,13 +3,23 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Screen, ScreenHeader, SegmentedChoice, Text, useTheme } from '@/ui';
+import { FeedbackPanel } from '../components/FeedbackPanel';
 import { AuditPanel, DisputesPanel, FlagsPanel } from '../components/ListPanels';
 import { PeoplePanel } from '../components/PeoplePanel';
 import { PilotPanel } from '../components/PilotPanel';
 import { ReportsPanel } from '../components/ReportsPanel';
 import { VenuesPanel } from '../components/VenuesPanel';
 
-const SECTIONS = ['reports', 'flags', 'disputes', 'users', 'venues', 'pilot', 'audit'] as const;
+const SECTIONS = [
+  'reports',
+  'flags',
+  'disputes',
+  'users',
+  'venues',
+  'feedback',
+  'pilot',
+  'audit',
+] as const;
 type Section = (typeof SECTIONS)[number];
 
 /** The console (docs/PHASE6_PLAN.md M5). Only reached through the gate; the server checks every call again. */
@@ -43,6 +53,7 @@ export default function AdminScreen() {
         {section === 'disputes' ? <DisputesPanel /> : null}
         {section === 'users' ? <PeoplePanel userId={person} onSelect={setPerson} /> : null}
         {section === 'venues' ? <VenuesPanel /> : null}
+        {section === 'feedback' ? <FeedbackPanel onOpenUser={openUser} /> : null}
         {section === 'pilot' ? <PilotPanel /> : null}
         {section === 'audit' ? <AuditPanel /> : null}
       </View>

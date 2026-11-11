@@ -13,6 +13,8 @@ import {
   verifyTotp,
   fetchVenues,
   fetchPilotMetrics,
+  fetchFeedback,
+  type FeedbackStatus,
   type ReportCursor,
   type VenueCursor,
   type VenueStatus,
@@ -89,3 +91,6 @@ export const useAdminVenues = (status: VenueStatus) =>
 
 export const usePilotMetrics = (days: number) =>
   useQuery({ queryKey: ['admin', 'pilot', days], queryFn: () => fetchPilotMetrics(days) });
+
+export const useFeedback = (status: FeedbackStatus | null) =>
+  useQuery({ queryKey: ['admin', 'feedback', status], queryFn: () => fetchFeedback(status) });

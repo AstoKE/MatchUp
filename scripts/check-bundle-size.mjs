@@ -75,11 +75,13 @@
 // TOTAL 940 -> 941 and INITIAL 558 -> 559 (2026-11-09, minor/patch dependency updates): @tanstack/query-core and the
 // Supabase client grew a little (measured with source maps against main). i18next 26.7 / react-i18next 17.1.13 would have
 // added 1.9 kB more for features the app does not use, so they stay at 26.5 / 17.1.8.
+// TOTAL 941 -> 943 (2026-11-11, ROADMAP P-22): the feedback form behind Settings › Destek (the sheet, its call and copy in
+// both languages) and the console's feedback section (AdminGate, lazy, admins only). INITIAL did not move (559 kB).
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 941;
+const TOTAL_RATCHET_KB = 943;
 const INITIAL_RATCHET_KB = 559;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');

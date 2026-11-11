@@ -9,6 +9,7 @@
     "users": "Kişiler",
     "audit": "Kayıt",
     "venues": "Mekânlar",
+    "feedback": "Geri bildirim",
     "pilot": "Pilot"
   },
   "mfa": {
@@ -233,5 +234,25 @@
       "near_me_used": "Yakınımdakiler kullanıldı",
       "venue_suggest_opened": "Mekân önerme açıldı"
     }
+  },
+  "feedback": {
+    "filter": "Durum",
+    "open": "Açık",
+    "done": "Tamamlanan",
+    "empty": "Burada mesaj yok.",
+    "kind": {
+      "REQUEST": "İstek",
+      "SUGGESTION": "Öneri",
+      "COMPLAINT": "Şikayet"
+    },
+    "status": {
+      "NEW": "Yeni",
+      "SEEN": "Görüldü",
+      "DONE": "Tamamlandı"
+    },
+    "context": "Gönderildiği yer: {{screen}}",
+    "markSeen": "Görüldü",
+    "markDone": "Tamamlandı",
+    "reopen": "Yeniden aç"
   }
 }

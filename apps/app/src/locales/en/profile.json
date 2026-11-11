@@ -119,5 +119,21 @@
     "MALE": "Man",
     "UNDISCLOSED": "Rather not say",
     "required": "Choose an option."
+  },
+  "feedback": {
+    "open": "Send a request, suggestion or complaint",
+    "title": "Write to us",
+    "intro": "If you have a request, a suggestion or a complaint about the app, write it here. We read every one.",
+    "kind": "What is it about?",
+    "kinds": {
+      "REQUEST": "Request",
+      "SUGGESTION": "Suggestion",
+      "COMPLAINT": "Complaint"
+    },
+    "reportHint": "For a complaint about a person or an event, use \"Report\" on their page: reports go to moderation.",
+    "body": "Your message",
+    "bodyHint": "At least {{min}} and at most {{max}} characters. Do not include personal details such as an address or phone number.",
+    "send": "Send",
+    "sent": "Your message reached us. Thank you!"
   }
 }

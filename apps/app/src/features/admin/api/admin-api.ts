@@ -362,3 +362,30 @@ const pilotMetrics = z.object({
 export type PilotMetrics = z.infer<typeof pilotMetrics>;
 export const fetchPilotMetrics = (days: number) =>
   call('admin_pilot_metrics', { p_days: days }, (data) => pilotMetrics.parse(data));
+
+// ---- feedback (ROADMAP P-22) -------------------------------------------------------------------------------------------
+export const FEEDBACK_STATUSES = ['NEW', 'SEEN', 'DONE'] as const;
+export type FeedbackStatus = (typeof FEEDBACK_STATUSES)[number];
+const feedbackRow = z.array(
+  z.object({
+    id: z.uuid(),
+    kind: z.enum(['REQUEST', 'SUGGESTION', 'COMPLAINT']),
+    body: z.string(),
+    context: z.nullable(z.string()),
+    status: z.enum(FEEDBACK_STATUSES),
+    user_id: z.uuid(),
+    user_name: z.nullable(z.string()),
+    created_at: z.string(),
+    handled_at: z.nullable(z.string()),
+  }),
+);
+export type FeedbackItem = z.infer<typeof feedbackRow>[number];
+/** Without a status: everything not done yet (new and seen), newest first. */
+export const fetchFeedback = (status: FeedbackStatus | null) =>
+  call('admin_list_feedback', status ? { p_status: status } : {}, (data) =>
+    feedbackRow.parse(data),
+  );
+export async function setFeedbackStatus(id: string, status: FeedbackStatus): Promise<void> {
+  const { error } = await supabase.rpc('admin_set_feedback_status', { p_id: id, p_status: status });
+  if (error) throw mapRpcError(error);
+}
