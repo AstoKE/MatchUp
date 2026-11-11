@@ -119,5 +119,21 @@
     "MALE": "Erkek",
     "UNDISCLOSED": "Belirtmek istemiyorum",
     "required": "Bir seçenek seç."
+  },
+  "feedback": {
+    "open": "İstek, öneri ya da şikayet gönder",
+    "title": "Bize yaz",
+    "intro": "Uygulamayla ilgili bir isteğin, önerin ya da şikayetin varsa buradan yaz. Hepsini okuyoruz.",
+    "kind": "Ne hakkında?",
+    "kinds": {
+      "REQUEST": "İstek",
+      "SUGGESTION": "Öneri",
+      "COMPLAINT": "Şikayet"
+    },
+    "reportHint": "Bir kişi ya da etkinlik hakkında şikayetin varsa, onun sayfasındaki \"Bildir\" seçeneğini kullan: o bildirimler moderasyona gider.",
+    "body": "Mesajın",
+    "bodyHint": "En az {{min}}, en fazla {{max}} karakter. Adres, telefon gibi kişisel bilgi yazma.",
+    "send": "Gönder",
+    "sent": "Mesajın bize ulaştı. Teşekkürler!"
   }
 }

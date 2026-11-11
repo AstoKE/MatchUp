@@ -50,7 +50,8 @@ jobs:
         env:
           CI: '1'
       - name: Expo doctor
-        run: npx --yes expo-doctor@latest
+        # Pinned: 1.21.7 (2026-11-11) shipped without its @expo/env dependency and cannot start. Raise it by hand.
+        run: npx --yes expo-doctor@1.21.6
         working-directory: apps/app
         env:
           CI: '1'

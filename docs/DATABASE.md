@@ -11,6 +11,10 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 ## 0. As built in Phase 7
 
 - `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261117100000_feedback.sql` (ROADMAP P-22):
+  - **Table:** `feedback` (kind, body 10–2000, optional screen name, status `NEW`/`SEEN`/`DONE`, who handled it). RLS on, no API grants.
+  - **RPCs:** `submit_feedback`; `admin_list_feedback`, `admin_set_feedback_status` (audit action `FEEDBACK_UPDATED`).
+  - **Export and purge:** `private.export_feedback_data` joins `export_my_data`; `purge_account` deletes the person's feedback and forgets them as a handler.
 - `20261114100000_phone_verification.sql` (Phase 8, ADR-0029):
   - **Config:** `app_config` `phone.required` (off).
   - **Functions:**
@@ -422,6 +426,8 @@ Every `admin_*` function starts with `private.assert_admin_aal2()`: signed in, v
 | `block_user(id)`, `unblock_user(id)`, `list_my_blocks()` | 6 — **built (M1)** | self | mutual and silent: neither side finds, joins or reviews the other; open requests between them are rejected without a notification; someone already approved stays approved |
 | `get_player_card(user_id)` | 6 — **built (M3)** | self | `NOT_FOUND` unless the profile is public or the viewer has met the person, and always when blocked either way; honors `show_reliability` and `show_badges` |
 | `report(target_type, target_id, reason, details, invite_token)` | 6 — **built (M2)** | self | `USER` and `EVENT` only; only what the reporter could see, otherwise `NOT_FOUND`; 20 a day (`RATE_LIMITED`); repeating an open report returns the first |
+| `submit_feedback(kind, body, context)` | P-22 — **built** | self (onboarded) | `REQUEST`/`SUGGESTION`/`COMPLAINT`, 10–2000 characters, `context` a screen name; 5 a day (`quota.max_feedback_per_day`); nobody reads `feedback` through the API |
+| `admin_list_feedback(status)`, `admin_set_feedback_status(id, status)` | P-22 — **built** | admin with `aal2` | default list = not done, newest first, at most 100; a status change is audited (`FEEDBACK_UPDATED`, no text) |
 | `admin_*` (queue, action, resolve dispute, verify venue, suspend) | 6 | admin | audited |
 | `request_account_deletion()`, `cancel_account_deletion()` | 6 | self | actual purge by Edge Function after grace |
 | `track_event(name, props)` | 7 | self | allowlist, rate limited |

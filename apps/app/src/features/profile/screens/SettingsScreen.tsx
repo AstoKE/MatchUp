@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AccountSection } from '@/features/account';
 import { useSession } from '@/features/auth';
+import { FeedbackSheet } from '@/features/feedback';
 import { PushSettingsSection } from '@/features/notifications';
 import { BlockedList } from '@/features/players';
 import { LanguagePicker, SupportContact } from '@/features/settings';
@@ -189,6 +190,7 @@ function Settings({ profile }: { profile: MyProfile }) {
       </Section>
 
       <Section title={t('common:support.title')}>
+        <FeedbackRow />
         <SupportContact />
       </Section>
 
@@ -222,6 +224,18 @@ function PhoneRow() {
           router.push({ pathname: '/verify-phone', params: { returnTo: '/settings' } })
         }
       />
+    </View>
+  );
+}
+
+/** ROADMAP P-22: requests, suggestions and complaints about the app, sent from here. */
+function FeedbackRow() {
+  const { t } = useTranslation('profile');
+  const [open, setOpen] = useState(false);
+  return (
+    <View style={{ alignItems: 'flex-start' }}>
+      <Button variant="secondary" label={t('feedback.open')} onPress={() => setOpen(true)} />
+      <FeedbackSheet visible={open} context="settings" onClose={() => setOpen(false)} />
     </View>
   );
 }
