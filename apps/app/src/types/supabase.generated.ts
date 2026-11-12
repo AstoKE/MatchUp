@@ -1945,6 +1945,10 @@ export type Database = {
       };
       admin_add_venue: { Args: { p_input: Json; p_source_ref?: string }; Returns: string };
       admin_cancel_event: { Args: { p_event_id: string; p_note: string }; Returns: undefined };
+      admin_create_business: {
+        Args: { p_city_id: string; p_name: string; p_owner: string; p_venue_ids: string[] };
+        Returns: string;
+      };
       admin_decide_business: {
         Args: { p_approve: boolean; p_id: string; p_reason?: string };
         Returns: undefined;
@@ -1988,6 +1992,10 @@ export type Database = {
       };
       admin_restore_review: { Args: { p_note: string; p_review_id: string }; Returns: undefined };
       admin_search_users: { Args: { p_query: string }; Returns: Json };
+      admin_set_business_hidden: {
+        Args: { p_hidden: boolean; p_id: string; p_note: string };
+        Returns: undefined;
+      };
       admin_set_feedback_status: { Args: { p_id: string; p_status: string }; Returns: undefined };
       admin_set_organization_hidden: {
         Args: { p_hidden: boolean; p_id: string; p_note: string };
@@ -2061,6 +2069,7 @@ export type Database = {
       get_my_avatar: { Args: Record<PropertyKey, never>; Returns: Json };
       get_organization: { Args: { p_id: string }; Returns: Json };
       get_player_card: { Args: { p_user_id: string }; Returns: Json };
+      get_venue_business: { Args: { p_venue_id: string }; Returns: Json };
       invite_to_organization: { Args: { p_org: string; p_user: string }; Returns: string };
       leave_organization: { Args: { p_org: string }; Returns: undefined };
       list_event_requests: { Args: { p_event_id: string }; Returns: Json };

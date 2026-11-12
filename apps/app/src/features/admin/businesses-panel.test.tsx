@@ -7,13 +7,33 @@ import { ensureAdminCopy } from './copy';
 
 const mockFetch = jest.fn();
 const mockDecide = jest.fn();
+const mockCreate = jest.fn();
+const mockHide = jest.fn();
+const mockUsers = jest.fn();
+const mockVenues = jest.fn();
 jest.mock('./api/admin-api', () => ({
   ...jest.requireActual('./api/admin-api'),
   fetchBusinessRequests: (...a: unknown[]) => mockFetch(...a),
   decideBusiness: (...a: unknown[]) => mockDecide(...a),
+  createBusiness: (...a: unknown[]) => mockCreate(...a),
+  setBusinessHidden: (...a: unknown[]) => mockHide(...a),
+  searchUsers: (...a: unknown[]) => mockUsers(...a),
+  searchCommercialVenues: (...a: unknown[]) => mockVenues(...a),
 }));
 jest.mock('@/features/catalog/api/catalog-api', () => ({
-  fetchCatalog: () => Promise.resolve({ sports: [], cities: [] }),
+  fetchCatalog: () =>
+    Promise.resolve({
+      sports: [],
+      cities: [
+        {
+          id: '00000000-0000-4000-8000-0000000000a1',
+          slug: 'ankara',
+          names: { tr: 'Ankara', en: 'Ankara' },
+          timeZone: 'Europe/Istanbul',
+          districts: [],
+        },
+      ],
+    }),
 }));
 
 const admin: SessionState = {
@@ -49,6 +69,10 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockFetch.mockResolvedValue([request]);
   mockDecide.mockResolvedValue(undefined);
+  mockCreate.mockResolvedValue('00000000-0000-4000-8000-0000000000b9');
+  mockHide.mockResolvedValue(undefined);
+  mockUsers.mockResolvedValue([{ id: REQUESTER, name: 'Deniz Kaya', account_status: 'ACTIVE' }]);
+  mockVenues.mockResolvedValue([]);
 });
 
 describe('the console: business requests (Phase 10 / M1)', () => {
@@ -71,5 +95,29 @@ describe('the console: business requests (Phase 10 / M1)', () => {
     await waitFor(() =>
       expect(mockDecide).toHaveBeenCalledWith(BUSINESS, false, 'Tesisle iletişim kurulamadı.'),
     );
+  });
+
+  it('hides an active business only with a note (M2)', async () => {
+    mockFetch.mockResolvedValue([{ ...request, status: 'ACTIVE' }]);
+    await renderApp(<BusinessesPanel onOpenUser={jest.fn()} />, { session: admin });
+    expect(await screen.findByRole('button', { name: 'Gizle', disabled: true })).toBeTruthy();
+    await fireEvent.changeText(screen.getByLabelText('Not (gerekli)'), 'Şikayet incelemede.');
+    await fireEvent.press(screen.getByRole('button', { name: 'Gizle' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Evet' }));
+    await waitFor(() =>
+      expect(mockHide).toHaveBeenCalledWith(BUSINESS, true, 'Şikayet incelemede.'),
+    );
+  });
+
+  it('adds a business directly with its owner (P-19)', async () => {
+    mockFetch.mockResolvedValue([]);
+    await renderApp(<BusinessesPanel onOpenUser={jest.fn()} />, { session: admin });
+    await fireEvent.press(await screen.findByRole('button', { name: 'İşletme ekle' }));
+    await fireEvent.changeText(screen.getByLabelText('İşletmenin adı'), 'Yıldız Spor');
+    await fireEvent.changeText(screen.getByLabelText('Sahibini ara (ad)'), 'Deniz');
+    await fireEvent.press(screen.getByRole('button', { name: 'Ara' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Deniz Kaya' }));
+    expect(screen.getByText('Sahibi: Deniz Kaya')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'İşletmeyi ekle', disabled: true })).toBeTruthy();
   });
 });

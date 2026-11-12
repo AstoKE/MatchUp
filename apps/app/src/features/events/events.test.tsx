@@ -85,6 +85,7 @@ jest.mock('./city-preference', () => ({
   storeCity: jest.fn(),
 }));
 jest.mock('./api/events-api', () => ({
+  fetchVenueBusiness: () => Promise.resolve(null),
   fetchEventOrganization: () => Promise.resolve(null),
   fetchEvent: (...a: unknown[]) => mockApi.fetchEvent(...a),
   createEvent: (...a: unknown[]) => mockApi.createEvent(...a),

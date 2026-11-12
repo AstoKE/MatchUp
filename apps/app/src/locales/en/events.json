@@ -160,7 +160,8 @@
     "venue": "Venue",
     "venueVerified": "{{name}} · verified venue",
     "venueUnverified": "{{name}} · unverified venue",
-    "bookingValue": "{{status}} (declared by the organizer)"
+    "bookingValue": "{{status}} (declared by the organizer)",
+    "venueBusiness": "Run by"
   },
   "edit": {
     "title": "Edit event",

@@ -466,13 +466,13 @@ export async function setOrganizationHidden(
 }
 
 // ---- business requests (Phase 10, ADR-0031) ----------------------------------------------------------------------------
-export type BusinessRequestStatus = 'PENDING' | 'ACTIVE' | 'REJECTED';
+export type BusinessRequestStatus = 'PENDING' | 'ACTIVE' | 'REJECTED' | 'HIDDEN';
 const businessRequestRow = z.array(
   z.object({
     id: z.uuid(),
     name: z.string(),
     city_id: z.uuid(),
-    status: z.enum(['PENDING', 'ACTIVE', 'REJECTED']),
+    status: z.enum(['PENDING', 'ACTIVE', 'REJECTED', 'HIDDEN']),
     reject_reason: z.nullable(z.string()),
     created_at: z.string(),
     venues: z.array(z.object({ id: z.uuid(), name: z.string() })),
@@ -497,4 +497,40 @@ export async function decideBusiness(id: string, approve: boolean, reason: strin
     ...(reason ? { p_reason: reason } : {}),
   });
   if (error) throw mapRpcError(error);
+}
+
+// ---- businesses: added by an administrator, hidden, restored (Phase 10 / M2) ----------------------------------------
+export async function createBusiness(input: {
+  name: string;
+  cityId: string;
+  ownerId: string;
+  venueIds: string[];
+}): Promise<string> {
+  const { data, error } = await supabase.rpc('admin_create_business', {
+    p_name: input.name,
+    p_city_id: input.cityId,
+    p_owner: input.ownerId,
+    p_venue_ids: input.venueIds,
+  });
+  if (error) throw mapRpcError(error);
+  return z.uuid().parse(data);
+}
+export async function setBusinessHidden(id: string, hidden: boolean, note: string): Promise<void> {
+  const { error } = await supabase.rpc('admin_set_business_hidden', {
+    p_id: id,
+    p_hidden: hidden,
+    p_note: note,
+  });
+  if (error) throw mapRpcError(error);
+}
+/** Commercial facilities in a province whose name matches (for adding a business). */
+export async function searchCommercialVenues(cityId: string, q: string) {
+  const { data, error } = await supabase.rpc('search_venues', {
+    p_filters: { city_id: cityId, q, limit: 20 },
+  });
+  if (error) throw mapRpcError(error);
+  return z
+    .object({ items: z.array(z.object({ id: z.uuid(), name: z.string(), kind: z.string() })) })
+    .parse(data)
+    .items.filter((v) => v.kind === 'COMMERCIAL_FACILITY');
 }

@@ -160,7 +160,8 @@
     "venue": "Mekân",
     "venueVerified": "{{name}} · doğrulanmış mekân",
     "venueUnverified": "{{name}} · doğrulanmamış mekân",
-    "bookingValue": "{{status}} (organizatörün beyanı)"
+    "bookingValue": "{{status}} (organizatörün beyanı)",
+    "venueBusiness": "İşletme"
   },
   "edit": {
     "title": "Etkinliği düzenle",

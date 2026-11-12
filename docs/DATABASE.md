@@ -11,6 +11,10 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 ## 0. As built in Phase 7
 
 - `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261123100000_business_admin.sql` (Phase 10 M2, ADR-0031):
+  - **Status `HIDDEN`:** set and lifted by an administrator (`admin_set_business_hidden`, note required, moderation actions `BUSINESS_HIDDEN`/`BUSINESS_RESTORED`, target type `BUSINESS`).
+  - **`admin_create_business(name, city, owner, venues)`** (P-19): an active business for an onboarded owner, at once; audited `BUSINESS_ADDED`; the owner is notified (`BUSINESS_APPROVED`).
+  - **`get_venue_business(venue)`:** the active business running a venue, for anyone signed in. `admin_list_business_requests` also lists `HIDDEN`.
 - `20261122100000_businesses.sql` (Phase 10 M1, ADR-0031):
   - **Tables:** `businesses` (name 2–80 with the display-name filter, province, contact phone and/or e-mail for administrators only, a message, status `PENDING`/`ACTIVE`/`REJECTED`/`DISSOLVED`, who decided and why), `business_members` (`OWNER`, later `STAFF`), `business_venues` (one business per venue, `COMMERCIAL_FACILITY` only). RLS on, no API grants.
   - **RPCs:** `request_business` (at most 3 owned, waiting included; at most 10 venues; `VENUE_CLAIMED` when a venue already has or awaits a business), `cancel_business_request`, `list_my_businesses` (without contact details); `admin_list_business_requests`, `admin_decide_business` (second factor; a reason is required to reject; a rejection releases the claims; audited as `BUSINESS_APPROVED`/`BUSINESS_REJECTED`). Ownership never changes a venue's verification.
