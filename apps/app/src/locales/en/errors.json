@@ -26,5 +26,6 @@
   "TIMEOUT": "That took too long. Please try again.",
   "UNKNOWN": "Something went wrong. Please try again.",
   "MFA_REQUIRED": "This needs your second verification step.",
-  "PHONE_NOT_VERIFIED": "Verify your phone to continue."
+  "PHONE_NOT_VERIFIED": "Verify your phone to continue.",
+  "VENUE_CLAIMED": "This venue already has a business, or one is waiting for approval."
 }

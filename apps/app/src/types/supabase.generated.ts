@@ -128,6 +128,145 @@ export type Database = {
           },
         ];
       };
+      business_members: {
+        Row: {
+          business_id: string;
+          created_at: string;
+          role: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          business_id: string;
+          created_at?: string;
+          role: string;
+          user_id: string;
+        };
+        Update: {
+          business_id?: string;
+          created_at?: string;
+          role?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'business_members_business_id_fkey';
+            columns: ['business_id'];
+            isOneToOne: false;
+            referencedRelation: 'businesses';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'business_members_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      business_venues: {
+        Row: {
+          business_id: string;
+          created_at: string;
+          venue_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          business_id: string;
+          created_at?: string;
+          venue_id: string;
+        };
+        Update: {
+          business_id?: string;
+          created_at?: string;
+          venue_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'business_venues_business_id_fkey';
+            columns: ['business_id'];
+            isOneToOne: false;
+            referencedRelation: 'businesses';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'business_venues_venue_id_fkey';
+            columns: ['venue_id'];
+            isOneToOne: true;
+            referencedRelation: 'venues';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      businesses: {
+        Row: {
+          city_id: string;
+          contact_email: string | null;
+          contact_phone: string | null;
+          created_at: string;
+          created_by: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          id: string;
+          message: string | null;
+          name: string;
+          reject_reason: string | null;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          city_id: string;
+          contact_email?: string | null;
+          contact_phone?: string | null;
+          created_at?: string;
+          created_by: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          id?: string;
+          message?: string | null;
+          name: string;
+          reject_reason?: string | null;
+          status?: string;
+        };
+        Update: {
+          city_id?: string;
+          contact_email?: string | null;
+          contact_phone?: string | null;
+          created_at?: string;
+          created_by?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          id?: string;
+          message?: string | null;
+          name?: string;
+          reject_reason?: string | null;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'businesses_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'cities';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'businesses_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'businesses_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       cities: {
         Row: {
           centroid: unknown;
@@ -1806,6 +1945,10 @@ export type Database = {
       };
       admin_add_venue: { Args: { p_input: Json; p_source_ref?: string }; Returns: string };
       admin_cancel_event: { Args: { p_event_id: string; p_note: string }; Returns: undefined };
+      admin_decide_business: {
+        Args: { p_approve: boolean; p_id: string; p_reason?: string };
+        Returns: undefined;
+      };
       admin_decide_organization: {
         Args: { p_approve: boolean; p_id: string; p_reason?: string };
         Returns: undefined;
@@ -1815,6 +1958,7 @@ export type Database = {
       admin_get_user: { Args: { p_user_id: string }; Returns: Json };
       admin_hide_review: { Args: { p_note: string; p_review_id: string }; Returns: undefined };
       admin_list_actions: { Args: { p_cursor?: Json; p_limit?: number }; Returns: Json };
+      admin_list_business_requests: { Args: { p_status?: string }; Returns: Json };
       admin_list_disputes: { Args: Record<PropertyKey, never>; Returns: Json };
       admin_list_feedback: { Args: { p_status?: string }; Returns: Json };
       admin_list_flags: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -1857,6 +2001,7 @@ export type Database = {
       approve_participation: { Args: { p_participation_id: string }; Returns: undefined };
       block_user: { Args: { p_user_id: string }; Returns: undefined };
       cancel_account_deletion: { Args: Record<PropertyKey, never>; Returns: undefined };
+      cancel_business_request: { Args: { p_id: string }; Returns: undefined };
       cancel_event: {
         Args: { p_event_id: string; p_message?: string; p_reason: string };
         Returns: undefined;
@@ -1920,6 +2065,7 @@ export type Database = {
       leave_organization: { Args: { p_org: string }; Returns: undefined };
       list_event_requests: { Args: { p_event_id: string }; Returns: Json };
       list_my_blocks: { Args: Record<PropertyKey, never>; Returns: Json };
+      list_my_businesses: { Args: Record<PropertyKey, never>; Returns: Json };
       list_my_events: {
         Args: { p_bucket: string; p_cursor?: Json; p_limit?: number };
         Returns: Json;
@@ -1956,6 +2102,17 @@ export type Database = {
         Returns: string;
       };
       request_account_deletion: { Args: Record<PropertyKey, never>; Returns: string };
+      request_business: {
+        Args: {
+          p_city_id: string;
+          p_contact_email: string;
+          p_contact_phone: string;
+          p_message: string;
+          p_name: string;
+          p_venue_ids: string[];
+        };
+        Returns: string;
+      };
       request_join: {
         Args: {
           p_event_id: string;

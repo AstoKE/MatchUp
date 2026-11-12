@@ -26,5 +26,6 @@
   "TIMEOUT": "İşlem zaman aşımına uğradı. Lütfen tekrar dene.",
   "UNKNOWN": "Bir şeyler ters gitti. Lütfen tekrar dene.",
   "MFA_REQUIRED": "Bu işlem için ikinci doğrulaman gerekiyor.",
-  "PHONE_NOT_VERIFIED": "Devam etmek için telefonunu doğrula."
+  "PHONE_NOT_VERIFIED": "Devam etmek için telefonunu doğrula.",
+  "VENUE_CLAIMED": "Bu mekânın zaten bir işletmesi var ya da başka bir istekte bekliyor."
 }
