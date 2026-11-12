@@ -207,6 +207,10 @@ function ProfileContent({ profile, catalog }: { profile: MyProfile; catalog: Cat
           onPress={() => router.push('/organizations' as Href)}
         />
         <AccountRow
+          label={t('profile:businessesTitle')}
+          onPress={() => router.push('/businesses' as Href)}
+        />
+        <AccountRow
           label={t('notifications:title')}
           onPress={() => router.push('/notifications')}
         />

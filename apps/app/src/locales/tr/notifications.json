@@ -29,7 +29,9 @@
     "ORGANIZATION_REJECTED": "Organizasyon isteğin onaylanmadı. Sebebini Organizasyonlarım'da görebilirsin.",
     "ORGANIZATION_INVITED": "Bir organizasyona davet edildin.",
     "ORGANIZATION_JOIN_REQUESTED": "Organizasyonuna katılmak isteyen var.",
-    "ORGANIZATION_MEMBER_APPROVED": "Bir organizasyona üye oldun."
+    "ORGANIZATION_MEMBER_APPROVED": "Bir organizasyona üye oldun.",
+    "BUSINESS_APPROVED": "İşletme isteğin onaylandı.",
+    "BUSINESS_REJECTED": "İşletme isteğin onaylanmadı. Sebebini İşletmelerim'de görebilirsin."
   },
   "unknown": "Yeni bir bildirimin var.",
   "emptyAction": "Etkinlikleri keşfet",

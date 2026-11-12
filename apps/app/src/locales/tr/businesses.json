@@ -1,0 +1,33 @@
+{
+  "title": "İşletmelerim",
+  "intro": "Bir spor tesisi işletiyorsan, işletmeni ve tesislerini ekleyebilirsin. İstekleri bir yönetici inceler; gerekirse seninle iletişime geçer.",
+  "empty": "Henüz bir işletmen ya da isteğin yok.",
+  "loadFailed": "İşletmeler yüklenemedi",
+  "create": "İşletme ekle",
+  "limit": "En fazla {{count}} işletme ekleyebilirsin; bekleyen istekler de sayılır.",
+  "status": {
+    "PENDING": "Onay bekliyor",
+    "ACTIVE": "Aktif",
+    "REJECTED": "Onaylanmadı"
+  },
+  "venues": "Tesisler: {{names}}",
+  "pendingHint": "Bir yönetici isteğini inceleyecek; karar verilince sana bildirim gelir.",
+  "rejected": "Onaylanmama sebebi: {{reason}}",
+  "cancel": "İsteği geri çek",
+  "cancelYes": "Evet, geri çek",
+  "keep": "Vazgeç",
+  "requestTitle": "İşletme ekle",
+  "requestIntro": "İşletmenin adı onaylandıktan sonra görünür. İletişim bilgilerin sadece yöneticilere gösterilir; işletmenin gerçekten sana ait olduğunu doğrulamak için kullanılır.",
+  "name": "İşletmenin adı",
+  "city": "İl",
+  "phone": "İletişim telefonu",
+  "contactHint": "Telefon ya da e-postadan en az biri gerekli. Sadece yöneticiler görür.",
+  "email": "İletişim e-postası",
+  "message": "Not (isteğe bağlı)",
+  "messageHint": "En fazla {{max}} karakter: örneğin tesisteki görevin.",
+  "venueSearch": "Tesislerini ara",
+  "venueHint": "Ada göre ara ve işlettiğin tesisleri seç (en fazla {{max}}). Sadece ticari tesisler seçilebilir.",
+  "noVenue": "Bu adla bir tesis bulunamadı. Tesisin listede yoksa önce etkinlik oluştururken mekân olarak önerebilirsin.",
+  "send": "İsteği gönder",
+  "sent": "İsteğin gönderildi. Karar verilince haber vereceğiz."
+}

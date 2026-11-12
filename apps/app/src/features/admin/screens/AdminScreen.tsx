@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Screen, ScreenHeader, SegmentedChoice, Text, useTheme } from '@/ui';
+import { BusinessesPanel } from '../components/BusinessesPanel';
 import { FeedbackPanel } from '../components/FeedbackPanel';
 import { OrganizationsPanel } from '../components/OrganizationsPanel';
 import { AuditPanel, DisputesPanel, FlagsPanel } from '../components/ListPanels';
@@ -18,6 +19,7 @@ const SECTIONS = [
   'users',
   'venues',
   'organizations',
+  'businesses',
   'feedback',
   'pilot',
   'audit',
@@ -56,6 +58,7 @@ export default function AdminScreen() {
         {section === 'users' ? <PeoplePanel userId={person} onSelect={setPerson} /> : null}
         {section === 'venues' ? <VenuesPanel /> : null}
         {section === 'organizations' ? <OrganizationsPanel onOpenUser={openUser} /> : null}
+        {section === 'businesses' ? <BusinessesPanel onOpenUser={openUser} /> : null}
         {section === 'feedback' ? <FeedbackPanel onOpenUser={openUser} /> : null}
         {section === 'pilot' ? <PilotPanel /> : null}
         {section === 'audit' ? <AuditPanel /> : null}

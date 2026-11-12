@@ -10,6 +10,7 @@
     "audit": "Record",
     "venues": "Venues",
     "organizations": "Organizations",
+    "businesses": "Businesses",
     "feedback": "Feedback",
     "pilot": "Pilot"
   },
@@ -291,5 +292,26 @@
       "INVITED": "invited",
       "REQUESTED": "asked to join"
     }
+  },
+  "businesses": {
+    "filter": "Status",
+    "status": {
+      "PENDING": "Waiting",
+      "ACTIVE": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "empty": "No requests here.",
+    "contact": "Contact: {{contact}}",
+    "message": "Note: {{message}}",
+    "venues": "Claimed facilities: {{names}}",
+    "noVenues": "No facility chosen.",
+    "requester": "Requester: member since {{since}} · {{reports}} open reports",
+    "reason": "Reason: {{reason}}",
+    "reasonLabel": "Reason for rejecting",
+    "reasonHint": "Required to reject; the requester reads it.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approved": "Business approved.",
+    "rejected": "Request rejected."
   }
 }
