@@ -101,6 +101,8 @@ Applied 2026-10-25 without the dashboard, by pulling the hosted config into a sc
 
 **Fifth push, 2026-11-11 (ROADMAP P-20, P-21, P-22, by the founder):** `20261115100000_requests_avatars`, `20261116100000_activity_push`, `20261117100000_feedback`. Before it, merged `main` was checked as a whole (all migrations on an empty database, pgTAP 1416 passed) and the three were rehearsed on a database at hosted's level with hosted-like rows (`push_activity` came out off only for people who had turned every kind off; existing outbox and audit rows untouched). The founder's dry-run reported the remote database up to date, and the founder confirmed the three are applied; Claude did not read hosted itself.
 
+**Sixth push, 2026-11-11/12 (Phase 9 M1, M2, by the founder):** `20261118100000_organizations`, `20261119100000_organization_membership`. The founder's `migration list --remote` showed both on Local and Remote; the advisor output shared showed only the known WARNs (SECURITY DEFINER functions callable by signed-in users, by design; leaked password protection; multiple permissive policies).
+
 **Rehearse a migration that touches existing rows before pushing it.** CI applies migrations to an empty database, which proves nothing about backfills. Before a push that updates or constrains existing data: `supabase db reset --local --version <the last migration hosted has>`, create the kinds of rows hosted holds (including canceled and completed events, which are frozen), then `supabase migration up --local` and check the result.
 
 **Not verified on the hosted project yet:** the purge job actually running at 03:17 UTC (check `cron.job_run_details` after the first night), email delivery with the default SMTP (rate-limited), latency from Ankara.

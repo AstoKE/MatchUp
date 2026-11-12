@@ -369,6 +369,7 @@ export type Database = {
           invite_token: string | null;
           last_material_change_at: string | null;
           location_visibility: Database['public']['Enums']['location_visibility'];
+          organization_id: string | null;
           organizer_id: string;
           organizer_plays: boolean;
           public_location_label: string | null;
@@ -416,6 +417,7 @@ export type Database = {
           invite_token?: string | null;
           last_material_change_at?: string | null;
           location_visibility?: Database['public']['Enums']['location_visibility'];
+          organization_id?: string | null;
           organizer_id: string;
           organizer_plays?: boolean;
           public_location_label?: string | null;
@@ -462,6 +464,7 @@ export type Database = {
           invite_token?: string | null;
           last_material_change_at?: string | null;
           location_visibility?: Database['public']['Enums']['location_visibility'];
+          organization_id?: string | null;
           organizer_id?: string;
           organizer_plays?: boolean;
           public_location_label?: string | null;
@@ -489,6 +492,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'districts';
             referencedColumns: ['id', 'city_id'];
+          },
+          {
+            foreignKeyName: 'events_organization_id_fkey';
+            columns: ['organization_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
           },
           {
             foreignKeyName: 'events_organizer_id_fkey';
@@ -1881,6 +1891,7 @@ export type Database = {
       finalize_attendance: { Args: { p_event_id: string }; Returns: undefined };
       get_event: { Args: { p_event_id: string; p_invite_token?: string }; Returns: Json };
       get_event_attendance: { Args: { p_event_id: string }; Returns: Json };
+      get_event_organization: { Args: { p_event_id: string }; Returns: Json };
       get_event_reviews: { Args: { p_event_id: string }; Returns: Json };
       get_my_account: {
         Args: Record<PropertyKey, never>;
@@ -1909,6 +1920,7 @@ export type Database = {
         Returns: Json;
       };
       list_my_organizations: { Args: Record<PropertyKey, never>; Returns: Json };
+      list_organization_events: { Args: { p_org: string }; Returns: Json };
       list_organizations_to_invite: { Args: { p_user: string }; Returns: Json };
       mark_attendance: {
         Args: {
@@ -1961,6 +1973,7 @@ export type Database = {
       search_venues: { Args: { p_filters: Json }; Returns: Json };
       send_test_push: { Args: Record<PropertyKey, never>; Returns: boolean };
       set_analytics_consent: { Args: { p_granted: boolean }; Returns: undefined };
+      set_event_organization: { Args: { p_event_id: string; p_org?: string }; Returns: undefined };
       set_marketing_consent: { Args: { p_granted: boolean }; Returns: undefined };
       set_my_avatar: { Args: { p_avatar_key: string }; Returns: undefined };
       set_my_avatar_photo: { Args: { p_path: string }; Returns: string };

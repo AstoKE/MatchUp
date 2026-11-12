@@ -25,6 +25,7 @@ import {
   fetchEvent,
   publishEvent,
   updateEvent,
+  fetchEventOrganization,
 } from './api/events-api';
 
 export const eventQueryKey = (id: string) => ['event', id] as const;
@@ -219,5 +220,13 @@ export function useSuggestVenue() {
   return useMutation({
     mutationFn: suggestVenue,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['venues'] }),
+  });
+}
+
+/** Phase 9 / M3: the organization the event is shown under (null when none or not visible). */
+export function useEventOrganization(id: string) {
+  return useQuery({
+    queryKey: [...eventQueryKey(id), 'organization'],
+    queryFn: () => fetchEventOrganization(id),
   });
 }

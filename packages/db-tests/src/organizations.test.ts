@@ -1,5 +1,6 @@
+import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { catalog, codeOf, onboardedUser, rpc, type Catalog } from './event-fixtures';
+import { catalog, codeOf, eventInput, onboardedUser, rpc, type Catalog } from './event-fixtures';
 import { closeDb, db, deleteCreatedUsers, rest } from './helpers';
 
 /**
@@ -98,5 +99,36 @@ describe('organization requests', () => {
     expect((await rpc('leave_organization', { p_org: made.body }, guest.token)).status).toBe(204);
     const owners = await rpc('leave_organization', { p_org: made.body }, owner.token);
     expect(codeOf(owners.body)).toBe('NOT_ALLOWED');
+  });
+
+  it('an event shown under the organization (M3)', async () => {
+    const owner = await onboardedUser(c, 'Kurucu E');
+    const made = await ask(owner.token, 'Etkinlik Kulübü');
+    await db().query(
+      `update public.organizations set status = 'ACTIVE', decided_at = now() where id = $1`,
+      [made.body],
+    );
+    const event = await rpc(
+      'create_event',
+      { p_client_request_id: randomUUID(), p_input: eventInput(c), p_publish: true },
+      owner.token,
+    );
+    expect(event.status).toBe(200);
+    expect(
+      (
+        await rpc(
+          'set_event_organization',
+          { p_event_id: event.body, p_org: made.body },
+          owner.token,
+        )
+      ).status,
+    ).toBe(204);
+    const shown = await rpc('get_event_organization', { p_event_id: event.body }, owner.token);
+    expect((shown.body as { name: string }).name).toBe('Etkinlik Kulübü');
+    const listed = await rpc('list_organization_events', { p_org: made.body }, owner.token);
+    expect((listed.body as { id: string }[]).map((e) => e.id)).toEqual([event.body]);
+    expect(
+      (await rpc('set_event_organization', { p_event_id: event.body }, owner.token)).status,
+    ).toBe(204);
   });
 });

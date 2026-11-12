@@ -2,12 +2,19 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { EventOrganizationControl } from '@/features/organizations';
 import { errorText } from '@/lib/error-text';
 import { Banner, Button, EmptyState, Screen, ScreenHeader, Text, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
 import { InvitePanel } from '../components/InvitePanel';
 import { LazyAttendancePanel, LazyRequestsPanel } from '../components/LazyPanels';
-import { useCompleteEvent, useDeleteDraft, useEvent, usePublishEvent } from '../hooks';
+import {
+  useCompleteEvent,
+  useDeleteDraft,
+  useEvent,
+  useEventOrganization,
+  usePublishEvent,
+} from '../hooks';
 
 /**
  * Everything the organizer does with an event (docs/design.md §5.7), one tap from its page. Who may reach this is the
@@ -103,6 +110,9 @@ function Manage({ event }: { event: EventDetails }) {
       </ScreenHeader>
       {error ? <Banner kind="danger" message={error} /> : null}
 
+      {event.status === 'DRAFT' || event.status === 'PUBLISHED' ? (
+        <ManagedOrganization eventId={event.id} />
+      ) : null}
       {event.status === 'PUBLISHED' ? <LazyRequestsPanel event={event} /> : null}
       {started && (event.status === 'PUBLISHED' || event.status === 'COMPLETED') ? (
         <LazyAttendancePanel eventId={event.id} isOrganizer />
@@ -194,4 +204,11 @@ function Manage({ event }: { event: EventDetails }) {
       </View>
     </Screen>
   );
+}
+
+/** Phase 9 / M3: which organization the event is shown under (a control only for those who run one). */
+function ManagedOrganization({ eventId }: { eventId: string }) {
+  const current = useEventOrganization(eventId);
+  if (current.isPending) return null;
+  return <EventOrganizationControl eventId={eventId} currentId={current.data?.id ?? null} />;
 }

@@ -48,6 +48,9 @@ const catalog = {
   ],
 };
 
+const mockEventOrganization = jest.fn((..._args: unknown[]) =>
+  Promise.resolve(null as null | { id: string; name: string }),
+);
 const mockApi = {
   fetchEvent: jest.fn(),
   fetchCatalog: jest.fn(),
@@ -58,7 +61,10 @@ const mockApi = {
   decideParticipation: jest.fn(),
   fetchEventRequests: jest.fn(),
 };
+// The organization control is tested with the organizations; here it stays out of the way.
+jest.mock('@/features/organizations', () => ({ EventOrganizationControl: () => null }));
 jest.mock('./api/events-api', () => ({
+  fetchEventOrganization: (...a: unknown[]) => mockEventOrganization(...a),
   fetchEvent: (...a: unknown[]) => mockApi.fetchEvent(...a),
   createEvent: jest.fn(),
   updateEvent: jest.fn(),
@@ -282,6 +288,18 @@ describe('joining an event', () => {
 });
 
 describe('the event page for different viewers', () => {
+  it('shows the organization the event is under, as a link to its page (Phase 9 / M3)', async () => {
+    mockEventOrganization.mockResolvedValueOnce({
+      id: '00000000-0000-4000-8000-0000000000d1',
+      name: 'Çankaya Kartalları',
+    });
+    await renderApp(<EventDetailScreen />, { session: player });
+    expect(
+      await screen.findByRole('link', { name: 'Çankaya Kartalları organizasyonunun sayfasını aç' }),
+    ).toBeTruthy();
+    expect(screen.getByText('Düzenleyen: Çankaya Kartalları')).toBeTruthy();
+  });
+
   it('shows the organizer and, to someone allowed to, the approved players', async () => {
     mockApi.fetchEvent.mockResolvedValue(
       event({

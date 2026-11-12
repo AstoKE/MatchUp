@@ -68,6 +68,9 @@
     "removed": "{{name}} was removed.",
     "statusInvited": "Invited",
     "statusRequested": "Wants to join",
-    "openCard": "{{name}}, {{role}}: open the player card"
+    "openCard": "{{name}}, {{role}}: open the player card",
+    "events": "Upcoming events",
+    "noEvents": "No upcoming events right now.",
+    "spots": "{{approved}}/{{capacity}} players"
   }
 }

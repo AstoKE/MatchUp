@@ -1,6 +1,6 @@
 # Phase 9 plan: organizations
 
-Status 2026-11-11: M1 merged (#106); M2 built (in review). ROADMAP §3.3 P-16 and P-17, started on the founder's instruction ("sıradaki feature ile devam et", 2026-11-11). ADR-0030.
+Status 2026-11-12: M1 and M2 merged (#106, #107); M3 built (in review). ROADMAP §3.3 P-16 and P-17, started on the founder's instruction ("sıradaki feature ile devam et", 2026-11-11). ADR-0030.
 
 An organization is a lasting group (a team, a club, a regular crowd): a name, a page, members and roles, and events created as the group. It merges ROADMAP P-04's persistent teams and P-07's organizations into one concept. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
@@ -38,6 +38,7 @@ An organization is a lasting group (a team, a club, a regular crowd): a name, a 
 
 ### M3: events as the organization
 - An owner or administrator creates an event as the organization (`events.organization_id`). The event page shows it, and the organization page lists its upcoming events.
+- **As built:** the organizer links (or unlinks) their event in event management ("Organizasyon adına"), so the multi-step event form is unchanged; `set_event_organization` is a separate, additive call.
 - `event_type` stays `COMMUNITY`: no commercial tier (decision above).
 
 ### M4: safety
