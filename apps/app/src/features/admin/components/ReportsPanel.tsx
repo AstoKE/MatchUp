@@ -19,6 +19,7 @@ import {
   setVenueStatus,
   suspendUser,
   type ReportItem,
+  setOrganizationHidden,
 } from '../api/admin-api';
 import { useDecision, useReport, useReports } from '../hooks';
 import { Confirmed, formatWhen, Panel } from './Pieces';
@@ -185,6 +186,12 @@ function ReportDetail({
         <Text variant="label">{t('admin:reports.target')}</Text>
         {target === null ? (
           <Text tone="secondary">{t('admin:reports.targetGone')}</Text>
+        ) : r.target_type === 'ORGANIZATION' ? (
+          <Text>
+            {target.name} ·{' '}
+            {t(`admin:organizations.status.${(target.status ?? 'ACTIVE') as 'ACTIVE'}`)} ·{' '}
+            {t('admin:organizations.members', { count: target.member_count ?? 0 })}
+          </Text>
         ) : r.target_type === 'VENUE' ? (
           <Text>
             {target.name} · {t(`admin:reports.venueState.${target.listing_status ?? 'ACTIVE'}`)}
@@ -285,6 +292,17 @@ function ReportDetail({
                 label={t('admin:reports.hideVenueClose')}
                 pending={resolve.isPending}
                 onConfirm={() => run('ACTIONED', () => setVenueStatus(target.id, 'HIDE', note))}
+              />
+            ) : null}
+            {target && r.target_type === 'ORGANIZATION' && target.status === 'ACTIVE' ? (
+              <Confirmed
+                variant="destructive"
+                label={t('admin:reports.hideOrganizationClose')}
+                disabled={!noteReady}
+                pending={resolve.isPending}
+                onConfirm={() =>
+                  run('ACTIONED', () => setOrganizationHidden(target.id, true, note))
+                }
               />
             ) : null}
             {target && r.target_type === 'EVENT' ? (

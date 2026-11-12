@@ -36,7 +36,8 @@
     "kind": {
       "USER": "Person",
       "EVENT": "Event",
-      "VENUE": "Venue"
+      "VENUE": "Venue",
+      "ORGANIZATION": "Organization"
     },
     "by": "Reported by {{name}}",
     "openForTarget_one": "{{count}} open report",
@@ -67,7 +68,8 @@
     "venueState": {
       "ACTIVE": "Listed",
       "HIDDEN": "Hidden"
-    }
+    },
+    "hideOrganizationClose": "Hide the organization and close"
   },
   "reason": {
     "SPAM": "Spam",
@@ -261,7 +263,8 @@
     "status": {
       "PENDING": "Waiting",
       "ACTIVE": "Approved",
-      "REJECTED": "Rejected"
+      "REJECTED": "Rejected",
+      "HIDDEN": "Hidden"
     },
     "empty": "No requests here.",
     "requester": "Requester: member since {{since}} · {{events}} completed events as organizer · {{reports}} open reports",
@@ -271,6 +274,22 @@
     "approve": "Approve",
     "reject": "Reject",
     "approved": "Organization approved.",
-    "rejected": "Request rejected."
+    "rejected": "Request rejected.",
+    "hide": "Hide",
+    "restore": "Restore",
+    "noteLabel": "Note (required)",
+    "noteHint": "Why it is hidden or restored; kept in the record, shown to nobody.",
+    "showMembers": "Show members",
+    "hideMembers": "Hide members",
+    "members_one": "{{count}} member",
+    "members_other": "{{count}} members",
+    "openReports": "{{count}} open reports",
+    "hidden": "Organization hidden.",
+    "restored": "Organization restored.",
+    "memberState": {
+      "ACTIVE": "member",
+      "INVITED": "invited",
+      "REQUESTED": "asked to join"
+    }
   }
 }

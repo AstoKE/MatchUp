@@ -109,7 +109,7 @@ export const REPORT_REASONS = [
 export type ReportReason = (typeof REPORT_REASONS)[number];
 
 export async function sendReport(args: {
-  targetType: 'USER' | 'EVENT';
+  targetType: 'USER' | 'EVENT' | 'ORGANIZATION';
   targetId: string;
   reason: ReportReason;
   details: string | null;

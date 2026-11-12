@@ -16,6 +16,7 @@ import {
   fetchFeedback,
   type FeedbackStatus,
   fetchOrganizationRequests,
+  fetchAdminOrganization,
   type OrganizationRequestStatus,
   type ReportCursor,
   type VenueCursor,
@@ -101,4 +102,11 @@ export const useOrganizationRequests = (status: OrganizationRequestStatus) =>
   useQuery({
     queryKey: ['admin', 'organizations', status],
     queryFn: () => fetchOrganizationRequests(status),
+  });
+
+export const useAdminOrganization = (id: string, enabled: boolean) =>
+  useQuery({
+    queryKey: ['admin', 'organization', id],
+    queryFn: () => fetchAdminOrganization(id),
+    enabled,
   });

@@ -17,7 +17,7 @@ export function ReportSheet({
   onClose,
 }: {
   visible: boolean;
-  targetType: 'USER' | 'EVENT';
+  targetType: 'USER' | 'EVENT' | 'ORGANIZATION';
   targetId: string;
   inviteToken?: string | null;
   onClose: () => void;
@@ -34,7 +34,13 @@ export function ReportSheet({
   return (
     <Sheet
       visible={visible}
-      title={t(targetType === 'EVENT' ? 'players:report.titleEvent' : 'players:report.titleUser')}
+      title={t(
+        targetType === 'EVENT'
+          ? 'players:report.titleEvent'
+          : targetType === 'ORGANIZATION'
+            ? 'players:report.titleOrganization'
+            : 'players:report.titleUser',
+      )}
       onClose={onClose}
       closeLabel={t('common:cancel')}
       footer={

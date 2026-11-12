@@ -7,10 +7,14 @@ import { ensureAdminCopy } from './copy';
 
 const mockFetch = jest.fn();
 const mockDecide = jest.fn();
+const mockHide = jest.fn();
+const mockAdminOrg = jest.fn();
 jest.mock('./api/admin-api', () => ({
   ...jest.requireActual('./api/admin-api'),
   fetchOrganizationRequests: (...a: unknown[]) => mockFetch(...a),
   decideOrganization: (...a: unknown[]) => mockDecide(...a),
+  setOrganizationHidden: (...a: unknown[]) => mockHide(...a),
+  fetchAdminOrganization: (...a: unknown[]) => mockAdminOrg(...a),
 }));
 jest.mock('@/features/catalog/api/catalog-api', () => ({
   fetchCatalog: () => Promise.resolve({ sports: [], cities: [] }),
@@ -50,6 +54,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockFetch.mockResolvedValue([request]);
   mockDecide.mockResolvedValue(undefined);
+  mockHide.mockResolvedValue(undefined);
 });
 
 describe('the console: organization requests (Phase 9 / M1)', () => {
@@ -77,5 +82,30 @@ describe('the console: organization requests (Phase 9 / M1)', () => {
     await renderApp(<OrganizationsPanel onOpenUser={onOpenUser} />, { session: admin });
     await fireEvent.press(await screen.findByRole('button', { name: 'Deniz Kaya' }));
     expect(onOpenUser).toHaveBeenCalledWith(REQUESTER);
+  });
+
+  it('hides an active organization only with a note, and shows its members (M4)', async () => {
+    mockFetch.mockResolvedValue([{ ...request, status: 'ACTIVE', decided_at: request.created_at }]);
+    mockAdminOrg.mockResolvedValue({
+      id: ORG,
+      name: request.name,
+      description: null,
+      status: 'ACTIVE',
+      created_at: request.created_at,
+      members: [
+        { user_id: REQUESTER, display_name: 'Deniz Kaya', role: 'OWNER', status: 'ACTIVE' },
+      ],
+      open_reports: 2,
+      history: [],
+    });
+    await renderApp(<OrganizationsPanel onOpenUser={jest.fn()} />, { session: admin });
+    await fireEvent.press(await screen.findByRole('radio', { name: 'Onaylanan' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Üyeleri göster' }));
+    expect(await screen.findByText('2 açık bildirim')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Gizle', disabled: true })).toBeTruthy();
+    await fireEvent.changeText(screen.getByLabelText('Not (gerekli)'), 'Hakaret içeren ad.');
+    await fireEvent.press(screen.getByRole('button', { name: 'Gizle' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Evet' }));
+    await waitFor(() => expect(mockHide).toHaveBeenCalledWith(ORG, true, 'Hakaret içeren ad.'));
   });
 });

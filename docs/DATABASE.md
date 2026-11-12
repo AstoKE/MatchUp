@@ -11,6 +11,10 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 ## 0. As built in Phase 7
 
 - `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261121100000_organization_safety.sql` (Phase 9 M4, ADR-0030):
+  - **Status `HIDDEN`:** set by an administrator; like a dissolved organization everywhere else (every read and write requires `ACTIVE`), nothing deleted; restorable.
+  - **Reports:** target type `ORGANIZATION` (`report`, `report_item`, `admin_get_report` redefined; not by the owner).
+  - **Console:** `admin_get_organization` (members, open reports, history), `admin_set_organization_hidden(id, hidden, note)` (second factor, note required, moderation actions `ORGANIZATION_HIDDEN`/`ORGANIZATION_RESTORED`); `admin_list_organization_requests` also lists `HIDDEN`.
 - `20261120100000_organization_events.sql` (Phase 9 M3, ADR-0030):
   - **Events:** `events.organization_id` (the DATABASE §4 seam), indexed with `starts_at`. `event_type` stays `COMMUNITY`.
   - **RPCs:** `set_event_organization(event, org default null)` (the organizer, while draft or published, for an active organization they own or administer; null unlinks), `get_event_organization` (for whoever can see the event; active organizations only), `list_organization_events` (upcoming public published events, at most 50, blocked pairs left out).

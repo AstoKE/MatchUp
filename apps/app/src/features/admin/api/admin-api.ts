@@ -57,7 +57,7 @@ export async function verifyTotp(factorId: string, code: string): Promise<void> 
 // ---- reports ---------------------------------------------------------------------------------------------------------
 const reportItem = z.object({
   id: z.uuid(),
-  target_type: z.enum(['USER', 'EVENT', 'VENUE']),
+  target_type: z.enum(['USER', 'EVENT', 'VENUE', 'ORGANIZATION']),
   target_id: z.uuid(),
   target_label: z.nullable(z.string()),
   reason: z.string(),
@@ -91,6 +91,7 @@ const reportDetailRow = z.extend(reportItem, {
       is_admin: z.optional(z.boolean()),
       listing_status: z.optional(z.enum(['ACTIVE', 'HIDDEN'])),
       verified: z.optional(z.boolean()),
+      member_count: z.optional(z.number()),
     }),
   ),
   others: z.array(
@@ -391,7 +392,7 @@ export async function setFeedbackStatus(id: string, status: FeedbackStatus): Pro
 }
 
 // ---- organization requests (Phase 9, ADR-0030) -------------------------------------------------------------------------
-export type OrganizationRequestStatus = 'PENDING' | 'ACTIVE' | 'REJECTED';
+export type OrganizationRequestStatus = 'PENDING' | 'ACTIVE' | 'REJECTED' | 'HIDDEN';
 const organizationRequestRow = z.array(
   z.object({
     id: z.uuid(),
@@ -399,7 +400,7 @@ const organizationRequestRow = z.array(
     description: z.nullable(z.string()),
     city_id: z.uuid(),
     sport_ids: z.array(z.uuid()),
-    status: z.enum(['PENDING', 'ACTIVE', 'REJECTED']),
+    status: z.enum(['PENDING', 'ACTIVE', 'REJECTED', 'HIDDEN']),
     reject_reason: z.nullable(z.string()),
     created_at: z.string(),
     decided_at: z.nullable(z.string()),
@@ -424,6 +425,42 @@ export async function decideOrganization(
     p_id: id,
     p_approve: approve,
     ...(reason ? { p_reason: reason } : {}),
+  });
+  if (error) throw mapRpcError(error);
+}
+
+// ---- organization safety (Phase 9 / M4) ------------------------------------------------------------------------------
+const adminOrganizationRow = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  description: z.nullable(z.string()),
+  status: z.string(),
+  created_at: z.string(),
+  members: z.array(
+    z.object({
+      user_id: z.uuid(),
+      display_name: z.nullable(z.string()),
+      role: z.enum(['OWNER', 'ADMIN', 'MEMBER']),
+      status: z.enum(['ACTIVE', 'INVITED', 'REQUESTED']),
+    }),
+  ),
+  open_reports: z.number(),
+  history: z.array(
+    z.object({ action: z.string(), note: z.nullable(z.string()), created_at: z.string() }),
+  ),
+});
+export type AdminOrganization = z.infer<typeof adminOrganizationRow>;
+export const fetchAdminOrganization = (id: string) =>
+  call('admin_get_organization', { p_id: id }, (data) => adminOrganizationRow.parse(data));
+export async function setOrganizationHidden(
+  id: string,
+  hidden: boolean,
+  note: string,
+): Promise<void> {
+  const { error } = await supabase.rpc('admin_set_organization_hidden', {
+    p_id: id,
+    p_hidden: hidden,
+    p_note: note,
   });
   if (error) throw mapRpcError(error);
 }

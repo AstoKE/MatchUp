@@ -21,7 +21,7 @@ Sizes are gzip level 9 of the exported files. Per-package numbers are source-map
 
 | | gzip |
 |---|---|
-| TOTAL web JS | **957 kB** (1051 kB before the SVG tab icons; 1113 kB at the start of this work; 1400 kB was the Phase 1 ratchet) |
+| TOTAL web JS | **958 kB** (1051 kB before the SVG tab icons; 1113 kB at the start of this work; 1400 kB was the Phase 1 ratchet) |
 | INITIAL (`entry` 287 + `__common` 247 + runtime 4) | **~537 kB** |
 | route chunk `_layout` (tab bar) | 1 kB (was 149 kB with Ionicons) |
 | route chunk `index` (Sentry, lazy) | 373 kB |

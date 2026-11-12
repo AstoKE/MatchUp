@@ -131,4 +131,27 @@ describe('organization requests', () => {
       (await rpc('set_event_organization', { p_event_id: event.body }, owner.token)).status,
     ).toBe(204);
   });
+
+  it('an organization can be reported, not by its owner (M4)', async () => {
+    const owner = await onboardedUser(c, 'Kurucu F');
+    const reporter = await onboardedUser(c, 'Kurucu G');
+    const made = await ask(owner.token, 'Bildirilen Kulüp');
+    await db().query(
+      `update public.organizations set status = 'ACTIVE', decided_at = now() where id = $1`,
+      [made.body],
+    );
+    const sent = await rpc(
+      'report',
+      { p_target_type: 'ORGANIZATION', p_target_id: made.body, p_reason: 'INAPPROPRIATE' },
+      reporter.token,
+    );
+    expect(sent.status).toBe(200);
+    const own = await rpc(
+      'report',
+      { p_target_type: 'ORGANIZATION', p_target_id: made.body, p_reason: 'SPAM' },
+      owner.token,
+    );
+    expect(codeOf(own.body)).toBe('VALIDATION_FAILED');
+    await db().query(`delete from public.reports where id = $1`, [sent.body]);
+  });
 });
