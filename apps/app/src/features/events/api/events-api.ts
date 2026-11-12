@@ -283,3 +283,12 @@ export async function fetchEventOrganization(
   if (error) throw mapRpcError(error);
   return z.nullable(z.object({ id: z.uuid(), name: z.string() })).parse(data ?? null);
 }
+
+/** Phase 10 / M2: the active business that runs a venue (null when none). */
+export async function fetchVenueBusiness(
+  venueId: string,
+): Promise<{ id: string; name: string } | null> {
+  const { data, error } = await supabase.rpc('get_venue_business', { p_venue_id: venueId });
+  if (error) throw mapRpcError(error);
+  return z.nullable(z.object({ id: z.uuid(), name: z.string() })).parse(data ?? null);
+}

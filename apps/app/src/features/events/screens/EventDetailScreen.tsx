@@ -26,7 +26,7 @@ import { JoinPanel } from '../components/JoinPanel';
 import { Pill, SlotMeter } from '../components/SlotMeter';
 import { LazyAttendancePanel, LazyReviewPanel } from '../components/LazyPanels';
 import { formatCost, formatEventStart } from '../format';
-import { useEvent, useEventOrganization } from '../hooks';
+import { useEvent, useEventOrganization, useVenueBusiness } from '../hooks';
 
 /**
  * Event detail at /e/<id>, open to guests (D-09): RLS decides what they see. The organizer's tools are one tap away,
@@ -280,6 +280,7 @@ function Detail({
             )}
           />
         ) : null}
+        {event.venue ? <VenueBusiness venueId={event.venue.id} /> : null}
         <Fact
           label={t('events:detail.skill')}
           value={
@@ -478,4 +479,12 @@ function EventOrganization({ eventId }: { eventId: string }) {
       </Pressable>
     </Link>
   );
+}
+
+/** Phase 10 / M2: the business that runs the venue, when it has one. */
+function VenueBusiness({ venueId }: { venueId: string }) {
+  const { t } = useTranslation('events');
+  const business = useVenueBusiness(venueId);
+  if (!business.data) return null;
+  return <Fact label={t('detail.venueBusiness')} value={business.data.name} />;
 }

@@ -17,6 +17,7 @@ import {
   type FeedbackStatus,
   fetchOrganizationRequests,
   fetchBusinessRequests,
+  searchCommercialVenues,
   type BusinessRequestStatus,
   fetchAdminOrganization,
   type OrganizationRequestStatus,
@@ -117,4 +118,11 @@ export const useBusinessRequests = (status: BusinessRequestStatus) =>
   useQuery({
     queryKey: ['admin', 'businesses', status],
     queryFn: () => fetchBusinessRequests(status),
+  });
+
+export const useCommercialVenues = (cityId: string | null, q: string) =>
+  useQuery({
+    queryKey: ['admin', 'commercial-venues', cityId, q],
+    queryFn: () => searchCommercialVenues(cityId as string, q),
+    enabled: cityId !== null && q.trim().length >= 2,
   });

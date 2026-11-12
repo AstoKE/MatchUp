@@ -77,4 +77,26 @@ describe('business requests', () => {
     const review = await rpc('admin_list_business_requests', {}, a.token);
     expect(codeOf(review.body)).toBe('NOT_ALLOWED');
   });
+
+  it('a venue shows the business that runs it, and nothing before approval (M2)', async () => {
+    const a = await onboardedUser(c, 'İşletmeci D');
+    const { rows } = await db().query<{ id: string }>(
+      `insert into public.venues (kind, name, city_id, district_id, location, provenance)
+       values ('COMMERCIAL_FACILITY', 'Gösterilen Saha ' || gen_random_uuid(), $1, $2,
+               extensions.st_setsrid(extensions.st_makepoint(32.78, 39.90), 4326)::extensions.geography, 'ADMIN_CURATED')
+       returning id`,
+      [c.city, c.district],
+    );
+    const shown = rows[0]!.id;
+    const made = await ask(a.token, 'Gösterilen Spor', [shown]);
+    expect((await rpc('get_venue_business', { p_venue_id: shown }, a.token)).body).toBeNull();
+    await db().query(
+      `update public.businesses set status = 'ACTIVE', decided_at = now() where id = $1`,
+      [made.body],
+    );
+    const after = await rpc('get_venue_business', { p_venue_id: shown }, a.token);
+    expect((after.body as { name: string }).name).toBe('Gösterilen Spor');
+    await db().query(`delete from public.businesses where id = $1`, [made.body]);
+    await db().query(`delete from public.venues where id = $1`, [shown]);
+  });
 });

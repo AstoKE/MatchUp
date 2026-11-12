@@ -921,6 +921,14 @@
       "guard": "private.assert_admin_aal2"
     },
     {
+      "fn": "public.admin_create_business(p_name text, p_city_id uuid, p_owner uuid, p_venue_ids uuid[])",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
       "fn": "public.admin_decide_business(p_id uuid, p_approve boolean, p_reason text)",
       "definer": true,
       "search_path_empty": true,
@@ -1090,6 +1098,14 @@
     },
     {
       "fn": "public.admin_search_users(p_query text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_set_business_hidden(p_id uuid, p_hidden boolean, p_note text)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
@@ -1327,6 +1343,14 @@
       "anon": false,
       "authenticated": true,
       "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.get_venue_business(p_venue_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
     },
     {
       "fn": "public.invite_to_organization(p_org uuid, p_user uuid)",

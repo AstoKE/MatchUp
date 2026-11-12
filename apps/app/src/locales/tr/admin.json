@@ -298,7 +298,8 @@
     "status": {
       "PENDING": "Bekleyen",
       "ACTIVE": "Onaylanan",
-      "REJECTED": "Reddedilen"
+      "REJECTED": "Reddedilen",
+      "HIDDEN": "Gizlenen"
     },
     "empty": "Burada istek yok.",
     "contact": "İletişim: {{contact}}",
@@ -312,6 +313,21 @@
     "approve": "Onayla",
     "reject": "Reddet",
     "approved": "İşletme onaylandı.",
-    "rejected": "İstek reddedildi."
+    "rejected": "İstek reddedildi.",
+    "add": "İşletme ekle",
+    "name": "İşletmenin adı",
+    "city": "İl",
+    "owner": "Sahibi: {{name}}",
+    "changeOwner": "Değiştir",
+    "ownerSearch": "Sahibini ara (ad)",
+    "venueSearch": "Tesis ara (ad)",
+    "create": "İşletmeyi ekle",
+    "created": "İşletme eklendi; sahibine bildirim gitti.",
+    "noteLabel": "Not (gerekli)",
+    "noteHint": "Gizleme ya da geri açma sebebi; kayıtta kalır.",
+    "hide": "Gizle",
+    "restore": "Geri aç",
+    "hidden": "İşletme gizlendi.",
+    "restored": "İşletme geri açıldı."
   }
 }

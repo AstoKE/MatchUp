@@ -26,6 +26,7 @@ import {
   publishEvent,
   updateEvent,
   fetchEventOrganization,
+  fetchVenueBusiness,
 } from './api/events-api';
 
 export const eventQueryKey = (id: string) => ['event', id] as const;
@@ -228,5 +229,14 @@ export function useEventOrganization(id: string) {
   return useQuery({
     queryKey: [...eventQueryKey(id), 'organization'],
     queryFn: () => fetchEventOrganization(id),
+  });
+}
+
+/** Phase 10 / M2: the business that runs a venue. */
+export function useVenueBusiness(venueId: string | null) {
+  return useQuery({
+    queryKey: ['venue', venueId, 'business'],
+    queryFn: () => fetchVenueBusiness(venueId as string),
+    enabled: venueId !== null,
   });
 }

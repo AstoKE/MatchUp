@@ -298,7 +298,8 @@
     "status": {
       "PENDING": "Waiting",
       "ACTIVE": "Approved",
-      "REJECTED": "Rejected"
+      "REJECTED": "Rejected",
+      "HIDDEN": "Hidden"
     },
     "empty": "No requests here.",
     "contact": "Contact: {{contact}}",
@@ -312,6 +313,21 @@
     "approve": "Approve",
     "reject": "Reject",
     "approved": "Business approved.",
-    "rejected": "Request rejected."
+    "rejected": "Request rejected.",
+    "add": "Add a business",
+    "name": "Business name",
+    "city": "Province",
+    "owner": "Owner: {{name}}",
+    "changeOwner": "Change",
+    "ownerSearch": "Search the owner (name)",
+    "venueSearch": "Search facilities (name)",
+    "create": "Add the business",
+    "created": "Business added; its owner was notified.",
+    "noteLabel": "Note (required)",
+    "noteHint": "Why it is hidden or restored; kept in the record.",
+    "hide": "Hide",
+    "restore": "Restore",
+    "hidden": "Business hidden.",
+    "restored": "Business restored."
   }
 }

@@ -51,6 +51,9 @@ const catalog = {
 const mockEventOrganization = jest.fn((..._args: unknown[]) =>
   Promise.resolve(null as null | { id: string; name: string }),
 );
+const mockVenueBusiness = jest.fn((..._args: unknown[]) =>
+  Promise.resolve(null as null | { id: string; name: string }),
+);
 const mockApi = {
   fetchEvent: jest.fn(),
   fetchCatalog: jest.fn(),
@@ -64,6 +67,7 @@ const mockApi = {
 // The organization control is tested with the organizations; here it stays out of the way.
 jest.mock('@/features/organizations', () => ({ EventOrganizationControl: () => null }));
 jest.mock('./api/events-api', () => ({
+  fetchVenueBusiness: (...a: unknown[]) => mockVenueBusiness(...a),
   fetchEventOrganization: (...a: unknown[]) => mockEventOrganization(...a),
   fetchEvent: (...a: unknown[]) => mockApi.fetchEvent(...a),
   createEvent: jest.fn(),
@@ -288,6 +292,26 @@ describe('joining an event', () => {
 });
 
 describe('the event page for different viewers', () => {
+  it('shows the business that runs the venue (Phase 10 / M2)', async () => {
+    mockVenueBusiness.mockResolvedValueOnce({
+      id: '00000000-0000-4000-8000-0000000000b1',
+      name: 'Yıldız Spor Tesisleri',
+    });
+    mockApi.fetchEvent.mockResolvedValue(
+      event({
+        venue: {
+          id: '00000000-0000-4000-8000-0000000000c1',
+          name: 'Yıldız Halı Saha',
+          kind: 'COMMERCIAL_FACILITY',
+          verified: false,
+        },
+      }),
+    );
+    await renderApp(<EventDetailScreen />, { session: player });
+    expect(await screen.findByText('Yıldız Spor Tesisleri')).toBeTruthy();
+    expect(mockVenueBusiness).toHaveBeenCalledWith('00000000-0000-4000-8000-0000000000c1');
+  });
+
   it('shows the organization the event is under, as a link to its page (Phase 9 / M3)', async () => {
     mockEventOrganization.mockResolvedValueOnce({
       id: '00000000-0000-4000-8000-0000000000d1',
