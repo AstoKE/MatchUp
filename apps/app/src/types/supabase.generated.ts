@@ -2067,6 +2067,7 @@ export type Database = {
         }[];
       };
       get_my_avatar: { Args: Record<PropertyKey, never>; Returns: Json };
+      get_my_business: { Args: { p_id: string }; Returns: Json };
       get_organization: { Args: { p_id: string }; Returns: Json };
       get_player_card: { Args: { p_user_id: string }; Returns: Json };
       get_venue_business: { Args: { p_venue_id: string }; Returns: Json };
@@ -2181,7 +2182,21 @@ export type Database = {
       };
       unblock_user: { Args: { p_user_id: string }; Returns: undefined };
       unregister_push_device: { Args: { p_token: string }; Returns: undefined };
+      update_business_venue: {
+        Args: {
+          p_address: string;
+          p_business: string;
+          p_name: string;
+          p_sport_ids: string[];
+          p_venue: string;
+        };
+        Returns: undefined;
+      };
       update_event: { Args: { p_event_id: string; p_input: Json }; Returns: undefined };
+      update_my_business: {
+        Args: { p_contact_email: string; p_contact_phone: string; p_id: string; p_name: string };
+        Returns: undefined;
+      };
       update_my_profile: {
         Args: { p_bio: string; p_city_id: string; p_display_name: string; p_district_id: string };
         Returns: undefined;
