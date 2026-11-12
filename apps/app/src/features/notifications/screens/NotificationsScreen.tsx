@@ -101,13 +101,15 @@ function lookOf(type: AppNotification['type']): {
   if (
     type === 'REQUEST_APPROVED' ||
     type === 'ORGANIZATION_APPROVED' ||
-    type === 'ORGANIZATION_MEMBER_APPROVED'
+    type === 'ORGANIZATION_MEMBER_APPROVED' ||
+    type === 'BUSINESS_APPROVED'
   ) {
     return { icon: 'check', color: 'success' };
   }
   if (
     type === 'REQUEST_REJECTED' ||
     type === 'ORGANIZATION_REJECTED' ||
+    type === 'BUSINESS_REJECTED' ||
     type === 'PARTICIPANT_REMOVED' ||
     type === 'EVENT_CANCELED' ||
     type === 'EVENT_CANCELED_BY_ADMIN'
@@ -137,17 +139,20 @@ function Row({ notification, onOpen }: { notification: AppNotification; onOpen: 
     organization && notification.type !== 'ORGANIZATION_REJECTED' && notification.organizationId
       ? notification.organizationId
       : null;
+  // A business decision opens the person's businesses (with the reason of a rejection).
+  const business = notification.type?.startsWith('BUSINESS_') ?? false;
   const look = lookOf(notification.type);
   return (
     <Pressable
-      accessibilityRole={eventId || organization ? 'link' : 'text'}
-      disabled={!eventId && !organization}
+      accessibilityRole={eventId || organization || business ? 'link' : 'text'}
+      disabled={!eventId && !organization && !business}
       onPress={() => {
         if (!notification.read) onOpen();
         if (eventId) router.push({ pathname: '/e/[id]', params: { id: eventId } });
         else if (organizationPage)
           router.push({ pathname: '/o/[id]', params: { id: organizationPage } } as Href);
         else if (organization) router.push('/organizations' as Href);
+        else if (business) router.push('/businesses' as Href);
       }}
       style={{
         minHeight: TOUCH_TARGET,

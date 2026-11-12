@@ -16,6 +16,8 @@ import {
   fetchFeedback,
   type FeedbackStatus,
   fetchOrganizationRequests,
+  fetchBusinessRequests,
+  type BusinessRequestStatus,
   fetchAdminOrganization,
   type OrganizationRequestStatus,
   type ReportCursor,
@@ -109,4 +111,10 @@ export const useAdminOrganization = (id: string, enabled: boolean) =>
     queryKey: ['admin', 'organization', id],
     queryFn: () => fetchAdminOrganization(id),
     enabled,
+  });
+
+export const useBusinessRequests = (status: BusinessRequestStatus) =>
+  useQuery({
+    queryKey: ['admin', 'businesses', status],
+    queryFn: () => fetchBusinessRequests(status),
   });

@@ -1,0 +1,33 @@
+{
+  "title": "My businesses",
+  "intro": "If you run a sports facility, you can add your business and its facilities. An administrator reviews requests and may contact you.",
+  "empty": "You have no businesses or requests yet.",
+  "loadFailed": "Businesses could not be loaded",
+  "create": "Add a business",
+  "limit": "You can add at most {{count}} businesses; waiting requests count too.",
+  "status": {
+    "PENDING": "Waiting for approval",
+    "ACTIVE": "Active",
+    "REJECTED": "Not approved"
+  },
+  "venues": "Facilities: {{names}}",
+  "pendingHint": "An administrator will review your request; you will be notified of the decision.",
+  "rejected": "Reason: {{reason}}",
+  "cancel": "Withdraw the request",
+  "cancelYes": "Yes, withdraw",
+  "keep": "Keep it",
+  "requestTitle": "Add a business",
+  "requestIntro": "The business's name is visible once approved. Your contact details are shown to administrators only, to check that the business is yours.",
+  "name": "Business name",
+  "city": "Province",
+  "phone": "Contact phone",
+  "contactHint": "A phone or an e-mail is required. Only administrators see them.",
+  "email": "Contact e-mail",
+  "message": "Note (optional)",
+  "messageHint": "At most {{max}} characters: for example your role at the facility.",
+  "venueSearch": "Search your facilities",
+  "venueHint": "Search by name and choose the facilities you run (at most {{max}}). Only commercial facilities can be chosen.",
+  "noVenue": "No facility with this name. If yours is not listed, you can suggest it as a venue when creating an event.",
+  "send": "Send the request",
+  "sent": "Your request was sent. We will let you know the decision."
+}

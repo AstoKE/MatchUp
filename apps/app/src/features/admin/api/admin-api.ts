@@ -464,3 +464,37 @@ export async function setOrganizationHidden(
   });
   if (error) throw mapRpcError(error);
 }
+
+// ---- business requests (Phase 10, ADR-0031) ----------------------------------------------------------------------------
+export type BusinessRequestStatus = 'PENDING' | 'ACTIVE' | 'REJECTED';
+const businessRequestRow = z.array(
+  z.object({
+    id: z.uuid(),
+    name: z.string(),
+    city_id: z.uuid(),
+    status: z.enum(['PENDING', 'ACTIVE', 'REJECTED']),
+    reject_reason: z.nullable(z.string()),
+    created_at: z.string(),
+    venues: z.array(z.object({ id: z.uuid(), name: z.string() })),
+    contact_phone: z.nullable(z.string()),
+    contact_email: z.nullable(z.string()),
+    message: z.nullable(z.string()),
+    requester_id: z.uuid(),
+    requester_name: z.nullable(z.string()),
+    requester_since: z.string(),
+    requester_open_reports: z.number(),
+  }),
+);
+export type BusinessRequest = z.infer<typeof businessRequestRow>[number];
+export const fetchBusinessRequests = (status: BusinessRequestStatus) =>
+  call('admin_list_business_requests', { p_status: status }, (data) =>
+    businessRequestRow.parse(data),
+  );
+export async function decideBusiness(id: string, approve: boolean, reason: string | null) {
+  const { error } = await supabase.rpc('admin_decide_business', {
+    p_id: id,
+    p_approve: approve,
+    ...(reason ? { p_reason: reason } : {}),
+  });
+  if (error) throw mapRpcError(error);
+}

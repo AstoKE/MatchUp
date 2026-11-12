@@ -28,6 +28,7 @@ export const DOMAIN_ERROR_CODES = [
   'REVIEW_NOT_ELIGIBLE',
   'ALREADY_REVIEWED',
   'WINDOW_CLOSED',
+  'VENUE_CLAIMED',
 ] as const;
 
 export type DomainErrorCode = (typeof DOMAIN_ERROR_CODES)[number];

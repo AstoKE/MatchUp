@@ -10,6 +10,7 @@
     "audit": "Kayıt",
     "venues": "Mekânlar",
     "organizations": "Organizasyonlar",
+    "businesses": "İşletmeler",
     "feedback": "Geri bildirim",
     "pilot": "Pilot"
   },
@@ -291,5 +292,26 @@
       "INVITED": "davetli",
       "REQUESTED": "istek attı"
     }
+  },
+  "businesses": {
+    "filter": "Durum",
+    "status": {
+      "PENDING": "Bekleyen",
+      "ACTIVE": "Onaylanan",
+      "REJECTED": "Reddedilen"
+    },
+    "empty": "Burada istek yok.",
+    "contact": "İletişim: {{contact}}",
+    "message": "Not: {{message}}",
+    "venues": "Sahiplenilen tesisler: {{names}}",
+    "noVenues": "Tesis seçilmemiş.",
+    "requester": "İsteyen: {{since}} tarihinden beri üye · {{reports}} açık bildirim",
+    "reason": "Red sebebi: {{reason}}",
+    "reasonLabel": "Red sebebi",
+    "reasonHint": "Reddetmek için gerekli; isteyen kişi bunu okur.",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "approved": "İşletme onaylandı.",
+    "rejected": "İstek reddedildi."
   }
 }

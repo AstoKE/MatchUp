@@ -90,12 +90,16 @@
 // (with its two calls), and the organization chunk gains the upcoming-events list. INITIAL unchanged (561 kB).
 // TOTAL 957 -> 958 (2026-11-12, Phase 9 / M4): hiding, restoring and inspecting an organization in the console
 // (AdminGate, admins only) and the organization page's report button. INITIAL unchanged (561 kB).
+// TOTAL 958 -> 964 and INITIAL 561 -> 562 (2026-11-12, Phase 10 / M1, ADR-0031): businesses. The two screens are one lazy
+// chunk with their own copy (as the organizations'), plus the console's businesses section (AdminGate, admins only). The
+// first load measures 575,106 bytes (561.6 kB; 574,200 after Phase 9 / M2): the Profile row, two notification texts and
+// their routing, and the VENUE_CLAIMED error text.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 958;
-const INITIAL_RATCHET_KB = 561;
+const TOTAL_RATCHET_KB = 964;
+const INITIAL_RATCHET_KB = 562;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';
