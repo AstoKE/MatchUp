@@ -36,7 +36,8 @@
     "kind": {
       "USER": "Kişi",
       "EVENT": "Etkinlik",
-      "VENUE": "Mekân"
+      "VENUE": "Mekân",
+      "ORGANIZATION": "Organizasyon"
     },
     "by": "Bildiren: {{name}}",
     "openForTarget_one": "{{count}} açık bildirim",
@@ -67,7 +68,8 @@
     "venueState": {
       "ACTIVE": "Listede",
       "HIDDEN": "Gizli"
-    }
+    },
+    "hideOrganizationClose": "Organizasyonu gizle ve kapat"
   },
   "reason": {
     "SPAM": "Spam",
@@ -261,7 +263,8 @@
     "status": {
       "PENDING": "Bekleyen",
       "ACTIVE": "Onaylanan",
-      "REJECTED": "Reddedilen"
+      "REJECTED": "Reddedilen",
+      "HIDDEN": "Gizlenen"
     },
     "empty": "Burada istek yok.",
     "requester": "İsteyen: {{since}} tarihinden beri üye · organizatör olarak {{events}} tamamlanmış etkinlik · {{reports}} açık bildirim",
@@ -271,6 +274,22 @@
     "approve": "Onayla",
     "reject": "Reddet",
     "approved": "Organizasyon onaylandı.",
-    "rejected": "İstek reddedildi."
+    "rejected": "İstek reddedildi.",
+    "hide": "Gizle",
+    "restore": "Geri aç",
+    "noteLabel": "Not (gerekli)",
+    "noteHint": "Gizleme ya da geri açma sebebi; kayıtta kalır, kimseye gösterilmez.",
+    "showMembers": "Üyeleri göster",
+    "hideMembers": "Üyeleri gizle",
+    "members_one": "{{count}} üye",
+    "members_other": "{{count}} üye",
+    "openReports": "{{count}} açık bildirim",
+    "hidden": "Organizasyon gizlendi.",
+    "restored": "Organizasyon geri açıldı.",
+    "memberState": {
+      "ACTIVE": "üye",
+      "INVITED": "davetli",
+      "REQUESTED": "istek attı"
+    }
   }
 }

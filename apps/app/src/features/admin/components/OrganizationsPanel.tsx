@@ -17,10 +17,11 @@ import {
 } from '@/ui';
 import {
   decideOrganization,
+  setOrganizationHidden,
   type OrganizationRequest,
   type OrganizationRequestStatus,
 } from '../api/admin-api';
-import { useDecision, useOrganizationRequests } from '../hooks';
+import { useAdminOrganization, useDecision, useOrganizationRequests } from '../hooks';
 import { Confirmed, formatWhen, Panel } from './Pieces';
 
 /**
@@ -39,7 +40,7 @@ export function OrganizationsPanel({ onOpenUser }: { onOpenUser: (id: string) =>
         label={t('admin:organizations.filter')}
         value={status}
         onChange={setStatus}
-        options={(['PENDING', 'ACTIVE', 'REJECTED'] as const).map((value) => ({
+        options={(['PENDING', 'ACTIVE', 'REJECTED', 'HIDDEN'] as const).map((value) => ({
           value,
           label: t(`admin:organizations.status.${value}`),
         }))}
@@ -155,6 +156,74 @@ function RequestCard({
           </View>
         </View>
       ) : null}
+      {request.status === 'ACTIVE' || request.status === 'HIDDEN' ? (
+        <SafetyActions id={request.id} hidden={request.status === 'HIDDEN'} />
+      ) : null}
     </Panel>
+  );
+}
+
+/** Phase 9 / M4: members, open reports and history on demand; hide or restore with a required note. */
+function SafetyActions({ id, hidden }: { id: string; hidden: boolean }) {
+  const { t } = useTranslation(['admin', 'common']);
+  const { spacing } = useTheme();
+  const toast = useToast();
+  const [open, setOpen] = useState(false);
+  const [note, setNote] = useState('');
+  const details = useAdminOrganization(id, open);
+  const change = useDecision(() => setOrganizationHidden(id, !hidden, note.trim()));
+  return (
+    <View style={{ gap: spacing[2] }}>
+      <View style={{ alignItems: 'flex-start' }}>
+        <Button
+          variant="tertiary"
+          label={t(open ? 'admin:organizations.hideMembers' : 'admin:organizations.showMembers')}
+          aria-expanded={open}
+          onPress={() => setOpen((v) => !v)}
+        />
+      </View>
+      {open && details.data ? (
+        <View style={{ gap: spacing[1] }}>
+          <Text variant="caption" tone="secondary">
+            {t('admin:organizations.openReports', { count: details.data.open_reports })}
+          </Text>
+          {details.data.members.map((m) => (
+            <Text key={m.user_id} variant="bodySm">
+              {m.display_name ?? t('admin:reports.unknown')} ·{' '}
+              {t(`admin:organizations.memberState.${m.status}`)}
+              {m.status === 'ACTIVE' ? ` · ${m.role}` : ''}
+            </Text>
+          ))}
+        </View>
+      ) : null}
+      {change.isError ? <Banner kind="danger" message={errorText(change.error)} /> : null}
+      <TextField
+        label={t('admin:organizations.noteLabel')}
+        hint={t('admin:organizations.noteHint')}
+        value={note}
+        onChangeText={setNote}
+        maxLength={1000}
+      />
+      <View style={{ alignItems: 'flex-start' }}>
+        <Confirmed
+          variant={hidden ? 'primary' : 'destructive'}
+          label={t(hidden ? 'admin:organizations.restore' : 'admin:organizations.hide')}
+          disabled={note.trim().length === 0}
+          pending={change.isPending}
+          onConfirm={() =>
+            // The organization moves to another list: toast after the promise (see VenuesPanel).
+            void change
+              .mutateAsync(undefined)
+              .then(() =>
+                toast.show(
+                  t(hidden ? 'admin:organizations.restored' : 'admin:organizations.hidden'),
+                  'success',
+                ),
+              )
+              .catch(() => undefined)
+          }
+        />
+      </View>
+    </View>
   );
 }

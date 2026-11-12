@@ -21,7 +21,8 @@
       "FAKE_EVENT": "Fake event",
       "INAPPROPRIATE": "Inappropriate content",
       "OTHER": "Other"
-    }
+    },
+    "titleOrganization": "Report the organization"
   },
   "block": {
     "open": "Block",

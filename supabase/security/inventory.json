@@ -905,6 +905,14 @@
       "guard": "private.assert_admin_aal2"
     },
     {
+      "fn": "public.admin_get_organization(p_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
       "fn": "public.admin_get_report(p_report_id uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -1050,6 +1058,14 @@
     },
     {
       "fn": "public.admin_set_feedback_status(p_id uuid, p_status text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_set_organization_hidden(p_id uuid, p_hidden boolean, p_note text)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,

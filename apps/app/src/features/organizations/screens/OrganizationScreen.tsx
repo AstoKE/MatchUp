@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localizedName, useCatalog } from '@/features/catalog';
+import { ReportSheet } from '@/features/players';
 import { UserAvatar } from '@/features/profile';
 import { errorText } from '@/lib/error-text';
 import { currentLocale } from '@/lib/i18n';
@@ -170,6 +171,8 @@ function Page({ page }: { page: OrganizationPage }) {
           ))}
         </Section>
       ) : null}
+      {page.role !== 'OWNER' ? <ReportOrganization organizationId={page.id} /> : null}
+
       {page.members && leader ? (
         <Text variant="caption" tone="secondary">
           {t('organizations:page.inviteHint')}
@@ -472,5 +475,26 @@ function UpcomingEvents({ organizationId }: { organizationId: string }) {
         ))
       )}
     </Section>
+  );
+}
+
+/** Phase 9 / M4: report the organization (its name, description or conduct); the owner cannot report their own. */
+function ReportOrganization({ organizationId }: { organizationId: string }) {
+  const { t } = useTranslation('players');
+  const [open, setOpen] = useState(false);
+  return (
+    <View style={{ alignItems: 'flex-start' }}>
+      <Button
+        variant="tertiary"
+        label={t('report.titleOrganization')}
+        onPress={() => setOpen(true)}
+      />
+      <ReportSheet
+        visible={open}
+        targetType="ORGANIZATION"
+        targetId={organizationId}
+        onClose={() => setOpen(false)}
+      />
+    </View>
   );
 }

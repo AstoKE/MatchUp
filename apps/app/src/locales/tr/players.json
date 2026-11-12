@@ -21,7 +21,8 @@
       "FAKE_EVENT": "Sahte etkinlik",
       "INAPPROPRIATE": "Uygunsuz içerik",
       "OTHER": "Diğer"
-    }
+    },
+    "titleOrganization": "Organizasyonu bildir"
   },
   "block": {
     "open": "Engelle",

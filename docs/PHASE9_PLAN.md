@@ -1,6 +1,6 @@
 # Phase 9 plan: organizations
 
-Status 2026-11-12: M1 and M2 merged (#106, #107); M3 built (in review). ROADMAP §3.3 P-16 and P-17, started on the founder's instruction ("sıradaki feature ile devam et", 2026-11-11). ADR-0030.
+Status 2026-11-12: M1–M3 merged (#106, #107, #109); M4 built (in review). ROADMAP §3.3 P-16 and P-17, started on the founder's instruction ("sıradaki feature ile devam et", 2026-11-11). ADR-0030.
 
 An organization is a lasting group (a team, a club, a regular crowd): a name, a page, members and roles, and events created as the group. It merges ROADMAP P-04's persistent teams and P-07's organizations into one concept. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 

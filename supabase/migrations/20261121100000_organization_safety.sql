@@ -251,6 +251,40 @@ begin
 end;
 $$;
 
+-- Same as 20261118100000, and the console can list hidden organizations too.
+create or replace function public.admin_list_organization_requests(p_status text default 'PENDING')
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  perform private.assert_admin_aal2();
+  if p_status is null or p_status not in ('PENDING', 'ACTIVE', 'REJECTED', 'HIDDEN') then
+    raise exception 'VALIDATION_FAILED' using errcode = 'P0001';
+  end if;
+  return coalesce((
+    select pg_catalog.jsonb_agg(r.item order by r.ord)
+      from (
+        select pg_catalog.row_number() over (
+                 order by case when p_status = 'PENDING' then o.created_at end,
+                          case when p_status <> 'PENDING' then o.decided_at end desc, o.id) as ord,
+               private.organization_json(o, 'OWNER') || pg_catalog.jsonb_build_object(
+                 'requester_id', p.id, 'requester_name', p.display_name, 'requester_since', p.created_at,
+                 'requester_status', p.account_status,
+                 'requester_events_organized', (select pg_catalog.count(*) from public.events e
+                                                 where e.organizer_id = p.id and e.status = 'COMPLETED'),
+                 'requester_open_reports', (select pg_catalog.count(*) from public.reports rp
+                                             where rp.target_type = 'USER' and rp.target_id = p.id and rp.status = 'OPEN')) as item
+          from public.organizations o
+          join public.profiles p on p.id = o.created_by
+         where o.status = p_status
+         limit 200
+      ) r), '[]'::jsonb);
+end;
+$$;
+
 revoke all on function public.admin_get_organization(uuid), public.admin_set_organization_hidden(uuid, boolean, text)
   from public, anon, authenticated;
 grant execute on function public.admin_get_organization(uuid), public.admin_set_organization_hidden(uuid, boolean, text)

@@ -164,6 +164,24 @@ describe('the organization page (Phase 9 / M2)', () => {
   });
 });
 
+describe('reporting the organization (Phase 9 / M4)', () => {
+  it('anyone but the owner can open the report form', async () => {
+    mockApi.fetchOrganization.mockResolvedValue(page());
+    await renderApp(<OrganizationScreen />, { session: me });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Organizasyonu bildir' }));
+    expect(await screen.findByRole('button', { name: 'Bildirimi gönder' })).toBeTruthy();
+  });
+
+  it('the owner does not report their own', async () => {
+    mockApi.fetchOrganization.mockResolvedValue(
+      page({ role: 'OWNER', membership: 'ACTIVE', members: [], waiting: [] }),
+    );
+    await renderApp(<OrganizationScreen />, { session: me });
+    await screen.findByText('Hafta içi akşam halı saha.');
+    expect(screen.queryByRole('button', { name: 'Organizasyonu bildir' })).toBeNull();
+  });
+});
+
 describe('the invitation on a player card', () => {
   it('shows nothing to someone who runs no organization', async () => {
     mockApi.fetchOrganizationsToInvite.mockResolvedValue([]);
