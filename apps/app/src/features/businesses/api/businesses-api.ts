@@ -101,3 +101,92 @@ export async function searchClaimableVenues(cityId: string, q: string): Promise<
     .parse(data)
     .items.filter((v) => v.kind === 'COMMERCIAL_FACILITY');
 }
+
+// ---- the owner's edits (M3) -------------------------------------------------------------------------------------------
+export interface OwnedVenue {
+  id: string;
+  name: string;
+  addressText: string | null;
+  verified: boolean;
+  listed: boolean;
+  sportIds: string[];
+}
+export interface OwnedBusiness {
+  id: string;
+  name: string;
+  cityId: string;
+  contactPhone: string | null;
+  contactEmail: string | null;
+  venues: OwnedVenue[];
+}
+
+export async function fetchMyBusiness(id: string): Promise<OwnedBusiness> {
+  const { data, error } = await supabase.rpc('get_my_business', { p_id: id });
+  if (error) throw mapRpcError(error);
+  const b = z
+    .object({
+      id: z.uuid(),
+      name: z.string(),
+      city_id: z.uuid(),
+      contact_phone: z.nullable(z.string()),
+      contact_email: z.nullable(z.string()),
+      venues: z.array(
+        z.object({
+          id: z.uuid(),
+          name: z.string(),
+          address_text: z.nullable(z.string()),
+          verified: z.boolean(),
+          listed: z.boolean(),
+          sport_ids: z.array(z.uuid()),
+        }),
+      ),
+    })
+    .parse(data);
+  return {
+    id: b.id,
+    name: b.name,
+    cityId: b.city_id,
+    contactPhone: b.contact_phone,
+    contactEmail: b.contact_email,
+    venues: b.venues.map((v) => ({
+      id: v.id,
+      name: v.name,
+      addressText: v.address_text,
+      verified: v.verified,
+      listed: v.listed,
+      sportIds: v.sport_ids,
+    })),
+  };
+}
+
+export async function updateMyBusiness(input: {
+  id: string;
+  name: string;
+  contactPhone: string | null;
+  contactEmail: string | null;
+}): Promise<void> {
+  const { error } = await supabase.rpc('update_my_business', {
+    p_id: input.id,
+    p_name: input.name,
+    p_contact_phone: input.contactPhone ?? '',
+    p_contact_email: input.contactEmail ?? '',
+  });
+  if (error) throw mapRpcError(error);
+}
+
+export async function updateBusinessVenue(input: {
+  businessId: string;
+  venueId: string;
+  name: string;
+  addressText: string | null;
+  sportIds: string[];
+}): Promise<void> {
+  const { error } = await supabase.rpc('update_business_venue', {
+    p_business: input.businessId,
+    p_venue: input.venueId,
+    p_name: input.name,
+    p_address: input.addressText ?? '',
+    p_sport_ids: input.sportIds,
+  });
+  if (error) throw mapRpcError(error);
+}

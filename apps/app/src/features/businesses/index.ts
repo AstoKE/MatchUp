@@ -1,1 +1,5 @@
-export { LazyBusinessRequestScreen, LazyMyBusinessesScreen } from './LazyScreens';
+export {
+  LazyBusinessEditScreen,
+  LazyBusinessRequestScreen,
+  LazyMyBusinessesScreen,
+} from './LazyScreens';

@@ -86,6 +86,7 @@ function BusinessRow({ business }: { business: Business }) {
   const { t } = useTranslation(['businesses', 'common']);
   const { colors, radius, spacing } = useTheme();
   const catalog = useCatalog();
+  const router = useRouter();
   const cancel = useCancelBusinessRequest();
   const [confirming, setConfirming] = useState(false);
   const city = catalog.data?.cities.find((c) => c.id === business.cityId);
@@ -113,6 +114,17 @@ function BusinessRow({ business }: { business: Business }) {
         <Text variant="bodySm">
           {t('businesses:venues', { names: business.venues.map((v) => v.name).join(', ') })}
         </Text>
+      ) : null}
+      {business.status === 'ACTIVE' && business.role === 'OWNER' ? (
+        <View style={{ alignItems: 'flex-start' }}>
+          <Button
+            variant="secondary"
+            label={t('businesses:edit.open')}
+            onPress={() =>
+              router.push({ pathname: '/businesses/[id]', params: { id: business.id } } as Href)
+            }
+          />
+        </View>
       ) : null}
       {business.status === 'PENDING' ? (
         <Text variant="caption" tone="secondary">

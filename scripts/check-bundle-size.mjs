@@ -96,11 +96,12 @@
 // their routing, and the VENUE_CLAIMED error text.
 // TOTAL 964 -> 966 (2026-11-12, Phase 10 / M2): the console's "add a business" form, hide and restore (AdminGate, admins
 // only), and the event page's business line. INITIAL unchanged (562 kB).
+// TOTAL 966 -> 967 (2026-11-12, Phase 10 / M3): the owner's edit screen joins the lazy business chunk. INITIAL unchanged.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 966;
+const TOTAL_RATCHET_KB = 967;
 const INITIAL_RATCHET_KB = 562;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
