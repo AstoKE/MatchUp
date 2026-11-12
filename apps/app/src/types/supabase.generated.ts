@@ -1810,6 +1810,7 @@ export type Database = {
         Args: { p_approve: boolean; p_id: string; p_reason?: string };
         Returns: undefined;
       };
+      admin_get_organization: { Args: { p_id: string }; Returns: Json };
       admin_get_report: { Args: { p_report_id: string }; Returns: Json };
       admin_get_user: { Args: { p_user_id: string }; Returns: Json };
       admin_hide_review: { Args: { p_note: string; p_review_id: string }; Returns: undefined };
@@ -1844,6 +1845,10 @@ export type Database = {
       admin_restore_review: { Args: { p_note: string; p_review_id: string }; Returns: undefined };
       admin_search_users: { Args: { p_query: string }; Returns: Json };
       admin_set_feedback_status: { Args: { p_id: string; p_status: string }; Returns: undefined };
+      admin_set_organization_hidden: {
+        Args: { p_hidden: boolean; p_id: string; p_note: string };
+        Returns: undefined;
+      };
       admin_set_venue_status: {
         Args: { p_action: string; p_note?: string; p_venue_id: string };
         Returns: boolean;
