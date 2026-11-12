@@ -29,5 +29,21 @@
   "venueHint": "Search by name and choose the facilities you run (at most {{max}}). Only commercial facilities can be chosen.",
   "noVenue": "No facility with this name. If yours is not listed, you can suggest it as a venue when creating an event.",
   "send": "Send the request",
-  "sent": "Your request was sent. We will let you know the decision."
+  "sent": "Your request was sent. We will let you know the decision.",
+  "edit": {
+    "open": "Edit",
+    "title": "Edit the business",
+    "unavailable": "This business cannot be edited",
+    "saveBusiness": "Save the business",
+    "saved": "Saved.",
+    "venues": "Facilities",
+    "venuesHint": "You can edit your facilities' name, address and sports. The location and verification are set by administrators.",
+    "noVenues": "No facility is linked to this business.",
+    "verified": "Verified facility",
+    "unverified": "Unverified facility",
+    "venueName": "Facility name",
+    "address": "Address (optional)",
+    "sports": "Sports (at most {{max}})",
+    "saveVenue": "Save the facility"
+  }
 }

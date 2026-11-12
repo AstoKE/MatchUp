@@ -449,6 +449,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.lock_owned_business(p_id uuid, p_uid uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.lock_participation_for_attendance(p_uid uuid, p_participation uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -1329,6 +1337,14 @@
       "guard": "private.assert_active_verified_user"
     },
     {
+      "fn": "public.get_my_business(p_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
       "fn": "public.get_organization(p_id uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -1713,7 +1729,23 @@
       "guard": "private.assert_active_verified_user"
     },
     {
+      "fn": "public.update_business_venue(p_business uuid, p_venue uuid, p_name text, p_address text, p_sport_ids uuid[])",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
       "fn": "public.update_event(p_event_id uuid, p_input jsonb)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.update_my_business(p_id uuid, p_name text, p_contact_phone text, p_contact_email text)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,

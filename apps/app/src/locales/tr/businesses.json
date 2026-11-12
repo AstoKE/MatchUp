@@ -29,5 +29,21 @@
   "venueHint": "Ada göre ara ve işlettiğin tesisleri seç (en fazla {{max}}). Sadece ticari tesisler seçilebilir.",
   "noVenue": "Bu adla bir tesis bulunamadı. Tesisin listede yoksa önce etkinlik oluştururken mekân olarak önerebilirsin.",
   "send": "İsteği gönder",
-  "sent": "İsteğin gönderildi. Karar verilince haber vereceğiz."
+  "sent": "İsteğin gönderildi. Karar verilince haber vereceğiz.",
+  "edit": {
+    "open": "Düzenle",
+    "title": "İşletmeyi düzenle",
+    "unavailable": "Bu işletme düzenlenemiyor",
+    "saveBusiness": "İşletmeyi kaydet",
+    "saved": "Kaydedildi.",
+    "venues": "Tesisler",
+    "venuesHint": "Tesislerin adını, adresini ve sporlarını düzenleyebilirsin. Konumu ve doğrulamayı yöneticiler belirler.",
+    "noVenues": "Bu işletmeye bağlı tesis yok.",
+    "verified": "Doğrulanmış tesis",
+    "unverified": "Doğrulanmamış tesis",
+    "venueName": "Tesisin adı",
+    "address": "Adres (isteğe bağlı)",
+    "sports": "Sporlar (en fazla {{max}})",
+    "saveVenue": "Tesisi kaydet"
+  }
 }

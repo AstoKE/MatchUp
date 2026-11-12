@@ -11,6 +11,8 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 ## 0. As built in Phase 7
 
 - `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261124100000_business_operator.sql` (Phase 10 M3, ADR-0031; founder 2026-11-12: a business edits itself once approved or added):
+  - **RPCs:** `get_my_business` (the owner's view with contact details and venues), `update_my_business` (name and contact, a contact still required), `update_business_venue` (name 3–80 with the display-name filter, address ≤ 300 without links, 1–10 active sports). Only the `OWNER` of an `ACTIVE` business, for its listed venues; never location, province, district, kind or verification.
 - `20261123100000_business_admin.sql` (Phase 10 M2, ADR-0031):
   - **Status `HIDDEN`:** set and lifted by an administrator (`admin_set_business_hidden`, note required, moderation actions `BUSINESS_HIDDEN`/`BUSINESS_RESTORED`, target type `BUSINESS`).
   - **`admin_create_business(name, city, owner, venues)`** (P-19): an active business for an onboarded owner, at once; audited `BUSINESS_ADDED`; the owner is notified (`BUSINESS_APPROVED`).

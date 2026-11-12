@@ -2,9 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSession } from '@/features/auth';
 import {
   cancelBusinessRequest,
+  fetchMyBusiness,
   fetchMyBusinesses,
   requestBusiness,
   searchClaimableVenues,
+  updateBusinessVenue,
+  updateMyBusiness,
 } from './api/businesses-api';
 
 export function useMyBusinesses() {
@@ -39,3 +42,22 @@ export const useClaimableVenues = (cityId: string | null, q: string) =>
     queryFn: () => searchClaimableVenues(cityId as string, q),
     enabled: cityId !== null && q.trim().length >= 2,
   });
+
+export const useMyBusiness = (id: string) =>
+  useQuery({ queryKey: ['businesses', 'owned', id], queryFn: () => fetchMyBusiness(id) });
+
+export function useUpdateMyBusiness() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: Parameters<typeof updateMyBusiness>[0]) => updateMyBusiness(input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['businesses'] }),
+  });
+}
+
+export function useUpdateBusinessVenue() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: Parameters<typeof updateBusinessVenue>[0]) => updateBusinessVenue(input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['businesses'] }),
+  });
+}

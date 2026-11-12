@@ -5,6 +5,9 @@ import { Screen, Skeleton } from '@/ui';
 const MyBusinessesScreen = lazy(() =>
   import('./screens').then((m) => ({ default: m.MyBusinessesScreen })),
 );
+const BusinessEditScreen = lazy(() =>
+  import('./screens').then((m) => ({ default: m.BusinessEditScreen })),
+);
 const BusinessRequestScreen = lazy(() =>
   import('./screens').then((m) => ({ default: m.BusinessRequestScreen })),
 );
@@ -35,6 +38,14 @@ export function LazyBusinessRequestScreen() {
   return (
     <Loading>
       <BusinessRequestScreen />
+    </Loading>
+  );
+}
+
+export function LazyBusinessEditScreen() {
+  return (
+    <Loading>
+      <BusinessEditScreen />
     </Loading>
   );
 }

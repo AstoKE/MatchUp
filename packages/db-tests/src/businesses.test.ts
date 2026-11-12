@@ -99,4 +99,45 @@ describe('business requests', () => {
     await db().query(`delete from public.businesses where id = $1`, [made.body]);
     await db().query(`delete from public.venues where id = $1`, [shown]);
   });
+
+  it('the owner of an active business edits it and its venue, not the place or verification (M3)', async () => {
+    const a = await onboardedUser(c, 'İşletmeci E');
+    const { rows } = await db().query<{ id: string }>(
+      `insert into public.venues (kind, name, city_id, district_id, location, provenance)
+       values ('COMMERCIAL_FACILITY', 'Düzenlenen Saha ' || gen_random_uuid(), $1, $2,
+               extensions.st_setsrid(extensions.st_makepoint(32.78, 39.90), 4326)::extensions.geography, 'ADMIN_CURATED')
+       returning id`,
+      [c.city, c.district],
+    );
+    const edited = rows[0]!.id;
+    const made = await ask(a.token, 'Düzenlenen Spor', [edited]);
+    await db().query(
+      `update public.businesses set status = 'ACTIVE', decided_at = now() where id = $1`,
+      [made.body],
+    );
+    const renamed = await rpc(
+      'update_business_venue',
+      {
+        p_business: made.body,
+        p_venue: edited,
+        p_name: 'Düzenlenen Saha Kapalı',
+        p_address: 'Kızılay',
+        p_sport_ids: [c.sport],
+      },
+      a.token,
+    );
+    expect(renamed.status).toBe(204);
+    const after = await db().query<{ name: string; verification_status: string }>(
+      `select name, verification_status from public.venues where id = $1`,
+      [edited],
+    );
+    expect(after.rows[0]).toEqual({
+      name: 'Düzenlenen Saha Kapalı',
+      verification_status: 'UNVERIFIED',
+    });
+    const mine = await rpc('get_my_business', { p_id: made.body }, a.token);
+    expect((mine.body as { contact_phone: string }).contact_phone).toBe('05321112233');
+    await db().query(`delete from public.businesses where id = $1`, [made.body]);
+    await db().query(`delete from public.venues where id = $1`, [edited]);
+  });
 });
