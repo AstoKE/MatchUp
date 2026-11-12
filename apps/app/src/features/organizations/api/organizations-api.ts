@@ -195,3 +195,36 @@ export const setMemberRole = (org: string, user: string, role: 'ADMIN' | 'MEMBER
   done(supabase.rpc('set_organization_role', { p_org: org, p_user: user, p_role: role }));
 export const transferOwnership = (org: string, user: string) =>
   done(supabase.rpc('transfer_organization_ownership', { p_org: org, p_user: user }));
+
+// ---- events (M3) ------------------------------------------------------------------------------------------------------
+export interface OrganizationEvent {
+  id: string;
+  title: string;
+  startsAt: string;
+  approvedCount: number;
+  capacity: number;
+}
+
+/** Upcoming public events shown under the organization, soonest first. */
+export async function fetchOrganizationEvents(org: string): Promise<OrganizationEvent[]> {
+  const { data, error } = await supabase.rpc('list_organization_events', { p_org: org });
+  if (error) throw mapRpcError(error);
+  return z
+    .array(
+      z.object({
+        id: z.uuid(),
+        title: z.string(),
+        starts_at: z.string(),
+        approved_count: z.number(),
+        capacity: z.number(),
+      }),
+    )
+    .parse(data)
+    .map((e) => ({
+      id: e.id,
+      title: e.title,
+      startsAt: e.starts_at,
+      approvedCount: e.approved_count,
+      capacity: e.capacity,
+    }));
+}

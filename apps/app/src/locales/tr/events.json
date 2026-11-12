@@ -481,5 +481,12 @@
   "venueKind": {
     "PUBLIC_SPACE": "Kamuya açık alan",
     "COMMERCIAL_FACILITY": "İşletme"
+  },
+  "organization": {
+    "by": "Düzenleyen: {{name}}",
+    "openPage": "{{name}} organizasyonunun sayfasını aç",
+    "label": "Organizasyon adına",
+    "none": "Kendi adıma",
+    "hint": "Etkinlik seçtiğin organizasyonun sayfasında da görünür. Yalnızca sahibi ya da yöneticisi olduğun organizasyonlar listelenir."
   }
 }

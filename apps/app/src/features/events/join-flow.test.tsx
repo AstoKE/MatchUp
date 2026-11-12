@@ -52,6 +52,7 @@ const mockApi = {
   requestJoin: jest.fn(),
 };
 jest.mock('./api/events-api', () => ({
+  fetchEventOrganization: () => Promise.resolve(null),
   fetchEvent: (...a: unknown[]) => mockApi.fetchEvent(...a),
 }));
 jest.mock('./api/participation-api', () => ({

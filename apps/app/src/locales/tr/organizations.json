@@ -68,6 +68,9 @@
     "removed": "{{name}} çıkarıldı.",
     "statusInvited": "Davet edildi",
     "statusRequested": "Katılmak istiyor",
-    "openCard": "{{name}}, {{role}}: oyuncu kartını aç"
+    "openCard": "{{name}}, {{role}}: oyuncu kartını aç",
+    "events": "Yaklaşan etkinlikler",
+    "noEvents": "Şu an yaklaşan bir etkinlik yok.",
+    "spots": "{{approved}}/{{capacity}} oyuncu"
   }
 }

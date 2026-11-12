@@ -5,6 +5,7 @@ import {
   decideJoinRequest,
   fetchMyOrganizations,
   fetchOrganization,
+  fetchOrganizationEvents,
   leaveOrganization,
   removeMember,
   requestOrganization,
@@ -80,3 +81,9 @@ export function useMembershipAction(org: string) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['organizations'] }),
   });
 }
+
+export const useOrganizationEvents = (id: string) =>
+  useQuery({
+    queryKey: ['organizations', 'events', id],
+    queryFn: () => fetchOrganizationEvents(id),
+  });

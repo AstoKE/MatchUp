@@ -6,6 +6,7 @@ import trInvite from '@/locales/tr/organization-invite.json';
 import trOrganizations from '@/locales/tr/organizations.json';
 import { renderApp } from '@/test/render';
 import type { OrganizationPage, OrganizationPerson } from './api/organizations-api';
+import { EventOrganizationControl } from './components/EventOrganizationControl';
 import { InviteToOrganization } from './components/InviteToOrganization';
 import { OrganizationScreen } from './screens/OrganizationScreen';
 
@@ -20,6 +21,9 @@ const mockApi = {
   transferOwnership: jest.fn(),
   fetchOrganizationsToInvite: jest.fn(),
   inviteToOrganization: jest.fn(),
+  fetchOrganizationEvents: jest.fn(),
+  fetchRunnableOrganizations: jest.fn(),
+  setEventOrganization: jest.fn(),
 };
 jest.mock('./api/organizations-api', () => ({
   ...jest.requireActual('./api/organizations-api'),
@@ -31,6 +35,11 @@ jest.mock('./api/organizations-api', () => ({
   removeMember: (...a: unknown[]) => mockApi.removeMember(...a),
   setMemberRole: (...a: unknown[]) => mockApi.setMemberRole(...a),
   transferOwnership: (...a: unknown[]) => mockApi.transferOwnership(...a),
+  fetchOrganizationEvents: (...a: unknown[]) => mockApi.fetchOrganizationEvents(...a),
+}));
+jest.mock('./api/event-link-api', () => ({
+  fetchRunnableOrganizations: (...a: unknown[]) => mockApi.fetchRunnableOrganizations(...a),
+  setEventOrganization: (...a: unknown[]) => mockApi.setEventOrganization(...a),
 }));
 jest.mock('./api/invite-api', () => ({
   fetchOrganizationsToInvite: (...a: unknown[]) => mockApi.fetchOrganizationsToInvite(...a),
@@ -82,6 +91,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   for (const fn of Object.values(mockApi)) fn.mockResolvedValue(undefined);
   mockApi.requestToJoin.mockResolvedValue('REQUESTED');
+  mockApi.fetchOrganizationEvents.mockResolvedValue([]);
 });
 
 describe('the organization page (Phase 9 / M2)', () => {
@@ -193,5 +203,48 @@ describe('the copy', () => {
       );
     expect(keys(enInvite).sort()).toEqual(keys(trInvite).sort());
     expect(keys(enOrganizations).sort()).toEqual(keys(trOrganizations).sort());
+  });
+});
+
+describe('events as the organization (Phase 9 / M3)', () => {
+  it('the page lists upcoming events, linking to them', async () => {
+    mockApi.fetchOrganization.mockResolvedValue(page());
+    mockApi.fetchOrganizationEvents.mockResolvedValue([
+      {
+        id: '00000000-0000-4000-8000-0000000000e1',
+        title: 'Perşembe maçı',
+        startsAt: '2026-12-03T17:00:00Z',
+        approvedCount: 6,
+        capacity: 10,
+      },
+    ]);
+    await renderApp(<OrganizationScreen />, { session: me });
+    expect(await screen.findByText('Perşembe maçı')).toBeTruthy();
+    expect(screen.getByText(/6\/10 oyuncu/)).toBeTruthy();
+  });
+
+  it('says when there are none', async () => {
+    mockApi.fetchOrganization.mockResolvedValue(page());
+    await renderApp(<OrganizationScreen />, { session: me });
+    expect(await screen.findByText('Şu an yaklaşan bir etkinlik yok.')).toBeTruthy();
+  });
+
+  it('the organizer shows an event under an organization they run, or under themselves', async () => {
+    mockApi.fetchRunnableOrganizations.mockResolvedValue([{ id: ORG, name: 'Çankaya Kartalları' }]);
+    const EVENT = '00000000-0000-4000-8000-0000000000e1';
+    await renderApp(<EventOrganizationControl eventId={EVENT} currentId={null} />, { session: me });
+    await fireEvent.press(await screen.findByRole('radio', { name: 'Çankaya Kartalları' }));
+    await waitFor(() => expect(mockApi.setEventOrganization).toHaveBeenCalledWith(EVENT, ORG));
+    expect(screen.getByRole('radio', { name: 'Kendi adıma' })).toBeTruthy();
+  });
+
+  it('shows no control to someone who runs no organization', async () => {
+    mockApi.fetchRunnableOrganizations.mockResolvedValue([]);
+    await renderApp(
+      <EventOrganizationControl eventId="00000000-0000-4000-8000-0000000000e1" currentId={null} />,
+      { session: me },
+    );
+    await waitFor(() => expect(mockApi.fetchRunnableOrganizations).toHaveBeenCalled());
+    expect(screen.queryByText('Organizasyon adına')).toBeNull();
   });
 });

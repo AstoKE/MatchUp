@@ -20,7 +20,12 @@ import {
 } from '@/ui';
 import type { OrganizationPage, OrganizationPerson } from '../api/organizations-api';
 import { ensureOrganizationsCopy } from '../copy';
-import { useMembershipAction, useOrganization, type MembershipAction } from '../hooks';
+import {
+  useMembershipAction,
+  useOrganization,
+  useOrganizationEvents,
+  type MembershipAction,
+} from '../hooks';
 
 /**
  * An active organization (Phase 9 / M2, ADR-0030): what it is and who runs it, for anyone signed in. Members see the
@@ -109,6 +114,8 @@ function Page({ page }: { page: OrganizationPage }) {
       {error ? <Banner kind="danger" message={error} /> : null}
 
       <MyState page={page} busy={act.isPending} run={run} />
+
+      <UpcomingEvents organizationId={page.id} />
 
       <Section title={t('organizations:page.leaders')}>
         {page.leaders.map((person) => (
@@ -411,5 +418,59 @@ function Section({ title, children }: { title: string; children: React.ReactNode
         {children}
       </View>
     </View>
+  );
+}
+
+/** Phase 9 / M3: the organization's upcoming public events. */
+function UpcomingEvents({ organizationId }: { organizationId: string }) {
+  const { t } = useTranslation('organizations');
+  const { colors, radius, spacing } = useTheme();
+  const events = useOrganizationEvents(organizationId);
+  if (events.isError || !events.data) return null;
+  const when = new Intl.DateTimeFormat(currentLocale(), {
+    timeZone: 'Europe/Istanbul',
+    weekday: 'short',
+    day: 'numeric',
+    month: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  return (
+    <Section title={t('page.events')}>
+      {events.data.length === 0 ? (
+        <View role="listitem">
+          <Text tone="secondary">{t('page.noEvents')}</Text>
+        </View>
+      ) : (
+        events.data.map((event) => (
+          <View key={event.id} role="listitem">
+            <Link href={{ pathname: '/e/[id]', params: { id: event.id } }} asChild>
+              <Pressable
+                accessibilityRole="link"
+                style={{
+                  minHeight: TOUCH_TARGET,
+                  gap: spacing[1],
+                  padding: spacing[3],
+                  borderRadius: radius.md,
+                  borderWidth: 1,
+                  borderColor: colors.borderSubtle,
+                  backgroundColor: colors.surfaceRaised,
+                }}
+              >
+                <Text variant="titleSm" tone="link">
+                  {event.title}
+                </Text>
+                <Text variant="caption" tone="secondary">
+                  {[
+                    when.format(new Date(event.startsAt)),
+                    t('page.spots', { approved: event.approvedCount, capacity: event.capacity }),
+                  ].join(' · ')}
+                </Text>
+              </Pressable>
+            </Link>
+          </View>
+        ))
+      )}
+    </Section>
   );
 }

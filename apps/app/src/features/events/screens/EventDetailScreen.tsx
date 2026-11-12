@@ -1,4 +1,4 @@
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,7 @@ import { JoinPanel } from '../components/JoinPanel';
 import { Pill, SlotMeter } from '../components/SlotMeter';
 import { LazyAttendancePanel, LazyReviewPanel } from '../components/LazyPanels';
 import { formatCost, formatEventStart } from '../format';
-import { useEvent } from '../hooks';
+import { useEvent, useEventOrganization } from '../hooks';
 
 /**
  * Event detail at /e/<id>, open to guests (D-09): RLS decides what they see. The organizer's tools are one tap away,
@@ -344,6 +344,8 @@ function Detail({
         ) : null}
       </View>
 
+      <EventOrganization eventId={event.id} />
+
       {event.organizerName ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
           <UserAvatar
@@ -456,5 +458,24 @@ function Detail({
         />
       ) : null}
     </Screen>
+  );
+}
+
+/** Phase 9 / M3: "Düzenleyen: <organization>", a link to its page, when the event is shown under one. */
+function EventOrganization({ eventId }: { eventId: string }) {
+  const { t } = useTranslation('events');
+  const organization = useEventOrganization(eventId);
+  if (!organization.data) return null;
+  const { id, name } = organization.data;
+  return (
+    <Link href={{ pathname: '/o/[id]', params: { id } } as Href} asChild>
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel={t('organization.openPage', { name })}
+        style={{ minHeight: TOUCH_TARGET, justifyContent: 'center', alignSelf: 'flex-start' }}
+      >
+        <Text tone="link">{t('organization.by', { name })}</Text>
+      </Pressable>
+    </Link>
   );
 }

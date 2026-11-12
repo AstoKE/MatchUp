@@ -71,6 +71,8 @@ const mockApi = {
   fetchMyProfile: jest.fn(),
 };
 const mockVenues = { search: jest.fn() };
+// The organization control is tested with the organizations; here it stays out of the way.
+jest.mock('@/features/organizations', () => ({ EventOrganizationControl: () => null }));
 jest.mock('./api/venues-api', () => ({
   searchVenues: (...a: unknown[]) => mockVenues.search(...a),
 }));
@@ -83,6 +85,7 @@ jest.mock('./city-preference', () => ({
   storeCity: jest.fn(),
 }));
 jest.mock('./api/events-api', () => ({
+  fetchEventOrganization: () => Promise.resolve(null),
   fetchEvent: (...a: unknown[]) => mockApi.fetchEvent(...a),
   createEvent: (...a: unknown[]) => mockApi.createEvent(...a),
   updateEvent: (...a: unknown[]) => mockApi.updateEvent(...a),

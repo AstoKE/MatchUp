@@ -481,5 +481,12 @@
   "venueKind": {
     "PUBLIC_SPACE": "Public space",
     "COMMERCIAL_FACILITY": "Business"
+  },
+  "organization": {
+    "by": "Organized by {{name}}",
+    "openPage": "Open the page of {{name}}",
+    "label": "On behalf of",
+    "none": "Myself",
+    "hint": "The event also shows on the chosen organization's page. Only organizations you own or administer are listed."
   }
 }

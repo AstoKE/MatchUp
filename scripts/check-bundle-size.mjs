@@ -86,11 +86,13 @@
 // TOTAL 949 -> 955 and INITIAL 560 -> 561 (2026-11-11, Phase 9 / M2): the organization page joins the lazy organization
 // chunk (+3.1 kB), the player card's invitation is its own lazy chunk with its own copy (1.3 kB). The first load grows
 // 666 bytes (573,534 -> 574,200): three notification texts and their routing, the page's route and the lazy wrappers.
+// TOTAL 955 -> 957 (2026-11-12, Phase 9 / M3): the event management control "Organizasyon adına" is its own lazy chunk
+// (with its two calls), and the organization chunk gains the upcoming-events list. INITIAL unchanged (561 kB).
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 955;
+const TOTAL_RATCHET_KB = 957;
 const INITIAL_RATCHET_KB = 561;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');

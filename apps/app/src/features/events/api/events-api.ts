@@ -274,3 +274,12 @@ export async function deleteDraft(id: string): Promise<void> {
   const { error } = await supabase.rpc('delete_draft', { p_event_id: id });
   if (error) throw mapRpcError(error);
 }
+
+/** Phase 9 / M3: the organization an event is shown under, when the viewer can see it and it is active. */
+export async function fetchEventOrganization(
+  eventId: string,
+): Promise<{ id: string; name: string } | null> {
+  const { data, error } = await supabase.rpc('get_event_organization', { p_event_id: eventId });
+  if (error) throw mapRpcError(error);
+  return z.nullable(z.object({ id: z.uuid(), name: z.string() })).parse(data ?? null);
+}
