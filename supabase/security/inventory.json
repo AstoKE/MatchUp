@@ -153,6 +153,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.business_json(b businesses, p_role text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.can_delete_avatar(p_name text)",
       "definer": true,
       "search_path_empty": true,
@@ -183,6 +191,14 @@
       "anon": false,
       "authenticated": true,
       "guard": "auth.uid()"
+    },
+    {
+      "fn": "private.clean_business_name(p_name text)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
     },
     {
       "fn": "private.clean_display_name(p_name text)",
@@ -258,6 +274,14 @@
     },
     {
       "fn": "private.export_analytics_data(p_uid uuid)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.export_business_data(p_uid uuid)",
       "definer": false,
       "search_path_empty": true,
       "anon": false,
@@ -897,6 +921,14 @@
       "guard": "private.assert_admin_aal2"
     },
     {
+      "fn": "public.admin_decide_business(p_id uuid, p_approve boolean, p_reason text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
       "fn": "public.admin_decide_organization(p_id uuid, p_approve boolean, p_reason text)",
       "definer": true,
       "search_path_empty": true,
@@ -938,6 +970,14 @@
     },
     {
       "fn": "public.admin_list_actions(p_cursor jsonb, p_limit integer)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.admin_list_business_requests(p_status text)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
@@ -1111,6 +1151,14 @@
       "anon": false,
       "authenticated": true,
       "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.cancel_business_request(p_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
     },
     {
       "fn": "public.cancel_event(p_event_id uuid, p_reason text, p_message text)",
@@ -1313,6 +1361,14 @@
       "guard": "private.assert_onboarded_user"
     },
     {
+      "fn": "public.list_my_businesses()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
+    },
+    {
       "fn": "public.list_my_events(p_bucket text, p_cursor jsonb, p_limit integer)",
       "definer": true,
       "search_path_empty": true,
@@ -1431,6 +1487,14 @@
       "anon": false,
       "authenticated": true,
       "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.request_business(p_name text, p_city_id uuid, p_contact_phone text, p_contact_email text, p_message text, p_venue_ids uuid[])",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
     },
     {
       "fn": "public.request_join(p_event_id uuid, p_message text, p_position_id uuid, p_invite_token text)",
@@ -1734,6 +1798,27 @@
       "authenticated": [
         "SELECT"
       ]
+    },
+    {
+      "table": "public.business_members",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.business_venues",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
+    },
+    {
+      "table": "public.businesses",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
     },
     {
       "table": "public.cities",

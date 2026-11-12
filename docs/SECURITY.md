@@ -116,6 +116,7 @@ Engineering will implement the technical hooks; the following need a Turkish-law
 9. **Terms of Service**: user conduct, organizer responsibilities, **assumption-of-risk / injury disclaimers**, disclaimer that MatchUp does not guarantee venue bookings, collect payments, or verify identities/skill; handling of money exchanged offline between users.
 10. **Age policy**: 18+ self-declaration adequacy; handling minors discovered.
 11. **Data breach notification** procedure (72-hour notification to the Authority under KVKK) and incident response owner.
+18. **Businesses** (Phase 10, ADR-0031): contact phone and e-mail of a business requester (administrators only; exported and purged), and the record of rejected requests.
 17. **Organizations** (Phase 9, ADR-0030): names and descriptions as public user content (moderation, 5651); the record of a rejected request and its reason, and how long it is kept.
 16. **Feedback** (ROADMAP P-22): free text about the app; its retention (today: kept until the account is deleted, then deleted) and the Privacy Notice line.
 15. **Phone numbers** (Phase 8, ADR-0029):

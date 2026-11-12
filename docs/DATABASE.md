@@ -11,6 +11,11 @@ Migration `20261024220000_foundation_identity.sql` implements §3.1 partially: `
 ## 0. As built in Phase 7
 
 - `20261109100000_dispute_admin_guard.sql` (M2): `admin_resolve_attendance_dispute` uses `private.assert_admin_aal2`.
+- `20261122100000_businesses.sql` (Phase 10 M1, ADR-0031):
+  - **Tables:** `businesses` (name 2–80 with the display-name filter, province, contact phone and/or e-mail for administrators only, a message, status `PENDING`/`ACTIVE`/`REJECTED`/`DISSOLVED`, who decided and why), `business_members` (`OWNER`, later `STAFF`), `business_venues` (one business per venue, `COMMERCIAL_FACILITY` only). RLS on, no API grants.
+  - **RPCs:** `request_business` (at most 3 owned, waiting included; at most 10 venues; `VENUE_CLAIMED` when a venue already has or awaits a business), `cancel_business_request`, `list_my_businesses` (without contact details); `admin_list_business_requests`, `admin_decide_business` (second factor; a reason is required to reject; a rejection releases the claims; audited as `BUSINESS_APPROVED`/`BUSINESS_REJECTED`). Ownership never changes a venue's verification.
+  - **Notifications:** `BUSINESS_APPROVED`, `BUSINESS_REJECTED`. New error code `VENUE_CLAIMED`.
+  - **Export and purge:** `private.export_business_data`; the purge deletes waiting requests, dissolves a business the person owned alone and releases its venues, erases contact details.
 - `20261121100000_organization_safety.sql` (Phase 9 M4, ADR-0030):
   - **Status `HIDDEN`:** set by an administrator; like a dissolved organization everywhere else (every read and write requires `ACTIVE`), nothing deleted; restorable.
   - **Reports:** target type `ORGANIZATION` (`report`, `report_item`, `admin_get_report` redefined; not by the owner).
