@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   enrollTotp,
+  fetchDashboardSummary,
   fetchActions,
   fetchDisputes,
   fetchFlags,
@@ -25,6 +26,15 @@ import {
   type VenueCursor,
   type VenueStatus,
 } from './api/admin-api';
+
+export const useDashboardSummary = (active: boolean) =>
+  useQuery({
+    queryKey: ['admin', 'dashboard'],
+    queryFn: fetchDashboardSummary,
+    enabled: active,
+    refetchInterval: active ? 60_000 : false,
+    refetchIntervalInBackground: false,
+  });
 
 export const useAdminSecurity = (enabled: boolean) =>
   useQuery({ queryKey: ['admin', 'security'], queryFn: fetchAdminSecurity, retry: false, enabled });

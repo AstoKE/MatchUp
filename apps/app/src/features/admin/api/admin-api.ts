@@ -2,6 +2,36 @@ import { mapRpcError, VENUE_KINDS, type VenueKind } from '@matchup/domain';
 import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
 
+const dashboardQueue = z.object({ count: z.number(), oldest_at: z.nullable(z.string()) });
+const dashboardSummary = z.object({
+  generated_at: z.string(),
+  reports: z.extend(dashboardQueue, {
+    by_type: z.object({
+      USER: z.number(),
+      EVENT: z.number(),
+      VENUE: z.number(),
+      ORGANIZATION: z.number(),
+    }),
+  }),
+  organization_requests: dashboardQueue,
+  business_requests: dashboardQueue,
+  feedback: dashboardQueue,
+  disputes: dashboardQueue,
+  flags: z.object({ count: z.number() }),
+  recent_actions: z.array(
+    z.object({
+      // Plain strings: a moderation action or target added later must not break the whole page (it shows its code).
+      action: z.string(),
+      target_type: z.string(),
+      note: z.nullable(z.string()),
+      created_at: z.string(),
+    }),
+  ),
+});
+export type DashboardSummary = z.infer<typeof dashboardSummary>;
+export const fetchDashboardSummary = () =>
+  call('admin_dashboard_summary', undefined, (data) => dashboardSummary.parse(data));
+
 /**
  * Everything the console asks of the server (docs/DATABASE.md §9). The pages are only a view: every one of these
  * functions checks for an administrator with a second factor in the database, so a hand-made call fares no better.

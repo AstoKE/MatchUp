@@ -2,6 +2,7 @@
   "title": "Administration",
   "subtitle": "Reports, flags and decisions. Every action is recorded.",
   "section": {
+    "dashboard": "Dashboard",
     "label": "Section",
     "reports": "Reports",
     "flags": "Flags",
@@ -13,6 +14,53 @@
     "businesses": "Businesses",
     "feedback": "Feedback",
     "pilot": "Pilot"
+  },
+  "dashboard": {
+    "cards": {
+      "reports": "Reports (open)",
+      "organization_requests": "Organization requests",
+      "business_requests": "Business requests",
+      "feedback": "Feedback (new)",
+      "disputes": "Attendance disputes",
+      "flags": "Flags"
+    },
+    "empty": "Nothing waiting",
+    "oldest": "oldest: {{age}}",
+    "open": "Open",
+    "openLabel": "Open: {{title}}",
+    "queueLabel": "{{title}}: {{count}} waiting",
+    "breakdown": "User: {{USER}} · Event: {{EVENT}} · Venue: {{VENUE}} · Organization: {{ORGANIZATION}}",
+    "recent": "Recent actions",
+    "noActions": "No actions yet",
+    "audit": "Full log",
+    "updated": "Last updated: {{time}}",
+    "refresh": "Refresh",
+    "loadFailed": "Could not load the dashboard",
+    "targets": {
+      "USER": "User",
+      "EVENT": "Event",
+      "REVIEW": "Review",
+      "VENUE": "Venue",
+      "ORGANIZATION": "Organization",
+      "BUSINESS": "Business"
+    },
+    "actions": {
+      "REPORT_RESOLVED": "Report resolved",
+      "USER_SUSPENDED": "Account suspended",
+      "USER_REINSTATED": "Account reinstated",
+      "EVENT_CANCELED_BY_ADMIN": "Event canceled by administrator",
+      "REVIEW_HIDDEN": "Review hidden",
+      "REVIEW_RESTORED": "Review restored",
+      "VENUE_ADDED": "Venue added",
+      "VENUE_VERIFIED": "Venue verified",
+      "VENUE_HIDDEN": "Venue hidden",
+      "VENUE_RESTORED": "Venue restored",
+      "AVATAR_REMOVED": "Profile photo removed",
+      "ORGANIZATION_HIDDEN": "Organization hidden",
+      "ORGANIZATION_RESTORED": "Organization restored",
+      "BUSINESS_HIDDEN": "Business hidden",
+      "BUSINESS_RESTORED": "Business restored"
+    }
   },
   "mfa": {
     "enrollTitle": "Set up the second step",

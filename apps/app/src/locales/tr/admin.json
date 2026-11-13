@@ -2,6 +2,7 @@
   "title": "Yönetim",
   "subtitle": "Bildirimler, işaretler ve kararlar. Her işlem kayda geçer.",
   "section": {
+    "dashboard": "Pano",
     "label": "Bölüm",
     "reports": "Bildirimler",
     "flags": "İşaretler",
@@ -13,6 +14,53 @@
     "businesses": "İşletmeler",
     "feedback": "Geri bildirim",
     "pilot": "Pilot"
+  },
+  "dashboard": {
+    "cards": {
+      "reports": "Bildirimler (açık)",
+      "organization_requests": "Organizasyon istekleri",
+      "business_requests": "İşletme istekleri",
+      "feedback": "Geri bildirim (yeni)",
+      "disputes": "Yoklama itirazları",
+      "flags": "İşaretler"
+    },
+    "empty": "Bekleyen yok",
+    "oldest": "en eski: {{age}}",
+    "open": "Aç",
+    "openLabel": "Aç: {{title}}",
+    "queueLabel": "{{title}}: {{count}} bekliyor",
+    "breakdown": "Kişi: {{USER}} · Etkinlik: {{EVENT}} · Mekân: {{VENUE}} · Organizasyon: {{ORGANIZATION}}",
+    "recent": "Son işlemler",
+    "noActions": "Henüz işlem yok",
+    "audit": "Tüm kayıt",
+    "updated": "Son güncelleme: {{time}}",
+    "refresh": "Yenile",
+    "loadFailed": "Pano yüklenemedi",
+    "targets": {
+      "USER": "Kişi",
+      "EVENT": "Etkinlik",
+      "REVIEW": "Değerlendirme",
+      "VENUE": "Mekân",
+      "ORGANIZATION": "Organizasyon",
+      "BUSINESS": "İşletme"
+    },
+    "actions": {
+      "REPORT_RESOLVED": "Bildirim sonuçlandırıldı",
+      "USER_SUSPENDED": "Hesap askıya alındı",
+      "USER_REINSTATED": "Hesap yeniden açıldı",
+      "EVENT_CANCELED_BY_ADMIN": "Etkinlik yönetim tarafından iptal edildi",
+      "REVIEW_HIDDEN": "Değerlendirme gizlendi",
+      "REVIEW_RESTORED": "Değerlendirme yeniden gösterildi",
+      "VENUE_ADDED": "Mekân eklendi",
+      "VENUE_VERIFIED": "Mekân doğrulandı",
+      "VENUE_HIDDEN": "Mekân gizlendi",
+      "VENUE_RESTORED": "Mekân yeniden gösterildi",
+      "AVATAR_REMOVED": "Profil fotoğrafı kaldırıldı",
+      "ORGANIZATION_HIDDEN": "Organizasyon gizlendi",
+      "ORGANIZATION_RESTORED": "Organizasyon yeniden gösterildi",
+      "BUSINESS_HIDDEN": "İşletme gizlendi",
+      "BUSINESS_RESTORED": "İşletme yeniden gösterildi"
+    }
   },
   "mfa": {
     "enrollTitle": "İkinci doğrulamayı kur",

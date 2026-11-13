@@ -11,6 +11,7 @@ const EVENT = '00000000-0000-4000-8000-0000000000e1';
 const REPORT = '00000000-0000-4000-8000-0000000000c1';
 
 const mockApi = {
+  fetchDashboardSummary: jest.fn(),
   fetchAdminSecurity: jest.fn(),
   enrollTotp: jest.fn(),
   verifyTotp: jest.fn(),
@@ -30,6 +31,7 @@ const mockApi = {
   fetchPilotMetrics: jest.fn(),
 };
 jest.mock('./api/admin-api', () => ({
+  fetchDashboardSummary: (...a: unknown[]) => mockApi.fetchDashboardSummary(...a),
   fetchAdminSecurity: (...a: unknown[]) => mockApi.fetchAdminSecurity(...a),
   enrollTotp: (...a: unknown[]) => mockApi.enrollTotp(...a),
   verifyTotp: (...a: unknown[]) => mockApi.verifyTotp(...a),
@@ -155,6 +157,20 @@ const detail = (over: Record<string, unknown> = {}) => ({
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockApi.fetchDashboardSummary.mockResolvedValue({
+    generated_at: '2026-11-13T10:00:00Z',
+    reports: {
+      count: 1,
+      oldest_at: null,
+      by_type: { USER: 1, EVENT: 0, VENUE: 0, ORGANIZATION: 0 },
+    },
+    organization_requests: { count: 0, oldest_at: null },
+    business_requests: { count: 0, oldest_at: null },
+    feedback: { count: 0, oldest_at: null },
+    disputes: { count: 0, oldest_at: null },
+    flags: { count: 0 },
+    recent_actions: [],
+  });
   mockApi.fetchMyAccount.mockResolvedValue(account());
   mockApi.fetchAdminSecurity.mockResolvedValue({ secondFactorDone: true, factorId: 'f1' });
   mockApi.fetchReports.mockResolvedValue({ items: [item()], next_cursor: null });
@@ -217,12 +233,14 @@ describe('who gets in', () => {
 describe('the queue', () => {
   it('lists the open reports, with what a moderator needs to choose one', async () => {
     await renderApp(<AdminGate />, { session });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Aç: Bildirimler (açık)' }));
     expect(await screen.findByRole('button', { name: /Kişi · Deniz Kaya/ })).toBeTruthy();
     expect(mockApi.fetchReports).toHaveBeenCalledWith('OPEN', null);
   });
 
   it('dismisses a report in three taps: open it, dismiss, confirm', async () => {
     await renderApp(<AdminGate />, { session });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Aç: Bildirimler (açık)' }));
     await fireEvent.press(await screen.findByRole('button', { name: /Kişi · Deniz Kaya/ }));
     expect(await screen.findByText('Reklam yapıyor')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Reddet' }));
@@ -236,6 +254,7 @@ describe('the queue', () => {
 
   it('suspends and closes only with a note, and suspends before it closes', async () => {
     await renderApp(<AdminGate />, { session });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Aç: Bildirimler (açık)' }));
     await fireEvent.press(await screen.findByRole('button', { name: /Kişi · Deniz Kaya/ }));
     await screen.findByText('Reklam yapıyor');
     expect(
@@ -258,6 +277,7 @@ describe('the queue', () => {
   it('does not close the report when the suspension was refused', async () => {
     mockApi.suspendUser.mockRejectedValue(new Error('refused'));
     await renderApp(<AdminGate />, { session });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Aç: Bildirimler (açık)' }));
     await fireEvent.press(await screen.findByRole('button', { name: /Kişi · Deniz Kaya/ }));
     await screen.findByText('Reklam yapıyor');
     await fireEvent.changeText(screen.getByLabelText('Karar notu'), 'Neden');
@@ -287,6 +307,7 @@ describe('the queue', () => {
       }),
     );
     await renderApp(<AdminGate />, { session });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Aç: Bildirimler (açık)' }));
     await fireEvent.press(await screen.findByRole('button', { name: /Etkinlik · Sahte maç/ }));
     await screen.findByText('Katılım 2/10');
     await fireEvent.changeText(screen.getByLabelText('Karar notu'), 'Sahte');
@@ -298,6 +319,7 @@ describe('the queue', () => {
   it('says so when nothing is open', async () => {
     mockApi.fetchReports.mockResolvedValue({ items: [], next_cursor: null });
     await renderApp(<AdminGate />, { session });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Aç: Bildirimler (açık)' }));
     expect(await screen.findByText('Açık bildirim yok.')).toBeTruthy();
   });
 });
@@ -379,6 +401,7 @@ describe('venues', () => {
       }),
     );
     await renderApp(<AdminGate />, { session });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Aç: Bildirimler (açık)' }));
     await fireEvent.press(await screen.findByRole('button', { name: /Mekân · Yıldız Halı Saha/ }));
     expect(await screen.findByText('Yıldız Halı Saha · Listede')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Mekânı gizle ve kapat' }));

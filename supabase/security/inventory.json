@@ -945,6 +945,14 @@
       "guard": "private.assert_admin_aal2"
     },
     {
+      "fn": "public.admin_dashboard_summary()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_admin_aal2"
+    },
+    {
       "fn": "public.admin_decide_business(p_id uuid, p_approve boolean, p_reason text)",
       "definer": true,
       "search_path_empty": true,

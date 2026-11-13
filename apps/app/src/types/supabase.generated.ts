@@ -1962,6 +1962,7 @@ export type Database = {
         Args: { p_city_id: string; p_name: string; p_owner: string; p_venue_ids: string[] };
         Returns: string;
       };
+      admin_dashboard_summary: { Args: Record<PropertyKey, never>; Returns: Json };
       admin_decide_business: {
         Args: { p_approve: boolean; p_id: string; p_reason?: string };
         Returns: undefined;

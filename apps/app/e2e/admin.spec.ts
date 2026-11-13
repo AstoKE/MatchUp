@@ -77,6 +77,10 @@ async function enterConsole(page: Page, email: string) {
   await page.getByLabel('6 haneli kod').fill(totp(secret));
   await page.getByRole('button', { name: 'Doğrula' }).click();
   await expect(page.getByRole('heading', { name: 'Yönetim', level: 1 })).toBeVisible();
+  await expect(page.getByRole('radio', { name: 'Pano', exact: true })).toBeChecked();
+  await expect(page.getByText(/^Son güncelleme:/)).toBeVisible();
+  await expectNoBlocking(page);
+  await page.getByRole('button', { name: 'Aç: Bildirimler (açık)', exact: true }).click();
   return secret;
 }
 
@@ -150,6 +154,32 @@ test.describe('the administration console', () => {
     await expect(page.getByRole('heading', { name: 'Yönetim', level: 1 })).toBeVisible();
     await expectNoBlocking(page);
 
+    // The console starts on Pano. Its cards open the existing queues.
+    await expect(page.getByRole('radio', { name: 'Pano', exact: true })).toBeChecked();
+    const reportsCard = page.getByRole('group', { name: /^Bildirimler \(açık\):/ });
+    await expect(reportsCard).toBeVisible();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expectNoBlocking(page);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.url().endsWith('/rpc/admin_dashboard_summary') && response.status() === 200,
+      ),
+      page.getByRole('button', { name: 'Yenile', exact: true }).click(),
+    ]);
+    await page.getByRole('button', { name: 'Tüm kayıt', exact: true }).click();
+    await expect(page.getByRole('radio', { name: 'Kayıt', exact: true })).toBeChecked();
+    await page.getByRole('radio', { name: 'Pano', exact: true }).click();
+    await reportsCard.focus();
+    await page.keyboard.press('Tab');
+    await expect(
+      page.getByRole('button', { name: 'Aç: Bildirimler (açık)', exact: true }),
+    ).toBeFocused();
+    await page.keyboard.press('Enter');
     // Three taps from the list to a decision: open the report, dismiss, confirm.
     await page.getByRole('button', { name: new RegExp(`Etkinlik · ${t.title}`) }).click();
     await expect(page.getByText('Deneme bildirimi')).toBeVisible();

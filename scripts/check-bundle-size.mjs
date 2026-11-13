@@ -99,11 +99,13 @@
 // TOTAL 966 -> 967 (2026-11-12, Phase 10 / M3): the owner's edit screen joins the lazy business chunk. INITIAL unchanged.
 // TOTAL 967 -> 970 (2026-11-13, Phase 10 / M4): business staff. The player card's staff invitation is its own lazy chunk
 // with its own copy; the business chunk gains the staff section and the invitation states. INITIAL unchanged (562 kB).
+// TOTAL 970 -> 972 (2026-11-13, ROADMAP P-23): the read-only Pano dashboard, summary parser, relative-age helper and
+// Turkish/English labels join the lazy AdminGate chunk (20 -> 22 kB). INITIAL stays 562 kB; no first-load code added.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 970;
+const TOTAL_RATCHET_KB = 972;
 const INITIAL_RATCHET_KB = 562;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
