@@ -73,6 +73,18 @@ async function expectNoBlocking(page: Page) {
 async function enterConsole(page: Page, email: string) {
   await page.goto('/admin');
   await expect(page.getByRole('heading', { name: 'İkinci doğrulamayı kur' })).toBeVisible();
+  // The QR code must really draw (2026-11-13: an unencoded SVG data URI showed nothing in browsers).
+  const qr = page.locator('img[src^="data:image/svg+xml"]');
+  await expect(qr).toHaveCount(1);
+  await expect
+    .poll(() => qr.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0))
+    .toBe(true);
+  // React Native Web paints the picture as the background of the element before the hidden <img>: that is what shows.
+  const painted = await qr.evaluate((img) => {
+    const box = img.previousElementSibling;
+    return box ? getComputedStyle(box).backgroundImage : 'none';
+  });
+  expect(painted.startsWith('url(')).toBe(true);
   const secret = (await page.getByTestId('totp-secret').innerText()).trim();
   await page.getByLabel('6 haneli kod').fill(totp(secret));
   await page.getByRole('button', { name: 'Doğrula' }).click();

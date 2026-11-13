@@ -1,6 +1,7 @@
 import { mapRpcError, VENUE_KINDS, type VenueKind } from '@matchup/domain';
 import * as z from 'zod/mini';
 import { supabase } from '@/lib/supabase/client';
+import { qrDataUri } from '../qr-data-uri';
 
 const dashboardQueue = z.object({ count: z.number(), oldest_at: z.nullable(z.string()) });
 const dashboardSummary = z.object({
@@ -75,7 +76,11 @@ export async function enrollTotp(): Promise<TotpEnrollment> {
   }
   const made = await supabase.auth.mfa.enroll({ factorType: 'totp' });
   if (made.error) throw made.error;
-  return { factorId: made.data.id, qrCode: made.data.totp.qr_code, secret: made.data.totp.secret };
+  return {
+    factorId: made.data.id,
+    qrCode: qrDataUri(made.data.totp.qr_code),
+    secret: made.data.totp.secret,
+  };
 }
 
 /** Answers the authenticator; on success the session carries aal2. A wrong code throws. */
