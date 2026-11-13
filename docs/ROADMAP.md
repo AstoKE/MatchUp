@@ -127,7 +127,7 @@ To do, smaller than §3.3: each is one PR. Not started.
 
 | ID | Feature | Pri | What it means |
 |---|---|---|---|
-| P-23 | Admin dashboard: one place to follow the work | P2 | A first page in the console that shows what waits for an administrator, with counts and links: open reports, organization and business requests, feedback (new), attendance disputes, and recent moderation actions. Read-only, from existing admin RPCs (one summary RPC, second factor). Not started. |
+| P-23 | Admin dashboard: one place to follow the work | P2 | **Built 2026-11-13** (`20261125100000_admin_dashboard.sql`): Pano is the console's first/default page; six queues with counts, oldest waiting ages, report-type breakdown and links; latest ten moderation actions. Read-only summary RPC with second factor; manual refresh and polling every 60 seconds only while active and foregrounded. |
 
 ## 4. Ten highest-risk decisions and risks
 

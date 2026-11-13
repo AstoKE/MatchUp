@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Screen, ScreenHeader, SegmentedChoice, Text, useTheme } from '@/ui';
 import { BusinessesPanel } from '../components/BusinessesPanel';
+import { DashboardPanel } from '../components/DashboardPanel';
 import { FeedbackPanel } from '../components/FeedbackPanel';
 import { OrganizationsPanel } from '../components/OrganizationsPanel';
 import { AuditPanel, DisputesPanel, FlagsPanel } from '../components/ListPanels';
@@ -13,6 +14,7 @@ import { ReportsPanel } from '../components/ReportsPanel';
 import { VenuesPanel } from '../components/VenuesPanel';
 
 const SECTIONS = [
+  'dashboard',
   'reports',
   'flags',
   'disputes',
@@ -31,7 +33,7 @@ export default function AdminScreen() {
   const { t } = useTranslation(['admin', 'common']);
   const router = useRouter();
   const { spacing } = useTheme();
-  const [section, setSection] = useState<Section>('reports');
+  const [section, setSection] = useState<Section>('dashboard');
   const [person, setPerson] = useState<string | null>(null);
   const openUser = (id: string | null) => {
     setPerson(id);
@@ -52,6 +54,7 @@ export default function AdminScreen() {
         options={SECTIONS.map((value) => ({ value, label: t(`admin:section.${value}`) }))}
       />
       <View style={{ gap: spacing[3] }}>
+        {section === 'dashboard' ? <DashboardPanel onOpenSection={setSection} /> : null}
         {section === 'reports' ? <ReportsPanel onOpenUser={openUser} /> : null}
         {section === 'flags' ? <FlagsPanel onOpenUser={openUser} /> : null}
         {section === 'disputes' ? <DisputesPanel /> : null}
