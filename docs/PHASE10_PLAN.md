@@ -1,6 +1,6 @@
 # Phase 10 plan: businesses
 
-Status 2026-11-13: M1–M3 merged (#111, #112, #113); M4 staff built (in review). ROADMAP §3.3 P-18 and P-19, started on the founder's instruction (2026-11-12). ADR-0031.
+Status 2026-11-13: done, M1–M4 merged (#111, #112, #113, #114); report in [PHASE10_REPORT](PHASE10_REPORT.md). ROADMAP §3.3 P-18 and P-19, started on the founder's instruction (2026-11-12). ADR-0031.
 
 A business is the operator of one or more commercial facilities (a pitch, a court, a hall). It gets operator rights over its venues after an administrator approves it. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
