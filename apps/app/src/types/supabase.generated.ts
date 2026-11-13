@@ -132,20 +132,26 @@ export type Database = {
         Row: {
           business_id: string;
           created_at: string;
+          invited_by: string | null;
           role: string;
+          status: string;
           user_id: string;
         };
         ComputedFields: never;
         Insert: {
           business_id: string;
           created_at?: string;
+          invited_by?: string | null;
           role: string;
+          status?: string;
           user_id: string;
         };
         Update: {
           business_id?: string;
           created_at?: string;
+          invited_by?: string | null;
           role?: string;
+          status?: string;
           user_id?: string;
         };
         Relationships: [
@@ -154,6 +160,13 @@ export type Database = {
             columns: ['business_id'];
             isOneToOne: false;
             referencedRelation: 'businesses';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'business_members_invited_by_fkey';
+            columns: ['invited_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
             referencedColumns: ['id'];
           },
           {
@@ -2071,8 +2084,11 @@ export type Database = {
       get_organization: { Args: { p_id: string }; Returns: Json };
       get_player_card: { Args: { p_user_id: string }; Returns: Json };
       get_venue_business: { Args: { p_venue_id: string }; Returns: Json };
+      invite_business_staff: { Args: { p_business: string; p_user: string }; Returns: string };
       invite_to_organization: { Args: { p_org: string; p_user: string }; Returns: string };
+      leave_business: { Args: { p_business: string }; Returns: undefined };
       leave_organization: { Args: { p_org: string }; Returns: undefined };
+      list_businesses_to_invite: { Args: { p_user: string }; Returns: Json };
       list_event_requests: { Args: { p_event_id: string }; Returns: Json };
       list_my_blocks: { Args: Record<PropertyKey, never>; Returns: Json };
       list_my_businesses: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -2094,6 +2110,7 @@ export type Database = {
       publish_event: { Args: { p_event_id: string }; Returns: undefined };
       register_push_device: { Args: { p_platform: string; p_token: string }; Returns: undefined };
       reject_participation: { Args: { p_participation_id: string }; Returns: undefined };
+      remove_business_staff: { Args: { p_business: string; p_user: string }; Returns: undefined };
       remove_organization_member: { Args: { p_org: string; p_user: string }; Returns: undefined };
       remove_participant: {
         Args: { p_participation_id: string; p_reason?: string };
@@ -2137,6 +2154,10 @@ export type Database = {
         Returns: string;
       };
       request_to_join_organization: { Args: { p_org: string }; Returns: string };
+      respond_business_invite: {
+        Args: { p_accept: boolean; p_business: string };
+        Returns: undefined;
+      };
       respond_to_organization_invite: {
         Args: { p_accept: boolean; p_org: string };
         Returns: undefined;

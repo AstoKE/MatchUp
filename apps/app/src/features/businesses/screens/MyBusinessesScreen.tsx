@@ -8,7 +8,7 @@ import { currentLocale } from '@/lib/i18n';
 import { Banner, Button, EmptyState, Screen, ScreenHeader, Skeleton, Text, useTheme } from '@/ui';
 import { ownedCount, type Business } from '../api/businesses-api';
 import { ensureBusinessesCopy } from '../copy';
-import { useCancelBusinessRequest, useMyBusinesses } from '../hooks';
+import { useCancelBusinessRequest, useMyBusinesses, useStaffAction } from '../hooks';
 
 /** Profile › İşletmelerim (ADR-0031): the person's businesses and requests, and the way to ask for a new one. */
 export function MyBusinessesScreen() {
@@ -104,7 +104,12 @@ function BusinessRow({ business }: { business: Business }) {
       <Text variant="titleSm">{business.name}</Text>
       <Text variant="caption" tone="secondary">
         {[
-          t(`businesses:status.${business.status}`),
+          business.membership === 'INVITED'
+            ? t('businesses:staff.invitedState')
+            : t(`businesses:status.${business.status}`),
+          business.role === 'STAFF' && business.membership === 'ACTIVE'
+            ? t('businesses:staff.role')
+            : null,
           city ? localizedName(city.names, currentLocale()) : null,
         ]
           .filter(Boolean)
@@ -114,6 +119,12 @@ function BusinessRow({ business }: { business: Business }) {
         <Text variant="bodySm">
           {t('businesses:venues', { names: business.venues.map((v) => v.name).join(', ') })}
         </Text>
+      ) : null}
+      {business.membership === 'INVITED' ? <StaffInvitation businessId={business.id} /> : null}
+      {business.status === 'ACTIVE' &&
+      business.role === 'STAFF' &&
+      business.membership === 'ACTIVE' ? (
+        <StaffActions businessId={business.id} name={business.name} />
       ) : null}
       {business.status === 'ACTIVE' && business.role === 'OWNER' ? (
         <View style={{ alignItems: 'flex-start' }}>
@@ -163,6 +174,79 @@ function BusinessRow({ business }: { business: Business }) {
           </View>
         )
       ) : null}
+    </View>
+  );
+}
+
+/** Phase 10 / M4: an invitation to work at a business. */
+function StaffInvitation({ businessId }: { businessId: string }) {
+  const { t } = useTranslation(['businesses', 'common']);
+  const { spacing } = useTheme();
+  const act = useStaffAction(businessId);
+  return (
+    <View style={{ gap: spacing[2] }}>
+      <Text variant="label">{t('businesses:staff.invited')}</Text>
+      {act.isError ? <Banner kind="danger" message={errorText(act.error)} /> : null}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+        <Button
+          label={t('businesses:staff.accept')}
+          disabled={act.isPending}
+          onPress={() => act.mutate({ kind: 'respond', accept: true })}
+        />
+        <Button
+          variant="secondary"
+          label={t('businesses:staff.decline')}
+          disabled={act.isPending}
+          onPress={() => act.mutate({ kind: 'respond', accept: false })}
+        />
+      </View>
+    </View>
+  );
+}
+
+/** Phase 10 / M4: a staff member edits the facilities, or leaves (after asking). */
+function StaffActions({ businessId, name }: { businessId: string; name: string }) {
+  const { t } = useTranslation(['businesses', 'common']);
+  const { spacing } = useTheme();
+  const router = useRouter();
+  const act = useStaffAction(businessId);
+  const [leaving, setLeaving] = useState(false);
+  return (
+    <View style={{ gap: spacing[2] }}>
+      {act.isError ? <Banner kind="danger" message={errorText(act.error)} /> : null}
+      {leaving ? (
+        <View style={{ gap: spacing[2] }}>
+          <Text role="alert">{t('businesses:staff.leaveConfirm', { name })}</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+            <Button
+              variant="destructive"
+              label={t('businesses:staff.leaveYes')}
+              disabled={act.isPending}
+              onPress={() => act.mutate({ kind: 'leave' })}
+            />
+            <Button
+              variant="secondary"
+              label={t('businesses:keep')}
+              onPress={() => setLeaving(false)}
+            />
+          </View>
+        </View>
+      ) : (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+          <Button
+            variant="secondary"
+            label={t('businesses:staff.editVenues')}
+            onPress={() =>
+              router.push({ pathname: '/businesses/[id]', params: { id: businessId } } as Href)
+            }
+          />
+          <Button
+            variant="tertiary"
+            label={t('businesses:staff.leave')}
+            onPress={() => setLeaving(true)}
+          />
+        </View>
+      )}
     </View>
   );
 }

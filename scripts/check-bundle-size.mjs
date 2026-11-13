@@ -97,11 +97,13 @@
 // TOTAL 964 -> 966 (2026-11-12, Phase 10 / M2): the console's "add a business" form, hide and restore (AdminGate, admins
 // only), and the event page's business line. INITIAL unchanged (562 kB).
 // TOTAL 966 -> 967 (2026-11-12, Phase 10 / M3): the owner's edit screen joins the lazy business chunk. INITIAL unchanged.
+// TOTAL 967 -> 970 (2026-11-13, Phase 10 / M4): business staff. The player card's staff invitation is its own lazy chunk
+// with its own copy; the business chunk gains the staff section and the invitation states. INITIAL unchanged (562 kB).
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 967;
+const TOTAL_RATCHET_KB = 970;
 const INITIAL_RATCHET_KB = 562;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');

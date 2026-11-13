@@ -56,6 +56,8 @@ const owned = (over: Partial<OwnedBusiness> = {}): OwnedBusiness => ({
   id: BUSINESS,
   name: 'Yıldız Spor',
   cityId: '00000000-0000-4000-8000-0000000000a1',
+  role: 'OWNER',
+  staff: [],
   contactPhone: '05321112233',
   contactEmail: null,
   venues: [

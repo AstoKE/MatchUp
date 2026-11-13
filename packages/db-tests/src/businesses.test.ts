@@ -140,4 +140,63 @@ describe('business requests', () => {
     await db().query(`delete from public.businesses where id = $1`, [made.body]);
     await db().query(`delete from public.venues where id = $1`, [edited]);
   });
+
+  it('staff through the API: invite, accept, edit a venue, not the business (M4)', async () => {
+    const owner = await onboardedUser(c, 'İşletmeci F');
+    const worker = await onboardedUser(c, 'İşletmeci G');
+    const { rows } = await db().query<{ id: string }>(
+      `insert into public.venues (kind, name, city_id, district_id, location, provenance)
+       values ('COMMERCIAL_FACILITY', 'Çalışan Sahası ' || gen_random_uuid(), $1, $2,
+               extensions.st_setsrid(extensions.st_makepoint(32.78, 39.90), 4326)::extensions.geography, 'ADMIN_CURATED')
+       returning id`,
+      [c.city, c.district],
+    );
+    const v = rows[0]!.id;
+    const made = await ask(owner.token, 'Çalışanlı Spor', [v]);
+    await db().query(
+      `update public.businesses set status = 'ACTIVE', decided_at = now() where id = $1`,
+      [made.body],
+    );
+    const invited = await rpc(
+      'invite_business_staff',
+      { p_business: made.body, p_user: worker.user.id },
+      owner.token,
+    );
+    expect(invited.body).toBe('INVITED');
+    expect(
+      (
+        await rpc(
+          'respond_business_invite',
+          { p_business: made.body, p_accept: true },
+          worker.token,
+        )
+      ).status,
+    ).toBe(204);
+    const edit = await rpc(
+      'update_business_venue',
+      {
+        p_business: made.body,
+        p_venue: v,
+        p_name: 'Çalışan Sahası 2',
+        p_address: '',
+        p_sport_ids: [c.sport],
+      },
+      worker.token,
+    );
+    expect(edit.status).toBe(204);
+    const own = await rpc(
+      'update_my_business',
+      {
+        p_id: made.body,
+        p_name: 'Ele Geçirme',
+        p_contact_phone: '05321112233',
+        p_contact_email: '',
+      },
+      worker.token,
+    );
+    expect(codeOf(own.body)).toBe('NOT_FOUND');
+    expect((await rpc('leave_business', { p_business: made.body }, worker.token)).status).toBe(204);
+    await db().query(`delete from public.businesses where id = $1`, [made.body]);
+    await db().query(`delete from public.venues where id = $1`, [v]);
+  });
 });

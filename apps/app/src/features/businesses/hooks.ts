@@ -4,6 +4,9 @@ import {
   cancelBusinessRequest,
   fetchMyBusiness,
   fetchMyBusinesses,
+  leaveBusiness,
+  removeBusinessStaff,
+  respondBusinessInvite,
   requestBusiness,
   searchClaimableVenues,
   updateBusinessVenue,
@@ -58,6 +61,23 @@ export function useUpdateBusinessVenue() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: Parameters<typeof updateBusinessVenue>[0]) => updateBusinessVenue(input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['businesses'] }),
+  });
+}
+
+export type StaffAction =
+  { kind: 'respond'; accept: boolean } | { kind: 'leave' } | { kind: 'remove'; userId: string };
+
+/** Accepting or declining an invitation, leaving, removing a staff member. */
+export function useStaffAction(businessId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (action: StaffAction): Promise<void> =>
+      action.kind === 'respond'
+        ? respondBusinessInvite(businessId, action.accept)
+        : action.kind === 'leave'
+          ? leaveBusiness(businessId)
+          : removeBusinessStaff(businessId, action.userId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['businesses'] }),
   });
 }

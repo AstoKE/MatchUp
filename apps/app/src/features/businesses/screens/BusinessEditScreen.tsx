@@ -20,7 +20,12 @@ import {
 } from '@/ui';
 import { BUSINESS_NAME_MAX, type OwnedBusiness, type OwnedVenue } from '../api/businesses-api';
 import { ensureBusinessesCopy } from '../copy';
-import { useMyBusiness, useUpdateBusinessVenue, useUpdateMyBusiness } from '../hooks';
+import {
+  useMyBusiness,
+  useStaffAction,
+  useUpdateBusinessVenue,
+  useUpdateMyBusiness,
+} from '../hooks';
 
 const VENUE_SPORTS_MAX = 10;
 
@@ -65,7 +70,8 @@ export function BusinessEditScreen() {
   return (
     <Screen maxWidth={560}>
       {header}
-      <BusinessForm business={business.data} />
+      {business.data.role === 'OWNER' ? <BusinessForm business={business.data} /> : null}
+      {business.data.staff ? <StaffSection business={business.data} /> : null}
       <Text variant="title" heading={2}>
         {t('businesses:edit.venues')}
       </Text>
@@ -225,6 +231,45 @@ function VenueForm({ businessId, venue }: { businessId: string; venue: OwnedVenu
           }}
         />
       </View>
+    </View>
+  );
+}
+
+/** Phase 10 / M4: the owner's staff list; staff are invited from a player card. */
+function StaffSection({ business }: { business: OwnedBusiness }) {
+  const { t } = useTranslation(['businesses', 'common']);
+  const { spacing } = useTheme();
+  const act = useStaffAction(business.id);
+  const staff = business.staff ?? [];
+  return (
+    <View style={{ gap: spacing[2] }}>
+      <Text variant="title" heading={2}>
+        {t('businesses:staff.title')}
+      </Text>
+      <Text variant="caption" tone="secondary">
+        {t('businesses:staff.hint')}
+      </Text>
+      {act.isError ? <Banner kind="danger" message={errorText(act.error)} /> : null}
+      {staff.length === 0 ? <Text tone="secondary">{t('businesses:staff.none')}</Text> : null}
+      {staff.map((member) => (
+        <View
+          key={member.userId}
+          style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing[2] }}
+        >
+          <Text style={{ flexGrow: 1 }}>
+            {member.displayName ?? t('businesses:staff.unnamed')}
+            {member.status === 'INVITED' ? ` · ${t('businesses:staff.invitedState')}` : ''}
+          </Text>
+          <Button
+            variant="tertiary"
+            label={t(
+              member.status === 'INVITED' ? 'businesses:staff.withdraw' : 'businesses:staff.remove',
+            )}
+            disabled={act.isPending}
+            onPress={() => act.mutate({ kind: 'remove', userId: member.userId })}
+          />
+        </View>
+      ))}
     </View>
   );
 }

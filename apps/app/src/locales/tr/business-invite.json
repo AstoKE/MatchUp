@@ -1,0 +1,11 @@
+{
+  "open": "İşletmeye çalışan olarak ekle",
+  "title": "{{name}} kişisini çalışan olarak davet et",
+  "hint": "Çalışanlar işletmenin tesislerini (ad, adres, sporlar) düzenleyebilir; işletmenin kendisini ve iletişim bilgilerini göremez.",
+  "send": "Davet et ({{business}})",
+  "state": {
+    "ACTIVE": "Çalışan",
+    "INVITED": "Davet edildi"
+  },
+  "sent": "{{name}} davet edildi."
+}

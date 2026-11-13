@@ -24,6 +24,7 @@ const NOTIFICATION_TYPES = [
   'ORGANIZATION_MEMBER_APPROVED',
   'BUSINESS_APPROVED',
   'BUSINESS_REJECTED',
+  'BUSINESS_STAFF_INVITED',
 ] as const;
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 

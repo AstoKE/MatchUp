@@ -441,6 +441,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.lock_business_member(p_id uuid, p_uid uuid, p_owner_only boolean)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.lock_organizer(p_uid uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -1369,7 +1377,23 @@
       "guard": "auth.uid()"
     },
     {
+      "fn": "public.invite_business_staff(p_business uuid, p_user uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
       "fn": "public.invite_to_organization(p_org uuid, p_user uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.leave_business(p_business uuid)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
@@ -1383,6 +1407,14 @@
       "anon": false,
       "authenticated": true,
       "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.list_businesses_to_invite(p_user uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
     },
     {
       "fn": "public.list_event_requests(p_event_id uuid)",
@@ -1481,6 +1513,14 @@
       "guard": "private.assert_onboarded_user"
     },
     {
+      "fn": "public.remove_business_staff(p_business uuid, p_user uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
       "fn": "public.remove_organization_member(p_org uuid, p_user uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -1554,6 +1594,14 @@
     },
     {
       "fn": "public.request_to_join_organization(p_org uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.respond_business_invite(p_business uuid, p_accept boolean)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
