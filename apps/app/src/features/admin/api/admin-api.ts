@@ -20,24 +20,9 @@ const dashboardSummary = z.object({
   flags: z.object({ count: z.number() }),
   recent_actions: z.array(
     z.object({
-      action: z.enum([
-        'REPORT_RESOLVED',
-        'USER_SUSPENDED',
-        'USER_REINSTATED',
-        'EVENT_CANCELED_BY_ADMIN',
-        'REVIEW_HIDDEN',
-        'REVIEW_RESTORED',
-        'VENUE_ADDED',
-        'VENUE_VERIFIED',
-        'VENUE_HIDDEN',
-        'VENUE_RESTORED',
-        'AVATAR_REMOVED',
-        'ORGANIZATION_HIDDEN',
-        'ORGANIZATION_RESTORED',
-        'BUSINESS_HIDDEN',
-        'BUSINESS_RESTORED',
-      ]),
-      target_type: z.enum(['USER', 'EVENT', 'REVIEW', 'VENUE', 'ORGANIZATION', 'BUSINESS']),
+      // Plain strings: a moderation action or target added later must not break the whole page (it shows its code).
+      action: z.string(),
+      target_type: z.string(),
       note: z.nullable(z.string()),
       created_at: z.string(),
     }),

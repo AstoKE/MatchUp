@@ -80,6 +80,24 @@ it('lists localized recent actions and truncates notes to 120 characters', async
   expect(screen.queryByText('n'.repeat(140))).toBeNull();
 });
 
+it('an action this app version does not know yet shows its code instead of breaking the page', async () => {
+  mockFetch.mockResolvedValue({
+    ...summary,
+    recent_actions: [
+      {
+        action: 'SOMETHING_NEW',
+        target_type: 'TEAM',
+        note: null,
+        created_at: summary.generated_at,
+      },
+    ],
+  });
+  await renderApp(<DashboardPanel onOpenSection={jest.fn()} />);
+  expect(await screen.findByText('SOMETHING_NEW')).toBeTruthy();
+  expect(screen.getByText('TEAM')).toBeTruthy();
+  expect(screen.getByText('Bildirimler (açık)')).toBeTruthy();
+});
+
 it('retries a failed load and allows manual refresh', async () => {
   mockFetch.mockRejectedValueOnce(new Error('NETWORK_ERROR'));
   await renderApp(<DashboardPanel onOpenSection={jest.fn()} />);

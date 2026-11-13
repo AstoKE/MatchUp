@@ -95,8 +95,14 @@ export function DashboardPanel({
       ) : null}
       {data.recent_actions.map((action, index) => (
         <Panel key={index}>
-          <Text variant="label">{t(`admin:dashboard.actions.${action.action}`)}</Text>
-          <Text>{t(`admin:dashboard.targets.${action.target_type}`)}</Text>
+          <Text variant="label">
+            {t(`admin:dashboard.actions.${action.action}`, { defaultValue: action.action })}
+          </Text>
+          <Text>
+            {t(`admin:dashboard.targets.${action.target_type}`, {
+              defaultValue: action.target_type,
+            })}
+          </Text>
           {action.note ? <Text>{Array.from(action.note).slice(0, 120).join('')}</Text> : null}
           <Text tone="secondary">{relativeAge(action.created_at, now)}</Text>
         </Panel>
