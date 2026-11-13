@@ -45,5 +45,22 @@
     "address": "Adres (isteğe bağlı)",
     "sports": "Sporlar (en fazla {{max}})",
     "saveVenue": "Tesisi kaydet"
+  },
+  "staff": {
+    "title": "Çalışanlar",
+    "hint": "Çalışanları oyuncu kartlarından davet edersin: \"İşletmeye çalışan olarak ekle\". Tesisleri düzenleyebilirler.",
+    "none": "Henüz çalışan yok.",
+    "unnamed": "Oyuncu",
+    "remove": "Çıkar",
+    "withdraw": "Daveti geri çek",
+    "invited": "Bu işletmeye çalışan olarak davet edildin.",
+    "invitedState": "Davet edildi",
+    "accept": "Kabul et",
+    "decline": "Reddet",
+    "role": "Çalışan",
+    "editVenues": "Tesisleri düzenle",
+    "leave": "Ayrıl",
+    "leaveConfirm": "{{name}} işletmesinden ayrılmak istiyor musun?",
+    "leaveYes": "Evet, ayrıl"
   }
 }

@@ -45,5 +45,22 @@
     "address": "Address (optional)",
     "sports": "Sports (at most {{max}})",
     "saveVenue": "Save the facility"
+  },
+  "staff": {
+    "title": "Staff",
+    "hint": "You invite staff from their player card: \"Add as staff to a business\". They can edit the facilities.",
+    "none": "No staff yet.",
+    "unnamed": "Player",
+    "remove": "Remove",
+    "withdraw": "Withdraw the invitation",
+    "invited": "You were invited to work at this business.",
+    "invitedState": "Invited",
+    "accept": "Accept",
+    "decline": "Decline",
+    "role": "Staff",
+    "editVenues": "Edit the facilities",
+    "leave": "Leave",
+    "leaveConfirm": "Leave {{name}}?",
+    "leaveYes": "Yes, leave"
   }
 }

@@ -1,0 +1,11 @@
+{
+  "open": "Add as staff to a business",
+  "title": "Invite {{name}} as staff",
+  "hint": "Staff can edit the business's facilities (name, address, sports); they do not see the business itself or its contact details.",
+  "send": "Invite ({{business}})",
+  "state": {
+    "ACTIVE": "Staff",
+    "INVITED": "Invited"
+  },
+  "sent": "{{name}} was invited."
+}

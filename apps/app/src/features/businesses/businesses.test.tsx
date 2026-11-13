@@ -63,6 +63,7 @@ const business = (over: Partial<Business> = {}): Business => ({
   rejectReason: null,
   createdAt: '2026-11-12T10:00:00Z',
   venues: [{ id: VENUE.id, name: VENUE.name }],
+  membership: 'ACTIVE',
   ...over,
 });
 

@@ -1,6 +1,6 @@
 # Phase 10 plan: businesses
 
-Status 2026-11-12: M1 and M2 merged (#111, #112); M3 built (in review). ROADMAP §3.3 P-18 and P-19, started on the founder's instruction (2026-11-12). ADR-0031.
+Status 2026-11-13: M1–M3 merged (#111, #112, #113); M4 staff built (in review). ROADMAP §3.3 P-18 and P-19, started on the founder's instruction (2026-11-12). ADR-0031.
 
 A business is the operator of one or more commercial facilities (a pitch, a court, a hall). It gets operator rights over its venues after an administrator approves it. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
@@ -33,7 +33,7 @@ Defaults chosen while planning (the founder can change them): at most **3** busi
 
 ### M3: operator tools
 - An owner edits their venues' details (name, address, sports), never verification; staff members.
-- **As built (founder, 2026-11-12):** once a business is approved or added by an administrator, its owner edits the business (name, contact) and its venues (name, address, sports). Staff members are left for later.
+- **As built (founder, 2026-11-12):** once a business is approved or added by an administrator, its owner edits the business (name, contact) and its venues (name, address, sports). Staff members came in M4 (founder, 2026-11-13): the owner invites from a player card; staff edit the venues, not the business, its contact or its staff.
 
 ## Risks
 

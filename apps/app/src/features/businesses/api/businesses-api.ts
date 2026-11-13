@@ -17,6 +17,8 @@ const businessRow = z.object({
   created_at: z.string(),
   decided_at: z.nullable(z.string()),
   venues: z.array(z.object({ id: z.uuid(), name: z.string() })),
+  // Optional: sent from migration 20261126100000 on (staff).
+  membership: z.optional(z.enum(['ACTIVE', 'INVITED'])),
 });
 
 export interface Business {
@@ -28,6 +30,8 @@ export interface Business {
   rejectReason: string | null;
   createdAt: string;
   venues: { id: string; name: string }[];
+  /** The caller's own state: a member, or invited as staff. */
+  membership: 'ACTIVE' | 'INVITED';
 }
 
 export interface MyBusinesses {
@@ -51,13 +55,15 @@ export async function fetchMyBusinesses(): Promise<MyBusinesses> {
       rejectReason: b.reject_reason,
       createdAt: b.created_at,
       venues: b.venues,
+      membership: b.membership ?? 'ACTIVE',
     })),
   };
 }
 
 /** Owned ones that wait or are active count toward the limit. */
 export const ownedCount = (items: readonly Business[]) =>
-  items.filter((b) => b.role === 'OWNER' && b.status !== 'REJECTED').length;
+  items.filter((b) => b.role === 'OWNER' && b.status !== 'REJECTED' && b.membership === 'ACTIVE')
+    .length;
 
 export async function requestBusiness(input: {
   name: string;
@@ -111,10 +117,19 @@ export interface OwnedVenue {
   listed: boolean;
   sportIds: string[];
 }
+export interface StaffMember {
+  userId: string;
+  displayName: string | null;
+  status: 'ACTIVE' | 'INVITED';
+}
 export interface OwnedBusiness {
   id: string;
   name: string;
   cityId: string;
+  /** OWNER edits everything; STAFF edit the venues only. */
+  role: 'OWNER' | 'STAFF';
+  /** The owner only. */
+  staff: StaffMember[] | null;
   contactPhone: string | null;
   contactEmail: string | null;
   venues: OwnedVenue[];
@@ -128,6 +143,18 @@ export async function fetchMyBusiness(id: string): Promise<OwnedBusiness> {
       id: z.uuid(),
       name: z.string(),
       city_id: z.uuid(),
+      role: z.optional(z.enum(['OWNER', 'STAFF'])),
+      staff: z.optional(
+        z.nullable(
+          z.array(
+            z.object({
+              user_id: z.uuid(),
+              display_name: z.nullable(z.string()),
+              status: z.enum(['ACTIVE', 'INVITED']),
+            }),
+          ),
+        ),
+      ),
       contact_phone: z.nullable(z.string()),
       contact_email: z.nullable(z.string()),
       venues: z.array(
@@ -146,6 +173,10 @@ export async function fetchMyBusiness(id: string): Promise<OwnedBusiness> {
     id: b.id,
     name: b.name,
     cityId: b.city_id,
+    role: b.role ?? 'OWNER',
+    staff: b.staff
+      ? b.staff.map((m) => ({ userId: m.user_id, displayName: m.display_name, status: m.status }))
+      : null,
     contactPhone: b.contact_phone,
     contactEmail: b.contact_email,
     venues: b.venues.map((v) => ({
@@ -188,5 +219,22 @@ export async function updateBusinessVenue(input: {
     p_address: input.addressText ?? '',
     p_sport_ids: input.sportIds,
   });
+  if (error) throw mapRpcError(error);
+}
+
+// ---- staff (M4) -------------------------------------------------------------------------------------------------------
+export async function respondBusinessInvite(id: string, accept: boolean): Promise<void> {
+  const { error } = await supabase.rpc('respond_business_invite', {
+    p_business: id,
+    p_accept: accept,
+  });
+  if (error) throw mapRpcError(error);
+}
+export async function removeBusinessStaff(id: string, userId: string): Promise<void> {
+  const { error } = await supabase.rpc('remove_business_staff', { p_business: id, p_user: userId });
+  if (error) throw mapRpcError(error);
+}
+export async function leaveBusiness(id: string): Promise<void> {
+  const { error } = await supabase.rpc('leave_business', { p_business: id });
   if (error) throw mapRpcError(error);
 }

@@ -31,7 +31,8 @@
     "ORGANIZATION_JOIN_REQUESTED": "Someone wants to join your organization.",
     "ORGANIZATION_MEMBER_APPROVED": "You became a member of an organization.",
     "BUSINESS_APPROVED": "Your business request was approved.",
-    "BUSINESS_REJECTED": "Your business request was not approved. You can see why in My businesses."
+    "BUSINESS_REJECTED": "Your business request was not approved. You can see why in My businesses.",
+    "BUSINESS_STAFF_INVITED": "You were invited to work at a business."
   },
   "unknown": "You have a new notification.",
   "emptyAction": "Discover events",

@@ -12,6 +12,7 @@ declare module 'i18next' {
       organizations: typeof import('@/locales/tr/organizations.json');
       organizationInvite: typeof import('@/locales/tr/organization-invite.json');
       businesses: typeof import('@/locales/tr/businesses.json');
+      businessInvite: typeof import('@/locales/tr/business-invite.json');
     };
   }
 }
