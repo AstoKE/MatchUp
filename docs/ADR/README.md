@@ -33,3 +33,4 @@ Format: Context · Decision · Consequences · Status. One decision per file, im
 | [0027](0027-avatars-gender-and-profile-photos.md) | Drawn avatars by gender and first sport, a private gender, profile photos in a private bucket with the profile's visibility rule | Accepted |
 | [0028](0028-push-notifications.md) | Push notifications through Expo, sent from Postgres (pg_cron + pg_net), behind two separate consents off by default; no web push (moves ROADMAP P-01 into the MVP) | Accepted |
 | [0029](0029-phone-verification.md) | Phone verification by SMS through Supabase Auth: one Turkish mobile number per account, enforced in the database behind a switch (amends SECURITY §7, ADR-0026) | Accepted |
+| [0032](0032-recurring-events.md) | Recurring events: a series opens ordinary events two weeks ahead from an hourly job; players join each event; changes reach only events not opened yet | Accepted |

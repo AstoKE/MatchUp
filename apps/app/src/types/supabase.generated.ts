@@ -494,6 +494,49 @@ export type Database = {
           },
         ];
       };
+      event_series: {
+        Row: {
+          anchor_at: string;
+          close_offset: string | null;
+          created_at: string;
+          id: string;
+          interval_weeks: number;
+          next_at: string;
+          organizer_id: string | null;
+          status: string;
+          stopped_at: string | null;
+          stopped_reason: string | null;
+          template: NonNullable<Json>;
+        };
+        ComputedFields: never;
+        Insert: {
+          anchor_at: string;
+          close_offset?: string | null;
+          created_at?: string;
+          id?: string;
+          interval_weeks: number;
+          next_at: string;
+          organizer_id?: string | null;
+          status?: string;
+          stopped_at?: string | null;
+          stopped_reason?: string | null;
+          template: NonNullable<Json>;
+        };
+        Update: {
+          anchor_at?: string;
+          close_offset?: string | null;
+          created_at?: string;
+          id?: string;
+          interval_weeks?: number;
+          next_at?: string;
+          organizer_id?: string | null;
+          status?: string;
+          stopped_at?: string | null;
+          stopped_reason?: string | null;
+          template?: NonNullable<Json>;
+        };
+        Relationships: [];
+      };
       events: {
         Row: {
           approved_count: number;
@@ -530,6 +573,7 @@ export type Database = {
           published_at: string | null;
           registration_closes_at: string | null;
           review_window_closes_at: string | null;
+          series_id: string | null;
           setting: Database['public']['Enums']['event_setting'] | null;
           skill_max: number | null;
           skill_min: number | null;
@@ -578,6 +622,7 @@ export type Database = {
           published_at?: string | null;
           registration_closes_at?: string | null;
           review_window_closes_at?: string | null;
+          series_id?: string | null;
           setting?: Database['public']['Enums']['event_setting'] | null;
           skill_max?: number | null;
           skill_min?: number | null;
@@ -625,6 +670,7 @@ export type Database = {
           published_at?: string | null;
           registration_closes_at?: string | null;
           review_window_closes_at?: string | null;
+          series_id?: string | null;
           setting?: Database['public']['Enums']['event_setting'] | null;
           skill_max?: number | null;
           skill_min?: number | null;
@@ -657,6 +703,13 @@ export type Database = {
             columns: ['organizer_id'];
             isOneToOne: false;
             referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'events_series_id_fkey';
+            columns: ['series_id'];
+            isOneToOne: false;
+            referencedRelation: 'event_series';
             referencedColumns: ['id'];
           },
           {
@@ -2050,6 +2103,10 @@ export type Database = {
         Args: { p_client_request_id: string; p_input: Json; p_publish?: boolean };
         Returns: string;
       };
+      create_event_series: {
+        Args: { p_event_id: string; p_interval_weeks: number };
+        Returns: string;
+      };
       decide_organization_request: {
         Args: { p_accept: boolean; p_org: string; p_user: string };
         Returns: undefined;
@@ -2065,6 +2122,7 @@ export type Database = {
       get_event_attendance: { Args: { p_event_id: string }; Returns: Json };
       get_event_organization: { Args: { p_event_id: string }; Returns: Json };
       get_event_reviews: { Args: { p_event_id: string }; Returns: Json };
+      get_event_series: { Args: { p_event_id: string }; Returns: Json };
       get_my_account: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -2093,6 +2151,7 @@ export type Database = {
       list_event_requests: { Args: { p_event_id: string }; Returns: Json };
       list_my_blocks: { Args: Record<PropertyKey, never>; Returns: Json };
       list_my_businesses: { Args: Record<PropertyKey, never>; Returns: Json };
+      list_my_event_series: { Args: Record<PropertyKey, never>; Returns: Json };
       list_my_events: {
         Args: { p_bucket: string; p_cursor?: Json; p_limit?: number };
         Returns: Json;
@@ -2191,6 +2250,7 @@ export type Database = {
         Args: { p_level: number; p_position_ids: string[]; p_sport_id: string };
         Returns: undefined;
       };
+      stop_event_series: { Args: { p_series_id: string }; Returns: undefined };
       submit_feedback: {
         Args: { p_body: string; p_context?: string; p_kind: string };
         Returns: string;

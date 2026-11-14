@@ -185,6 +185,7 @@ Founder actions; none of them changes code.
    - `auto-finalize-attendance`
    - `close-review-windows`
    - `attendance-reminders`
+   - `open-series-events` (Phase 11)
 
    All of them should be active.
 
