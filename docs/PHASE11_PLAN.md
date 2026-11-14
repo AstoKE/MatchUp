@@ -1,6 +1,6 @@
 # Phase 11 plan: recurring events
 
-Status 2026-11-14: M1 (database, #118) and M2 (app) built; M3 next. ROADMAP P-05, started on the founder's instruction ("1i yap", 2026-11-14). ADR-0032.
+Status 2026-11-14: M1 (database, #118), M2 (app, #119) and M3 (regulars and changes) built; report in [PHASE11_REPORT](PHASE11_REPORT.md). ROADMAP P-05, started on the founder's instruction ("1i yap", 2026-11-14). ADR-0032.
 
 An organizer turns a published event into a series ("her salı 20:00 halı saha"). The service then opens the next events of the series by itself, a fixed time ahead, as ordinary events. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
@@ -70,6 +70,13 @@ Defaults chosen while planning (the founder can change them):
 - A series stops by itself after 3 events in a row that ended with no player approved besides the organizer, so that empty listings do not pile up.
 - The organizer is told whenever a series stops by itself, and why.
 - The phase report.
+
+Defaults chosen while building M3 (the founder can change them):
+- "The previous event" is the latest earlier event of the series that was not canceled. Its approved players are told, except accounts that are not active and anyone in a block with the organizer.
+- After "like this one", the series continues in the period after the last opened event: the week after, or two weeks after for a fortnightly series. A week already opened is never doubled.
+- Canceled events do not count towards the 3 empty events. The number is `series.empty_events_to_stop`.
+- The organizer's notice of a stop is in the app only (no push), and goes to an active account only (not to a suspended one). Tapping it opens the management of the series' latest event, where the reason is written.
+- **Database:** `20261130100000_event_series_regulars`. Notification types `SERIES_EVENT_OPENED` and `SERIES_STOPPED`; push kind `SERIES_EVENT_OPENED`; stop reason `NO_PLAYERS`; RPC `apply_event_to_series(event)`.
 
 ## Risks
 

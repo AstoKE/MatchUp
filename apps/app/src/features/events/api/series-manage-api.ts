@@ -33,6 +33,13 @@ export async function createEventSeries(eventId: string, intervalWeeks: 1 | 2): 
   return z.uuid().parse(data);
 }
 
+/** Phase 11 / M3: the next events of the series take this event's details and time. Returns the next start. */
+export async function applyEventToSeries(eventId: string): Promise<string> {
+  const { data, error } = await supabase.rpc('apply_event_to_series', { p_event_id: eventId });
+  if (error) throw mapRpcError(error);
+  return z.string().parse(data);
+}
+
 export async function stopEventSeries(seriesId: string): Promise<void> {
   const { error } = await supabase.rpc('stop_event_series', { p_series_id: seriesId });
   if (error) throw mapRpcError(error);

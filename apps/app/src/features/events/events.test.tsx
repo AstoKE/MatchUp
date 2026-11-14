@@ -76,6 +76,7 @@ const mockSeries = {
   fetchSeriesUpcoming: jest.fn(),
   createEventSeries: jest.fn(),
   stopEventSeries: jest.fn(),
+  applyEventToSeries: jest.fn(),
 };
 jest.mock('./api/series-api', () => ({
   fetchEventSeries: (...a: unknown[]) => mockSeries.fetchEventSeries(...a),
@@ -84,6 +85,7 @@ jest.mock('./api/series-manage-api', () => ({
   fetchSeriesUpcoming: (...a: unknown[]) => mockSeries.fetchSeriesUpcoming(...a),
   createEventSeries: (...a: unknown[]) => mockSeries.createEventSeries(...a),
   stopEventSeries: (...a: unknown[]) => mockSeries.stopEventSeries(...a),
+  applyEventToSeries: (...a: unknown[]) => mockSeries.applyEventToSeries(...a),
 }));
 // The organization control is tested with the organizations; here it stays out of the way.
 jest.mock('@/features/organizations', () => ({ EventOrganizationControl: () => null }));
@@ -819,7 +821,7 @@ describe('recurring events (Phase 11 / M2)', () => {
 
     await press('Seriyi durdur');
     expect(mockSeries.stopEventSeries).not.toHaveBeenCalled();
-    expect(screen.getByText(/Açılmış etkinlikler olduğu gibi kalır/)).toBeTruthy();
+    expect(screen.getByText(/Seri durunca yeni etkinlik açılmaz/)).toBeTruthy();
     mockSeries.fetchEventSeries.mockResolvedValue({
       ...active,
       status: 'STOPPED',
@@ -846,6 +848,55 @@ describe('recurring events (Phase 11 / M2)', () => {
     await renderApp(<EventManageScreen />, { session: signedIn });
     expect(await screen.findByRole('heading', { name: 'Seri durdu' })).toBeTruthy();
     expect(screen.getByText(/Kayıtlı bilgilerden biri artık geçerli olmadığı için/)).toBeTruthy();
+  });
+
+  const stopped = { ...active, status: 'STOPPED', nextAt: null, slot: null };
+
+  it('says when a series stopped because nobody came', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event());
+    mockSeries.fetchEventSeries.mockResolvedValue({ ...stopped, stoppedReason: 'NO_PLAYERS' });
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    expect(
+      await screen.findByText(
+        'Üst üste 3 etkinliğe senden başka katılan olmadığı için seri durdu.',
+      ),
+    ).toBeTruthy();
+  });
+
+  it('stays quiet on a stop reason it does not know (a newer server)', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event());
+    mockSeries.fetchEventSeries.mockResolvedValue({ ...stopped, stoppedReason: null });
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    expect(await screen.findByRole('heading', { name: 'Seri durdu' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Yeniden tekrarla' })).toBeTruthy();
+  });
+
+  it('makes the next events like an upcoming event of the series (Phase 11 / M3)', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event());
+    mockSeries.fetchEventSeries.mockResolvedValue(active);
+    mockSeries.applyEventToSeries.mockResolvedValue(active.nextAt);
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    expect(await screen.findByText(/henüz açılmamış etkinliklere uygulanır/)).toBeTruthy();
+    await press('Sonraki etkinlikler bunun gibi olsun');
+    await waitFor(() => expect(mockSeries.applyEventToSeries).toHaveBeenCalledWith(EVENT));
+    expect(await screen.findByText('Sonraki etkinlikler bu etkinliğe göre açılacak')).toBeTruthy();
+  });
+
+  it('does not offer an event that has started as the model', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(
+      event({ startsAt: new Date(Date.now() - 3_600_000).toISOString() }),
+    );
+    mockSeries.fetchEventSeries.mockResolvedValue(active);
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    expect(await screen.findByText('Her hafta salı 20:00')).toBeTruthy();
+    expect(
+      screen.queryByRole('button', { name: 'Sonraki etkinlikler bunun gibi olsun' }),
+    ).toBeNull();
+    expect(screen.getByRole('button', { name: 'Seriyi durdur' })).toBeTruthy();
   });
 
   it('a draft only says that it can repeat once published', async () => {

@@ -553,6 +553,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.notify_series_regulars(p_event uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.open_series(p_id uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -858,6 +866,14 @@
     },
     {
       "fn": "private.send_attendance_reminders(p_at timestamp with time zone)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.series_has_no_players(p_id uuid)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
@@ -1239,6 +1255,14 @@
       "anon": false,
       "authenticated": true,
       "guard": "private.assert_admin_aal2"
+    },
+    {
+      "fn": "public.apply_event_to_series(p_event_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
     },
     {
       "fn": "public.approve_participation(p_participation_id uuid)",

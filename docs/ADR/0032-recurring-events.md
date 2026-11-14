@@ -19,6 +19,11 @@ Most pickup games repeat on a fixed weekday and time. Organizers re-create the s
 5. **The series acts as its organizer, and only while they may organize.** Each run checks the organizer as `assert_onboarded_user` would: active, onboarded, current consent, and a verified phone when required. The same limits apply as for hand-made events (5 upcoming published events). If the organizer may no longer organize, or the saved details no longer validate, the series is stopped with a reason; a full limit only skips that week.
 6. **Writes through RPCs only** (`create_event_series`, `stop_event_series`), with RLS on and no API grants. `SECURITY DEFINER`, `search_path = ''`, revoked from `anon`. Reads go through `get_event_series` and `list_my_event_series`.
 7. **Weekday and time in Europe/Istanbul.** Starts are computed in local time, so the time of day stays the same.
+8. **The regulars, changes and automatic stops (M3, 2026-11-14).**
+   - When an event opens, the players approved for the previous event that was not canceled are told: an in-app `SERIES_EVENT_OPENED` notification, and a push behind the "my events" switch. Not told: the organizer, accounts that are not active, and anyone in a block with the organizer. They still join themselves.
+   - `apply_event_to_series` copies an opened, upcoming event's details, weekday, time and registration close into the series. The series continues in the period after the last opened event; opened events stay as they are.
+   - A series stops by itself (`NO_PLAYERS`) when its last 3 events that took place had no approved player besides the organizer (`series.empty_events_to_stop`). Canceled events do not count.
+   - When a series stops by itself, its organizer gets an in-app `SERIES_STOPPED` notification while the account is active. Payloads carry ids and the reason key only.
 
 ## Alternatives rejected
 
@@ -35,4 +40,5 @@ Most pickup games repeat on a fixed weekday and time. Organizers re-create the s
 **Negative**
 - An hourly job is one more moving part to watch (OPERATIONS).
 - Details copied at creation can go stale. The job stops the series rather than opening a broken event.
-- The organizer has to edit future weeks one by one until M3 adds "apply to the next events".
+- Opened weeks are still edited one by one; "apply to the next events" (M3) changes only the weeks not opened yet.
+- A new stop reason (`NO_PLAYERS`) reaches apps built before M3. From M3 on, the app reads the reason as text and shows none for a reason it does not know. Only internal builds had the M2 app.

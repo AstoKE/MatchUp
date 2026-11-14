@@ -32,14 +32,16 @@
     "ORGANIZATION_MEMBER_APPROVED": "You became a member of an organization.",
     "BUSINESS_APPROVED": "Your business request was approved.",
     "BUSINESS_REJECTED": "Your business request was not approved. You can see why in My businesses.",
-    "BUSINESS_STAFF_INVITED": "You were invited to work at a business."
+    "BUSINESS_STAFF_INVITED": "You were invited to work at a business.",
+    "SERIES_EVENT_OPENED": "The next game of {{event}}, which you played, is open. Send a request if you want to join.",
+    "SERIES_STOPPED": "Your repeating event {{event}} stopped. You can see why in event management."
   },
   "unknown": "You have a new notification.",
   "emptyAction": "Discover events",
   "push": {
     "promptTitle": "Notifications",
     "promptBody": "If you like, we can tell you about your own events, send new events that suit you and an occasional reminder. Choose what you want.",
-    "activity": "My events: join requests for your events and approval of your requests",
+    "activity": "My events: join requests for your events, approval of your requests and new weeks of repeating events you played",
     "recommendations": "Events for you: new games for your sports and province (at most 1 a day)",
     "reminders": "Reminders: events in your province when you have not been around for a while (at most 2 a week)",
     "changeLater": "You can change this any time in Settings › Notifications.",
