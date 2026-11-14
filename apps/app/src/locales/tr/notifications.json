@@ -32,14 +32,16 @@
     "ORGANIZATION_MEMBER_APPROVED": "Bir organizasyona üye oldun.",
     "BUSINESS_APPROVED": "İşletme isteğin onaylandı.",
     "BUSINESS_REJECTED": "İşletme isteğin onaylanmadı. Sebebini İşletmelerim'de görebilirsin.",
-    "BUSINESS_STAFF_INVITED": "Bir işletmeye çalışan olarak davet edildin."
+    "BUSINESS_STAFF_INVITED": "Bir işletmeye çalışan olarak davet edildin.",
+    "SERIES_EVENT_OPENED": "Oynadığın {{event}} etkinliğinin yeni haftası açıldı. Katılmak istersen isteğini gönder.",
+    "SERIES_STOPPED": "Tekrarlanan {{event}} etkinliğin durdu. Nedenini etkinlik yönetiminde görebilirsin."
   },
   "unknown": "Yeni bir bildirimin var.",
   "emptyAction": "Etkinlikleri keşfet",
   "push": {
     "promptTitle": "Bildirimler",
     "promptBody": "İstersen etkinliklerinle ilgili gelişmeleri, sana uygun yeni etkinlikleri ve zaman zaman bir hatırlatma gönderebiliriz. Açmak istediklerini seç.",
-    "activity": "Etkinliklerim: etkinliğine gelen katılım istekleri ve isteğinin onaylanması",
+    "activity": "Etkinliklerim: etkinliğine gelen katılım istekleri, isteğinin onaylanması ve oynadığın tekrarlanan etkinliklerin yeni haftaları",
     "recommendations": "Sana uygun etkinlikler: sporlarına ve şehrine göre yeni maçlar (günde en fazla 1)",
     "reminders": "Hatırlatmalar: bir süre girmediğinde şehrindeki etkinlikler (haftada en fazla 2)",
     "changeLater": "Bunu istediğin zaman Ayarlar › Bildirimler'den değiştirebilirsin.",

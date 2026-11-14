@@ -12,8 +12,9 @@ import {
 } from './support/stack';
 
 /**
- * Phase 11 / M2 (ADR-0032): an organizer turns an event into a weekly series through the screens, finds the next week
- * already open and marked in My events, and stops the series; the opened week stays. The rules are in pgTAP
+ * Phase 11 / M2–M3 (ADR-0032): an organizer turns an event into a weekly series through the screens, makes it the model
+ * for the next events, finds the next week already open and marked in My events, and stops the series; the opened week
+ * stays. The rules are in pgTAP
  * 44_event_series and the hourly job's races in the integration tests.
  */
 const stack: LocalStack | null = getLocalStack();
@@ -66,6 +67,10 @@ test('an event becomes a weekly series, opens the next week and is stopped', asy
   const opened = main.getByRole('link', { name: /etkinliğini aç$/ });
   await expect(opened).toHaveCount(1);
   await expectNoBlocking(page);
+  // Phase 11 / M3: this event becomes the model for the events not opened yet.
+  await main.getByRole('button', { name: 'Sonraki etkinlikler bunun gibi olsun' }).click();
+  await expect(page.getByText('Sonraki etkinlikler bu etkinliğe göre açılacak')).toBeVisible();
+  await expect(opened).toHaveCount(1);
 
   // 2. The next week is an ordinary published event that says it repeats.
   await opened.click();
@@ -86,7 +91,7 @@ test('an event becomes a weekly series, opens the next week and is stopped', asy
   // 4. Stop it, after a confirmation; the opened week stays, no longer repeating.
   await page.goto(`/e/${eventId}/manage`);
   await main.getByRole('button', { name: 'Seriyi durdur' }).click();
-  await expect(main.getByText(/Açılmış etkinlikler olduğu gibi kalır/)).toBeVisible();
+  await expect(main.getByText(/Seri durunca yeni etkinlik açılmaz/)).toBeVisible();
   await main.getByRole('button', { name: 'Durdur', exact: true }).click();
   await expect(main.getByText('Bu seriyi durdurdun; yeni etkinlik açılmıyor.')).toBeVisible();
   await expect(main.getByRole('button', { name: 'Yeniden tekrarla' })).toBeVisible();

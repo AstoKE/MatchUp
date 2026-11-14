@@ -120,6 +120,25 @@ describe('NotificationsScreen', () => {
     expect(mockRouter.push).toHaveBeenCalledWith({ pathname: '/e/[id]', params: { id: EVENT } });
   });
 
+  it('tells a regular about the next week and an organizer why a series stopped (Phase 11)', async () => {
+    mockApi.fetchNotifications.mockResolvedValue([
+      note({ id: 'a', type: 'SERIES_EVENT_OPENED', read: true }),
+      note({ id: 'b', type: 'SERIES_STOPPED' }),
+    ]);
+    await renderApp(<NotificationsScreen />, { session: signedIn });
+    expect(
+      await screen.findByText(
+        'Oynadığın Perşembe maçı etkinliğinin yeni haftası açıldı. Katılmak istersen isteğini gönder.',
+      ),
+    ).toBeTruthy();
+    await fireEvent.press(screen.getByText(/Tekrarlanan Perşembe maçı etkinliğin durdu/));
+    // The reason is on the management page of the series' latest event.
+    expect(mockRouter.push).toHaveBeenCalledWith({
+      pathname: '/e/[id]/manage',
+      params: { id: EVENT },
+    });
+  });
+
   it('does not mark an already read item again', async () => {
     mockApi.fetchNotifications.mockResolvedValue([note({ read: true })]);
     await renderApp(<NotificationsScreen />, { session: signedIn });

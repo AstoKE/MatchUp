@@ -143,4 +143,68 @@ describe('event series', () => {
     );
     expect(rows[0]).toEqual({ n: '2', starts: '2' });
   });
+
+  // Phase 11 / M3.
+  it('takes an opened event as the model for the next ones, for its organizer only', async () => {
+    const organizer = await onboardedUser(c, 'Seri Model');
+    const other = await onboardedUser(c, 'Seri Başkası');
+    const event = await published(organizer.token, 2);
+    const made = await rpc(
+      'create_event_series',
+      { p_event_id: event, p_interval_weeks: 1 },
+      organizer.token,
+    );
+    expect(made.status).toBe(200);
+
+    const foreign = await rpc('apply_event_to_series', { p_event_id: event }, other.token);
+    expect(foreign.status).toBe(400);
+    expect(codeOf(foreign.body)).toBe('NOT_FOUND');
+    const guest = await rpc('apply_event_to_series', { p_event_id: event });
+    expect([401, 403]).toContain(guest.status);
+
+    const applied = await rpc('apply_event_to_series', { p_event_id: event }, organizer.token);
+    expect(applied.status).toBe(200);
+    // The next week is already open, so the series goes on the week after it.
+    const next = Date.parse(applied.body as string);
+    expect(next - Date.parse(days(2))).toBeGreaterThan(13 * 86_400_000);
+  });
+
+  it('does not deadlock when a change meets the hourly job, and goes on after the last opened week', async () => {
+    const organizer = await onboardedUser(c, 'Seri Kilit');
+    const event = await published(organizer.token, 2);
+    const made = await rpc(
+      'create_event_series',
+      { p_event_id: event, p_interval_weeks: 1 },
+      organizer.token,
+    );
+    expect(made.status).toBe(200);
+    // A free start the job sees as due.
+    await db().query(
+      `update public.event_series set next_at = now() + interval '5 days' where id = $1`,
+      [made.body],
+    );
+
+    const results = await runConcurrently(2, async ({ client, barrier, index }) => {
+      if (index === 0) await actAs(client, organizer.user.id);
+      await barrier();
+      await client.query(
+        index === 0
+          ? 'select public.apply_event_to_series($1)'
+          : 'select private.open_series_events()',
+        index === 0 ? [event] : [],
+      );
+    });
+    expect(fulfilled(results)).toHaveLength(2);
+    // Whichever ran first, the series' next start falls in a week after every event it has opened.
+    const { rows } = await db().query<{ after: boolean; n: string; starts: string }>(
+      `select date_trunc('week', s.next_at at time zone 'Europe/Istanbul')
+                > max(date_trunc('week', e.starts_at at time zone 'Europe/Istanbul')) as after,
+              count(*) as n, count(distinct e.starts_at) as starts
+         from public.event_series s join public.events e on e.series_id = s.id
+        where s.id = $1 group by s.next_at`,
+      [made.body],
+    );
+    expect(rows[0]!.after).toBe(true);
+    expect(rows[0]!.starts).toBe(rows[0]!.n);
+  });
 });

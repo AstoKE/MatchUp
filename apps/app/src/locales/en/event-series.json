@@ -11,6 +11,9 @@
   "quota": "You can have at most 2 repeating events at a time. Stop one to start another.",
   "activeTitle": "Repeating event",
   "activeBody": "New events open by themselves two weeks ahead. Changing or canceling one event does not change the series.",
+  "apply": "Make the next events like this one",
+  "applyHint": "This event's details, day, time and registration close apply to the events not opened yet. Events already opened stay as they are.",
+  "appliedToast": "The next events will open like this one",
   "next": "Next: {{date}}. It opens two weeks before.",
   "opened": "Opened events",
   "openEvent": "Open the event on {{date}}",
@@ -23,6 +26,7 @@
   "stopped": {
     "BY_ORGANIZER": "You stopped this series; no new events open.",
     "ORGANIZER_UNAVAILABLE": "The series stopped because your account cannot organize events right now.",
-    "DETAILS_INVALID": "The series stopped because some of its saved details are no longer valid (for example, the format was retired or the district closed)."
+    "DETAILS_INVALID": "The series stopped because some of its saved details are no longer valid (for example, the format was retired or the district closed).",
+    "NO_PLAYERS": "The series stopped because nobody besides you joined 3 events in a row."
   }
 }

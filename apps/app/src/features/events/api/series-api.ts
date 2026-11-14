@@ -6,15 +6,20 @@ export const SERIES_STOP_REASONS = [
   'BY_ORGANIZER',
   'ORGANIZER_UNAVAILABLE',
   'DETAILS_INVALID',
+  'NO_PLAYERS',
 ] as const;
 export type SeriesStopReason = (typeof SERIES_STOP_REASONS)[number];
+
+const isStopReason = (value: string): value is SeriesStopReason =>
+  (SERIES_STOP_REASONS as readonly string[]).includes(value);
 
 const seriesRow = z.object({
   id: z.uuid(),
   interval_weeks: z.number(),
   status: z.enum(['ACTIVE', 'STOPPED']),
   is_mine: z.boolean(),
-  stopped_reason: z.nullable(z.enum(SERIES_STOP_REASONS)),
+  // A string, not an enum: a reason added later must not break this app version (it shows no reason instead).
+  stopped_reason: z.nullable(z.string()),
   next_at: z.nullable(z.string()),
   // Phase 11 / M2, optional for a hosted database without that migration.
   weekday: z.optional(z.nullable(z.number())),
@@ -44,7 +49,8 @@ export async function fetchEventSeries(eventId: string): Promise<EventSeries | n
     intervalWeeks: row.interval_weeks === 2 ? 2 : 1,
     status: row.status,
     isMine: row.is_mine,
-    stoppedReason: row.stopped_reason,
+    stoppedReason:
+      row.stopped_reason !== null && isStopReason(row.stopped_reason) ? row.stopped_reason : null,
     nextAt: row.next_at,
     slot:
       typeof row.weekday === 'number' &&

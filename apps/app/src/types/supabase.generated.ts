@@ -2073,6 +2073,7 @@ export type Database = {
         Returns: boolean;
       };
       admin_suspend_user: { Args: { p_note: string; p_user_id: string }; Returns: undefined };
+      apply_event_to_series: { Args: { p_event_id: string }; Returns: string };
       approve_participation: { Args: { p_participation_id: string }; Returns: undefined };
       block_user: { Args: { p_user_id: string }; Returns: undefined };
       cancel_account_deletion: { Args: Record<PropertyKey, never>; Returns: undefined };

@@ -11,7 +11,12 @@ import trSeries from '@/locales/tr/event-series.json';
 import { Banner, Button, SegmentedChoice, Text, TOUCH_TARGET, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
 import type { EventSeries } from '../api/series-api';
-import { createEventSeries, fetchSeriesUpcoming, stopEventSeries } from '../api/series-manage-api';
+import {
+  applyEventToSeries,
+  createEventSeries,
+  fetchSeriesUpcoming,
+  stopEventSeries,
+} from '../api/series-manage-api';
 import { formatEventStart } from '../format';
 import { eventQueryKey, useEventSeries } from '../hooks';
 import { useSeriesLine } from '../series-line';
@@ -75,7 +80,7 @@ export function SeriesPanel({ event, started }: { event: EventDetails; started: 
       }}
     >
       {current?.status === 'ACTIVE' ? (
-        <ActiveSeries eventId={event.id} series={current} />
+        <ActiveSeries eventId={event.id} series={current} canApply={canStart} />
       ) : (
         <>
           <Text variant="title" heading={2}>
@@ -135,7 +140,16 @@ function StartSeries({ eventId, again }: { eventId: string; again: boolean }) {
   );
 }
 
-function ActiveSeries({ eventId, series }: { eventId: string; series: EventSeries }) {
+function ActiveSeries({
+  eventId,
+  series,
+  canApply,
+}: {
+  eventId: string;
+  series: EventSeries;
+  /** An opened event that has not started can be the model for the next ones (Phase 11 / M3). */
+  canApply: boolean;
+}) {
   const { t } = useTranslation(['eventSeries', 'common']);
   const { spacing } = useTheme();
   const toast = useToast();
@@ -143,6 +157,7 @@ function ActiveSeries({ eventId, series }: { eventId: string; series: EventSerie
   const line = useSeriesLine(series);
   const upcoming = useSeriesUpcoming(series.id);
   const stop = useSeriesMutation(eventId, (id: string) => stopEventSeries(id));
+  const apply = useSeriesMutation<void>(eventId, () => applyEventToSeries(eventId));
   const [confirming, setConfirming] = useState(false);
   const others = (upcoming.data ?? []).filter((e) => e.id !== eventId);
   // Series times are Turkey's local time (ADR-0032), whatever the city.
@@ -180,6 +195,26 @@ function ActiveSeries({ eventId, series }: { eventId: string; series: EventSerie
               </View>
             ))}
           </View>
+        </View>
+      ) : null}
+      {canApply ? (
+        <View style={{ gap: spacing[2] }}>
+          <Text variant="bodySm" tone="secondary">
+            {t('applyHint')}
+          </Text>
+          {apply.isError ? <Banner kind="danger" message={errorText(apply.error)} /> : null}
+          <Button
+            variant="secondary"
+            label={t('apply')}
+            loading={apply.isPending}
+            loadingLabel={t('common:loading')}
+            onPress={() =>
+              apply.mutate(undefined, {
+                onSuccess: () => toast.show(t('appliedToast'), 'success'),
+              })
+            }
+            fullWidth
+          />
         </View>
       ) : null}
       {stop.isError ? <Banner kind="danger" message={errorText(stop.error)} /> : null}

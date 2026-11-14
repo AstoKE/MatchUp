@@ -11,6 +11,9 @@
   "quota": "Aynı anda en fazla 2 tekrarlanan etkinliğin olabilir. Yenisini başlatmak için birini durdur.",
   "activeTitle": "Tekrarlanan etkinlik",
   "activeBody": "Yeni etkinlikler iki hafta önceden kendiliğinden açılır. Bir etkinliği değiştirmek ya da iptal etmek seriyi değiştirmez.",
+  "apply": "Sonraki etkinlikler bunun gibi olsun",
+  "applyHint": "Bu etkinliğin bilgileri, günü, saati ve kayıt kapanışı henüz açılmamış etkinliklere uygulanır. Açılmış etkinlikler olduğu gibi kalır.",
+  "appliedToast": "Sonraki etkinlikler bu etkinliğe göre açılacak",
   "next": "Sıradaki: {{date}}. İki hafta önceden açılır.",
   "opened": "Açılan etkinlikler",
   "openEvent": "{{date}} etkinliğini aç",
@@ -23,6 +26,7 @@
   "stopped": {
     "BY_ORGANIZER": "Bu seriyi durdurdun; yeni etkinlik açılmıyor.",
     "ORGANIZER_UNAVAILABLE": "Hesabın şu an etkinlik düzenleyemediği için seri durdu.",
-    "DETAILS_INVALID": "Kayıtlı bilgilerden biri artık geçerli olmadığı için seri durdu (örneğin format kaldırıldı ya da ilçe kapandı)."
+    "DETAILS_INVALID": "Kayıtlı bilgilerden biri artık geçerli olmadığı için seri durdu (örneğin format kaldırıldı ya da ilçe kapandı).",
+    "NO_PLAYERS": "Üst üste 3 etkinliğe senden başka katılan olmadığı için seri durdu."
   }
 }

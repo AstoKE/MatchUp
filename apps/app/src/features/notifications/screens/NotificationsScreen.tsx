@@ -148,7 +148,10 @@ function Row({ notification, onOpen }: { notification: AppNotification; onOpen: 
       disabled={!eventId && !organization && !business}
       onPress={() => {
         if (!notification.read) onOpen();
-        if (eventId) router.push({ pathname: '/e/[id]', params: { id: eventId } });
+        // A stopped series says why in the management of its latest event (Phase 11).
+        if (eventId && notification.type === 'SERIES_STOPPED')
+          router.push({ pathname: '/e/[id]/manage', params: { id: eventId } });
+        else if (eventId) router.push({ pathname: '/e/[id]', params: { id: eventId } });
         else if (organizationPage)
           router.push({ pathname: '/o/[id]', params: { id: organizationPage } } as Href);
         else if (organization) router.push('/organizations' as Href);
