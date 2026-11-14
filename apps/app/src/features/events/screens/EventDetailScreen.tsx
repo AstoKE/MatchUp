@@ -26,7 +26,8 @@ import { JoinPanel } from '../components/JoinPanel';
 import { Pill, SlotMeter } from '../components/SlotMeter';
 import { LazyAttendancePanel, LazyReviewPanel } from '../components/LazyPanels';
 import { formatCost, formatEventStart } from '../format';
-import { useEvent, useEventOrganization, useVenueBusiness } from '../hooks';
+import { useEvent, useEventOrganization, useEventSeries, useVenueBusiness } from '../hooks';
+import { useSeriesLine } from '../series-line';
 
 /**
  * Event detail at /e/<id>, open to guests (D-09): RLS decides what they see. The organizer's tools are one tap away,
@@ -261,6 +262,8 @@ function Detail({
           label={t('events:detail.when')}
           value={`${formatEventStart(event.startsAt, timeZone, locale)} · ${t('events:detail.durationValue', { count: event.durationMinutes })}`}
         />
+        {/* get_event_series is for signed-in people only (ADR-0032). */}
+        {session.status === 'authenticated' ? <SeriesFact eventId={event.id} /> : null}
         <Fact
           label={t('events:detail.where')}
           value={
@@ -479,6 +482,15 @@ function EventOrganization({ eventId }: { eventId: string }) {
       </Pressable>
     </Link>
   );
+}
+
+/** Phase 11 / M2: "Her hafta salı 20:00" when the event belongs to an active series. */
+function SeriesFact({ eventId }: { eventId: string }) {
+  const { t } = useTranslation('events');
+  const series = useEventSeries(eventId);
+  const line = useSeriesLine(series.data);
+  if (!line) return null;
+  return <Fact label={t('series.fact')} value={line} />;
 }
 
 /** Phase 10 / M2: the business that runs the venue, when it has one. */

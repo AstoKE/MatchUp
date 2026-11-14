@@ -1,0 +1,28 @@
+{
+  "title": "Tekrarla",
+  "draftHint": "Etkinliği yayınladıktan sonra her hafta ya da 2 haftada bir kendiliğinden açılmasını sağlayabilirsin.",
+  "body": "Bu etkinlik her hafta ya da 2 haftada bir aynı gün ve saatte, aynı bilgilerle kendiliğinden açılır. Yeni etkinlikler iki hafta önceden açılır; oyuncular her birine ayrı ayrı katılır.",
+  "interval": "Ne sıklıkla",
+  "weekly": "Her hafta",
+  "fortnightly": "2 haftada bir",
+  "start": "Tekrarlamayı başlat",
+  "restart": "Yeniden tekrarla",
+  "startedToast": "Etkinlik artık tekrarlanıyor",
+  "quota": "Aynı anda en fazla 2 tekrarlanan etkinliğin olabilir. Yenisini başlatmak için birini durdur.",
+  "activeTitle": "Tekrarlanan etkinlik",
+  "activeBody": "Yeni etkinlikler iki hafta önceden kendiliğinden açılır. Bir etkinliği değiştirmek ya da iptal etmek seriyi değiştirmez.",
+  "next": "Sıradaki: {{date}}. İki hafta önceden açılır.",
+  "opened": "Açılan etkinlikler",
+  "openEvent": "{{date}} etkinliğini aç",
+  "stop": "Seriyi durdur",
+  "confirmStop": "Seri durunca yeni etkinlik açılmaz. Açılmış etkinlikler olduğu gibi kalır; istersen onları tek tek iptal edebilirsin.",
+  "confirmStopYes": "Durdur",
+  "keep": "Vazgeç",
+  "stoppedToast": "Seri durduruldu",
+  "stoppedTitle": "Seri durdu",
+  "stopped": {
+    "BY_ORGANIZER": "Bu seriyi durdurdun; yeni etkinlik açılmıyor.",
+    "ORGANIZER_UNAVAILABLE": "Hesabın şu an etkinlik düzenleyemediği için seri durdu.",
+    "DETAILS_INVALID": "Kayıtlı bilgilerden biri artık geçerli olmadığı için seri durdu (örneğin format kaldırıldı ya da ilçe kapandı)."
+  }
+}

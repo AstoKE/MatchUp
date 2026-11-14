@@ -1,0 +1,28 @@
+{
+  "title": "Repeat",
+  "draftHint": "Once the event is published, you can have it open again by itself every week or every two weeks.",
+  "body": "This event opens again by itself on the same day and time, with the same details, every week or every two weeks. New events open two weeks ahead, and players join each one separately.",
+  "interval": "How often",
+  "weekly": "Every week",
+  "fortnightly": "Every two weeks",
+  "start": "Start repeating",
+  "restart": "Repeat again",
+  "startedToast": "The event now repeats",
+  "quota": "You can have at most 2 repeating events at a time. Stop one to start another.",
+  "activeTitle": "Repeating event",
+  "activeBody": "New events open by themselves two weeks ahead. Changing or canceling one event does not change the series.",
+  "next": "Next: {{date}}. It opens two weeks before.",
+  "opened": "Opened events",
+  "openEvent": "Open the event on {{date}}",
+  "stop": "Stop the series",
+  "confirmStop": "Once the series stops, no new events open. Events already opened stay as they are; you can cancel them one by one.",
+  "confirmStopYes": "Stop",
+  "keep": "Keep it",
+  "stoppedToast": "Series stopped",
+  "stoppedTitle": "Series stopped",
+  "stopped": {
+    "BY_ORGANIZER": "You stopped this series; no new events open.",
+    "ORGANIZER_UNAVAILABLE": "The series stopped because your account cannot organize events right now.",
+    "DETAILS_INVALID": "The series stopped because some of its saved details are no longer valid (for example, the format was retired or the district closed)."
+  }
+}

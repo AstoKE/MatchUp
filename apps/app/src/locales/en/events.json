@@ -489,5 +489,20 @@
     "label": "On behalf of",
     "none": "Myself",
     "hint": "The event also shows on the chosen organization's page. Only organizations you own or administer are listed."
+  },
+  "series": {
+    "fact": "Repeats",
+    "badge": "Repeats",
+    "everyWeek": "Every {{day}} at {{time}}",
+    "everyTwoWeeks": "Every other {{day}} at {{time}}",
+    "weekday": {
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday",
+      "7": "Sunday"
+    }
   }
 }

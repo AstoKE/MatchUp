@@ -7,7 +7,7 @@ import { errorText } from '@/lib/error-text';
 import { Banner, Button, EmptyState, Screen, ScreenHeader, Text, useTheme, useToast } from '@/ui';
 import type { EventDetails } from '../api/events-api';
 import { InvitePanel } from '../components/InvitePanel';
-import { LazyAttendancePanel, LazyRequestsPanel } from '../components/LazyPanels';
+import { LazyAttendancePanel, LazyRequestsPanel, LazySeriesPanel } from '../components/LazyPanels';
 import {
   useCompleteEvent,
   useDeleteDraft,
@@ -113,6 +113,7 @@ function Manage({ event }: { event: EventDetails }) {
       {event.status === 'DRAFT' || event.status === 'PUBLISHED' ? (
         <ManagedOrganization eventId={event.id} />
       ) : null}
+      <LazySeriesPanel event={event} started={started} />
       {event.status === 'PUBLISHED' ? <LazyRequestsPanel event={event} /> : null}
       {started && (event.status === 'PUBLISHED' || event.status === 'COMPLETED') ? (
         <LazyAttendancePanel eventId={event.id} isOrganizer />

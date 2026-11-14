@@ -489,5 +489,20 @@
     "label": "Organizasyon adına",
     "none": "Kendi adıma",
     "hint": "Etkinlik seçtiğin organizasyonun sayfasında da görünür. Yalnızca sahibi ya da yöneticisi olduğun organizasyonlar listelenir."
+  },
+  "series": {
+    "fact": "Tekrar",
+    "badge": "Tekrarlanan",
+    "everyWeek": "Her hafta {{day}} {{time}}",
+    "everyTwoWeeks": "2 haftada bir {{day}} {{time}}",
+    "weekday": {
+      "1": "pazartesi",
+      "2": "salı",
+      "3": "çarşamba",
+      "4": "perşembe",
+      "5": "cuma",
+      "6": "cumartesi",
+      "7": "pazar"
+    }
   }
 }

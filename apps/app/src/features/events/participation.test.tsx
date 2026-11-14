@@ -77,6 +77,8 @@ jest.mock('./api/events-api', () => ({
   completeEvent: jest.fn(),
   deleteDraft: jest.fn(),
 }));
+// Series are tested in events.test.tsx; here no event belongs to one.
+jest.mock('./api/series-api', () => ({ fetchEventSeries: () => Promise.resolve(null) }));
 jest.mock('./api/participation-api', () => ({
   fetchMyParticipation: (...a: unknown[]) => mockApi.fetchMyParticipation(...a),
   requestJoin: (...a: unknown[]) => mockApi.requestJoin(...a),

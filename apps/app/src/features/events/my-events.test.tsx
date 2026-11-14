@@ -103,6 +103,7 @@ function item(over: Partial<MyEventItem> = {}): MyEventItem {
     status: 'PUBLISHED',
     myStatus: 'ORGANIZER',
     pendingCount: 0,
+    inSeries: false,
     ...over,
   };
 }
@@ -154,6 +155,18 @@ describe('MyEventsScreen', () => {
     expect(screen.getByText('Taslak')).toBeTruthy();
     expect(screen.getByText('3 bekleyen istek')).toBeTruthy();
     expect(screen.getByText('2 etkinlik')).toBeTruthy();
+  });
+
+  it('marks the events that belong to a series (Phase 11)', async () => {
+    mockApi.fetchMyEvents.mockResolvedValue(
+      page([
+        item({ id: 'a', title: 'Salı maçı', myStatus: 'APPROVED', inSeries: true }),
+        item({ id: 'b', title: 'Tek seferlik maç', myStatus: 'APPROVED' }),
+      ]),
+    );
+    await renderApp(<MyEventsScreen />, { session: signedIn });
+    expect(await screen.findByText('Salı maçı')).toBeTruthy();
+    expect(screen.getAllByText('Tekrarlanan')).toHaveLength(1);
   });
 
   it('my requests shows pending and waitlist as two sections, in words', async () => {

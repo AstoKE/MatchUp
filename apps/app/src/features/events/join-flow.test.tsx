@@ -64,6 +64,7 @@ jest.mock('./api/attendance-api', () => ({}));
 jest.mock('./api/reviews-api', () => ({}));
 jest.mock('./api/my-events-api', () => ({}));
 jest.mock('./api/search-api', () => ({}));
+jest.mock('./api/series-api', () => ({}));
 jest.mock('@/features/catalog/api/catalog-api', () => ({
   fetchCatalog: (...a: unknown[]) => mockApi.fetchCatalog(...a),
 }));

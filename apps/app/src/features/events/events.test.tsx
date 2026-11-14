@@ -71,6 +71,20 @@ const mockApi = {
   fetchMyProfile: jest.fn(),
 };
 const mockVenues = { search: jest.fn() };
+const mockSeries = {
+  fetchEventSeries: jest.fn(),
+  fetchSeriesUpcoming: jest.fn(),
+  createEventSeries: jest.fn(),
+  stopEventSeries: jest.fn(),
+};
+jest.mock('./api/series-api', () => ({
+  fetchEventSeries: (...a: unknown[]) => mockSeries.fetchEventSeries(...a),
+}));
+jest.mock('./api/series-manage-api', () => ({
+  fetchSeriesUpcoming: (...a: unknown[]) => mockSeries.fetchSeriesUpcoming(...a),
+  createEventSeries: (...a: unknown[]) => mockSeries.createEventSeries(...a),
+  stopEventSeries: (...a: unknown[]) => mockSeries.stopEventSeries(...a),
+}));
 // The organization control is tested with the organizations; here it stays out of the way.
 jest.mock('@/features/organizations', () => ({ EventOrganizationControl: () => null }));
 jest.mock('./api/venues-api', () => ({
@@ -183,6 +197,8 @@ beforeEach(() => {
   mockRouter.canGoBack.mockReturnValue(false);
   mockApi.fetchCatalog.mockResolvedValue(catalog);
   mockVenues.search.mockResolvedValue([]);
+  mockSeries.fetchEventSeries.mockResolvedValue(null);
+  mockSeries.fetchSeriesUpcoming.mockResolvedValue([]);
   mockApi.fetchMyProfile.mockResolvedValue({
     userId: ME,
     displayName: 'Ayşe A',
@@ -742,5 +758,118 @@ describe('EditEventScreen', () => {
       cost_amount_minor: 15000,
       address_text: 'Üniversiteler Mh.',
     });
+  });
+});
+
+describe('recurring events (Phase 11 / M2)', () => {
+  const SERIES = '00000000-0000-4000-8000-0000000000b1';
+  const NEXT = '00000000-0000-4000-8000-0000000000e2';
+  const active = {
+    id: SERIES,
+    intervalWeeks: 1,
+    status: 'ACTIVE',
+    isMine: true,
+    stoppedReason: null,
+    nextAt: new Date(Date.now() + 17 * 86_400_000).toISOString(),
+    slot: { weekday: 2, time: '20:00' },
+  };
+
+  it('turns a published, upcoming event into a fortnightly series', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event());
+    mockSeries.createEventSeries.mockResolvedValue(SERIES);
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    expect(await screen.findByRole('heading', { name: 'Tekrarla' })).toBeTruthy();
+    await fireEvent.press(screen.getByRole('radio', { name: '2 haftada bir' }));
+    mockSeries.fetchEventSeries.mockResolvedValue({ ...active, intervalWeeks: 2 });
+    await press('Tekrarlamayı başlat');
+    await waitFor(() => expect(mockSeries.createEventSeries).toHaveBeenCalledWith(EVENT, 2));
+    expect(await screen.findByText('2 haftada bir salı 20:00')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Tekrarlanan etkinlik' })).toBeTruthy();
+  });
+
+  it('says why a new series cannot start when two already repeat', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event());
+    mockSeries.createEventSeries.mockRejectedValue(new AppError('QUOTA_EXCEEDED'));
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    await screen.findByRole('button', { name: 'Tekrarlamayı başlat' });
+    await press('Tekrarlamayı başlat');
+    expect(
+      await screen.findByText(
+        'Aynı anda en fazla 2 tekrarlanan etkinliğin olabilir. Yenisini başlatmak için birini durdur.',
+      ),
+    ).toBeTruthy();
+  });
+
+  it('shows the series, links the opened events and stops it after a confirmation', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event());
+    mockSeries.fetchEventSeries.mockResolvedValue(active);
+    mockSeries.fetchSeriesUpcoming.mockResolvedValue([
+      { id: EVENT, startsAt: event().startsAt },
+      { id: NEXT, startsAt: new Date(Date.now() + 10 * 86_400_000).toISOString() },
+    ]);
+    mockSeries.stopEventSeries.mockResolvedValue(undefined);
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    expect(await screen.findByText('Her hafta salı 20:00')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Tekrarlamayı başlat' })).toBeNull();
+    // Only the other opened events, each a link to its page.
+    expect(await screen.findAllByRole('link', { name: /etkinliğini aç$/ })).toHaveLength(1);
+
+    await press('Seriyi durdur');
+    expect(mockSeries.stopEventSeries).not.toHaveBeenCalled();
+    expect(screen.getByText(/Açılmış etkinlikler olduğu gibi kalır/)).toBeTruthy();
+    mockSeries.fetchEventSeries.mockResolvedValue({
+      ...active,
+      status: 'STOPPED',
+      stoppedReason: 'BY_ORGANIZER',
+      nextAt: null,
+      slot: null,
+    });
+    await press('Durdur');
+    await waitFor(() => expect(mockSeries.stopEventSeries).toHaveBeenCalledWith(SERIES));
+    expect(await screen.findByText('Bu seriyi durdurdun; yeni etkinlik açılmıyor.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Yeniden tekrarla' })).toBeTruthy();
+  });
+
+  it('tells the organizer why the service stopped a series', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event());
+    mockSeries.fetchEventSeries.mockResolvedValue({
+      ...active,
+      status: 'STOPPED',
+      stoppedReason: 'DETAILS_INVALID',
+      nextAt: null,
+      slot: null,
+    });
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    expect(await screen.findByRole('heading', { name: 'Seri durdu' })).toBeTruthy();
+    expect(screen.getByText(/Kayıtlı bilgilerden biri artık geçerli olmadığı için/)).toBeTruthy();
+  });
+
+  it('a draft only says that it can repeat once published', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event({ status: 'DRAFT' }));
+    await renderApp(<EventManageScreen />, { session: signedIn });
+    expect(await screen.findByText(/Etkinliği yayınladıktan sonra her hafta/)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Tekrarlamayı başlat' })).toBeNull();
+  });
+
+  it('a player sees on the event page when it repeats', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event({ isOrganizer: false }));
+    mockSeries.fetchEventSeries.mockResolvedValue({ ...active, isMine: false, nextAt: null });
+    await renderApp(<EventDetailScreen />, { session: signedIn });
+    expect(await screen.findByText('Her hafta salı 20:00')).toBeTruthy();
+    expect(screen.getByText('Tekrar')).toBeTruthy();
+  });
+
+  it('a guest is not asked about the series', async () => {
+    mockParams = { id: EVENT };
+    mockApi.fetchEvent.mockResolvedValue(event({ isOrganizer: false, private: null }));
+    await renderApp(<EventDetailScreen />, { session: { status: 'guest' } });
+    await screen.findByText('Perşembe maçı');
+    expect(mockSeries.fetchEventSeries).not.toHaveBeenCalled();
   });
 });

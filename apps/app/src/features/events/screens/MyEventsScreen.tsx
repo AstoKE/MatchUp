@@ -53,6 +53,7 @@ function badgesFor(event: MyEventItem): CardBadge[] {
       ...(chip ? { chip } : null),
     });
   }
+  if (event.inSeries) badges.push({ label: t('events:series.badge'), tone: 'neutral' });
   return badges;
 }
 

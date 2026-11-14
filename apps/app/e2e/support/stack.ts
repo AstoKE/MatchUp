@@ -218,7 +218,8 @@ export async function createPublishedEvent(
 
 /**
  * TEST-ONLY: deleting an Auth user leaves its events behind (no FK, ADR-0003), so Discover would keep
- * listing them for later runs. API roles cannot delete events, hence psql in the DB container.
+ * listing them for later runs. API roles cannot delete events, hence psql in the DB container. Their series go too
+ * (Phase 11), after the events that point at them.
  */
 export function deleteEventsOf(userId: string) {
   if (!/^[0-9a-f-]{36}$/.test(userId)) throw new Error('not a uuid');
@@ -231,7 +232,7 @@ export function deleteEventsOf(userId: string) {
     '-v',
     'ON_ERROR_STOP=1',
     '-c',
-    `delete from public.events where organizer_id = '${userId}'`,
+    `delete from public.events where organizer_id = '${userId}'; delete from public.event_series where organizer_id = '${userId}'`,
   ]);
 }
 
