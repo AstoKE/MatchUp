@@ -1,6 +1,6 @@
 # Phase 11 plan: recurring events
 
-Status 2026-11-14: planned; M1 in progress. ROADMAP P-05, started on the founder's instruction ("1i yap", 2026-11-14). ADR-0032.
+Status 2026-11-14: M1 (database, #118) and M2 (app) built; M3 next. ROADMAP P-05, started on the founder's instruction ("1i yap", 2026-11-14). ADR-0032.
 
 An organizer turns a published event into a series ("her salı 20:00 halı saha"). The service then opens the next events of the series by itself, a fixed time ahead, as ordinary events. Each milestone is one PR and leaves `pnpm check`, `db:test`, `test:integration` and web E2E green.
 
@@ -54,8 +54,12 @@ Defaults chosen while planning (the founder can change them):
 
 ### M2: the app
 - **Event management:** a "Tekrarla" card. It offers every week or every two weeks, explains when the next events open, and shows the series' state with "Seriyi durdur" once the event is in a series.
-- **Event page:** a line such as "Her hafta salı 20:00".
-- **My events:** a mark on events that belong to a series.
+  - Active series: the line, the next start, links to the other opened events, and a stop that asks for a confirmation.
+  - Stopped series: why it stopped, and "Yeniden tekrarla" while the event is still upcoming.
+  - Draft: a hint that it can repeat once published.
+- **Event page:** a line such as "Her hafta salı 20:00", for signed-in people (the RPC is not open to guests).
+- **My events:** a "Tekrarlanan" mark on events that belong to a series.
+- **Database (additive, `20261129100000_event_series_app`):** `in_series` on `list_my_events` rows; the weekday and local time on `get_event_series`, from the series' own schedule so that an event moved by hand does not change the line.
 - **Tests:**
   - component tests;
   - a web E2E flow: make a series from an event, see the next event appear, stop the series.

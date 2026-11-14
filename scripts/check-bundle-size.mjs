@@ -101,12 +101,16 @@
 // with its own copy; the business chunk gains the staff section and the invitation states. INITIAL unchanged (562 kB).
 // TOTAL 970 -> 972 (2026-11-13, ROADMAP P-23): the read-only Pano dashboard, summary parser, relative-age helper and
 // Turkish/English labels join the lazy AdminGate chunk (20 -> 22 kB). INITIAL stays 562 kB; no first-load code added.
+// TOTAL 972 -> 977 and INITIAL 562 -> 563 (2026-11-14, Phase 11 / M2, ADR-0032): recurring events. Making and stopping a
+// series, its organizer-only calls and its copy are one lazy chunk (`SeriesPanel`, 3.5 kB gzip with both languages);
+// measured on the same tree, main was 972 / 562. What everybody sees stays in the first load: the event page's "Her
+// hafta salı 20:00" line, the "Tekrarlanan" mark in My events, their read call and their few Turkish words (~0.7 kB).
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const TOTAL_RATCHET_KB = 972;
-const INITIAL_RATCHET_KB = 562;
+const TOTAL_RATCHET_KB = 977;
+const INITIAL_RATCHET_KB = 563;
 const MAP_RATCHET_KB = 290;
 const isMapChunk = (name) => name.startsWith('MapCanvas');
 const dir = process.argv[2] ?? 'apps/app/dist/_expo/static/js/web';

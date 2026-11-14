@@ -25,6 +25,14 @@ export function formatEventTime(iso: string, timeZone: string, locale: string): 
   );
 }
 
+/**
+ * A series' "HH:MM" (Turkey's local time, ADR-0032) in the app's time format. Turkey has kept +03:00 all year since
+ * 2016, so any day of that period carries the time.
+ */
+export function formatSeriesTime(time: string, locale: string): string {
+  return formatEventTime(`2024-01-01T${time}:00+03:00`, 'Europe/Istanbul', locale);
+}
+
 /** "Cumartesi, 31 Ekim" for a local calendar day (`YYYY-MM-DD`); noon UTC keeps every zone on that day. */
 export function formatDayHeading(date: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, {

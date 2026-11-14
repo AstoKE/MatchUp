@@ -53,6 +53,26 @@ describe('translation resources', () => {
     },
   );
 
+  // Copy that travels with a lazy chunk (addResourceBundle) is not in `resources`; hold it to the same parity.
+  it.each([
+    'admin',
+    'organizations',
+    'organization-invite',
+    'businesses',
+    'business-invite',
+    'event-series',
+  ])('lazily loaded "%s": tr and en have identical keys and placeholders', (file) => {
+    /* eslint-disable @typescript-eslint/no-require-imports -- a file per case; the JSON is the test's input */
+    const tr = flatten(require(`@/locales/tr/${file}.json`) as Json);
+    const en = flatten(require(`@/locales/en/${file}.json`) as Json);
+    /* eslint-enable @typescript-eslint/no-require-imports */
+    expect(Object.keys(en).sort()).toEqual(Object.keys(tr).sort());
+    for (const [key, text] of Object.entries(tr)) {
+      expect(text.trim().length).toBeGreaterThan(0);
+      expect(placeholders(en[key] ?? '')).toEqual(placeholders(text));
+    }
+  });
+
   it('no resource hard-codes the product name (ADR-0010)', () => {
     const all = JSON.stringify(resources);
     expect(all).not.toContain(brand.name);

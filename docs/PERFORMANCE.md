@@ -21,7 +21,7 @@ Sizes are gzip level 9 of the exported files. Per-package numbers are source-map
 
 | | gzip |
 |---|---|
-| TOTAL web JS | **972 kB** (2026-11-13, P-23: Pano and its copy add ~2 kB to the lazy AdminGate chunk; INITIAL unchanged at 562 kB; 1051 kB before the SVG tab icons; 1113 kB at the start of this work; 1400 kB was the Phase 1 ratchet) |
+| TOTAL web JS | **977 kB** (2026-11-14, Phase 11 M2: the lazy `SeriesPanel` chunk, 3.5 kB, and the series line and mark everybody sees; INITIAL 562 → 563 kB. 972 kB on 2026-11-13, P-23: Pano and its copy add ~2 kB to the lazy AdminGate chunk; INITIAL unchanged at 562 kB; 1051 kB before the SVG tab icons; 1113 kB at the start of this work; 1400 kB was the Phase 1 ratchet) |
 | INITIAL (`entry` 287 + `__common` 247 + runtime 4) | **~537 kB** |
 | route chunk `_layout` (tab bar) | 1 kB (was 149 kB with Ionicons) |
 | route chunk `index` (Sentry, lazy) | 373 kB |

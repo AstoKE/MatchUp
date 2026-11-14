@@ -19,6 +19,8 @@ const myRow = z.object({
   status: z.enum(EVENT_STATUSES),
   my_status: z.nullable(z.enum(MY_STATUSES)),
   pending_count: z.nullable(z.number()),
+  // Phase 11 / M2, optional for a hosted database without that migration.
+  in_series: z.optional(z.boolean()),
 });
 const pageRow = z.object({
   items: z.array(myRow),
@@ -31,6 +33,8 @@ export interface MyEventItem extends EventListItem {
   myStatus: MyStatus | null;
   /** Organizer only: open join requests awaiting a decision. */
   pendingCount: number | null;
+  /** The event belongs to a series (ADR-0032). */
+  inSeries: boolean;
 }
 export interface MyEventsPage {
   items: MyEventItem[];
@@ -53,6 +57,7 @@ export async function fetchMyEvents(
       status: row.status,
       myStatus: row.my_status,
       pendingCount: row.pending_count,
+      inSeries: row.in_series ?? false,
     })),
     nextCursor: page.next_cursor,
   };

@@ -22,6 +22,7 @@ jest.mock('./src/features/events/components/LazyPanels', () => ({
   LazyAttendancePanel: jest.requireActual('./src/features/events/components/AttendancePanel')
     .AttendancePanel,
   LazyReviewPanel: jest.requireActual('./src/features/events/components/ReviewPanel').ReviewPanel,
+  LazySeriesPanel: jest.requireActual('./src/features/events/components/SeriesPanel').SeriesPanel,
 }));
 jest.mock('./src/features/events/components/LazyEventsMap', () => ({
   LazyEventsMap: jest.requireActual('./src/features/events/components/EventsMap').EventsMap,

@@ -16,6 +16,7 @@ import {
 } from './api/participation-api';
 import { fetchEventReviews, submitReviews } from './api/reviews-api';
 import { searchEvents, type SearchCursor } from './api/search-api';
+import { fetchEventSeries } from './api/series-api';
 import { searchVenues, suggestVenue, type VenueFilters } from './api/venues-api';
 import {
   cancelEvent,
@@ -229,6 +230,14 @@ export function useEventOrganization(id: string) {
   return useQuery({
     queryKey: [...eventQueryKey(id), 'organization'],
     queryFn: () => fetchEventOrganization(id),
+  });
+}
+
+/** Phase 11 / M2: the series an event belongs to (null when none or not visible). */
+export function useEventSeries(eventId: string) {
+  return useQuery({
+    queryKey: [...eventQueryKey(eventId), 'series'],
+    queryFn: () => fetchEventSeries(eventId),
   });
 }
 

@@ -90,7 +90,7 @@ Dependencies refer to feature IDs. "AC" = acceptance criteria (abbreviated; expa
 | P-02 | QR / geo check-in for attendance | P2 | Strengthens trust root (R-5) |
 | P-03 | Event chat / participant messaging | P2 | Moderation load; replaces WhatsApp links |
 | P-04 | Teams, friends, invitations (Community tab) | P2 | New tables per DATABASE §4. Teams as organizations: see §3.3, P-16 |
-| P-05 | Recurring events | P2 | **Phase 11 (ADR-0032, PHASE11_PLAN), founder's decisions 2026-11-14:** weekly or fortnightly, opened two weeks ahead, players join each event, changes reach only events not opened yet. **M1 (database) built.** |
+| P-05 | Recurring events | P2 | **Phase 11 (ADR-0032, PHASE11_PLAN), founder's decisions 2026-11-14:** weekly or fortnightly, opened two weeks ahead, players join each event, changes reach only events not opened yet. **M1 (database) and M2 (app) built.** |
 | P-06 | Recommendations ("players like you", events) | P3 | needs data volume |
 | P-07 | Organizations, partner verification, partner events | P3 | enables `event_type = PARTNER`; detailed in §3.3 (P-16, P-17) |
 | P-08 | Venue operator tools, availability, booking requests | P3 | needs business accounts first: §3.3 (P-18, P-19) |

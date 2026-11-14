@@ -1,6 +1,7 @@
--- Phase 11 / M1 (ADR-0032): recurring events. Making a series, what the job opens, stopping, limits, export and purge.
+-- Phase 11 / M1–M2 (ADR-0032): recurring events. Making a series, what the job opens, stopping, limits, export and purge,
+-- and what the app shows of a series.
 begin;
-select plan(32);
+select plan(36);
 
 create function pg_temp.act_as(p_uid uuid)
 returns void language plpgsql as $$
@@ -102,9 +103,15 @@ select throws_ok(format('select public.stop_event_series(%L)', pg_temp.id('s1'))
 select is(public.get_event_series(pg_temp.id('weekly')) ->> 'interval_weeks', '1', 'a player sees that a public event repeats');
 select ok(public.get_event_series(pg_temp.id('weekly')) -> 'next_at' = 'null'::jsonb
           and not (public.get_event_series(pg_temp.id('weekly')) ->> 'is_mine')::boolean, 'but not the organizer''s details');
+select is(public.get_event_series(pg_temp.id('weekly')) ->> 'local_time', '20:00', 'everyone sees the local time it repeats at');
+select is((public.get_event_series(pg_temp.id('weekly')) ->> 'weekday')::int,
+  extract(isodow from (now() at time zone 'Europe/Istanbul')::date + 1)::int, 'and the weekday');
 select pg_temp.act_as(pg_temp.u(1));
 select ok(public.get_event_series(pg_temp.id('weekly')) ->> 'next_at' is not null, 'the organizer sees the next start');
 select is(jsonb_array_length(public.list_my_event_series()), 2, 'and lists their series');
+select is((select count(*) filter (where (i ->> 'in_series')::boolean) || '/' || count(*)
+             from jsonb_array_elements(public.list_my_events('ORGANIZING') -> 'items') i), '3/5',
+  'my events marks the events of a series (two in the weekly one, one in the fortnightly one)');
 
 -- A canceled week stays canceled; a full calendar skips a week, not the series.
 select public.cancel_event(pg_temp.id('next'), 'OTHER');
@@ -127,6 +134,8 @@ select is((select status || '|' || stopped_reason from public.event_series where
   'the organizer stops a series');
 select is((select count(*) from public.events where series_id = pg_temp.id('s1') and status = 'PUBLISHED'), 1::bigint,
   'and the event already opened stays');
+select ok(public.get_event_series(pg_temp.id('weekly')) -> 'weekday' = 'null'::jsonb,
+  'a stopped series no longer says when it repeats');
 update public.event_series set template = template || '{"capacity": 999}'::jsonb where id = pg_temp.id('s2');
 select private.open_series(pg_temp.id('s2'));
 select is((select stopped_reason from public.event_series where id = pg_temp.id('s2')), 'DETAILS_INVALID',
