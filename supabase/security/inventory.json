@@ -169,6 +169,14 @@
       "guard": "auth.uid()"
     },
     {
+      "fn": "private.can_organize(p_uid uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.can_read_avatar(p_name text)",
       "definer": true,
       "search_path_empty": true,
@@ -265,6 +273,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.event_series_before_update()",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.events_before_write()",
       "definer": false,
       "search_path_empty": true,
@@ -329,6 +345,14 @@
       "guard": "none"
     },
     {
+      "fn": "private.export_series_data(p_uid uuid)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.finalize_event_row(p_event uuid)",
       "definer": true,
       "search_path_empty": true,
@@ -354,6 +378,14 @@
     },
     {
       "fn": "private.handle_new_user()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.insert_event(p_uid uuid, p_client_request_id uuid, r private.event_input, p_series uuid)",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
@@ -514,6 +546,22 @@
     },
     {
       "fn": "private.notify(p_user uuid, p_type text, p_payload jsonb, p_dedupe text)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.open_series(p_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.open_series_events()",
       "definer": true,
       "search_path_empty": true,
       "anon": false,
@@ -817,6 +865,22 @@
       "guard": "none"
     },
     {
+      "fn": "private.series_step(p_at timestamp with time zone, p_weeks smallint)",
+      "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.series_template(p_event uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
       "fn": "private.set_push_consent(p_uid uuid, p_kind consent_kind, p_granted boolean)",
       "definer": true,
       "search_path_empty": true,
@@ -859,6 +923,14 @@
     {
       "fn": "private.snap_point(p geography)",
       "definer": false,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": false,
+      "guard": "none"
+    },
+    {
+      "fn": "private.stop_series(p_id uuid, p_reason text)",
+      "definer": true,
       "search_path_empty": true,
       "anon": false,
       "authenticated": false,
@@ -1265,6 +1337,14 @@
       "guard": "private.assert_onboarded_user"
     },
     {
+      "fn": "public.create_event_series(p_event_id uuid, p_interval_weeks integer)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_onboarded_user"
+    },
+    {
       "fn": "public.decide_organization_request(p_org uuid, p_user uuid, p_accept boolean)",
       "definer": true,
       "search_path_empty": true,
@@ -1335,6 +1415,14 @@
       "anon": false,
       "authenticated": true,
       "guard": "private.assert_onboarded_user"
+    },
+    {
+      "fn": "public.get_event_series(p_event_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "auth.uid()"
     },
     {
       "fn": "public.get_my_account()",
@@ -1447,6 +1535,14 @@
       "anon": false,
       "authenticated": true,
       "guard": "auth.uid()"
+    },
+    {
+      "fn": "public.list_my_event_series()",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_active_verified_user"
     },
     {
       "fn": "public.list_my_events(p_bucket text, p_cursor jsonb, p_limit integer)",
@@ -1729,6 +1825,14 @@
       "guard": "private.assert_onboarded_user"
     },
     {
+      "fn": "public.stop_event_series(p_series_id uuid)",
+      "definer": true,
+      "search_path_empty": true,
+      "anon": false,
+      "authenticated": true,
+      "guard": "private.assert_active_verified_user"
+    },
+    {
       "fn": "public.submit_feedback(p_kind text, p_body text, p_context text)",
       "definer": true,
       "search_path_empty": true,
@@ -1979,6 +2083,13 @@
       "authenticated": [
         "SELECT"
       ]
+    },
+    {
+      "table": "public.event_series",
+      "rls": true,
+      "policies": [],
+      "anon": [],
+      "authenticated": []
     },
     {
       "table": "public.events",
